@@ -44,9 +44,8 @@ public abstract class BaseAutoDeployListener implements AutoDeployListener {
 		String fileName = file.getName();
 
 		if (isMatchingFile(file, "WEB-INF/liferay-hook.xml") &&
-			!isMatchingFile(file, "WEB-INF/liferay-portlet.xml") &&
-			!fileName.contains("-theme") && !fileName.contains("-web") &&
-			!isJarFile(file)) {
+			!isPortletPlugin(file) && !isThemePlugin(file) &&
+			!isWebPlugin(file)) {
 
 			return true;
 		}
@@ -58,7 +57,7 @@ public abstract class BaseAutoDeployListener implements AutoDeployListener {
 		throws AutoDeployException {
 
 		if (isMatchingFile(file, "WEB-INF/liferay-layout-templates.xml") &&
-			!isThemePlugin(file)) {
+			!isPortletPlugin(file) && !isThemePlugin(file)) {
 
 			return true;
 		}
@@ -140,10 +139,30 @@ public abstract class BaseAutoDeployListener implements AutoDeployListener {
 		return false;
 	}
 
-	public boolean isThemePlugin(File file) throws AutoDeployException {
-		if (isMatchingFile(file, "WEB-INF/liferay-look-and-feel.xml") &&
-			!isJarFile(file)) {
+	public boolean isPortletPlugin(File file) throws AutoDeployException {
+		if (isMatchingFile(
+				file, "WEB-INF/" + Portal.PORTLET_XML_FILE_NAME_STANDARD)) {
 
+			return true;
+		}
+
+		if (isMatchingFile(file, "WEB-INF/liferay-portlet.xml")) {
+			return true;
+		}
+
+		if (isMatchingFile(file, "index_mvc.jsp")) {
+			return true;
+		}
+
+		if (isMatchingFile(file, "index.php")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isThemePlugin(File file) throws AutoDeployException {
+		if (isMatchingFile(file, "WEB-INF/liferay-look-and-feel.xml")) {
 			return true;
 		}
 
@@ -162,7 +181,7 @@ public abstract class BaseAutoDeployListener implements AutoDeployListener {
 		String fileName = file.getName();
 
 		if (isMatchingFile(file, "WEB-INF/liferay-plugin-package.properties") &&
-			fileName.contains("-web") && !isJarFile(file)) {
+			fileName.contains("-web")) {
 
 			return true;
 		}
