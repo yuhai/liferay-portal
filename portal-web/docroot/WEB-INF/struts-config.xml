@@ -35,8 +35,6 @@
 
 		<action path="/portal/extend_session" forward="/portal/extend_session.jsp" />
 
-		<action path="/portal/fckeditor" type="com.liferay.portal.editor.fckeditor.ConnectorAction" />
-
 		<action path="/portal/flash" forward="/portal/flash.jsp" />
 
 		<action path="/portal/j_login" forward="/portal/j_login.jsp" />
@@ -910,10 +908,6 @@
 		</action>
 
 		<action path="/journal/rss" type="com.liferay.portlet.journal.action.RSSAction" />
-
-		<action path="/journal/search" type="com.liferay.portlet.journal.action.SearchAction">
-			<forward name="portlet.journal.view" path="portlet.journal.view" />
-		</action>
 
 		<action path="/journal/select_display_page" type="com.liferay.portlet.layoutsadmin.action.EditLayoutsAction" />
 
