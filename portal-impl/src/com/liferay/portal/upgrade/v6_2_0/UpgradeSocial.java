@@ -24,18 +24,13 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
 import com.liferay.portlet.journal.model.JournalArticle;
-import com.liferay.portlet.wiki.model.WikiPage;
-import com.liferay.portlet.wiki.social.WikiActivityKeys;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -131,60 +126,72 @@ public class UpgradeSocial extends UpgradeProcess {
 	}
 
 	protected void updateDLFileVersionActivities() throws Exception {
-		long classNameId = PortalUtil.getClassNameId(DLFileEntry.class);
-
-		runSQL("delete from SocialActivity where classNameId = " + classNameId);
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		Connection con1 = null;
+		Connection con2 = null;
+		Connection con3 = null;
+		PreparedStatement ps1 = null;
+		PreparedStatement ps2 = null;
+		PreparedStatement ps3 = null;
+		ResultSet rs1 = null;
+		ResultSet rs2 = null;
+		ResultSet rs3 = null;
 
 		try {
-			Set<String> keys = new HashSet<String>();
+			con1 = DataAccess.getUpgradeOptimizedConnection();
+			con2 = DataAccess.getUpgradeOptimizedConnection();
+			con3 = DataAccess.getUpgradeOptimizedConnection();
 
-			con = DataAccess.getUpgradeOptimizedConnection();
+			ps1 = con1.prepareStatement(
+				"select DISTINCT fileEntryId from DLFileVersion");
 
-			ps = con.prepareStatement(
-				"select groupId, companyId, userId, modifiedDate, " +
-					"fileEntryId, title, version from DLFileVersion " +
-						"where status = ?");
+			rs1 = ps1.executeQuery();
 
-			ps.setInt(1, WorkflowConstants.STATUS_APPROVED);
+			while (rs1.next()) {
+				long fileEntryId = rs1.getLong("fileEntryId");
 
-			rs = ps.executeQuery();
+				ps2 = con2.prepareStatement(
+					"select title from DLFileVersion where fileEntryId " +
+						"= ? and status = ? order by fileVersionId asc");
 
-			while (rs.next()) {
-				long groupId = rs.getLong("groupId");
-				long companyId = rs.getLong("companyId");
-				long userId = rs.getLong("userId");
-				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
-				long fileEntryId = rs.getLong("fileEntryId");
-				String title = rs.getString("title");
-				double version = rs.getDouble("version");
+				ps2.setLong(1, fileEntryId);
+				ps2.setInt(2, WorkflowConstants.STATUS_APPROVED);
 
-				int type = DLActivityKeys.ADD_FILE_ENTRY;
+				rs2 = ps2.executeQuery();
 
-				if (version > 1.0) {
-					type = DLActivityKeys.UPDATE_FILE_ENTRY;
+				ps3 = con3.prepareStatement(
+						"select activityId from SocialActivity where " +
+							"classPK = ? order by activityId asc");
+
+				ps3.setLong(1, fileEntryId);
+
+				rs3 = ps3.executeQuery();
+
+				while (rs2.next() && rs3.next()) {
+					String title = rs2.getString("title");
+					long activityId = rs3.getInt("activityId");
+
+					JSONObject extraDataJSONObject =
+						JSONFactoryUtil.createJSONObject();
+
+					extraDataJSONObject.put("title", title);
+
+					StringBundler sb = new StringBundler(6);
+
+					sb.append("update SocialActivity set extraData = ");
+					sb.append("'");
+					sb.append(extraDataJSONObject.toString());
+					sb.append("'");
+					sb.append(" where activityId = ");
+					sb.append(String.valueOf(activityId));
+
+					runSQL(sb.toString());
 				}
-
-				modifiedDate = getUniqueModifiedDate(
-					keys, groupId, userId, modifiedDate, classNameId,
-					fileEntryId, type);
-
-				JSONObject extraDataJSONObject =
-					JSONFactoryUtil.createJSONObject();
-
-				extraDataJSONObject.put("title", title);
-
-				addActivity(
-					increment(), groupId, companyId, userId, modifiedDate, 0,
-					classNameId, fileEntryId, type,
-					extraDataJSONObject.toString(), 0);
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(con1, ps1, rs1);
+			DataAccess.cleanUp(con2, ps2, rs2);
+			DataAccess.cleanUp(con3, ps3, rs3);
 		}
 	}
 
@@ -247,56 +254,75 @@ public class UpgradeSocial extends UpgradeProcess {
 	}
 
 	protected void updateWikiPageActivities() throws Exception {
-		long classNameId = PortalUtil.getClassNameId(WikiPage.class);
-
-		runSQL("delete from SocialActivity where classNameId = " + classNameId);
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		Connection con1 = null;
+		Connection con2 = null;
+		Connection con3 = null;
+		PreparedStatement ps1 = null;
+		PreparedStatement ps2 = null;
+		PreparedStatement ps3 = null;
+		ResultSet rs1 = null;
+		ResultSet rs2 = null;
+		ResultSet rs3 = null;
 
 		try {
-			Set<String> keys = new HashSet<String>();
+			con1 = DataAccess.getUpgradeOptimizedConnection();
+			con2 = DataAccess.getUpgradeOptimizedConnection();
+			con3 = DataAccess.getUpgradeOptimizedConnection();
 
-			con = DataAccess.getUpgradeOptimizedConnection();
+			ps1 = con1.prepareStatement(
+				"select DISTINCT resourcePrimKey from WikiPage");
 
-			ps = con.prepareStatement(
-				"select groupId, companyId, userId, modifiedDate, " +
-					"resourcePrimKey, version from WikiPage");
+			rs1 = ps1.executeQuery();
 
-			rs = ps.executeQuery();
+			while (rs1.next()) {
+				long resourcePrimKey = rs1.getLong("resourcePrimKey");
 
-			while (rs.next()) {
-				long groupId = rs.getLong("groupId");
-				long companyId = rs.getLong("companyId");
-				long userId = rs.getLong("userId");
-				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
-				long resourcePrimKey = rs.getLong("resourcePrimKey");
-				double version = rs.getDouble("version");
+				ps2 = con2.prepareStatement(
+					"select title, version from WikiPage where " +
+						"resourcePrimKey= ? and status = ? " +
+							"order by pageId asc");
 
-				int type = WikiActivityKeys.ADD_PAGE;
+				ps2.setLong(1, resourcePrimKey);
+				ps2.setInt(2, WorkflowConstants.STATUS_APPROVED);
 
-				if (version > 1.0) {
-					type = WikiActivityKeys.UPDATE_PAGE;
+				rs2 = ps2.executeQuery();
+
+				ps3 = con3.prepareStatement(
+						"select activityId from SocialActivity where " +
+							"classPK = ? order by activityId asc");
+
+				ps3.setLong(1, resourcePrimKey);
+
+				rs3 = ps3.executeQuery();
+
+				while (rs2.next() && rs3.next()) {
+					long activityId = rs3.getInt("activityId");
+					String title = rs2.getString("title");
+					double version = rs2.getDouble("version");
+
+					JSONObject extraDataJSONObject =
+						JSONFactoryUtil.createJSONObject();
+
+					extraDataJSONObject.put("title", title);
+					extraDataJSONObject.put("version", version);
+
+					StringBundler sb = new StringBundler(6);
+
+					sb.append("update SocialActivity set extraData = ");
+					sb.append("'");
+					sb.append(extraDataJSONObject.toString());
+					sb.append("'");
+					sb.append(" where activityId = ");
+					sb.append(String.valueOf(activityId));
+
+					runSQL(sb.toString());
 				}
-
-				modifiedDate = getUniqueModifiedDate(
-					keys, groupId, userId, modifiedDate, classNameId,
-					resourcePrimKey, type);
-
-				JSONObject extraDataJSONObject =
-					JSONFactoryUtil.createJSONObject();
-
-				extraDataJSONObject.put("version", version);
-
-				addActivity(
-					increment(), groupId, companyId, userId, modifiedDate, 0,
-					classNameId, resourcePrimKey, type,
-					extraDataJSONObject.toString(), 0);
 			}
 		}
 		finally {
-			DataAccess.cleanUp(con, ps, rs);
+			DataAccess.cleanUp(con1, ps1, rs1);
+			DataAccess.cleanUp(con2, ps2, rs2);
+			DataAccess.cleanUp(con3, ps3, rs3);
 		}
 	}
 
