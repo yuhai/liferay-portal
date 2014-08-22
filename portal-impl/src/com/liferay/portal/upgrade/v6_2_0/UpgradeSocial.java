@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -29,9 +28,6 @@ import com.liferay.portlet.journal.model.JournalArticle;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
-
-import java.util.Set;
 
 /**
  * @author Sergio Sanchez
@@ -39,90 +35,12 @@ import java.util.Set;
  */
 public class UpgradeSocial extends UpgradeProcess {
 
-	protected void addActivity(
-			long activityId, long groupId, long companyId, long userId,
-			Timestamp createDate, long mirrorActivityId, long classNameId,
-			long classPK, int type, String extraData, long receiverUserId)
-		throws Exception {
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			StringBundler sb = new StringBundler(5);
-
-			sb.append("insert into SocialActivity (activityId, groupId, ");
-			sb.append("companyId, userId, createDate, mirrorActivityId, ");
-			sb.append("classNameId, classPK, type_, extraData, ");
-			sb.append("receiverUserId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ");
-			sb.append("?)");
-
-			ps = con.prepareStatement(sb.toString());
-
-			ps.setLong(1, activityId);
-			ps.setLong(2, groupId);
-			ps.setLong(3, companyId);
-			ps.setLong(4, userId);
-			ps.setLong(5, createDate.getTime());
-			ps.setLong(6, mirrorActivityId);
-			ps.setLong(7, classNameId);
-			ps.setLong(8, classPK);
-			ps.setInt(9, type);
-			ps.setString(10, extraData);
-			ps.setLong(11, receiverUserId);
-
-			ps.executeUpdate();
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to add activity " + activityId, e);
-			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
-		}
-	}
-
 	@Override
 	protected void doUpgrade() throws Exception {
 		updateDLFileVersionActivities();
 		updateJournalActivities();
 		updateSOSocialActivities();
 		updateWikiPageActivities();
-	}
-
-	protected Timestamp getUniqueModifiedDate(
-		Set<String> keys, long groupId, long userId, Timestamp modifiedDate,
-		long classNameId, long resourcePrimKey, double type) {
-
-		while (true) {
-			StringBundler sb = new StringBundler(11);
-
-			sb.append(groupId);
-			sb.append(StringPool.DASH);
-			sb.append(userId);
-			sb.append(StringPool.DASH);
-			sb.append(modifiedDate);
-			sb.append(StringPool.DASH);
-			sb.append(classNameId);
-			sb.append(StringPool.DASH);
-			sb.append(resourcePrimKey);
-			sb.append(StringPool.DASH);
-			sb.append(type);
-
-			String key = sb.toString();
-
-			modifiedDate = new Timestamp(modifiedDate.getTime() + 1);
-
-			if (!keys.contains(key)) {
-				keys.add(key);
-
-				return modifiedDate;
-			}
-		}
 	}
 
 	protected void updateDLFileVersionActivities() throws Exception {
