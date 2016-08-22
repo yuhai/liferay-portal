@@ -14,6 +14,8 @@
 
 package com.liferay.bookmarks.verify;
 
+import com.liferay.bookmarks.internal.verify.model.BookmarksEntryVerifiableModel;
+import com.liferay.bookmarks.internal.verify.model.BookmarksFolderVerifiableModel;
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksEntryLocalService;
@@ -23,6 +25,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.verify.VerifyProcess;
+import com.liferay.portal.verify.VerifyResourceBlock;
 
 import java.util.List;
 
@@ -44,6 +47,7 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 	protected void doVerify() throws Exception {
 		updateEntryAssets();
 		updateFolderAssets();
+		verifyResourcedModels();
 		verifyTree();
 	}
 
@@ -121,6 +125,13 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 		}
 	}
 
+	protected void verifyResourcedModels() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			_verifyResourceBlock.verify(new BookmarksEntryVerifiableModel());
+			_verifyResourceBlock.verify(new BookmarksFolderVerifiableModel());
+		}
+	}
+
 	protected void verifyTree() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			long[] companyIds = PortalInstances.getCompanyIdsBySQL();
@@ -136,5 +147,7 @@ public class BookmarksServiceVerifyProcess extends VerifyProcess {
 
 	private BookmarksEntryLocalService _bookmarksEntryLocalService;
 	private BookmarksFolderLocalService _bookmarksFolderLocalService;
+	private final VerifyResourceBlock _verifyResourceBlock =
+		new VerifyResourceBlock();
 
 }
