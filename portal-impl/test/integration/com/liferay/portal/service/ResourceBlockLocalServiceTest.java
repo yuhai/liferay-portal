@@ -17,10 +17,18 @@ package com.liferay.portal.service;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PermissionedModel;
+import com.liferay.portal.kernel.model.ResourceBlock;
 import com.liferay.portal.kernel.model.ResourceBlockPermissionsContainer;
 import com.liferay.portal.kernel.service.ResourceBlockLocalServiceUtil;
+import com.liferay.portal.kernel.service.persistence.ResourceBlockUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionDefinition;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.test.rule.ExpectedDBType;
 import com.liferay.portal.test.rule.ExpectedLog;
 import com.liferay.portal.test.rule.ExpectedLogs;
@@ -286,6 +294,92 @@ public class ResourceBlockLocalServiceTest {
 			permissionedModel.getResourceBlockId(), _REFERENCE_COUNT);
 	}
 
+	@Test
+	public void testRollbackRelease() throws Throwable {
+		final PermissionedModel permissionedModel = new MockPermissionedModel();
+
+		ResourceBlockPermissionsContainer resourceBlockPermissionsContainer =
+			new ResourceBlockPermissionsContainer();
+
+		resourceBlockPermissionsContainer.addPermission(_ROLE_ID, _ACTION_IDS);
+
+		ResourceBlock resourceBlock =
+			ResourceBlockLocalServiceUtil.updateResourceBlockId(
+				_COMPANY_ID, _GROUP_ID, _MODEL_NAME, permissionedModel,
+				resourceBlockPermissionsContainer.getPermissionsHash(),
+				resourceBlockPermissionsContainer);
+
+		Assert.assertEquals(1, resourceBlock.getReferenceCount());
+
+		TransactionConfig transactionConfig = TransactionConfig.Factory.create(
+			Isolation.DEFAULT, Propagation.REQUIRED, false,
+			TransactionDefinition.TIMEOUT_DEFAULT,
+			new Class[] {SystemException.class},
+			new String[] {SystemException.class.getName()}, new Class[0],
+			StringPool.EMPTY_ARRAY);
+
+		try {
+			TransactionInvokerUtil.invoke(
+				transactionConfig,
+				new Callable<Void>() {
+
+					public Void call() throws Exception {
+						ResourceBlockLocalServiceUtil.
+							releasePermissionedModelResourceBlock(
+								permissionedModel);
+
+						throw new SystemException(
+							ResourceBlockLocalServiceTest.class.getName());
+					}
+
+				});
+		}
+		catch (SystemException se) {
+			Assert.assertEquals(
+				ResourceBlockLocalServiceTest.class.getName(), se.getMessage());
+		}
+
+		ResourceBlockUtil.clearCache(resourceBlock);
+
+		resourceBlock = ResourceBlockLocalServiceUtil.fetchResourceBlock(
+			resourceBlock.getResourceBlockId());
+
+		Assert.assertNotNull(resourceBlock);
+		Assert.assertEquals(1, resourceBlock.getReferenceCount());
+	}
+
+	@Test
+	public void testRollbackRetain() throws Throwable {
+		TransactionConfig transactionConfig = TransactionConfig.Factory.create(
+			Isolation.DEFAULT, Propagation.REQUIRED, false,
+			TransactionDefinition.TIMEOUT_DEFAULT,
+			new Class[] {SystemException.class},
+			new String[] {SystemException.class.getName()}, new Class[0],
+			StringPool.EMPTY_ARRAY);
+
+		TransactionRollbackCallable transactionRollbackCallable =
+			new TransactionRollbackCallable();
+
+		try {
+			TransactionInvokerUtil.invoke(
+				transactionConfig, transactionRollbackCallable);
+		}
+		catch (SystemException se) {
+			Assert.assertEquals(
+				ResourceBlockLocalServiceTest.class.getName(), se.getMessage());
+		}
+
+		ResourceBlock resourceBlock =
+			transactionRollbackCallable.getResourceBlock();
+
+		ResourceBlockUtil.clearCache(resourceBlock);
+
+		resourceBlock = ResourceBlockLocalServiceUtil.fetchResourceBlock(
+			resourceBlock.getResourceBlockId());
+
+		Assert.assertNull(resourceBlock);
+	}
+
 	private void _addResourceBlock(long resourceBlockId, long referenceCount)
 		throws Exception {
 
@@ -422,6 +516,36 @@ public class ResourceBlockLocalServiceTest {
 
 		private final PermissionedModel _permissionedModel;
 		private final Semaphore _semaphore;
+
+	}
+
+	private static class TransactionRollbackCallable implements Callable<Void> {
+
+		public Void call() throws Exception {
+			PermissionedModel permissionedModel = new MockPermissionedModel();
+
+			ResourceBlockPermissionsContainer
+				resourceBlockPermissionsContainer =
+					new ResourceBlockPermissionsContainer();
+
+			resourceBlockPermissionsContainer.addPermission(
+				_ROLE_ID, _ACTION_IDS);
+
+			_resourceBlock =
+				ResourceBlockLocalServiceUtil.updateResourceBlockId(
+					_COMPANY_ID, _GROUP_ID, _MODEL_NAME, permissionedModel,
+					resourceBlockPermissionsContainer.getPermissionsHash(),
+					resourceBlockPermissionsContainer);
+
+			throw new SystemException(
+				ResourceBlockLocalServiceTest.class.getName());
+		}
+
+		public ResourceBlock getResourceBlock() {
+			return _resourceBlock;
+		}
+
+		private ResourceBlock _resourceBlock;
 
 	}
 
