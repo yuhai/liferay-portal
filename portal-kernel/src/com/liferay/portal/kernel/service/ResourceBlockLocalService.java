@@ -343,6 +343,7 @@ public interface ResourceBlockLocalService extends BaseLocalService,
 	public void releasePermissionedModelResourceBlock(
 		PermissionedModel permissionedModel);
 
+	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
 	public void releasePermissionedModelResourceBlock(java.lang.String name,
 		long primKey) throws PortalException;
 

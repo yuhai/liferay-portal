@@ -428,6 +428,10 @@ public class ResourceBlockLocalServiceImpl
 	}
 
 	@Override
+	@Transactional(
+		isolation = Isolation.READ_COMMITTED,
+		propagation = Propagation.REQUIRES_NEW
+	)
 	public void releasePermissionedModelResourceBlock(String name, long primKey)
 		throws PortalException {
 
