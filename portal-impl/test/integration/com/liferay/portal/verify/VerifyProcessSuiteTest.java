@@ -15,6 +15,8 @@
 package com.liferay.portal.verify;
 
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.Sync;
+import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.verify.test.BaseVerifyProcessTestCase;
 
@@ -24,12 +26,15 @@ import org.junit.Rule;
 /**
  * @author Manuel de la Peña
  */
+@Sync
 public class VerifyProcessSuiteTest extends BaseVerifyProcessTestCase {
 
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Override
 	protected VerifyProcess getVerifyProcess() {
