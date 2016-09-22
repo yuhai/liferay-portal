@@ -5591,10 +5591,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 	</target>
 
 	<target name="prepare-portal-properties">
-		<execute>
-			<![CDATA[git checkout -- portal-impl/src/portal.properties]]>
-		</execute>
-
 		<replace file="portal-impl/src/portal.properties">
 			<replacefilter
 				token="#upgrade.processes="
@@ -7852,18 +7848,6 @@ if (ppstate.equals("normal")) {
 				value="${value}"
 			/>
 		</replace>
-	</target>
-
-	<target name="revert-test-properties">
-		<execute>
-			<![CDATA[git checkout -- portal-impl/test/portal-test.properties]]>
-		</execute>
-
-		<delete failonerror="false" file="portal-impl/test/portal-test-ext.properties" />
-
-		<execute>
-			<![CDATA[git checkout -- portal-web/test/test-portal-web.properties]]>
-		</execute>
 	</target>
 
 	<target name="run-poshi-evaluate-console">

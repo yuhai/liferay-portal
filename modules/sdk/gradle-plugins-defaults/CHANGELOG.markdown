@@ -236,9 +236,29 @@ directory instead of the root project directory. Doing this lets submodules like
 ### Changed
 - [LPS-68131]: Update the [Liferay Gradle Plugins] dependency to version 2.0.35.
 
+## 1.2.24 - 2016-09-20
+
+### Changed
+- [LPS-67352]: Update the [Liferay Gradle Plugins] dependency to version 2.0.36.
+- [LPS-68230]: Configure [Liferay Gradle Plugins Node] to use version 6.6.0 of
+Node.js.
+
+### Removed
+- [LPS-68230]: In order to reduce the number of plugins applied to a project and
+thus improve performance, plugins in
+`com.liferay.gradle.plugins.defaults.internal` are no longer applied via
+`apply plugin`.
+
+## 1.2.25 - 2016-09-20
+
+### Changed
+- [LPS-66906]: Update the [Liferay Gradle Plugins] dependency to version 2.0.37.
+
 [Liferay Gradle Plugins]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins
+[Liferay Gradle Plugins Node]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins-node
 [LPS-61099]: https://issues.liferay.com/browse/LPS-61099
 [LPS-66853]: https://issues.liferay.com/browse/LPS-66853
+[LPS-66906]: https://issues.liferay.com/browse/LPS-66906
 [LPS-67023]: https://issues.liferay.com/browse/LPS-67023
 [LPS-67352]: https://issues.liferay.com/browse/LPS-67352
 [LPS-67658]: https://issues.liferay.com/browse/LPS-67658
@@ -251,5 +271,6 @@ directory instead of the root project directory. Doing this lets submodules like
 [LPS-68009]: https://issues.liferay.com/browse/LPS-68009
 [LPS-68014]: https://issues.liferay.com/browse/LPS-68014
 [LPS-68131]: https://issues.liferay.com/browse/LPS-68131
+[LPS-68230]: https://issues.liferay.com/browse/LPS-68230
 [LRDOCS-2841]: https://issues.liferay.com/browse/LRDOCS-2841
 [LRDOCS-2981]: https://issues.liferay.com/browse/LRDOCS-2981
