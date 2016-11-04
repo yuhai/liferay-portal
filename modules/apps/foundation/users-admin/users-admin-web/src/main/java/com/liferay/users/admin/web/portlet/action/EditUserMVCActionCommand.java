@@ -781,22 +781,36 @@ public class EditUserMVCActionCommand extends BaseMVCActionCommand {
 			boolean privateLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
 				actionRequest, "privateLayoutSetPrototypeLinkEnabled");
 
-			LayoutSet publicLayoutSet = _layoutSetLocalService.getLayoutSet(
-				group.getGroupId(), false);
-			LayoutSet privateLayoutSet = _layoutSetLocalService.getLayoutSet(
-				group.getGroupId(), true);
+			if (publicLayoutSetPrototypeId == 0) {
+				try {
+					LayoutSet publicLayoutSet =
+						_layoutSetLocalService.getLayoutSet(
+							group.getGroupId(), false);
 
-			String publicLayoutSetPrototypeUuid =
-				publicLayoutSet.getLayoutSetPrototypeUuid();
-			String privateLayoutSetPrototypeUuid =
-				privateLayoutSet.getLayoutSetPrototypeUuid();
+					publicLayoutSetPrototypeId =
+						publicLayoutSet.getLayoutSetPrototypeId();
+				}
+				catch (Exception e) {
+				}
+			}
+
+			if (privateLayoutSetPrototypeId == 0) {
+				try {
+					LayoutSet privateLayoutSet =
+						_layoutSetLocalService.getLayoutSet(
+							group.getGroupId(), true);
+
+					privateLayoutSetPrototypeId =
+						privateLayoutSet.getLayoutSetPrototypeId();
+				}
+				catch (Exception e) {
+				}
+			}
 
 			if (hasGroupUpdatePermission &&
 				hasUnlinkLayoutSetPrototypePermission &&
 				((publicLayoutSetPrototypeId > 0) ||
-				 (privateLayoutSetPrototypeId > 0) ||
-				 Validator.isNotNull(publicLayoutSetPrototypeUuid) ||
-				 Validator.isNotNull(privateLayoutSetPrototypeUuid))) {
+				 (privateLayoutSetPrototypeId > 0))) {
 
 				SitesUtil.updateLayoutSetPrototypesLinks(
 					group, publicLayoutSetPrototypeId,
