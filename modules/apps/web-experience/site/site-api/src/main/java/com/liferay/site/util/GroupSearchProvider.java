@@ -80,7 +80,8 @@ public class GroupSearchProvider {
 		if (!searchTerms.hasSearchTerms() &&
 			isFilterManageableGroups(portletRequest) && (parentGroupId <= 0)) {
 
-			List<Group> groups = getAllGroups(portletRequest);
+			List<Group> groups = getAllGroups(
+				portletRequest, groupSearch.getEnd());
 
 			groupSearch.setTotal(groups.size());
 
@@ -127,7 +128,7 @@ public class GroupSearchProvider {
 		return groupSearch;
 	}
 
-	protected List<Group> getAllGroups(PortletRequest portletRequest)
+	protected List<Group> getAllGroups(PortletRequest portletRequest, int max)
 		throws PortalException {
 
 		List<Group> groups = new ArrayList<>();
@@ -135,15 +136,13 @@ public class GroupSearchProvider {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (isFilterManageableGroups(portletRequest)) {
-			User user = themeDisplay.getUser();
+		User user = themeDisplay.getUser();
 
-			groups = user.getMySiteGroups(
-				new String[] {
-					Group.class.getName(), Organization.class.getName()
-				},
-				QueryUtil.ALL_POS);
-		}
+		groups = user.getMySiteGroups(
+			new String[] {
+				Group.class.getName(), Organization.class.getName()
+			},
+			max);
 
 		long groupId = ParamUtil.getLong(
 			portletRequest, "groupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
@@ -176,7 +175,9 @@ public class GroupSearchProvider {
 
 		if (searchTerms.hasSearchTerms()) {
 			if (isFilterManageableGroups(portletRequest)) {
-				groupParams.put("groupsTree", getAllGroups(portletRequest));
+				groupParams.put(
+					"groupsTree",
+					getAllGroups(portletRequest, QueryUtil.ALL_POS));
 			}
 			else if (parentGroupId > 0) {
 				List<Group> groupsTree = new ArrayList<>();
