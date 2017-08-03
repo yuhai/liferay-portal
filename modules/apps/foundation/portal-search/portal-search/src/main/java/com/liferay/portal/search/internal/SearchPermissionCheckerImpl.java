@@ -208,6 +208,42 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 			}
 		}
 
+		Field organizationIdsField = doc.getField("organizationIds");
+
+		if (Validator.isNotNull(organizationIdsField)) {
+			Role orgAdminRole = 
+				_roleLocalService.fetchRole(
+					companyId, RoleConstants.ORGANIZATION_ADMINISTRATOR);
+
+			if (!roleIds.contains(orgAdminRole.getRoleId())) {
+				roleIds.add(orgAdminRole.getRoleId());
+			}
+
+			Role orgOwnerRole = 
+				_roleLocalService.fetchRole(
+					companyId, RoleConstants.ORGANIZATION_OWNER);
+
+			if (!roleIds.contains(orgOwnerRole.getRoleId())) {
+				roleIds.add(orgOwnerRole.getRoleId());
+			}
+
+			Role siteAdminRole = 
+				_roleLocalService.fetchRole(
+					companyId, RoleConstants.SITE_ADMINISTRATOR);
+
+			if (!roleIds.contains(siteAdminRole.getRoleId())) {
+				roleIds.add(siteAdminRole.getRoleId());
+			}
+
+			Role siteOwnerRole = 
+				_roleLocalService.fetchRole(
+					companyId, RoleConstants.SITE_OWNER);
+
+			if (!roleIds.contains(siteOwnerRole.getRoleId())) {
+				roleIds.add(siteOwnerRole.getRoleId());
+			}
+		}
+
 		doc.addKeyword(
 			Field.ROLE_ID, roleIds.toArray(new Long[roleIds.size()]));
 		doc.addKeyword(
