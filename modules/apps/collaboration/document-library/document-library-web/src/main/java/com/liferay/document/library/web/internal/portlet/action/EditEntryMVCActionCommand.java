@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -97,12 +98,31 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		long[] fileEntryIds = ParamUtil.getLongValues(
 			actionRequest, "rowIdsFileEntry");
 
+		long[] fileShortcutIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsDLFileShortcut");
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		for (long fileEntryId : fileEntryIds) {
 			_dlAppService.checkInFileEntry(
 				fileEntryId, false, StringPool.BLANK, serviceContext);
+		}
+
+		for (long fileShortcutId : fileShortcutIds) {
+			boolean flag = false;
+
+			FileShortcut fileShortcut = _dlAppService.getFileShortcut(
+				fileShortcutId);
+
+			long toFileEntryId = fileShortcut.getToFileEntryId();
+
+			flag = ArrayUtil.contains(fileEntryIds, toFileEntryId);
+
+			if (flag == false) {
+				_dlAppService.checkInFileEntry(
+					toFileEntryId, false, StringPool.BLANK, serviceContext);
+			}
 		}
 	}
 
@@ -112,11 +132,29 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		long[] fileEntryIds = ParamUtil.getLongValues(
 			actionRequest, "rowIdsFileEntry");
 
+		long[] fileShortcutIds = ParamUtil.getLongValues(
+			actionRequest, "rowIdsDLFileShortcut");
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		for (long fileEntryId : fileEntryIds) {
 			_dlAppService.checkOutFileEntry(fileEntryId, serviceContext);
+		}
+
+		for (long fileShortcutId : fileShortcutIds) {
+			boolean flag = false;
+
+			FileShortcut fileShortcut = _dlAppService.getFileShortcut(
+				fileShortcutId);
+
+			long toFileEntryId = fileShortcut.getToFileEntryId();
+
+			flag = ArrayUtil.contains(fileEntryIds, toFileEntryId);
+
+			if (flag == false) {
+				_dlAppService.checkOutFileEntry(toFileEntryId, serviceContext);
+			}
 		}
 	}
 
