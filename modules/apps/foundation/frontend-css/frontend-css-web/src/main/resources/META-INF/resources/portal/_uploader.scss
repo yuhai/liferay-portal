@@ -141,7 +141,11 @@
 		}
 
 		.delete-button {
-			display: inline;
+		background: #FFFFFF;
+		color: #869CAD;
+		display: block;
+		filter: alpha(opacity=100);
+		opacity: 1.0;
 		}
 	}
 
