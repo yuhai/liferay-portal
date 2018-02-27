@@ -102,9 +102,9 @@ import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
 import com.liferay.registry.ServiceTracker;
 import com.liferay.registry.ServiceTrackerCustomizer;
+import com.liferay.util.JS;
 
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -125,7 +125,6 @@ import java.util.function.Consumer;
 import javax.portlet.PortletMode;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.WindowState;
-
 import javax.servlet.ServletContext;
 
 /**
@@ -2801,6 +2800,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				String rootPortletId = PortletIdCodec.decodePortletName(
 					portletId);
 
+				rootPortletId = JS.getSafeName(rootPortletId);
+
 				while (true) {
 					String[] friendlyURLMapperRootPortletIds =
 						_friendlyURLMapperRootPortletIds.get();
@@ -2831,7 +2832,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					String rootPortletId = PortletIdCodec.decodePortletName(
 						portletIds[i]);
 
-					rootPortletIds[i] = rootPortletId;
+					rootPortletIds[i] = JS.getSafeName(rootPortletId);
 				}
 
 				while (true) {
