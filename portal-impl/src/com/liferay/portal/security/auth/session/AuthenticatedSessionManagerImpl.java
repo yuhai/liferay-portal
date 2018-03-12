@@ -492,6 +492,14 @@ public class AuthenticatedSessionManagerImpl
 
 				throw new AuthException();
 			}
+			else {
+				if (PropsValues.USERS_UPDATE_LAST_LOGIN ||
+					(user.getLastLoginDate() == null)) {
+
+					user = UserLocalServiceUtil.updateLastLogin(
+						user.getUserId(), request.getRemoteAddr());
+				}
+			}
 
 			return user;
 		}
