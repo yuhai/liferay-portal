@@ -14,7 +14,7 @@
 
 package com.liferay.site.navigation.language.web.internal.display.context;
 
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -23,9 +23,12 @@ import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.KeyValuePairComparator;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.site.navigation.language.web.configuration.SiteNavigationLanguagePortletInstanceConfiguration;
 
@@ -90,8 +93,9 @@ public class SiteNavigationLanguageDisplayContext {
 			return _availableLanguageIds;
 		}
 
-		_availableLanguageIds = LocaleUtil.toLanguageIds(
-			LanguageUtil.getAvailableLocales(_themeDisplay.getSiteGroupId()));
+		_availableLanguageIds = PrefsPropsUtil.getStringArray(_themeDisplay.getCompanyId(),
+				PropsKeys.LOCALES, StringPool.COMMA,
+				PropsValues.LOCALES_ENABLED);
 
 		return _availableLanguageIds;
 	}
