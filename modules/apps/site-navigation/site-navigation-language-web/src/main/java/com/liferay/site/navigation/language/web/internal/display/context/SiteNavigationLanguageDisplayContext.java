@@ -14,8 +14,9 @@
 
 package com.liferay.site.navigation.language.web.internal.display.context;
 
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -23,8 +24,10 @@ import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.KeyValuePairComparator;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.site.navigation.language.web.configuration.SiteNavigationLanguagePortletInstanceConfiguration;
@@ -90,8 +93,21 @@ public class SiteNavigationLanguageDisplayContext {
 			return _availableLanguageIds;
 		}
 
-		_availableLanguageIds = LocaleUtil.toLanguageIds(
-			LanguageUtil.getAvailableLocales(_themeDisplay.getSiteGroupId()));
+		String groupLanguageIds = null;
+
+		try {
+			Group group = GroupLocalServiceUtil.getGroup(
+				_themeDisplay.getSiteGroupId());
+
+			UnicodeProperties typeSettingsProperties =
+				group.getTypeSettingsProperties();
+
+			groupLanguageIds = typeSettingsProperties.getProperty(
+				PropsKeys.LOCALES);
+		} catch(Exception e) {
+		}
+
+		_availableLanguageIds = StringUtil.split(groupLanguageIds);
 
 		return _availableLanguageIds;
 	}
