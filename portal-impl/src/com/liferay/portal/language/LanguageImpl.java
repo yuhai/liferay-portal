@@ -64,7 +64,8 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -979,7 +980,7 @@ public class LanguageImpl implements Language, Serializable {
 		Map<String, Locale> groupLanguageIdLocalesMap =
 			_getGroupLanguageIdLocalesMap(groupId);
 
-		return new HashSet<>(groupLanguageIdLocalesMap.values());
+		return new LinkedHashSet<>(groupLanguageIdLocalesMap.values());
 	}
 
 	@Override
@@ -1611,7 +1612,7 @@ public class LanguageImpl implements Language, Serializable {
 		return companyLocalesBag;
 	}
 
-	private ObjectValuePair<HashMap<String, Locale>, HashMap<String, Locale>>
+	private ObjectValuePair<LinkedHashMap<String, Locale>, LinkedHashMap<String, Locale>>
 		_createGroupLocales(long groupId) {
 
 		String[] languageIds = PropsValues.LOCALES_ENABLED;
@@ -1632,8 +1633,10 @@ public class LanguageImpl implements Language, Serializable {
 		catch (Exception e) {
 		}
 
-		HashMap<String, Locale> groupLanguageCodeLocalesMap = new HashMap<>();
-		HashMap<String, Locale> groupLanguageIdLocalesMap = new HashMap<>();
+		LinkedHashMap<String, Locale> groupLanguageCodeLocalesMap =
+			new LinkedHashMap<>();
+		LinkedHashMap<String, Locale> groupLanguageIdLocalesMap =
+			new LinkedHashMap<>();
 
 		for (String languageId : languageIds) {
 			Locale locale = LocaleUtil.fromLanguageId(languageId, false);
@@ -1799,7 +1802,7 @@ public class LanguageImpl implements Language, Serializable {
 			_groupLanguageCodeLocalesMapMap.get(groupId);
 
 		if (groupLanguageCodeLocalesMap == null) {
-			ObjectValuePair<HashMap<String, Locale>, HashMap<String, Locale>>
+			ObjectValuePair<LinkedHashMap<String, Locale>, LinkedHashMap<String, Locale>>
 				objectValuePair = _createGroupLocales(groupId);
 
 			groupLanguageCodeLocalesMap = objectValuePair.getKey();
@@ -1813,7 +1816,7 @@ public class LanguageImpl implements Language, Serializable {
 			_groupLanguageIdLocalesMap.get(groupId);
 
 		if (groupLanguageIdLocalesMap == null) {
-			ObjectValuePair<HashMap<String, Locale>, HashMap<String, Locale>>
+			ObjectValuePair<LinkedHashMap<String, Locale>, LinkedHashMap<String, Locale>>
 				objectValuePair = _createGroupLocales(groupId);
 
 			groupLanguageIdLocalesMap = objectValuePair.getValue();
@@ -1930,7 +1933,7 @@ public class LanguageImpl implements Language, Serializable {
 				}
 			}
 
-			Set<String> duplicateLanguageCodes = new HashSet<>();
+			Set<String> duplicateLanguageCodes = new LinkedHashSet<>();
 
 			for (String languageId : languageIds) {
 				Locale locale = LocaleUtil.fromLanguageId(languageId, false);
@@ -1966,9 +1969,9 @@ public class LanguageImpl implements Language, Serializable {
 			}
 
 			_availableLocales = Collections.unmodifiableSet(
-				new HashSet<>(_languageIdLocalesMap.values()));
+				new LinkedHashSet<>(_languageIdLocalesMap.values()));
 
-			Set<Locale> supportedLocalesSet = new HashSet<>(
+			Set<Locale> supportedLocalesSet = new LinkedHashSet<>(
 				_languageIdLocalesMap.values());
 
 			supportedLocalesSet.removeAll(_localesBetaSet);
@@ -1980,10 +1983,10 @@ public class LanguageImpl implements Language, Serializable {
 		private final Set<Locale> _availableLocales;
 		private final Set<String> _duplicateLanguageCodes;
 		private final Map<String, Locale> _languageCodeLocalesMap =
-			new HashMap<>();
+			new LinkedHashMap<>();
 		private final Map<String, Locale> _languageIdLocalesMap =
-			new HashMap<>();
-		private final Set<Locale> _localesBetaSet = new HashSet<>();
+			new LinkedHashMap<>();
+		private final Set<Locale> _localesBetaSet = new LinkedHashSet<>();
 		private final Set<Locale> _supportedLocalesSet;
 
 	}
