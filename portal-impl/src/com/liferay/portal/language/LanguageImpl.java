@@ -1612,8 +1612,9 @@ public class LanguageImpl implements Language, Serializable {
 		return companyLocalesBag;
 	}
 
-	private ObjectValuePair<LinkedHashMap<String, Locale>, LinkedHashMap<String, Locale>>
-		_createGroupLocales(long groupId) {
+	private ObjectValuePair<LinkedHashMap<String, Locale>,
+		LinkedHashMap<String, Locale>>
+			_createGroupLocales(long groupId) {
 
 		String[] languageIds = PropsValues.LOCALES_ENABLED;
 
@@ -1802,8 +1803,9 @@ public class LanguageImpl implements Language, Serializable {
 			_groupLanguageCodeLocalesMapMap.get(groupId);
 
 		if (groupLanguageCodeLocalesMap == null) {
-			ObjectValuePair<LinkedHashMap<String, Locale>, LinkedHashMap<String, Locale>>
-				objectValuePair = _createGroupLocales(groupId);
+			ObjectValuePair<LinkedHashMap<String, Locale>,
+				LinkedHashMap<String, Locale>>
+					objectValuePair = _createGroupLocales(groupId);
 
 			groupLanguageCodeLocalesMap = objectValuePair.getKey();
 		}
@@ -1816,8 +1818,9 @@ public class LanguageImpl implements Language, Serializable {
 			_groupLanguageIdLocalesMap.get(groupId);
 
 		if (groupLanguageIdLocalesMap == null) {
-			ObjectValuePair<LinkedHashMap<String, Locale>, LinkedHashMap<String, Locale>>
-				objectValuePair = _createGroupLocales(groupId);
+			ObjectValuePair<LinkedHashMap<String, Locale>,
+				LinkedHashMap<String, Locale>>
+					objectValuePair = _createGroupLocales(groupId);
 
 			groupLanguageIdLocalesMap = objectValuePair.getValue();
 		}
