@@ -83,7 +83,7 @@ public class HeaderFilter extends BasePortalFilter {
 
 			response.setDateHeader(HttpHeaders.LAST_MODIFIED, lastModified);
 
-			if (lastModified <= ifModifiedSince) {
+			if (lastModified < (ifModifiedSince + 1000)) {
 				response.setDateHeader(
 					HttpHeaders.LAST_MODIFIED, ifModifiedSince);
 				response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
