@@ -20,9 +20,11 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.RequestDispatcherUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -74,6 +76,12 @@ public class RTLServlet extends HttpServlet {
 	@Override
 	protected long getLastModified(HttpServletRequest request) {
 		try {
+			String value = request.getParameter("t");
+
+			if (Validator.isNotNull(value)) {
+				return (GetterUtil.getLong(value) / 1000) * 1000;
+			}
+
 			URL url = getResourceURL(request);
 
 			if (url != null) {
