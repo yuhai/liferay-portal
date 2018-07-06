@@ -740,28 +740,14 @@ public class PortletPreferencesFactoryImpl
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
 			companyId, portletId);
 
-		boolean uniquePerCompany = false;
-		boolean uniquePerLayout = false;
-		boolean uniquePerGroup = false;
+		boolean uniquePerCompany = portlet.isPreferencesCompanyWide();
+		boolean uniquePerGroup = portlet.isPreferencesOwnedByGroup();
+		boolean uniquePerLayout = portlet.isPreferencesUniquePerLayout();
 
-		if (portlet.isPreferencesCompanyWide()) {
-			uniquePerCompany = true;
+		boolean hasUserId = PortletIdCodec.hasUserId(originalPortletId);
+
+		if (uniquePerCompany || (uniquePerGroup && !uniquePerLayout)) {
 			portletId = PortletIdCodec.decodePortletName(portletId);
-		}
-		else {
-			if (portlet.isPreferencesUniquePerLayout()) {
-				uniquePerLayout = true;
-
-				if (portlet.isPreferencesOwnedByGroup()) {
-					uniquePerGroup = true;
-				}
-			}
-			else {
-				if (portlet.isPreferencesOwnedByGroup()) {
-					uniquePerGroup = true;
-					portletId = PortletIdCodec.decodePortletName(portletId);
-				}
-			}
 		}
 
 		long ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
@@ -773,12 +759,14 @@ public class PortletPreferencesFactoryImpl
 			plid = group.getClassPK();
 		}
 
-		if (PortletIdCodec.hasUserId(originalPortletId)) {
+		if (hasUserId) {
 			ownerId = PortletIdCodec.decodeUserId(originalPortletId);
 			ownerType = PortletKeys.PREFS_OWNER_TYPE_USER;
 		}
-		else if (uniquePerLayout) {
-			if (plid == 0) {
+		else {
+			if ((uniquePerGroup && !uniquePerLayout) ||
+				(uniquePerLayout && (plid == 0))) {
+
 				if (siteGroupId > LayoutConstants.DEFAULT_PLID) {
 					ownerId = siteGroupId;
 				}
@@ -786,29 +774,24 @@ public class PortletPreferencesFactoryImpl
 					ownerId = layoutGroupId;
 				}
 			}
-			ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
-		}
-		else if (uniquePerGroup) {
-			plid = PortletKeys.PREFS_PLID_SHARED;
 
-			if (siteGroupId > LayoutConstants.DEFAULT_PLID) {
-				ownerId = siteGroupId;
+			if ((uniquePerCompany || uniquePerGroup) && !uniquePerLayout) {
+				plid = PortletKeys.PREFS_PLID_SHARED;
+			}
+
+			if (uniquePerLayout) {
+				ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
+			}
+			else if (uniquePerGroup) {
+				ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
+			}
+			else if (uniquePerCompany) {
+				ownerId = companyId;
+				ownerType = PortletKeys.PREFS_OWNER_TYPE_COMPANY;
 			}
 			else {
-				ownerId = layoutGroupId;
+				//should be some kind of exception;
 			}
-
-			ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
-
-		}
-		else if (uniquePerCompany) {
-			plid = PortletKeys.PREFS_PLID_SHARED;
-
-			ownerId = companyId;
-			ownerType = PortletKeys.PREFS_OWNER_TYPE_COMPANY;
-		}
-		else {
-			//should be some kind of exception;
 		}
 
 		if (strictMode) {
