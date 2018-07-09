@@ -740,26 +740,14 @@ public class PortletPreferencesFactoryImpl
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
 			companyId, portletId);
 
-		boolean uniquePerLayout = false;
-		boolean uniquePerGroup = false;
+		boolean uniquePerCompany = portlet.isPreferencesCompanyWide();
+		boolean uniquePerGroup = portlet.isPreferencesOwnedByGroup();
+		boolean uniquePerLayout = portlet.isPreferencesUniquePerLayout();
 
-		if (portlet.isPreferencesCompanyWide()) {
+		boolean hasUserId = PortletIdCodec.hasUserId(originalPortletId);
+
+		if (uniquePerCompany || (uniquePerGroup && !uniquePerLayout)) {
 			portletId = PortletIdCodec.decodePortletName(portletId);
-		}
-		else {
-			if (portlet.isPreferencesUniquePerLayout()) {
-				uniquePerLayout = true;
-
-				if (portlet.isPreferencesOwnedByGroup()) {
-					uniquePerGroup = true;
-				}
-			}
-			else {
-				if (portlet.isPreferencesOwnedByGroup()) {
-					uniquePerGroup = true;
-					portletId = PortletIdCodec.decodePortletName(portletId);
-				}
-			}
 		}
 
 		long ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
@@ -771,26 +759,38 @@ public class PortletPreferencesFactoryImpl
 			plid = group.getClassPK();
 		}
 
-		if (PortletIdCodec.hasUserId(originalPortletId)) {
+		if (hasUserId) {
 			ownerId = PortletIdCodec.decodeUserId(originalPortletId);
 			ownerType = PortletKeys.PREFS_OWNER_TYPE_USER;
 		}
-		else if (!uniquePerLayout) {
-			plid = PortletKeys.PREFS_PLID_SHARED;
+		else {
+			if ((uniquePerGroup && !uniquePerLayout) ||
+				(uniquePerLayout && (plid == 0))) {
 
-			if (uniquePerGroup) {
 				if (siteGroupId > LayoutConstants.DEFAULT_PLID) {
 					ownerId = siteGroupId;
 				}
 				else {
 					ownerId = layoutGroupId;
 				}
+			}
 
+			if ((uniquePerCompany || uniquePerGroup) && !uniquePerLayout) {
+				plid = PortletKeys.PREFS_PLID_SHARED;
+			}
+
+			if (uniquePerLayout) {
+				ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
+			}
+			else if (uniquePerGroup) {
 				ownerType = PortletKeys.PREFS_OWNER_TYPE_GROUP;
 			}
-			else {
+			else if (uniquePerCompany) {
 				ownerId = companyId;
 				ownerType = PortletKeys.PREFS_OWNER_TYPE_COMPANY;
+			}
+			else {
+				//should be some kind of exception;
 			}
 		}
 

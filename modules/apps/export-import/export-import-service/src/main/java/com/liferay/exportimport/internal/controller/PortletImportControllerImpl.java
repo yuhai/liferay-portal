@@ -330,10 +330,15 @@ public class PortletImportControllerImpl implements PortletImportController {
 		long ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
 		int ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
 
+		long plid = portletDataContext.getPlid();
+
+		if (plid == 0) {
+			ownerId = portletDataContext.getScopeGroupId();
+		}
+
 		javax.portlet.PortletPreferences portletPreferences =
 			_portletPreferencesLocalService.fetchPreferences(
-				portletDataContext.getCompanyId(), ownerId, ownerType,
-				portletDataContext.getPlid(),
+				portletDataContext.getCompanyId(), ownerId, ownerType, plid,
 				portletDataContext.getPortletId());
 
 		if (portletPreferences == null) {
@@ -345,8 +350,8 @@ public class PortletImportControllerImpl implements PortletImportController {
 
 		if (Validator.isNotNull(xml)) {
 			_portletPreferencesLocalService.updatePreferences(
-				ownerId, ownerType, portletDataContext.getPlid(),
-				portletDataContext.getPortletId(), xml);
+				ownerId, ownerType, plid, portletDataContext.getPortletId(),
+				xml);
 		}
 	}
 
