@@ -88,7 +88,7 @@ public class PortletImportControllerTest extends BaseExportImportTestCase {
 
 		PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.getStrictPortletSetup(
-				importedGroup.getCompanyId(), importedGroup.getGroupId(),
+				importedGroup.getCompanyId(), group.getGroupId(),
 				BookmarksPortletKeys.BOOKMARKS);
 
 		Assert.assertEquals(
