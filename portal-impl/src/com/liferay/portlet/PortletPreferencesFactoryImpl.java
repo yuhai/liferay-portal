@@ -789,9 +789,6 @@ public class PortletPreferencesFactoryImpl
 				ownerId = companyId;
 				ownerType = PortletKeys.PREFS_OWNER_TYPE_COMPANY;
 			}
-			else {
-				//should be some kind of exception;
-			}
 		}
 
 		if (strictMode) {
