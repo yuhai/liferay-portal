@@ -38,4 +38,9 @@ public class DLPortletDataHandler extends DLAdminPortletDataHandler {
 		super.activate(bundleContext);
 	}
 
+	@Override
+	public boolean isDisplayPortlet() {
+		return false;
+	}
+
 }
