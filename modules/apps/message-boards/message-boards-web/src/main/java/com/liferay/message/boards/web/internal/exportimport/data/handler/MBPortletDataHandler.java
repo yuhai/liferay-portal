@@ -17,7 +17,6 @@ package com.liferay.message.boards.web.internal.exportimport.data.handler;
 import com.liferay.exportimport.kernel.lar.DataLevel;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
-import com.liferay.message.boards.constants.MBConstants;
 import com.liferay.message.boards.constants.MBPortletKeys;
 
 import org.osgi.service.component.annotations.Activate;
@@ -40,11 +39,6 @@ public class MBPortletDataHandler
 	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
-	}
-
-	@Override
-	public String getServiceName() {
-		return MBConstants.SERVICE_NAME;
 	}
 
 	@Override

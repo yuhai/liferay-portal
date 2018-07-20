@@ -17,7 +17,6 @@ package com.liferay.wiki.internal.exportimport.data.handler;
 import com.liferay.exportimport.kernel.lar.DataLevel;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
-import com.liferay.wiki.constants.WikiConstants;
 import com.liferay.wiki.constants.WikiPortletKeys;
 
 import org.osgi.service.component.annotations.Activate;
@@ -40,11 +39,6 @@ public class WikiPortletDataHandler
 	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
-	}
-
-	@Override
-	public String getServiceName() {
-		return WikiConstants.SERVICE_NAME;
 	}
 
 	@Activate

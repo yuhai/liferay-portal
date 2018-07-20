@@ -14,7 +14,6 @@
 
 package com.liferay.bookmarks.internal.exportimport.data.handler;
 
-import com.liferay.bookmarks.constants.BookmarksConstants;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.exportimport.kernel.lar.DataLevel;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
@@ -41,11 +40,6 @@ public class BookmarksPortletDataHandler
 	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
-	}
-
-	@Override
-	public String getServiceName() {
-		return BookmarksConstants.SERVICE_NAME;
 	}
 
 	@Activate

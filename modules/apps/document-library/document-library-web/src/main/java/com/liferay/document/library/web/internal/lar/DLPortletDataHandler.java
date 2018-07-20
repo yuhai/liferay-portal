@@ -19,7 +19,6 @@ import com.liferay.exportimport.kernel.lar.DataLevel;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.constants.DLConstants;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,11 +41,6 @@ public class DLPortletDataHandler
 	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
-	}
-
-	@Override
-	public String getServiceName() {
-		return DLConstants.SERVICE_NAME;
 	}
 
 	@Activate
