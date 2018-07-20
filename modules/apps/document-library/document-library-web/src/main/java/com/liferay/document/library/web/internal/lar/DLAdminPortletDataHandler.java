@@ -609,7 +609,7 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 					portletIdProperty.eq(DLPortletKeys.DOCUMENT_LIBRARY_ADMIN));
 				disjunction.add(
 					portletIdProperty.like(
-						DLPortletKeys.DOCUMENT_LIBRARY_ADMIN + "%"));
+						DLPortletKeys.DOCUMENT_LIBRARY + "%"));
 
 				Property repositoryIdProperty = PropertyFactoryUtil.forName(
 					"repositoryId");
