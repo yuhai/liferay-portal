@@ -52,7 +52,7 @@ public class DLPortletDataHandler
 	@Activate
 	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
-		setPublishToLiveByDefault(PropsValues.DL_PUBLISH_TO_LIVE_BY_DEFAULT);
+		setDataPortletPreferences("rootFolderId");
 	}
 
 }

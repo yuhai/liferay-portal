@@ -51,6 +51,7 @@ public class BookmarksPortletDataHandler
 	@Activate
 	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
+		setDataPortletPreferences("rootFolderId");
 	}
 
 }

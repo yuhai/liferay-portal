@@ -47,6 +47,11 @@ public class BlogsPortletDataHandler
 		return BlogsConstants.SERVICE_NAME;
 	}
 
+	@Override
+	public boolean isDisplayPortlet() {
+		return true;
+	}
+
 	@Activate
 	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
