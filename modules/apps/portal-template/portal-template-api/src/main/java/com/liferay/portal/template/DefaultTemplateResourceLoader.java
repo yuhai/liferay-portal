@@ -68,15 +68,6 @@ public class DefaultTemplateResourceLoader implements TemplateResourceLoader {
 			"(lang.type=" + _name + ")",
 			new PropertyServiceReferenceMapper<>("lang.type"));
 
-		Collection<List<TemplateResourceParser>> templateResourceParserLists =
-			_serviceTrackerMap.values();
-
-		for (List<TemplateResourceParser> templateResourceParser :
-				templateResourceParserLists) {
-
-			_templateResourceParserList.addAll(templateResourceParser);
-		}
-
 		_modificationCheckInterval = modificationCheckInterval;
 
 		_multiVMPool = multiVMPool;
@@ -194,6 +185,18 @@ public class DefaultTemplateResourceLoader implements TemplateResourceLoader {
 	private Set<TemplateResourceParser> _getTemplateResourceParsers() {
 		TemplateResource templateResource = _getTemplateResource();
 
+		Collection<List<TemplateResourceParser>> templateResourceParserLists =
+			_serviceTrackerMap.values();
+
+		List<TemplateResourceParser> templateResourceParserList =
+			new ArrayList<>();
+
+		for (List<TemplateResourceParser> templateResourceParser :
+				templateResourceParserLists) {
+
+			templateResourceParserList.addAll(templateResourceParser);
+		}
+
 		if ((templateResource != null) &&
 			(templateResource instanceof ClassLoaderTemplateResource)) {
 
@@ -205,14 +208,14 @@ public class DefaultTemplateResourceLoader implements TemplateResourceLoader {
 					classLoaderTemplateResource.getClassLoader());
 
 			Set<TemplateResourceParser> templateResourceParsers = new HashSet(
-				_templateResourceParserList);
+				templateResourceParserList);
 
 			templateResourceParsers.add(classLoaderResourceParser);
 
 			return templateResourceParsers;
 		}
 
-		return new HashSet(_templateResourceParserList);
+		return new HashSet(templateResourceParserList);
 	}
 
 	private TemplateResource _loadFromCache(
@@ -360,8 +363,6 @@ public class DefaultTemplateResourceLoader implements TemplateResourceLoader {
 		_serviceTrackerMap;
 	private final SingleVMPool _singleVMPool;
 	private final PortalCache<String, TemplateResource> _singleVMPortalCache;
-	private List<TemplateResourceParser> _templateResourceParserList =
-		new ArrayList<>();
 
 	private static class NullHolderTemplateResource
 		implements TemplateResource {
