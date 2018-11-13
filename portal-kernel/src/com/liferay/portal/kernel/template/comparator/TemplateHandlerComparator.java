@@ -25,8 +25,11 @@ import java.util.Comparator;
 import java.util.Locale;
 
 /**
- * @author Eduardo Garcia
+ * @author     Eduardo Garcia
+ * @deprecated As of Judson (7.1.x), moved to {@link
+ *             com.liferay.portal.template.comparator.TemplateHandlerComparator}
  */
+@Deprecated
 public class TemplateHandlerComparator
 	implements Comparator<TemplateHandler>, Serializable {
 

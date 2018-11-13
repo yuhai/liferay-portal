@@ -34,8 +34,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Jorge Ferrer
+ * @author     Jorge Ferrer
+ * @deprecated As of Judson (7.1.x), moved to {@link
+ *             com.liferay.portal.template.BaseTemplateHandler}
  */
+@Deprecated
 @ProviderType
 public abstract class BaseTemplateHandler implements TemplateHandler {
 
