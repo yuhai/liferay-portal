@@ -21,10 +21,15 @@ import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoader;
 import com.liferay.portal.template.DefaultTemplateResourceLoader;
+import com.liferay.portal.template.TemplateResourceParser;
 import com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -77,12 +82,14 @@ public class FreeMarkerTemplateResourceLoader
 
 	@Activate
 	@Modified
-	protected void activate(Map<String, Object> properties) {
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
 		_freeMarkerEngineConfiguration = ConfigurableUtil.createConfigurable(
 			FreeMarkerEngineConfiguration.class, properties);
 
 		_defaultTemplateResourceLoader = new DefaultTemplateResourceLoader(
-			TemplateConstants.LANG_TYPE_FTL,
+			_templateResourceParsers, TemplateConstants.LANG_TYPE_FTL,
 			_freeMarkerEngineConfiguration.resourceModificationCheck(),
 			_multiVMPool, _singleVMPool);
 	}
@@ -97,6 +104,17 @@ public class FreeMarkerTemplateResourceLoader
 		_singleVMPool = singleVMPool;
 	}
 
+	@Reference(
+		target = "(lang.type=" + TemplateConstants.LANG_TYPE_FTL + ")",
+
+		unbind = "-"
+	)
+	protected void setTemplateResourceParser(
+		TemplateResourceParser templateResourceParser) {
+
+		_templateResourceParsers.add(templateResourceParser);
+	}
+
 	private static volatile DefaultTemplateResourceLoader
 		_defaultTemplateResourceLoader;
 	private static volatile FreeMarkerEngineConfiguration
@@ -104,5 +122,7 @@ public class FreeMarkerTemplateResourceLoader
 
 	private MultiVMPool _multiVMPool;
 	private SingleVMPool _singleVMPool;
+	private final Set<TemplateResourceParser> _templateResourceParsers =
+		Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 }
