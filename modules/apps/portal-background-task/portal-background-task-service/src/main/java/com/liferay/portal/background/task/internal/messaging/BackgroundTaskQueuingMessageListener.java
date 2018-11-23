@@ -14,6 +14,7 @@
 
 package com.liferay.portal.background.task.internal.messaging;
 
+import com.liferay.background.task.kernel.util.comparator.BackgroundTaskModifiedDateComparator;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskLockHelperUtil;
@@ -21,7 +22,10 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
+import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
 
 /**
@@ -82,7 +86,8 @@ public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 
 		BackgroundTask backgroundTask =
 			_backgroundTaskManager.fetchFirstBackgroundTask(
-				taskExecutorClassName, BackgroundTaskConstants.STATUS_QUEUED);
+				taskExecutorClassName, BackgroundTaskConstants.STATUS_QUEUED,
+				new BackgroundTaskModifiedDateComparator(true));
 
 		if (backgroundTask == null) {
 			if (_log.isDebugEnabled()) {
@@ -94,8 +99,19 @@ public class BackgroundTaskQueuingMessageListener extends BaseMessageListener {
 			return;
 		}
 
-		_backgroundTaskManager.resumeBackgroundTask(
+		ServiceContext serviceContext = new ServiceContext();
+
+		backgroundTask = _backgroundTaskManager.amendBackgroundTask(
+			backgroundTask.getBackgroundTaskId(), null,
+			BackgroundTaskConstants.STATUS_NEW, serviceContext);
+
+		Message message = new Message();
+
+		message.put(
+			BackgroundTaskConstants.BACKGROUND_TASK_ID,
 			backgroundTask.getBackgroundTaskId());
+
+		MessageBusUtil.sendMessage(DestinationNames.BACKGROUND_TASK, message);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
