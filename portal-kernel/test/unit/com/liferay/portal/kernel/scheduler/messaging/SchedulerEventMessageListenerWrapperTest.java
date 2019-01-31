@@ -17,8 +17,11 @@ package com.liferay.portal.kernel.scheduler.messaging;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.scheduler.SchedulerEntry;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
@@ -46,6 +49,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Tina Tian
@@ -55,7 +59,9 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 	@ClassRule
 	@Rule
-	public static final NewEnvTestRule newEnvTestRule = NewEnvTestRule.INSTANCE;
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
 
 	@Before
 	public void setUp() {
@@ -70,6 +76,28 @@ public class SchedulerEventMessageListenerWrapperTest {
 		_testMessage2 = new Message();
 
 		_testMessage2.setPayload("Test Message 2");
+
+		_testMessage3 = new Message();
+
+		_testMessage3.setPayload("Test Message 3");
+	}
+
+	@Test
+	public void testGetSchedulerEntry() {
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		SchedulerEntry schedulerEntry = Mockito.mock(SchedulerEntry.class);
+
+		schedulerEventMessageListenerWrapper.setSchedulerEntry(schedulerEntry);
+
+		Assert.assertEquals(
+			schedulerEntry,
+			schedulerEventMessageListenerWrapper.getSchedulerEntry());
 	}
 
 	@Test
@@ -183,7 +211,7 @@ public class SchedulerEventMessageListenerWrapperTest {
 		_testMessageListener.waitUntilBlock();
 
 		TestCallable testCallable = new TestCallable(
-			_testMessage2, schedulerEventMessageListenerWrapper);
+			true, _testMessage2, schedulerEventMessageListenerWrapper);
 
 		FutureTask<Void> futureTask2 = new FutureTask<>(testCallable);
 
@@ -195,15 +223,47 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 		thread2.interrupt();
 
+		futureTask2.get();
+
+		Assert.assertNull(_testMessage2.getResponse());
+
+		TestCallable testCallable3 = new TestCallable(
+			false, _testMessage3, schedulerEventMessageListenerWrapper);
+
+		FutureTask<Void> futureTask3 = new FutureTask<>(testCallable3);
+
+		Thread thread3 = new Thread(
+			futureTask3,
+			"SchedulerEventMessageListenerWrapperTest_startThread_Thread3");
+
+		thread3.start();
+
+		thread3.interrupt();
+
+		futureTask3.get();
+
+		Assert.assertNull(_testMessage3.getResponse());
+
 		_testMessageListener.unblock();
 
 		futureTask1.get();
-		futureTask2.get();
 
 		Assert.assertSame(
 			"Message is not processed", _testMessage1,
 			_testMessage1.getResponse());
-		Assert.assertNull(_testMessage2.getResponse());
+	}
+
+	@Test
+	public void testMisc() {
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		schedulerEventMessageListenerWrapper.setGroupName("groupName");
+		schedulerEventMessageListenerWrapper.setJobName("jobName");
 	}
 
 	private FutureTask<Void> _startThread(
@@ -230,52 +290,76 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 	private Message _testMessage1;
 	private Message _testMessage2;
+	private Message _testMessage3;
 	private TestMessageListener _testMessageListener;
 
 	private class TestCallable implements Callable<Void> {
 
 		@Override
 		public Void call() throws Exception {
-			try (CaptureHandler captureHandler =
-					JDKLoggerTestUtil.configureJDKLogger(
-						SchedulerEventMessageListenerWrapper.class.getName(),
-						Level.INFO)) {
+			String name = SchedulerEventMessageListenerWrapper.class.getName();
 
-				_schedulerEventMessageListenerWrapper.receive(_testMessage);
+			if (_enableLog) {
+				try (CaptureHandler captureHandler =
+						JDKLoggerTestUtil.configureJDKLogger(
+							name, Level.INFO)) {
 
-				List<LogRecord> logRecords = captureHandler.getLogRecords();
+					_schedulerEventMessageListenerWrapper.receive(_testMessage);
 
-				Assert.assertEquals(
-					logRecords.toString(), 1, logRecords.size());
+					List<LogRecord> logRecords = captureHandler.getLogRecords();
 
-				LogRecord logRecord = logRecords.get(0);
+					Assert.assertEquals(
+						logRecords.toString(), 1, logRecords.size());
 
-				int timeout = GetterUtil.getInteger(
-					PropsUtil.get(
-						PropsKeys.
-							SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT));
+					LogRecord logRecord = logRecords.get(0);
 
-				Assert.assertEquals(
-					"Unable to wait " + timeout + " milliseconds before retry",
-					logRecord.getMessage());
+					int timeout = GetterUtil.getInteger(
+						PropsUtil.get(
+							PropsKeys.
+								SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT));
+
+					Assert.assertEquals(
+						"Unable to wait " + timeout +
+						" milliseconds before retry", logRecord.getMessage());
+				}
+				catch (Exception e) {
+					Assert.assertTrue(
+						e instanceof IllegalMonitorStateException);
+				}
 			}
-			catch (Exception e) {
-				Assert.assertTrue(e instanceof IllegalMonitorStateException);
+			else {
+				try (CaptureHandler captureHandler =
+						JDKLoggerTestUtil.configureJDKLogger(
+							name, Level.WARNING)) {
+
+					_schedulerEventMessageListenerWrapper.receive(_testMessage);
+
+					List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+					Assert.assertEquals(
+						logRecords.toString(), 0, logRecords.size());
+				}
+				catch (Exception e) {
+					Assert.assertTrue(e instanceof IllegalMonitorStateException);
+				}
 			}
+			
 
 			return null;
 		}
 
 		private TestCallable(
-			Message message,
+			boolean enableLog, Message message,
 			SchedulerEventMessageListenerWrapper
 				schedulerEventMessageListenerWrapper) {
 
+			_enableLog = enableLog;
 			_testMessage = message;
 			_schedulerEventMessageListenerWrapper =
 				schedulerEventMessageListenerWrapper;
 		}
 
+		private boolean _enableLog;
 		private final SchedulerEventMessageListenerWrapper
 			_schedulerEventMessageListenerWrapper;
 		private final Message _testMessage;
