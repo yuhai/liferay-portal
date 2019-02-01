@@ -14,12 +14,26 @@
 
 package com.liferay.portal.kernel.scheduler.messaging;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.scheduler.JobState;
+import com.liferay.portal.kernel.scheduler.JobStateSerializeUtil;
+import com.liferay.portal.kernel.scheduler.SchedulerEngine;
+import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
+import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
+import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
+import com.liferay.portal.kernel.scheduler.SchedulerException;
+import com.liferay.portal.kernel.scheduler.StorageType;
+import com.liferay.portal.kernel.scheduler.Trigger;
+import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
@@ -33,7 +47,13 @@ import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
@@ -68,6 +88,8 @@ public class SchedulerEventMessageListenerWrapperTest {
 		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
 		_testMessageListener = new TestMessageListener();
+
+		_testMessageListener2 = new TestMessageListener2();
 
 		_testMessage1 = new Message();
 
@@ -254,6 +276,339 @@ public class SchedulerEventMessageListenerWrapperTest {
 	}
 
 	@Test
+	public void testReceiveWithSchedulerDisableAndDeleteJobThrowException() {
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
+
+		_testMessage1.put(SchedulerEngine.DISABLE, true);
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		schedulerEventMessageListenerWrapper.setMessageListener(
+			new MessageListener() {
+
+				@Override
+				public void receive(Message message) {
+					message.setResponse(message);
+				}
+			}
+		);
+
+		String name = SchedulerEventMessageListenerWrapper.class.getName();
+
+		setUpSchedulerEngineHelperUtil();
+
+		try(CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					name, Level.INFO)) {
+
+			schedulerEventMessageListenerWrapper.receive(_testMessage1);
+
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(
+				logRecords.toString(), 2, logRecords.size());
+
+			LogRecord logRecord1 = logRecords.get(0);
+			LogRecord logRecord2 = logRecords.get(1);
+
+			Assert.assertEquals(
+				"Unable to delete job null in group null",
+				logRecord1.getMessage());
+			Assert.assertEquals(
+				"Unable to send audit message",
+				logRecord2.getMessage());
+
+			captureHandler.resetLogLevel(Level.WARNING);
+
+			schedulerEventMessageListenerWrapper.receive(_testMessage1);
+
+			logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(
+				logRecords.toString(), 0, logRecords.size());
+		}
+		catch (Exception e) {
+			Assert.fail("Should not throw Exception");
+		}
+	}
+
+	@Test
+	public void testReceiveWithSchedulerDisable() {
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
+
+		_testMessage1.put(
+			SchedulerEngine.DESTINATION_NAME,
+			DestinationNames.SCHEDULER_DISPATCH);
+		_testMessage1.put(SchedulerEngine.DISABLE, true);
+		_testMessage1.put(SchedulerEngine.JOB_NAME, "job1");
+		_testMessage1.put(SchedulerEngine.GROUP_NAME, "group1");
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		Map<String, SchedulerEventMessageListenerWrapper>
+			removeMessageListener =
+				new HashMap<String, SchedulerEventMessageListenerWrapper>();
+
+		String destinationName = SchedulerEngine.DESTINATION_NAME;
+
+		removeMessageListener.put(
+			destinationName, schedulerEventMessageListenerWrapper);
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		registry.registerService(
+			MessageBus.class,
+			(MessageBus)ProxyUtil.newProxyInstance(
+				MessageBus.class.getClassLoader(),
+				new Class<?>[] {MessageBus.class},
+				(proxy, method, args) -> {
+					removeMessageListener.remove(destinationName);
+
+					return true;
+				}));
+
+		Trigger trigger = getTrigger("job1", "group1", 1);
+
+		SchedulerEntry schedulerEntry = new SchedulerEntryImpl("com.test", trigger);
+
+		schedulerEventMessageListenerWrapper.setSchedulerEntry(schedulerEntry);
+
+		schedulerEventMessageListenerWrapper.setMessageListener(
+			new MessageListener() {
+
+				@Override
+				public void receive(Message message) {
+					message.setResponse(message);
+				}
+			}
+		);
+
+		try {
+			schedulerEventMessageListenerWrapper.receive(_testMessage1);
+		}
+		catch (Exception e) {
+			Assert.fail("Should not throw Exception");
+		}
+
+		Assert.assertSame(
+			"Message is not processed", _testMessage1,
+			_testMessage1.getResponse());
+		Assert.assertEquals(
+			removeMessageListener.toString(), 0, removeMessageListener.size());
+
+		_testMessage2.put(SchedulerEngine.DISABLE, true);
+
+		try {
+			schedulerEventMessageListenerWrapper.receive(_testMessage2);
+		}
+		catch (Exception e) {
+			Assert.fail("Should not throw Exception");
+		}
+
+		Assert.assertSame(
+			"Message is not processed", _testMessage2,
+			_testMessage2.getResponse());
+	}
+
+	@Test
+	public void testReceiveWithMessageListenerThrowException() {
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
+
+		JobState jobState = new JobState(TriggerState.NORMAL);
+
+		_testMessage1.put(
+			SchedulerEngine.JOB_STATE, jobState);
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		schedulerEventMessageListenerWrapper.setMessageListener(
+			new MessageListener() {
+
+				@Override
+				public void receive(Message message)
+					throws MessageListenerException {
+
+					throw new MessageListenerException();
+				}
+			}
+		);
+
+		try {
+			schedulerEventMessageListenerWrapper.receive(_testMessage1);
+
+			Assert.fail("Should throw MessageListenerException");
+		}
+		catch (Exception e) {
+			Assert.assertTrue(e instanceof MessageListenerException);
+		}
+
+		schedulerEventMessageListenerWrapper.setMessageListener(
+			new MessageListener() {
+
+				@Override
+				public void receive(Message message)
+					throws MessageListenerException {
+
+					throw new NullPointerException();
+				}
+			}
+		);
+
+		try {
+			schedulerEventMessageListenerWrapper.receive(_testMessage2);
+
+			Assert.fail("Should throw MessageListenerException");
+		}
+		catch (Exception e) {
+			Assert.assertTrue(e instanceof MessageListenerException);
+			Assert.assertTrue(e.getCause() instanceof NullPointerException);
+		}
+	}
+
+	@Test
+	public void testReceive() {
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
+
+		Message testMessage1 = new Message();
+
+		testMessage1.put(
+			SchedulerEngine.DESTINATION_NAME,
+			DestinationNames.SCHEDULER_DISPATCH);
+
+		testMessage1.put(SchedulerEngine.JOB_NAME, "job1");
+		testMessage1.put(SchedulerEngine.GROUP_NAME, "group1");
+
+		Message testMessage2 = new Message();
+
+		testMessage2.put(
+			SchedulerEngine.DESTINATION_NAME,
+			DestinationNames.SCHEDULER_DISPATCH);
+
+		testMessage2.put(SchedulerEngine.JOB_NAME, "job2");
+		testMessage2.put(SchedulerEngine.GROUP_NAME, "group1");
+
+		Message testMessage3 = new Message();
+
+		testMessage3.put(
+			SchedulerEngine.DESTINATION_NAME,
+			DestinationNames.SCHEDULER_DISPATCH);
+
+		testMessage3.put(SchedulerEngine.JOB_NAME, "job1");
+		testMessage3.put(SchedulerEngine.GROUP_NAME, "group2");
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		Trigger trigger = getTrigger("job1", "group1", 1);
+
+		SchedulerEntry schedulerEntry = new SchedulerEntryImpl("com.test", trigger);
+
+		schedulerEventMessageListenerWrapper.setSchedulerEntry(schedulerEntry);
+	
+		schedulerEventMessageListenerWrapper.setMessageListener(
+			_testMessageListener2);
+
+		setUpSchedulerEngineHelperUtil();
+
+		try {
+			SchedulerEngineHelperUtil.schedule(
+				trigger, StorageType.MEMORY_CLUSTERED, "",
+				DestinationNames.SCHEDULER_DISPATCH, testMessage1, 0);
+
+			schedulerEventMessageListenerWrapper.receive(testMessage1);
+
+			Assert.assertSame(
+				"Message is not processed", testMessage1,
+				testMessage1.getResponse());
+
+			SchedulerEngineHelperUtil.schedule(
+				trigger, StorageType.MEMORY_CLUSTERED, "",
+				DestinationNames.SCHEDULER_DISPATCH, testMessage2, 0);
+
+			schedulerEventMessageListenerWrapper.receive(testMessage2);
+
+			Assert.assertNull(testMessage2.getResponse());
+
+			SchedulerEngineHelperUtil.schedule(
+				trigger, StorageType.MEMORY_CLUSTERED, "",
+				DestinationNames.SCHEDULER_DISPATCH, testMessage3, 0);
+
+			schedulerEventMessageListenerWrapper.receive(testMessage3);
+
+			Assert.assertNull(testMessage2.getResponse());
+		}
+		catch(Exception mle) {
+
+		}
+	}
+
+	protected static Trigger getTrigger(
+		String jobName, String groupName, int interval) {
+
+		return new MockTrigger(
+			jobName, groupName, null, null, interval, TimeUnit.MINUTES);
+	}
+
+	protected void setUpSchedulerEngineHelperUtil() {
+		final Method schedule = ReflectionTestUtil.getMethod(
+			SchedulerEngineHelper.class, "schedule",
+			new Class<?>[] {
+				Trigger.class, StorageType.class, String.class, String.class,
+				Message.class, int.class});
+		final Method auditSchedulerJobs = ReflectionTestUtil.getMethod(
+			SchedulerEngineHelper.class, "auditSchedulerJobs",
+			new Class<?>[] {Message.class, TriggerState.class});
+		final Method delete = ReflectionTestUtil.getMethod(
+			SchedulerEngineHelper.class, "delete",
+			new Class<?>[] {String.class, String.class, StorageType.class});
+
+		SchedulerEngineHelper schedulerEngineHelper = 
+			(SchedulerEngineHelper)ProxyUtil.newProxyInstance(
+				SchedulerEventMessageListenerWrapperTest.class.getClassLoader(),
+				new Class[] {SchedulerEngineHelper.class},
+				new InvocationHandler() {
+
+				@Override
+				public Object invoke(
+						Object proxy, Method method, Object[] args)
+					throws PortalException {
+
+					if (method.equals(schedule)) {
+						return null;
+					}
+					else if (method.equals(delete)) {
+						throw new SchedulerException();
+					}
+					else if (method.equals(auditSchedulerJobs)) {
+						throw new UnsupportedOperationException();
+					}
+
+					throw new UnsupportedOperationException();
+				}
+
+			});
+
+
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		registry.registerService(
+			SchedulerEngineHelper.class, schedulerEngineHelper);
+	}
+
+	@Test
 	public void testMisc() {
 		PropsTestUtil.setProps(
 			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT, "0");
@@ -292,6 +647,75 @@ public class SchedulerEventMessageListenerWrapperTest {
 	private Message _testMessage2;
 	private Message _testMessage3;
 	private TestMessageListener _testMessageListener;
+	private TestMessageListener2 _testMessageListener2;
+
+	private static class MockTrigger implements Trigger {
+
+		public MockTrigger(
+			String jobName, String groupName, Date startDate, Date endDate,
+			int interval, TimeUnit timeUnit) {
+
+			_jobName = jobName;
+			_groupName = groupName;
+
+			if (startDate != null) {
+				_startDate = startDate;
+			}
+			else {
+				_startDate = new Date();
+			}
+
+			_endDate = endDate;
+			_interval = interval;
+			_timeUnit = timeUnit;
+		}
+
+		@Override
+		public Date getEndDate() {
+			return _endDate;
+		}
+
+		@Override
+		public Date getFireDateAfter(Date date) {
+			return null;
+		}
+
+		@Override
+		public String getGroupName() {
+			return _groupName;
+		}
+
+		public int getInterval() {
+			return _interval;
+		}
+
+		@Override
+		public String getJobName() {
+			return _jobName;
+		}
+
+		@Override
+		public Date getStartDate() {
+			return _startDate;
+		}
+
+		public TimeUnit getTimeUnit() {
+			return _timeUnit;
+		}
+
+		@Override
+		public Serializable getWrappedTrigger() {
+			return null;
+		}
+
+		private final Date _endDate;
+		private final String _groupName;
+		private final int _interval;
+		private final String _jobName;
+		private final Date _startDate;
+		private final TimeUnit _timeUnit;
+
+	}
 
 	private class TestCallable implements Callable<Void> {
 
@@ -400,6 +824,18 @@ public class SchedulerEventMessageListenerWrapperTest {
 		private final CountDownLatch _waitCountDownLatch = new CountDownLatch(
 			1);
 
+	}
+
+	private class TestMessageListener2 implements MessageListener {
+
+		@Override
+		public void receive(Message message) {
+			try {
+				message.setResponse(message);
+			}
+			catch (Exception ie) {
+			}
+		}
 	}
 
 }
