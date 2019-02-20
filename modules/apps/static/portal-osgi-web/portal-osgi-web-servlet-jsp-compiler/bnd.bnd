@@ -61,6 +61,17 @@ Import-Package:\
 	org.xml.sax.ext,\
 	org.xml.sax.helpers,\
 	\
+	!org.apache.tools.ant,\
+	!org.apache.tools.ant.taskdefs,\
+	!org.apache.tools.ant.types,\
+	!org.apache.tools.ant.util,\
+	!org.eclipse.jdt.core.compiler,\
+	!org.eclipse.jdt.internal.compiler,\
+	!org.eclipse.jdt.internal.compiler.classfmt,\
+	!org.eclipse.jdt.internal.compiler.env,\
+	!org.eclipse.jdt.internal.compiler.impl,\
+	!org.eclipse.jdt.internal.compiler.problem,\
+	\
 	*
 Provide-Capability:\
 	liferay.extender;\
