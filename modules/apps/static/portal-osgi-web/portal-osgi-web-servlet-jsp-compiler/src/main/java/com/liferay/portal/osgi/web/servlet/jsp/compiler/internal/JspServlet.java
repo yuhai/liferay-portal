@@ -70,6 +70,12 @@ import org.apache.felix.utils.log.Logger;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.runtime.TagHandlerPool;
 
+import org.apache.tomcat.util.descriptor.tld.TaglibXml;
+import org.apache.tomcat.util.descriptor.tld.TldParser;
+import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
+import org.apache.jasper.compiler.TldCache;
+
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleReference;
 import org.osgi.framework.FrameworkUtil;
@@ -252,6 +258,16 @@ public class JspServlet extends HttpServlet {
 
 				@Override
 				public ServletContext getServletContext() {
+					Map<String, TldResourcePath> uriTldResourcePathMap =
+						new HashMap<>();
+					Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap =
+						new HashMap<>();
+
+					_jspServletContext.setAttribute(
+						TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
+						new TldCache(servletContext, uriTldResourcePathMap,
+							tldResourcePathTaglibXmlMap));
+
 					return _jspServletContext;
 				}
 

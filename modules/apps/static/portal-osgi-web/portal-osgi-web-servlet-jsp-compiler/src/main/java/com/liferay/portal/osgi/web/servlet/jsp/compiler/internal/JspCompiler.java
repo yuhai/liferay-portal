@@ -77,6 +77,8 @@ import org.apache.jasper.compiler.TldCache;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
+import org.apache.tomcat.SimpleInstanceManager;
+import org.apache.tomcat.InstanceManager;
 
 import org.apache.jasper.servlet.JspServletWrapper;
 
@@ -176,6 +178,8 @@ public class JspCompiler extends Compiler {
 
 		initClassPath(servletContext);
 		initTLDMappings(servletContext);
+		servletContext.setAttribute(InstanceManager.class.getName(),
+				new SimpleInstanceManager());
 
 		super.init(jspCompilationContext, jspServletWrapper);
 	}
