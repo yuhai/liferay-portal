@@ -14,19 +14,21 @@
 
 package com.liferay.portal.osgi.web.servlet.jsp.compiler.internal;
 
+import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.servlet.JspFactorySwapper;
+import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -42,6 +44,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.portlet.PortletRequest;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
@@ -69,13 +72,10 @@ import javax.servlet.jsp.JspFactory;
 import org.apache.felix.utils.log.Logger;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.runtime.TagHandlerPool;
-
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.apache.jasper.compiler.TldCache;
-
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleReference;
 import org.osgi.framework.FrameworkUtil;
@@ -94,8 +94,7 @@ public class JspServlet extends HttpServlet {
 	public void destroy() {
 		_jspServlet.destroy();
 
-		for (ServiceRegistration<?> serviceRegistration :
-				_serviceRegistrations) {
+		for (ServiceRegistration<?> serviceRegistration : _serviceRegistrations) {
 
 			serviceRegistration.unregister();
 		}
@@ -149,8 +148,7 @@ public class JspServlet extends HttpServlet {
 	}
 
 	@Override
-	public void init(final ServletConfig servletConfig)
-		throws ServletException {
+	public void init(final ServletConfig servletConfig) throws ServletException {
 
 		final ServletContext servletContext = servletConfig.getServletContext();
 
@@ -170,14 +168,13 @@ public class JspServlet extends HttpServlet {
 			JspFactory.setDefaultFactory(new JspFactoryImpl());
 
 			JspFactorySwapper.swap();
-		}
-		finally {
+		} finally {
 			currentThread.setContextClassLoader(contextClassLoader);
 		}
 
 		List<Bundle> bundles = new ArrayList<>();
 
-		BundleReference bundleReference = (BundleReference)classLoader;
+		BundleReference bundleReference = (BundleReference) classLoader;
 
 		_bundle = bundleReference.getBundle();
 
@@ -194,14 +191,13 @@ public class JspServlet extends HttpServlet {
 		_allParticipatingBundles = bundles.toArray(new Bundle[bundles.size()]);
 
 		_jspBundleClassloader = new JspBundleClassloader(
-			_allParticipatingBundles);
+				_allParticipatingBundles);
 
 		final Map<String, String> defaults = new HashMap<>();
 
-		defaults.put(
-			"compilerClassName",
-			"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal." +
-				"JspCompiler");
+		defaults.put("compilerClassName",
+				"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal."
+						+ "JspCompiler");
 		defaults.put("compilerSourceVM", "1.8");
 		defaults.put("compilerTargetVM", "1.8");
 		defaults.put("development", "false");
@@ -209,6 +205,7 @@ public class JspServlet extends HttpServlet {
 		defaults.put("keepgenerated", "false");
 		defaults.put("logVerbosityLevel", "NONE");
 		defaults.put("saveBytecode", "true");
+		defaults.put("strictQuoteEscaping", "false");
 
 		StringBundler sb = new StringBundler(4);
 
@@ -217,15 +214,37 @@ public class JspServlet extends HttpServlet {
 		sb.append(StringPool.DASH);
 		sb.append(_bundle.getVersion());
 
+		File file = new File(sb.toString());
+
+		if(!file.exists()) {
+			file.mkdir();
+		}
+
+//		try {
+//			String path = sb.toString() + File.separator + "a.txt";
+//
+//			File file1 = new File(path);
+//
+//			byte[] bytes = new byte[100];
+//
+//			FileOutputStream fos = new FileOutputStream(file1);
+//
+//			fos.write(bytes);
+//
+//			fos.close();
+//		}
+//		catch(IOException ex) {
+//			ex.printStackTrace();
+//		}
+
 		defaults.put(_INIT_PARAMETER_NAME_SCRATCH_DIR, sb.toString());
 
-		defaults.put(
-			TagHandlerPool.OPTION_TAGPOOL, JspTagHandlerPool.class.getName());
+		defaults.put(TagHandlerPool.OPTION_TAGPOOL,
+				JspTagHandlerPool.class.getName());
 
 		for (Map.Entry<Object, Object> entry : _initParams.entrySet()) {
-			defaults.put(
-				String.valueOf(entry.getKey()),
-				String.valueOf(entry.getValue()));
+			defaults.put(String.valueOf(entry.getKey()),
+					String.valueOf(entry.getValue()));
 		}
 
 		Enumeration<String> names = servletConfig.getInitParameterNames();
@@ -234,55 +253,52 @@ public class JspServlet extends HttpServlet {
 
 		nameSet.addAll(defaults.keySet());
 
-		final Enumeration<String> initParameterNames = Collections.enumeration(
-			nameSet);
+		final Enumeration<String> initParameterNames = Collections
+				.enumeration(nameSet);
 
-		_jspServlet.init(
-			new ServletConfig() {
+		_jspServlet.init(new ServletConfig() {
 
-				@Override
-				public String getInitParameter(String name) {
-					String value = servletConfig.getInitParameter(name);
+			@Override
+			public String getInitParameter(String name) {
+				String value = servletConfig.getInitParameter(name);
 
-					if (value == null) {
-						value = defaults.get(name);
-					}
-
-					return value;
+				if (value == null) {
+					value = defaults.get(name);
 				}
 
-				@Override
-				public Enumeration<String> getInitParameterNames() {
-					return initParameterNames;
-				}
+				return value;
+			}
 
-				@Override
-				public ServletContext getServletContext() {
-					Map<String, TldResourcePath> uriTldResourcePathMap =
-						new HashMap<>();
-					Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap =
-						new HashMap<>();
+			@Override
+			public Enumeration<String> getInitParameterNames() {
+				return initParameterNames;
+			}
 
-					_jspServletContext.setAttribute(
-						TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
-						new TldCache(servletContext, uriTldResourcePathMap,
-							tldResourcePathTaglibXmlMap));
+			@Override
+			public ServletContext getServletContext() {
+//				Map<String, TldResourcePath> uriTldResourcePathMap = new HashMap<>();
+//				Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
+//
+//				_jspServletContext.setAttribute(
+//						TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME, new TldCache(
+//								servletContext, uriTldResourcePathMap,
+//								tldResourcePathTaglibXmlMap));
 
-					return _jspServletContext;
-				}
+				return _jspServletContext;
+			}
 
-				@Override
-				public String getServletName() {
-					return servletConfig.getServletName();
-				}
+			@Override
+			public String getServletName() {
+				return servletConfig.getServletName();
+			}
 
-				private final ServletContext _jspServletContext =
-					new ServletContextWrapper(servletContext);
+			private final ServletContext _jspServletContext = new ServletContextWrapper(
+					servletContext);
 
-			});
+		});
 
 		_logVerbosityLevelDebug = Objects.equals(
-			_jspServlet.getInitParameter("logVerbosityLevel"), "DEBUG");
+				_jspServlet.getInitParameter("logVerbosityLevel"), "DEBUG");
 	}
 
 	@Override
@@ -296,30 +312,36 @@ public class JspServlet extends HttpServlet {
 	}
 
 	@Override
-	public void service(
-			HttpServletRequest request, HttpServletResponse response)
-		throws IOException, ServletException {
+	public void service(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 
 		Thread currentThread = Thread.currentThread();
 
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
+		PortletRequest portletRequest =
+				(PortletRequest)request.getAttribute(
+					JavaConstants.JAVAX_PORTLET_REQUEST);
+
+		if(portletRequest != null){
+			
+		}
+
 		try {
 			currentThread.setContextClassLoader(_jspBundleClassloader);
 
-			if (_logVerbosityLevelDebug) {
-				String path = (String)request.getAttribute(
-					RequestDispatcher.INCLUDE_SERVLET_PATH);
+			if (true) {
+				String path = (String) request
+						.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
 
 				if (path != null) {
-					String pathInfo = (String)request.getAttribute(
-						RequestDispatcher.INCLUDE_PATH_INFO);
+					String pathInfo = (String) request
+							.getAttribute(RequestDispatcher.INCLUDE_PATH_INFO);
 
 					if (pathInfo != null) {
 						path += pathInfo;
 					}
-				}
-				else {
+				} else {
 					path = request.getServletPath();
 
 					String pathInfo = request.getPathInfo();
@@ -329,23 +351,53 @@ public class JspServlet extends HttpServlet {
 					}
 				}
 
-				_jspServlet.log(
-					StringBundler.concat(
-						"[JSP DEBUG] ", _bundle, " invoking ", path));
+				_jspServlet.log(StringBundler.concat("[JSP DEBUG] ", _bundle,
+						" invoking ", path));
+			}
+
+			String name = "org.apache.jasper.runtime.JspApplicationContextImpl";
+
+			HttpServletRequest originalServletRequest =
+				PortalUtil.getOriginalServletRequest(request);
+			
+			ServletContext servletContext = originalServletRequest.getServletContext();
+
+			Object object = servletContext.getAttribute(name);
+
+			String path = servletContext.getContextPath();
+
+			if (object != null && path != null) {
+				System.out.println("Hello World");
+			}
+
+			ServletContext servletContext1 = request.getServletContext();
+
+			String path1 = servletContext1.getContextPath();
+
+			if (servletContext1 != null && path1 != null) {
+				System.out.println("Hello World2");
+			}
+
+			Enumeration<String> enu = servletContext1.getAttributeNames();
+
+			while (enu.hasMoreElements()) {
+				String name1 = enu.nextElement();
+
+				if(name1 != null) {
+				}
 			}
 
 			_jspServlet.service(request, response);
-		}
-		finally {
+		} finally {
 			currentThread.setContextClassLoader(contextClassLoader);
 		}
 	}
 
 	@Override
 	public void service(ServletRequest request, ServletResponse response)
-		throws IOException, ServletException {
+			throws IOException, ServletException {
 
-		service((HttpServletRequest)request, (HttpServletResponse)response);
+		service((HttpServletRequest) request, (HttpServletResponse) response);
 	}
 
 	@Override
@@ -356,8 +408,8 @@ public class JspServlet extends HttpServlet {
 	protected void collectTaglibProviderBundles(List<Bundle> bundles) {
 		BundleWiring bundleWiring = _bundle.adapt(BundleWiring.class);
 
-		for (BundleWire bundleWire :
-				bundleWiring.getRequiredWires("osgi.extender")) {
+		for (BundleWire bundleWire : bundleWiring
+				.getRequiredWires("osgi.extender")) {
 
 			BundleCapability bundleCapability = bundleWire.getCapability();
 
@@ -405,9 +457,9 @@ public class JspServlet extends HttpServlet {
 		}
 
 		if (classNames.isEmpty()) {
-			throw new IllegalArgumentException(
-				clazz.getName() + " does not implement one of the supported " +
-					"servlet listener interfaces");
+			throw new IllegalArgumentException(clazz.getName()
+					+ " does not implement one of the supported "
+					+ "servlet listener interfaces");
 		}
 
 		return classNames.toArray(new String[classNames.size()]);
@@ -418,46 +470,44 @@ public class JspServlet extends HttpServlet {
 	private static final String _INIT_PARAMETER_NAME_SCRATCH_DIR = "scratchdir";
 
 	private static final String _WORK_DIR = StringBundler.concat(
-		PropsValues.LIFERAY_HOME, File.separator, "work", File.separator);
+			PropsValues.LIFERAY_HOME, File.separator, "work", File.separator);
 
 	private static final Properties _initParams = PropsUtil.getProperties(
-		"jsp.servlet.init.param.", true);
-	private static final Bundle _jspBundle = FrameworkUtil.getBundle(
-		JspServlet.class);
-	private static final Pattern _originalJspPattern = Pattern.compile(
-		"^(?<file>.*)(\\.(portal|original))(?<extension>\\.(jsp|jspf))$");
-	private static final Bundle _utilTaglibBundle = FrameworkUtil.getBundle(
-		JspFactorySwapper.class);
+			"jsp.servlet.init.param.", true);
+	private static final Bundle _jspBundle = FrameworkUtil
+			.getBundle(JspServlet.class);
+	private static final Pattern _originalJspPattern = Pattern
+			.compile("^(?<file>.*)(\\.(portal|original))(?<extension>\\.(jsp|jspf))$");
+	private static final Bundle _utilTaglibBundle = FrameworkUtil
+			.getBundle(JspFactorySwapper.class);
 
 	private Bundle[] _allParticipatingBundles;
 	private Bundle _bundle;
 	private JspBundleClassloader _jspBundleClassloader;
-	private final HttpServlet _jspServlet =
-		new org.apache.jasper.servlet.JspServlet();
+	private final HttpServlet _jspServlet = new org.apache.jasper.servlet.JspServlet();
 	private Logger _logger;
 	private boolean _logVerbosityLevelDebug;
-	private final List<ServiceRegistration<?>> _serviceRegistrations =
-		new CopyOnWriteArrayList<>();
+	private final List<ServiceRegistration<?>> _serviceRegistrations = new CopyOnWriteArrayList<>();
 
 	private class ServletContextWrapper implements ServletContext {
 
 		@Override
-		public FilterRegistration.Dynamic addFilter(
-			String filterName, Class<? extends Filter> filterClass) {
+		public FilterRegistration.Dynamic addFilter(String filterName,
+				Class<? extends Filter> filterClass) {
 
 			return _servletContext.addFilter(filterName, filterClass);
 		}
 
 		@Override
-		public FilterRegistration.Dynamic addFilter(
-			String filterName, Filter filter) {
+		public FilterRegistration.Dynamic addFilter(String filterName,
+				Filter filter) {
 
 			return _servletContext.addFilter(filterName, filter);
 		}
 
 		@Override
-		public FilterRegistration.Dynamic addFilter(
-			String filterName, String className) {
+		public FilterRegistration.Dynamic addFilter(String filterName,
+				String className) {
 
 			return _servletContext.addFilter(filterName, className);
 		}
@@ -478,43 +528,43 @@ public class JspServlet extends HttpServlet {
 		}
 
 		@Override
-		public ServletRegistration.Dynamic addServlet(
-			String servletName, Class<? extends Servlet> servletClass) {
+		public ServletRegistration.Dynamic addServlet(String servletName,
+				Class<? extends Servlet> servletClass) {
 
 			return _servletContext.addServlet(servletName, servletClass);
 		}
 
 		@Override
-		public ServletRegistration.Dynamic addServlet(
-			String servletName, Servlet servlet) {
+		public ServletRegistration.Dynamic addServlet(String servletName,
+				Servlet servlet) {
 
 			return _servletContext.addServlet(servletName, servlet);
 		}
 
 		@Override
-		public ServletRegistration.Dynamic addServlet(
-			String servletName, String className) {
+		public ServletRegistration.Dynamic addServlet(String servletName,
+				String className) {
 
 			return _servletContext.addServlet(servletName, className);
 		}
 
 		@Override
 		public <T extends Filter> T createFilter(Class<T> clazz)
-			throws ServletException {
+				throws ServletException {
 
 			return _servletContext.createFilter(clazz);
 		}
 
 		@Override
 		public <T extends EventListener> T createListener(Class<T> clazz)
-			throws ServletException {
+				throws ServletException {
 
 			return _servletContext.createListener(clazz);
 		}
 
 		@Override
 		public <T extends Servlet> T createServlet(Class<T> clazz)
-			throws ServletException {
+				throws ServletException {
 
 			return _servletContext.createServlet(clazz);
 		}
@@ -530,11 +580,10 @@ public class JspServlet extends HttpServlet {
 				return false;
 			}
 
-			ServletContext servletContext = (ServletContext)obj;
+			ServletContext servletContext = (ServletContext) obj;
 
 			if (obj instanceof ServletContextWrapper) {
-				ServletContextWrapper servletContextWrapper =
-					(ServletContextWrapper)obj;
+				ServletContextWrapper servletContextWrapper = (ServletContextWrapper) obj;
 
 				servletContext = servletContextWrapper._servletContext;
 			}
@@ -593,8 +642,7 @@ public class JspServlet extends HttpServlet {
 		}
 
 		@Override
-		public Map<String, ? extends FilterRegistration>
-			getFilterRegistrations() {
+		public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
 
 			return _servletContext.getFilterRegistrations();
 		}
@@ -676,8 +724,8 @@ public class JspServlet extends HttpServlet {
 				}
 
 				if (!path.startsWith("/META-INF/")) {
-					url = _servletContext.getResource(
-						_DIR_NAME_RESOURCES.concat(path));
+					url = _servletContext.getResource(_DIR_NAME_RESOURCES
+							.concat(path));
 				}
 
 				if (url != null) {
@@ -693,8 +741,7 @@ public class JspServlet extends HttpServlet {
 				}
 
 				return _jspBundle.getResource(path);
-			}
-			catch (MalformedURLException murle) {
+			} catch (MalformedURLException murle) {
 			}
 
 			return null;
@@ -710,8 +757,7 @@ public class JspServlet extends HttpServlet {
 
 			try {
 				return url.openStream();
-			}
-			catch (IOException ioe) {
+			} catch (IOException ioe) {
 				return null;
 			}
 		}
@@ -720,8 +766,8 @@ public class JspServlet extends HttpServlet {
 		public Set<String> getResourcePaths(String path) {
 			Set<String> paths = _servletContext.getResourcePaths(path);
 
-			Enumeration<URL> enumeration = _jspBundle.findEntries(
-				path, null, false);
+			Enumeration<URL> enumeration = _jspBundle.findEntries(path, null,
+					false);
 
 			if (enumeration != null) {
 				if ((paths == null) && enumeration.hasMoreElements()) {
@@ -772,8 +818,7 @@ public class JspServlet extends HttpServlet {
 		}
 
 		@Override
-		public Map<String, ? extends ServletRegistration>
-			getServletRegistrations() {
+		public Map<String, ? extends ServletRegistration> getServletRegistrations() {
 
 			return _servletContext.getServletRegistrations();
 		}
@@ -833,7 +878,7 @@ public class JspServlet extends HttpServlet {
 
 		@Override
 		public void setSessionTrackingModes(
-			Set<SessionTrackingMode> sessionTrackingModes) {
+				Set<SessionTrackingMode> sessionTrackingModes) {
 
 			_servletContext.setSessionTrackingModes(sessionTrackingModes);
 		}
@@ -860,7 +905,7 @@ public class JspServlet extends HttpServlet {
 			}
 
 			Enumeration<URL> enumeration = _bundle.findEntries(
-				_DIR_NAME_RESOURCES, path.substring(1), false);
+					_DIR_NAME_RESOURCES, path.substring(1), false);
 
 			if (enumeration == null) {
 				return null;

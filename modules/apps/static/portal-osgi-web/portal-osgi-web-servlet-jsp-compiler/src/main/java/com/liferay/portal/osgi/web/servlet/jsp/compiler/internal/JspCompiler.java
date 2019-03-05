@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.FileOutputStream;
 
 import java.net.URI;
 import java.net.URL;
@@ -51,6 +52,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
+import javax.servlet.jsp.tagext.TagInfo;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -68,6 +70,7 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
+import org.apache.jasper.EmbeddedServletOptions;
 import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.ErrorDispatcher;
 import org.apache.jasper.compiler.JavacErrorDetail;
@@ -102,7 +105,7 @@ public class JspCompiler extends Compiler {
 		JspCompilationContext jspCompilationContext,
 		JspServletWrapper jspServletWrapper) {
 
-		Options options = jspCompilationContext.getOptions();
+		EmbeddedServletOptions options = (EmbeddedServletOptions)jspCompilationContext.getOptions();
 
 		_jspRuntimeContext = jspCompilationContext.getRuntimeContext();
 
@@ -177,7 +180,7 @@ public class JspCompiler extends Compiler {
 		jspCompilationContext.setClassLoader(jspBundleClassloader);
 
 		initClassPath(servletContext);
-		initTLDMappings(servletContext);
+		initTLDMappings(options, servletContext);
 		servletContext.setAttribute(InstanceManager.class.getName(),
 				new SimpleInstanceManager());
 
@@ -261,7 +264,7 @@ public class JspCompiler extends Compiler {
 				TldResourcePath tldResourcePath =
 					new TldResourcePath(url, absoluteResourcePath);
 
-				uriTldResourcePathMap.put(absoluteResourcePath, tldResourcePath);
+				uriTldResourcePathMap.put(uri, tldResourcePath);
 
 				TldParser tldParser = new TldParser(true, false, true);
 
@@ -325,11 +328,39 @@ public class JspCompiler extends Compiler {
 			}
 
 			if (compilationTask.call()) {
-				//for (BytecodeFile bytecodeFile : _classFiles) {
-				//	_jspRuntimeContext.setBytecode(
-				//		bytecodeFile.getClassName(),
-				//		bytecodeFile.getBytecode());
-				//}
+				for (BytecodeFile bytecodeFile : _classFiles) {
+//					_jspRuntimeContext.setBytecode(
+//						bytecodeFile.getClassName(),
+//						bytecodeFile.getBytecode());
+//		            if (!className.equals(c)) {
+//		                // Compute inner class file name
+//		                f = f.substring(0, f.lastIndexOf(File.separator)+1) +
+//		                    c.substring(c.lastIndexOf('.')+1) + ".class";
+//		            }
+//					String classFileName = bytecodeFile.getClassName();
+
+					String classFile;
+//
+//					if (ctxt.isTagFile()) {
+//						TagInfo tagInfo = ctxt.getTagInfo();
+//
+//						classFile = tagInfo.getTagClassName();
+//					}
+
+					classFile = ctxt.getClassFileName();
+
+		            byte[] bytecode = bytecodeFile.getBytecode();
+
+		            if (bytecode != null) {
+		                try {
+		                    FileOutputStream fos = new FileOutputStream(classFile);
+		                    fos.write(bytecode);
+		                    fos.close();
+		                } catch (IOException ex) {
+		                    ex.printStackTrace();
+		                }
+		            }
+				}
 
 				return;
 			}
@@ -419,13 +450,13 @@ public class JspCompiler extends Compiler {
 		}
 	}
 
-	protected void initTLDMappings(ServletContext servletContext) {
-		TldCache tldCache = (TldCache)servletContext.getAttribute(
-			TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME);
-
-		if (tldCache != null) {
-			return;
-		}
+	protected void initTLDMappings(EmbeddedServletOptions options, ServletContext servletContext) {
+//		TldCache tldCache = (TldCache)servletContext.getAttribute(
+//			TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME);
+//
+//		if (tldCache != null) {
+//			return;
+//		}
 
 		Map<String, TldResourcePath> uriTldResourcePathMap =
 			new HashMap<>();
@@ -473,9 +504,12 @@ public class JspCompiler extends Compiler {
 			}
 		}
 
-		servletContext.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
-			new TldCache(servletContext, uriTldResourcePathMap,
-				tldResourcePathTaglibXmlMap));
+		options.setTldCache(
+				new TldCache(servletContext, uriTldResourcePathMap,
+						tldResourcePathTaglibXmlMap));
+//		servletContext.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
+//			new TldCache(servletContext, uriTldResourcePathMap,
+//				tldResourcePathTaglibXmlMap));
 	}
 
 	private static Set<String> _collectPackageNames(BundleWiring bundleWiring) {
