@@ -12,18 +12,22 @@
  * details.
  */
 
-package com.liferay.portal.verify;
+package com.liferay.portal.verify.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
-import com.liferay.portal.kernel.service.persistence.ResourceActionUtil;
+import com.liferay.portal.kernel.service.persistence.ResourceActionPersistence;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
-import com.liferay.portal.verify.test.BaseVerifyProcessTestCase;
+import com.liferay.portal.verify.VerifyProcess;
+import com.liferay.portal.verify.VerifyResourceActions;
+import com.liferay.portal.verify.test.util.BaseVerifyProcessTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +37,12 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Michael Bowerman
  */
+@RunWith(Arquillian.class)
 public class VerifyResourceActionsTest extends BaseVerifyProcessTestCase {
 
 	@ClassRule
@@ -102,14 +108,16 @@ public class VerifyResourceActionsTest extends BaseVerifyProcessTestCase {
 		long resourceActionId = CounterLocalServiceUtil.increment(
 			ResourceAction.class.getName());
 
-		ResourceAction resourceAction = ResourceActionUtil.create(
+		ResourceAction resourceAction = _resourceActionPersistence.create(
 			resourceActionId);
 
 		resourceAction.setName(name);
 		resourceAction.setActionId(actionId);
 		resourceAction.setBitwiseValue(bitwiseValue);
 
-		_resourceActions.add(ResourceActionUtil.update(resourceAction));
+		_resourceActions.add(
+			ResourceActionLocalServiceUtil.updateResourceAction(
+				resourceAction));
 	}
 
 	private static final String _ACTION_ID_1 = "action1";
@@ -121,6 +129,9 @@ public class VerifyResourceActionsTest extends BaseVerifyProcessTestCase {
 	private static final String _NAME_1 = "portlet1";
 
 	private static final String _NAME_2 = "portlet2";
+
+	@Inject
+	private static ResourceActionPersistence _resourceActionPersistence;
 
 	@DeleteAfterTestRun
 	private final List<ResourceAction> _resourceActions = new ArrayList<>();
