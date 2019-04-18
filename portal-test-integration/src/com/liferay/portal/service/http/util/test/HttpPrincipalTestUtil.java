@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.service.http;
+package com.liferay.portal.service.http.util.test;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CompanyConstants;
