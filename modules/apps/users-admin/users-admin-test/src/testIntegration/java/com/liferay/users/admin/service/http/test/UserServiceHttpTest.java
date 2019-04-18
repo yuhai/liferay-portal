@@ -18,17 +18,21 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.service.http.UserServiceHttp;
 import com.liferay.portal.service.http.util.test.HttpPrincipalTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Calendar;
 import java.util.Locale;
 
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +49,17 @@ public class UserServiceHttpTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		ReflectionTestUtil.setFieldValue(
+			PropsValues.class, "TUNNELING_SERVLET_SHARED_SECRET",
+			"F0E1D2C3B4A5968778695A4B3C2D1E0F");
+		ReflectionTestUtil.setFieldValue(
+			PropsValues.class, "TUNNELING_SERVLET_SHARED_SECRET_HEX", true);
+
+		_login = HttpPrincipalTestUtil.getLogin(false);
+	}
+
 	@Test
 	public void testAddUser() throws Exception {
 		addUser();
@@ -55,7 +70,7 @@ public class UserServiceHttpTest {
 		User user = addUser();
 
 		UserServiceHttp.deleteUser(
-			HttpPrincipalTestUtil.getHttpPrincipal(), user.getUserId());
+			HttpPrincipalTestUtil.getHttpPrincipal(_login), user.getUserId());
 	}
 
 	@Test
@@ -63,7 +78,7 @@ public class UserServiceHttpTest {
 		User user = addUser();
 
 		UserServiceHttp.getUserByEmailAddress(
-			HttpPrincipalTestUtil.getHttpPrincipal(),
+			HttpPrincipalTestUtil.getHttpPrincipal(_login),
 			TestPropsValues.getCompanyId(), user.getEmailAddress());
 	}
 
@@ -96,13 +111,20 @@ public class UserServiceHttpTest {
 
 		ServiceContext serviceContext = new ServiceContext();
 
+		Thread currentThread = Thread.currentThread();
+
+		currentThread.setContextClassLoader(
+			PortalClassLoaderUtil.getClassLoader());
+
 		return UserServiceHttp.addUser(
-			HttpPrincipalTestUtil.getHttpPrincipal(),
+			HttpPrincipalTestUtil.getHttpPrincipal(_login),
 			TestPropsValues.getCompanyId(), autoPassword, password1, password2,
 			autoScreenName, screenName, emailAddress, facebookId, openId,
 			locale, firstName, middleName, lastName, prefixId, suffixId, male,
 			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
 			organizationIds, roleIds, userGroupIds, sendMail, serviceContext);
 	}
+
+	private static String _login;
 
 }
