@@ -12,8 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.service.user;
+package com.liferay.user.service.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.DefaultScreenNameValidator;
@@ -34,12 +35,14 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Brian Wing Shun Chan
  * @author José Manuel Navarro
  * @author Drew Brokke
  */
+@RunWith(Arquillian.class)
 public class UserServiceWhenAddingUserWithSpecialCharactersScreenNameTest {
 
 	@ClassRule
@@ -48,7 +51,7 @@ public class UserServiceWhenAddingUserWithSpecialCharactersScreenNameTest {
 		new LiferayIntegrationTestRule();
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		_screenNameValidator = ScreenNameValidatorFactory.getInstance();
 
 		if (_screenNameValidator instanceof DefaultScreenNameValidator) {
@@ -61,7 +64,7 @@ public class UserServiceWhenAddingUserWithSpecialCharactersScreenNameTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		if (_screenNameValidator instanceof DefaultScreenNameValidator) {
 			ReflectionTestUtil.setFieldValue(
 				_screenNameValidator, _FIELD_KEY, _originalSpecialCharacters);

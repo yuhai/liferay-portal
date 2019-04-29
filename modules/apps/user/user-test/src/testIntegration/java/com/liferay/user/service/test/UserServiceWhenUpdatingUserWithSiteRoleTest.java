@@ -12,8 +12,9 @@
  * details.
  */
 
-package com.liferay.portal.service.user;
+package com.liferay.user.service.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
@@ -21,10 +22,10 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
-import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
-import com.liferay.portal.kernel.service.UserServiceUtil;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
+import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.service.persistence.UserGroupRolePK;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
@@ -44,10 +46,12 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Pei-Jung Lan
  */
+@RunWith(Arquillian.class)
 public class UserServiceWhenUpdatingUserWithSiteRoleTest {
 
 	@ClassRule
@@ -63,12 +67,12 @@ public class UserServiceWhenUpdatingUserWithSiteRoleTest {
 
 		_group = GroupTestUtil.addGroup();
 
-		OrganizationLocalServiceUtil.addGroupOrganization(
+		_organizationLocalService.addGroupOrganization(
 			_group.getGroupId(), _organization);
 
 		_user = UserTestUtil.addUser();
 
-		OrganizationLocalServiceUtil.addUserOrganization(
+		_organizationLocalService.addUserOrganization(
 			_user.getUserId(), _organization);
 
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_SITE);
@@ -77,12 +81,12 @@ public class UserServiceWhenUpdatingUserWithSiteRoleTest {
 			_user.getUserId(), _group.getGroupId(), _role.getRoleId());
 
 		UserGroupRole userGroupRole =
-			UserGroupRoleLocalServiceUtil.createUserGroupRole(userGroupRolePK);
+			_userGroupRoleLocalService.createUserGroupRole(userGroupRolePK);
 
 		_user = _updateUser(_user, Collections.singletonList(userGroupRole));
 
 		Assert.assertTrue(
-			UserGroupRoleLocalServiceUtil.hasUserGroupRole(
+			_userGroupRoleLocalService.hasUserGroupRole(
 				_user.getUserId(), _group.getGroupId(), _role.getRoleId()));
 	}
 
@@ -99,7 +103,7 @@ public class UserServiceWhenUpdatingUserWithSiteRoleTest {
 		int birthdayDay = birthdayCal.get(Calendar.DATE);
 		int birthdayYear = birthdayCal.get(Calendar.YEAR);
 
-		return UserServiceUtil.updateUser(
+		return _userService.updateUser(
 			user.getUserId(), user.getPassword(), null, null,
 			user.isPasswordReset(), null, null, user.getScreenName(),
 			user.getEmailAddress(), user.getFacebookId(), user.getOpenId(),
@@ -118,10 +122,19 @@ public class UserServiceWhenUpdatingUserWithSiteRoleTest {
 	@DeleteAfterTestRun
 	private Organization _organization;
 
+	@Inject
+	private OrganizationLocalService _organizationLocalService;
+
 	@DeleteAfterTestRun
 	private Role _role;
 
 	@DeleteAfterTestRun
 	private User _user;
+
+	@Inject
+	private UserGroupRoleLocalService _userGroupRoleLocalService;
+
+	@Inject
+	private UserService _userService;
 
 }

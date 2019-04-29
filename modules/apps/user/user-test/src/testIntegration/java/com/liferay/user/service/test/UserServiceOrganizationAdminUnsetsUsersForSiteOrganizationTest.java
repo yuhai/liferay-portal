@@ -12,12 +12,12 @@
  * details.
  */
 
-package com.liferay.portal.service.user;
+package com.liferay.user.service.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
@@ -29,13 +29,16 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Brian Wing Shun Chan
  * @author José Manuel Navarro
  * @author Drew Brokke
  */
-public class UserServiceOrganizationAdminUnsetsUsersForSiteOrganizationTest {
+@RunWith(Arquillian.class)
+public class UserServiceOrganizationAdminUnsetsUsersForSiteOrganizationTest
+	extends BaseUserServiceTestCase {
 
 	@ClassRule
 	@Rule
@@ -56,33 +59,27 @@ public class UserServiceOrganizationAdminUnsetsUsersForSiteOrganizationTest {
 	public void testShouldUnsetSiteAdmin() throws Exception {
 		User groupAdminUser = UserTestUtil.addGroupAdminUser(_group);
 
-		try {
-			UserServiceTestUtil.unsetGroupUsers(
-				_group.getGroupId(), _organizationAdminUser, groupAdminUser);
-
-			Assert.assertTrue(
-				UserLocalServiceUtil.hasGroupUser(
-					_group.getGroupId(), groupAdminUser.getUserId()));
-		}
-		finally {
-			UserLocalServiceUtil.deleteUser(groupAdminUser);
-		}
+		_unsetGroupUsers(groupAdminUser);
 	}
 
 	@Test
 	public void testShouldUnsetSiteOwner() throws Exception {
 		User groupOwnerUser = UserTestUtil.addGroupOwnerUser(_group);
 
+		_unsetGroupUsers(groupOwnerUser);
+	}
+
+	private void _unsetGroupUsers(User objectUser) throws Exception {
 		try {
-			UserServiceTestUtil.unsetGroupUsers(
-				_group.getGroupId(), _organizationAdminUser, groupOwnerUser);
+			unsetGroupUsers(
+				_group.getGroupId(), _organizationAdminUser, objectUser);
 
 			Assert.assertTrue(
-				UserLocalServiceUtil.hasGroupUser(
-					_group.getGroupId(), groupOwnerUser.getUserId()));
+				userLocalService.hasGroupUser(
+					_group.getGroupId(), objectUser.getUserId()));
 		}
 		finally {
-			UserLocalServiceUtil.deleteUser(groupOwnerUser);
+			userLocalService.deleteUser(objectUser);
 		}
 	}
 
