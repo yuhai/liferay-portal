@@ -257,7 +257,7 @@
 	<sql id="com.liferay.message.boards.service.persistence.MBThreadFinder.countByG_U_LPD">
 		<![CDATA[
 			SELECT
-				COUNT(DISTINCT MBThread.threadId) AS COUNT_VALUE
+				COUNT(*) AS COUNT_VALUE
 			FROM
 				MBThread
 			INNER JOIN
