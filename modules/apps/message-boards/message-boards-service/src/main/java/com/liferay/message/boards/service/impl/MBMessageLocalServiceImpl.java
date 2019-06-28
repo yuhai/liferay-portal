@@ -192,7 +192,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		// Message
 
-		validateDiscussionMaxComments(className, classPK);
+		if (threadId > 0) {
+			validateDiscussionMaxComments(className, classPK);
+		}
 
 		long categoryId = MBCategoryConstants.DISCUSSION_CATEGORY_ID;
 		subject = getDiscussionMessageSubject(subject, body);
@@ -251,7 +253,11 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		MBMessage parentMBMessage = fetchMBMessage(parentMessageId);
+		MBMessage parentMBMessage = null;
+
+		if (parentMessageId > MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID) {
+			parentMBMessage = fetchMBMessage(parentMessageId);
+		}
 
 		if ((parentMBMessage != null) && !parentMBMessage.isApproved()) {
 			throw new PortalException("Parent message is not approved");
