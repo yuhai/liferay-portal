@@ -20,8 +20,10 @@ import com.liferay.mail.reader.internal.util.HtmlContentUtil;
 import com.liferay.mail.reader.model.Attachment;
 import com.liferay.mail.reader.model.Folder;
 import com.liferay.mail.reader.model.Message;
+import com.liferay.mail.reader.service.AttachmentLocalService;
 import com.liferay.mail.reader.service.base.MessageLocalServiceBaseImpl;
 import com.liferay.petra.string.CharPool;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -30,7 +32,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -39,9 +41,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Scott Lee
  */
+@Component(
+	property = "model.class.name=com.liferay.mail.reader.model.Message",
+	service = AopService.class
+)
 public class MessageLocalServiceImpl extends MessageLocalServiceBaseImpl {
 
 	@Override
@@ -87,8 +96,7 @@ public class MessageLocalServiceImpl extends MessageLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer<Message> indexer = IndexerRegistryUtil.getIndexer(
-			Message.class);
+		Indexer<Message> indexer = _indexerRegistry.getIndexer(Message.class);
 
 		indexer.reindex(message);
 
@@ -111,13 +119,12 @@ public class MessageLocalServiceImpl extends MessageLocalServiceBaseImpl {
 
 		// Attachments
 
-		attachmentLocalService.deleteAttachments(
+		_attachmentLocalService.deleteAttachments(
 			message.getCompanyId(), message.getMessageId());
 
 		// Indexer
 
-		Indexer<Message> indexer = IndexerRegistryUtil.getIndexer(
-			Message.class);
+		Indexer<Message> indexer = _indexerRegistry.getIndexer(Message.class);
 
 		indexer.delete(message);
 
@@ -330,8 +337,7 @@ public class MessageLocalServiceImpl extends MessageLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer<Message> indexer = IndexerRegistryUtil.getIndexer(
-			Message.class);
+		Indexer<Message> indexer = _indexerRegistry.getIndexer(Message.class);
 
 		indexer.reindex(message);
 
@@ -388,5 +394,11 @@ public class MessageLocalServiceImpl extends MessageLocalServiceBaseImpl {
 
 		return contentType.substring(0, i);
 	}
+
+	@Reference
+	private AttachmentLocalService _attachmentLocalService;
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
 
 }
