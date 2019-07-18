@@ -546,6 +546,10 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		urlTitle = StringUtil.replaceFirst(
 			urlTitle, CharPool.SLASH, StringPool.BLANK);
 
+		String test = "word";
+
+		test = "hai";
+
 		List<KBArticle> kbArticles = null;
 
 		OrderByComparator<KBArticle> orderByComparator =
