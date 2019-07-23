@@ -25,11 +25,13 @@ import com.liferay.portal.kernel.security.jaas.PortalPrincipal;
 import com.liferay.portal.kernel.security.jaas.PortalRole;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.HttpMethods;
+import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.IntegerWrapper;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.security.jaas.JAASHelper;
@@ -38,9 +40,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
 
 import java.lang.reflect.Field;
-
 import java.security.Principal;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +57,6 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +69,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -137,9 +135,13 @@ public class JAASTest {
 
 			});
 
+		String servletContextName =
+			ServletContextClassLoaderPool.getServletContextName(
+				PortalClassLoaderUtil.getClassLoader());
+
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest(
-				ServletContextPool.get(StringPool.BLANK), HttpMethods.GET,
+					ServletContextPool.get(StringPool.BLANK), HttpMethods.GET,
 				StringPool.SLASH);
 
 		mockHttpServletRequest.setRemoteUser(
@@ -148,8 +150,8 @@ public class JAASTest {
 		try {
 			User user = PortalUtil.getUser(mockHttpServletRequest);
 
-			Assert.assertEquals(1, counter.getValue());
 			Assert.assertEquals(_user.getUserId(), user.getUserId());
+			Assert.assertEquals(1, counter.getValue());
 
 			user = PortalUtil.getUser(mockHttpServletRequest);
 
