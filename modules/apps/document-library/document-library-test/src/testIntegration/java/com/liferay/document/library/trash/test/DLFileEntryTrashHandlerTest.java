@@ -100,10 +100,10 @@ public class DLFileEntryTrashHandlerTest
 			BaseModel<?> parentBaseModel, ServiceContext serviceContext)
 		throws Exception {
 
-		DLFolder dlFolder = (DLFolder)parentBaseModel;
+		DLFolder dlFolderr = (DLFolder)parentBaseModel;
 
 		return addBaseModelWithWorkflow(
-			dlFolder.getGroupId(), dlFolder.getFolderId(), false);
+			dlFolderr.getGroupId(), dlFolderr.getFolderId(), false);
 	}
 
 	@Override
