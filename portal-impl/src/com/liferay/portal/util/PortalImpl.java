@@ -5710,6 +5710,12 @@ public class PortalImpl implements Portal {
 
 		long userId = getUserId(httpServletRequest);
 
+		_log.error("userId: " + userId);
+
+		String remoteUser2 = httpServletRequest.getRemoteUser();
+
+		_log.error("remoteUser2: " + remoteUser2);
+
 		if (userId <= 0) {
 
 			// Portlet WARs may have the correct remote user and not have the
@@ -5718,6 +5724,10 @@ public class PortalImpl implements Portal {
 			// is inconsistent across different application servers.
 
 			String remoteUser = httpServletRequest.getRemoteUser();
+
+			_log.error("remoteUser: " + remoteUser);
+
+			_log.error("PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
 
 			if ((remoteUser == null) && !PropsValues.PORTAL_JAAS_ENABLE) {
 				HttpSession session = httpServletRequest.getSession();

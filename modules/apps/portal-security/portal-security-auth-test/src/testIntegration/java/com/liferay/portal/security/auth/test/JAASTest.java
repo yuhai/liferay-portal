@@ -97,6 +97,8 @@ public class JAASTest {
 
 		_jaasEnabledField.set(null, true);
 
+		System.out.println("##com.liferay.portal.security.auth.test.JAASTest.setUp() PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
+
 		Configuration.setConfiguration(new JAASConfiguration());
 
 		_user = TestPropsValues.getUser();
@@ -130,6 +132,8 @@ public class JAASTest {
 					}
 					finally {
 						counter.increment();
+
+						System.out.println("##com.liferay.portal.security.auth.test.JAASTest## executes");
 					}
 				}
 
@@ -148,6 +152,8 @@ public class JAASTest {
 			String.valueOf(_user.getScreenName()));
 
 		try {
+			System.out.println("##com.liferay.portal.security.auth.test.JAASTest.testGetUser() PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
+
 			User user = PortalUtil.getUser(mockHttpServletRequest);
 
 			Assert.assertEquals(_user.getUserId(), user.getUserId());
