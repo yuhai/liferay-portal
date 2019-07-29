@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -85,19 +86,15 @@ public class JAASTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_jaasEnabled = PropsValues.PORTAL_JAAS_ENABLE;
+
+		ReflectionTestUtil.setFieldValue(
+			PropsValues.class, "PORTAL_JAAS_ENABLE", true);
+
 		_jaasAuthTypeField = ReflectionUtil.getDeclaredField(
 			PropsValues.class, "PORTAL_JAAS_AUTH_TYPE");
 
 		_jaasAuthType = (String)_jaasAuthTypeField.get(null);
-
-		_jaasEnabledField = ReflectionUtil.getDeclaredField(
-			PropsValues.class, "PORTAL_JAAS_ENABLE");
-
-		_jaasEnabled = (Boolean)_jaasEnabledField.get(null);
-
-		_jaasEnabledField.set(null, true);
-
-		System.out.println("##com.liferay.portal.security.auth.test.JAASTest.setUp() PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
 
 		Configuration.setConfiguration(new JAASConfiguration());
 
@@ -108,8 +105,10 @@ public class JAASTest {
 	public void tearDown() throws Exception {
 		Configuration.setConfiguration(null);
 
+		ReflectionTestUtil.setFieldValue(
+			PropsValues.class, "PORTAL_JAAS_ENABLE", _jaasEnabled);
+
 		_jaasAuthTypeField.set(null, _jaasAuthType);
-		_jaasEnabledField.set(null, _jaasEnabled);
 	}
 
 	@Test
@@ -153,6 +152,7 @@ public class JAASTest {
 
 		try {
 			System.out.println("##com.liferay.portal.security.auth.test.JAASTest.testGetUser() PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
+
 
 			User user = PortalUtil.getUser(mockHttpServletRequest);
 
@@ -428,7 +428,7 @@ public class JAASTest {
 
 	private String _jaasAuthType;
 	private Field _jaasAuthTypeField;
-	private Boolean _jaasEnabled;
+	private boolean _jaasEnabled;
 	private Field _jaasEnabledField;
 	private User _user;
 
