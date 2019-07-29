@@ -5710,11 +5710,21 @@ public class PortalImpl implements Portal {
 
 		long userId = getUserId(httpServletRequest);
 
-		_log.error("userId: " + userId);
+		String remoteUser = httpServletRequest.getRemoteUser();
 
-		String remoteUser2 = httpServletRequest.getRemoteUser();
+		StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 
-		_log.error("remoteUser2: " + remoteUser2);
+		if(stackTraceElements.length > 3) {
+			String content = stackTraceElements[3].toString();
+
+			if(content.equals("com.liferay.portal.security.auth.test.JAASTest.testGetUser(JAASTest.java:157)")) {
+				_log.error("userId: " + userId);
+
+				_log.error("remoteUser: " + remoteUser);
+
+				_log.error("PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
+			}
+		}
 
 		if (userId <= 0) {
 
@@ -5722,12 +5732,6 @@ public class PortalImpl implements Portal {
 			// correct user id because the user id is saved in the session and
 			// may not be accessible by the portlet WAR's session. This behavior
 			// is inconsistent across different application servers.
-
-			String remoteUser = httpServletRequest.getRemoteUser();
-
-			_log.error("remoteUser: " + remoteUser);
-
-			_log.error("PropsValues.PORTAL_JAAS_ENABLE: " + PropsValues.PORTAL_JAAS_ENABLE);
 
 			if ((remoteUser == null) && !PropsValues.PORTAL_JAAS_ENABLE) {
 				HttpSession session = httpServletRequest.getSession();
