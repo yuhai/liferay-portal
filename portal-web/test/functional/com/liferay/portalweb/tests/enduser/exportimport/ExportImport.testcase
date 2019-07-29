@@ -1134,6 +1134,8 @@ definition {
 
 		User.logoutPG();
 
+		Pause(locator = "3000");
+
 		Navigator.openSpecificURL(url = "${downloadURL}");
 
 		AssertTextEquals(

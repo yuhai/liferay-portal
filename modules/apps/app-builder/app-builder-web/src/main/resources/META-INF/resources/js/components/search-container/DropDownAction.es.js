@@ -15,18 +15,28 @@
 import ClayDropDown from '@clayui/drop-down';
 import React from 'react';
 
-const {Item} = ClayDropDown;
+const {Divider, Item} = ClayDropDown;
 
-export default function DropDownAction({action, row, setActive}) {
+export default function DropDownAction({action, item, setActive}) {
+	const {callback, link, name} = action;
+	const href = link ? link(item) : 'javascript:;';
+
+	if (name === 'divider') {
+		return <Divider />;
+	}
+
 	return (
 		<Item
-			href="javascript:;"
+			href={href}
 			onClick={() => {
 				setActive(false);
-				action.callback(row);
+
+				if (callback) {
+					callback(item);
+				}
 			}}
 		>
-			{action.name}
+			{name}
 		</Item>
 	);
 }

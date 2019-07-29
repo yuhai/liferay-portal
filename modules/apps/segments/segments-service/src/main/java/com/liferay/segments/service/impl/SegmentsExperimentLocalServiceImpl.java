@@ -156,11 +156,34 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	@Override
+	public List<SegmentsExperiment> getSegmentsExperienceSegmentsExperiments(
+		long segmentsExperienceId, long classNameId, long classPK, int status) {
+
+		return segmentsExperimentPersistence.findByS_C_C_S(
+			segmentsExperienceId, classNameId, classPK, status);
+	}
+
+	@Override
 	public List<SegmentsExperiment> getSegmentsExperiments(
 		long groupId, long classNameId, long classPK) {
 
 		return segmentsExperimentPersistence.findByG_C_C(
 			groupId, classNameId, _getPublishedLayoutClassPK(classPK));
+	}
+
+	@Override
+	public SegmentsExperiment updateSegmentsExperiment(
+			long segmentsExperimentId, String name, String description)
+		throws PortalException {
+
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentPersistence.findByPrimaryKey(
+				segmentsExperimentId);
+
+		segmentsExperiment.setName(name);
+		segmentsExperiment.setDescription(description);
+
+		return segmentsExperimentPersistence.update(segmentsExperiment);
 	}
 
 	private long _getPublishedLayoutClassPK(long classPK) {

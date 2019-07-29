@@ -92,7 +92,7 @@ describe('SearchContainer', () => {
 			document.querySelector('span.loading-animation')
 		);
 
-		expect(queryAllByTestId('row').length).toBe(1);
+		expect(queryAllByTestId('item').length).toBe(1);
 		expect(container.querySelectorAll('li.page-item').length).toBe(3);
 
 		const [first, second, third] = lang.sub.mock.calls[0][1];
@@ -118,7 +118,7 @@ describe('SearchContainer', () => {
 			return document.querySelector('span.loading-animation');
 		});
 
-		expect(queryAllByTestId('row').length).toBe(20);
+		expect(queryAllByTestId('item').length).toBe(20);
 		expect(container.querySelectorAll('li.page-item').length).toBe(4);
 		expect(
 			container.querySelector('li.page-item.active').firstElementChild

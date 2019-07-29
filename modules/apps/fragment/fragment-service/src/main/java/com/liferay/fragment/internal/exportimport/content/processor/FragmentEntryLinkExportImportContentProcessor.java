@@ -100,7 +100,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 				continue;
 			}
 
-			if (Objects.equals(key, _EDITABLE_FRAGMENT_ENTRY_PROCESSOR_KEY)) {
+			if (Objects.equals(key, _KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR)) {
 				Iterator<String> editableKeysIterator =
 					editableProcessorJSONObject.keys();
 
@@ -119,7 +119,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 				}
 			}
 			else if (Objects.equals(
-						key, _FREEMARKER_FRAGMENT_ENTRY_PROCESSOR_KEY)) {
+						key, _KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR)) {
 
 				_replaceSegmentsExperienceExportContentReferences(
 					portletDataContext, stagedModel,
@@ -168,7 +168,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 				continue;
 			}
 
-			if (Objects.equals(key, _EDITABLE_FRAGMENT_ENTRY_PROCESSOR_KEY)) {
+			if (Objects.equals(key, _KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR)) {
 				Iterator<String> editableKeysIterator =
 					editableProcessorJSONObject.keys();
 
@@ -187,7 +187,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 			}
 			else {
 				if (Objects.equals(
-						key, _FREEMARKER_FRAGMENT_ENTRY_PROCESSOR_KEY)) {
+						key, _KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR)) {
 
 					_replaceSegmentsExperienceImportContentReferences(
 						portletDataContext, editableProcessorJSONObject);
@@ -534,11 +534,11 @@ public class FragmentEntryLinkExportImportContentProcessor
 
 	private static final String _DDM_TEMPLATE = "ddmTemplate_";
 
-	private static final String _EDITABLE_FRAGMENT_ENTRY_PROCESSOR_KEY =
+	private static final String _KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR =
 		"com.liferay.fragment.entry.processor.editable." +
 			"EditableFragmentEntryProcessor";
 
-	private static final String _FREEMARKER_FRAGMENT_ENTRY_PROCESSOR_KEY =
+	private static final String _KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR =
 		"com.liferay.fragment.entry.processor.freemarker." +
 			"FreeMarkerFragmentEntryProcessor";
 

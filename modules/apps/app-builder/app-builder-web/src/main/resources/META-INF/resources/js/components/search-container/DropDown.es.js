@@ -19,7 +19,7 @@ import DropDownAction from './DropDownAction.es';
 
 const {ItemList} = ClayDropDown;
 
-export default function DropDown({actions, row}) {
+export default function DropDown({actions, item}) {
 	const [active, setActive] = useState(false);
 
 	return (
@@ -41,8 +41,8 @@ export default function DropDown({actions, row}) {
 				{actions.map((action, index) => (
 					<DropDownAction
 						action={action}
+						item={item}
 						key={index}
-						row={row}
 						setActive={setActive}
 					/>
 				))}

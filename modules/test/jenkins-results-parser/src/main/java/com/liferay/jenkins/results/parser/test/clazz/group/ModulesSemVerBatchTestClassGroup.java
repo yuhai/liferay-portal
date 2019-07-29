@@ -142,7 +142,12 @@ public class ModulesSemVerBatchTestClassGroup
 		File portalModulesBaseDir = new File(
 			portalGitWorkingDirectory.getWorkingDirectory(), "modules");
 
-		if ((testSuiteName == null) || testSuiteName.equals("default")) {
+		if (testRelevantChanges) {
+			moduleDirsList.addAll(
+				portalGitWorkingDirectory.getModifiedModuleDirsList(
+					excludesPathMatchers, includesPathMatchers));
+		}
+		else {
 			moduleDirsList.addAll(
 				portalGitWorkingDirectory.getModuleDirsList(
 					excludesPathMatchers, includesPathMatchers));
@@ -153,11 +158,6 @@ public class ModulesSemVerBatchTestClassGroup
 			for (File semVerMarkerFile : semVerMarkerFiles) {
 				moduleDirsList.add(semVerMarkerFile.getParentFile());
 			}
-		}
-		else {
-			moduleDirsList.addAll(
-				portalGitWorkingDirectory.getModifiedModuleDirsList(
-					excludesPathMatchers, includesPathMatchers));
 		}
 
 		for (File moduleDir : moduleDirsList) {

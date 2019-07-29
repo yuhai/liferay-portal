@@ -35,7 +35,11 @@ import {
 	getEmptyLayoutData,
 	getLayoutDataFragmentEntryLinkIds
 } from '../utils/LayoutDataList.es';
-import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../utils/constants';
+import {
+	BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
+	EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+	FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
+} from '../utils/constants';
 import {getFragmentEntryLinkContent} from './fragments.es';
 import {prefixSegmentsExperienceId} from '../utils/prefixSegmentsExperienceId.es';
 
@@ -405,37 +409,23 @@ function _provideDefaultValueToFragments(state, incomingExperienceId) {
 		const [fragmentEntryLinkId, fragmentEntryLink] = entry;
 		let newAcc = acc;
 
+		const newProcessorEditableValues = [
+			BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
+			EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+			FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
+		].map(processor =>
+			_provideProcessorValuesForIncomingExperience(
+				processor,
+				fragmentEntryLink.editableValues || {},
+				defaultSegmentsExperienceKey,
+				incomingExperienceKey
+			)
+		);
+
 		const newEditableValues = Object.assign(
 			{},
 			fragmentEntryLink.editableValues,
-			{
-				[EDITABLE_FRAGMENT_ENTRY_PROCESSOR]: Object.entries(
-					fragmentEntryLink.editableValues[
-						EDITABLE_FRAGMENT_ENTRY_PROCESSOR
-					] || {}
-				).reduce((editableAcc, editableEntry) => {
-					const [editableKey, editableValue] = editableEntry;
-					let newEditableValue = editableValue;
-
-					if (editableValue[defaultSegmentsExperienceKey]) {
-						newEditableValue = Object.assign({}, editableValue, {
-							[incomingExperienceKey]: deepClone(
-								editableValue[defaultSegmentsExperienceKey]
-							)
-						});
-					} else {
-						newEditableValue = Object.assign({}, editableValue, {
-							[incomingExperienceKey]: {
-								defaultValue: editableValue.defaultValue
-							}
-						});
-					}
-
-					return Object.assign({}, editableAcc, {
-						[editableKey]: newEditableValue
-					});
-				}, {})
-			}
+			...newProcessorEditableValues
 		);
 
 		const newFragmentEntryLink = Object.assign({}, fragmentEntryLink, {
@@ -456,6 +446,47 @@ function _provideDefaultValueToFragments(state, incomingExperienceId) {
 	return Promise.all(updateRequests).then(() =>
 		setIn(nextState, ['fragmentEntryLinks'], newFragmentEntryLinks)
 	);
+}
+
+/**
+ * Creates an editableValue for the given processor copying the value of the default
+ * experience key but using the incoming experience key
+ * @param {string} processor
+ * @param {object} editableValues
+ * @param {string} defaultSegmentsExperienceKey
+ * @param {string} incomingExperienceKey
+ */
+function _provideProcessorValuesForIncomingExperience(
+	processor,
+	editableValues,
+	defaultSegmentsExperienceKey,
+	incomingExperienceKey
+) {
+	const cloned = {};
+	const processorEditableValue = editableValues[processor] || {};
+
+	Object.entries(processorEditableValue).map(editableEntry => {
+		const [editableKey, editableValue] = editableEntry;
+		let newEditableValue = editableValue;
+
+		if (editableValue[defaultSegmentsExperienceKey]) {
+			newEditableValue = Object.assign({}, editableValue, {
+				[incomingExperienceKey]: deepClone(
+					editableValue[defaultSegmentsExperienceKey]
+				)
+			});
+		} else {
+			newEditableValue = Object.assign({}, editableValue, {
+				[incomingExperienceKey]: {
+					defaultValue: editableValue.defaultValue
+				}
+			});
+		}
+
+		cloned[editableKey] = newEditableValue;
+	});
+
+	return {[processor]: cloned};
 }
 
 /**

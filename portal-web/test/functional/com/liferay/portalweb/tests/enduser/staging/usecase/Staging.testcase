@@ -645,11 +645,11 @@ definition {
 			portletName = "Custom Fields");
 
 		User.logoutPG(
-			nodePort = "9080",
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
 		User.loginPG(
+			nodePort = "9080",
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 

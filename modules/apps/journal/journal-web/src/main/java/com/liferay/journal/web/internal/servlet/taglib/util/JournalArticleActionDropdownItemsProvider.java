@@ -151,6 +151,14 @@ public class JournalArticleActionDropdownItemsProvider {
 
 						add(_getViewHistoryArticleActionUnsafeConsumer());
 					}
+
+					String[] availableLanguageIds =
+						_article.getAvailableLanguageIds();
+
+					if (availableLanguageIds.length > 1) {
+						add(
+							_getDeleteArticleTranslationsActionUnsafeConsumer());
+					}
 				}
 
 				add(_getViewUsagesArticleActionUnsafeConsumer());
@@ -374,6 +382,49 @@ public class JournalArticleActionDropdownItemsProvider {
 			dropdownItem.putData("deleteURL", deleteURL.toString());
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "delete"));
+		};
+	}
+
+	private UnsafeConsumer<DropdownItem, Exception>
+			_getDeleteArticleTranslationsActionUnsafeConsumer()
+		throws Exception {
+
+		PortletURL selectArticleTranslationsURL =
+			_liferayPortletResponse.createRenderURL();
+
+		selectArticleTranslationsURL.setParameter(
+			"mvcPath", "/select_article_translations.jsp");
+		selectArticleTranslationsURL.setParameter("redirect", _getRedirect());
+		selectArticleTranslationsURL.setParameter("backURL", _getRedirect());
+		selectArticleTranslationsURL.setParameter(
+			"articleId", _article.getArticleId());
+
+		selectArticleTranslationsURL.setWindowState(LiferayWindowState.POP_UP);
+
+		PortletURL deleteArticleTranslationsURL =
+			_liferayPortletResponse.createActionURL();
+
+		deleteArticleTranslationsURL.setParameter(
+			ActionRequest.ACTION_NAME, "/journal/select_article_translations");
+		deleteArticleTranslationsURL.setParameter(
+			"articleId", _article.getArticleId());
+
+		return dropdownItem -> {
+			dropdownItem.putData("action", "deleteArticleTranslations");
+			dropdownItem.putData(
+				"deleteArticleTranslationsURL",
+				deleteArticleTranslationsURL.toString());
+			dropdownItem.putData(
+				"selectArticleTranslationsURL",
+				selectArticleTranslationsURL.toString());
+			dropdownItem.putData(
+				"title",
+				LanguageUtil.get(_httpServletRequest, "delete-translations") +
+					StringPool.TRIPLE_PERIOD);
+
+			dropdownItem.setLabel(
+				LanguageUtil.get(_httpServletRequest, "delete-translations") +
+					StringPool.TRIPLE_PERIOD);
 		};
 	}
 

@@ -16,6 +16,7 @@ package com.liferay.frontend.js.loader.modules.extender.internal.resolution;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,6 +102,10 @@ public class BrowserModulesResolution {
 		_mappedModuleNamesMap.put(moduleName, value);
 	}
 
+	public void putModuleFlags(String moduleName, JSONObject flagsJSONObject) {
+		_flagsJSONObjects.put(moduleName, flagsJSONObject);
+	}
+
 	public void putPath(String moduleName, String path) {
 		_pathsMap.put(moduleName, path);
 	}
@@ -114,6 +119,7 @@ public class BrowserModulesResolution {
 			map.put("explanation", _resolvedModuleNames);
 		}
 
+		map.put("moduleFlags", _flagsJSONObjects);
 		map.put("moduleMap", _dependenciesMap);
 		map.put("pathMap", _pathsMap);
 		map.put("resolvedModules", _resolvedModuleNames);
@@ -125,6 +131,7 @@ public class BrowserModulesResolution {
 		new HashMap<>();
 	private int _explainIndentation;
 	private List<String> _explanation;
+	private final Map<String, JSONObject> _flagsJSONObjects = new HashMap<>();
 	private final JSONFactory _jsonFactory;
 	private final Map<String, Object> _mappedModuleNamesMap = new HashMap<>();
 	private final Map<String, String> _pathsMap = new HashMap<>();

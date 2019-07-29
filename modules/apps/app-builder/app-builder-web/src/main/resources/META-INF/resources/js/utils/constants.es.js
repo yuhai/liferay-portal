@@ -13,18 +13,16 @@
  */
 
 import moment from 'moment';
-import React from 'react';
-import {Link} from 'react-router-dom';
 import {deleteItem} from './client.es';
 
-const confirmDelete = endpoint => row =>
+const confirmDelete = endpoint => item =>
 	new Promise((resolve, reject) => {
 		const confirmed = confirm(
 			Liferay.Language.get('are-you-sure-you-want-to-delete-this')
 		);
 
 		if (confirmed) {
-			deleteItem(endpoint + row.id)
+			deleteItem(endpoint + item.id)
 				.then(() => resolve(true))
 				.catch(error => reject(error));
 		} else {
@@ -78,6 +76,21 @@ export const APPS = {
 export const CUSTOM_OBJECTS = {
 	ACTIONS: [
 		{
+			name: Liferay.Language.get('form-views'),
+			link: item => `#/custom-object/${item.id}/form-views`
+		},
+		{
+			name: Liferay.Language.get('table-views'),
+			link: item => `#/custom-object/${item.id}/table-views`
+		},
+		{
+			name: Liferay.Language.get('deployments'),
+			link: item => `#/custom-object/${item.id}/deployments`
+		},
+		{
+			name: 'divider'
+		},
+		{
 			name: Liferay.Language.get('delete'),
 			callback: confirmDelete('/o/data-engine/v1.0/data-definitions/')
 		}
@@ -105,11 +118,10 @@ export const CUSTOM_OBJECTS = {
 			dateCreated: moment(item.dateCreated).fromNow(),
 			dateModified: moment(item.dateModified).fromNow(),
 			id: item.id,
-			name: (
-				<Link to={`/custom-object/${item.id}/form-views`}>
-					{item.name.en_US}
-				</Link>
-			)
+			name: {
+				name: item.name.en_US,
+				link: item => `/custom-object/${item.id}/form-views`
+			}
 		}))
 };
 
@@ -132,7 +144,7 @@ export const FORM_VIEWS = {
 		}
 	],
 	EMPTY_STATE: {
-		title: Liferay.Language.get('there-are-no-table-views-yet'),
+		title: Liferay.Language.get('there-are-no-form-views-yet'),
 		description: Liferay.Language.get(
 			'create-one-or-more-forms-to-display-the-data-held-in-your-data-object'
 		)
@@ -167,7 +179,7 @@ export const TABLE_VIEWS = {
 		}
 	],
 	EMPTY_STATE: {
-		title: Liferay.Language.get('there-are-no-form-views-yet'),
+		title: Liferay.Language.get('there-are-no-table-views-yet'),
 		description: Liferay.Language.get(
 			'create-one-or-more-tables-to-display-the-data-held-in-your-data-object'
 		)

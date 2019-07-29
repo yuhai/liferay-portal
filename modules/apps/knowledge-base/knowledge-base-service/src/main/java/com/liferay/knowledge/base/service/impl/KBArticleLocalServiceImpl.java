@@ -35,20 +35,22 @@ import com.liferay.knowledge.base.exception.NoSuchArticleException;
 import com.liferay.knowledge.base.internal.importer.KBArchiveFactory;
 import com.liferay.knowledge.base.internal.importer.KBArticleImporter;
 import com.liferay.knowledge.base.internal.util.AdminSubscriptionSenderFactory;
+import com.liferay.knowledge.base.internal.util.KBArticleDiffUtil;
 import com.liferay.knowledge.base.internal.util.KBArticleLocalSiblingNavigationHelper;
+import com.liferay.knowledge.base.internal.util.KBCommentUtil;
+import com.liferay.knowledge.base.internal.util.KBSectionEscapeUtil;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.base.KBArticleLocalServiceBaseImpl;
 import com.liferay.knowledge.base.service.util.KnowledgeBaseConstants;
-import com.liferay.knowledge.base.util.AdminHelper;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator;
 import com.liferay.knowledge.base.util.comparator.KBArticleVersionComparator;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
@@ -94,7 +96,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.subscription.model.Subscription;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
@@ -108,11 +109,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Peter Shin
  * @author Brian Wing Shun Chan
  * @author Edward Han
  */
+@Component(
+	property = "model.class.name=com.liferay.knowledge.base.model.KBArticle",
+	service = AopService.class
+)
 public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 	@Override
@@ -124,7 +132,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		KBArticle kbArticle = kbArticleLocalService.getLatestKBArticle(
 			resourcePrimKey, WorkflowConstants.STATUS_ANY);
 
-		return portletFileRepository.addPortletFileEntry(
+		return _portletFileRepository.addPortletFileEntry(
 			kbArticle.getGroupId(), userId, KBArticle.class.getName(),
 			kbArticle.getClassPK(), KBConstants.SERVICE_NAME,
 			kbArticle.getAttachmentsFolderId(), inputStream, fileName, mimeType,
@@ -186,7 +194,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setDescription(description);
 		kbArticle.setPriority(priority);
 		kbArticle.setSections(
-			StringUtil.merge(adminHelper.escapeSections(sections)));
+			StringUtil.merge(KBSectionEscapeUtil.escapeSections(sections)));
 		kbArticle.setViewCount(0);
 		kbArticle.setLatest(true);
 		kbArticle.setMain(false);
@@ -312,7 +320,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			WorkflowThreadLocal.setEnabled(false);
 
 			KBArticleImporter kbArticleImporter = new KBArticleImporter(
-				kbArchiveFactory, this, portal, dlURLHelper);
+				_kbArchiveFactory, this, _portal, _dlURLHelper);
 
 			return kbArticleImporter.processZipFile(
 				userId, groupId, parentKbFolderId, prioritizeByNumericalPrefix,
@@ -345,7 +353,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		Group group = groupLocalService.getGroup(groupId);
 
 		List<Subscription> subscriptions =
-			subscriptionLocalService.getSubscriptions(
+			_subscriptionLocalService.getSubscriptions(
 				group.getCompanyId(), KBArticle.class.getName(), groupId);
 
 		for (Subscription subscription : subscriptions) {
@@ -379,8 +387,9 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// KB comments
 
-		kbCommentLocalService.deleteKBComments(
-			KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+		KBCommentUtil.deleteKBComments(
+			KBArticle.class.getName(), classNameLocalService,
+			kbArticle.getResourcePrimKey(), kbCommentPersistence);
 
 		// Asset
 
@@ -402,14 +411,14 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer<KBArticle> indexer = indexerRegistry.getIndexer(
+		Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
 			KBArticle.class);
 
 		indexer.delete(kbArticle);
 
 		// Attachments
 
-		portletFileRepository.deletePortletFolder(
+		_portletFileRepository.deletePortletFolder(
 			kbArticle.getAttachmentsFolderId());
 
 		// Subscriptions
@@ -879,7 +888,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		long groupId, String[] sections, int status, int start, int end,
 		OrderByComparator<KBArticle> orderByComparator) {
 
-		String[] array = adminHelper.escapeSections(sections);
+		String[] array = KBSectionEscapeUtil.escapeSections(sections);
 
 		for (int i = 0; i < array.length; i++) {
 			array[i] = StringUtil.quote(array[i], StringPool.PERCENT);
@@ -902,7 +911,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	public int getSectionsKBArticlesCount(
 		long groupId, String[] sections, int status) {
 
-		String[] array = adminHelper.escapeSections(sections);
+		String[] array = KBSectionEscapeUtil.escapeSections(sections);
 
 		for (int i = 0; i < array.length; i++) {
 			array[i] = StringUtil.quote(array[i], StringPool.PERCENT);
@@ -1079,7 +1088,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	public void subscribeGroupKBArticles(long userId, long groupId)
 		throws PortalException {
 
-		subscriptionLocalService.addSubscription(
+		_subscriptionLocalService.addSubscription(
 			userId, groupId, KBArticle.class.getName(), groupId);
 	}
 
@@ -1088,7 +1097,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			long userId, long groupId, long resourcePrimKey)
 		throws PortalException {
 
-		subscriptionLocalService.addSubscription(
+		_subscriptionLocalService.addSubscription(
 			userId, groupId, KBArticle.class.getName(), resourcePrimKey);
 	}
 
@@ -1096,7 +1105,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	public void unsubscribeGroupKBArticles(long userId, long groupId)
 		throws PortalException {
 
-		subscriptionLocalService.deleteSubscription(
+		_subscriptionLocalService.deleteSubscription(
 			userId, KBArticle.class.getName(), groupId);
 	}
 
@@ -1104,7 +1113,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	public void unsubscribeKBArticle(long userId, long resourcePrimKey)
 		throws PortalException {
 
-		subscriptionLocalService.deleteSubscription(
+		_subscriptionLocalService.deleteSubscription(
 			userId, KBArticle.class.getName(), resourcePrimKey);
 	}
 
@@ -1168,7 +1177,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setContent(content);
 		kbArticle.setDescription(description);
 		kbArticle.setSections(
-			StringUtil.merge(adminHelper.escapeSections(sections)));
+			StringUtil.merge(KBSectionEscapeUtil.escapeSections(sections)));
 		kbArticle.setLatest(true);
 		kbArticle.setMain(false);
 		kbArticle.setSourceURL(sourceURL);
@@ -1373,7 +1382,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer<KBArticle> indexer = indexerRegistry.getIndexer(
+		Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
 			KBArticle.class);
 
 		indexer.reindex(kbArticle);
@@ -1548,7 +1557,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		throws PortalException {
 
 		List<Subscription> subscriptions =
-			subscriptionLocalService.getSubscriptions(
+			_subscriptionLocalService.getSubscriptions(
 				kbArticle.getCompanyId(), KBArticle.class.getName(),
 				kbArticle.getResourcePrimKey());
 
@@ -1619,9 +1628,10 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			String value = BeanPropertiesUtil.getString(kbArticle, param);
 
 			try {
-				value = adminHelper.getKBArticleDiff(
-					kbArticle.getResourcePrimKey(), kbArticle.getVersion() - 1,
-					kbArticle.getVersion(), param);
+				value = KBArticleDiffUtil.getKBArticleDiff(
+					version -> getKBArticle(
+						kbArticle.getResourcePrimKey(), version),
+					kbArticle.getVersion() - 1, kbArticle.getVersion(), param);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -1637,7 +1647,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			long groupId)
 		throws ConfigurationException {
 
-		return configurationProvider.getConfiguration(
+		return _configurationProvider.getConfiguration(
 			KBGroupServiceConfiguration.class,
 			new GroupServiceSettingsLocator(groupId, KBConstants.SERVICE_NAME));
 	}
@@ -1872,7 +1882,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 
 		for (long removeFileEntryId : removeFileEntryIds) {
-			portletFileRepository.deletePortletFileEntry(removeFileEntryId);
+			_portletFileRepository.deletePortletFileEntry(removeFileEntryId);
 		}
 	}
 
@@ -1916,7 +1926,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Sync indexed permission fields
 
-		indexWriterHelper.updatePermissionFields(
+		_indexWriterHelper.updatePermissionFields(
 			KBArticle.class.getName(), String.valueOf(resourcePrimKey));
 	}
 
@@ -2052,38 +2062,35 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	@BeanReference(type = AdminHelper.class)
-	protected AdminHelper adminHelper;
-
-	@ServiceReference(type = ConfigurationProvider.class)
-	protected ConfigurationProvider configurationProvider;
-
-	@ServiceReference(type = DLURLHelper.class)
-	protected DLURLHelper dlURLHelper;
-
-	@ServiceReference(type = IndexerRegistry.class)
-	protected IndexerRegistry indexerRegistry;
-
-	@ServiceReference(type = IndexWriterHelper.class)
-	protected IndexWriterHelper indexWriterHelper;
-
-	@ServiceReference(type = KBArchiveFactory.class)
-	protected KBArchiveFactory kbArchiveFactory;
-
-	@ServiceReference(type = Portal.class)
-	protected Portal portal;
-
-	@ServiceReference(type = PortletFileRepository.class)
-	protected PortletFileRepository portletFileRepository;
-
-	@ServiceReference(type = SubscriptionLocalService.class)
-	protected SubscriptionLocalService subscriptionLocalService;
-
 	private static final int[] _STATUSES = {
 		WorkflowConstants.STATUS_APPROVED, WorkflowConstants.STATUS_PENDING
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleLocalServiceImpl.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private DLURLHelper _dlURLHelper;
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
+
+	@Reference
+	private IndexWriterHelper _indexWriterHelper;
+
+	@Reference
+	private KBArchiveFactory _kbArchiveFactory;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortletFileRepository _portletFileRepository;
+
+	@Reference
+	private SubscriptionLocalService _subscriptionLocalService;
 
 }

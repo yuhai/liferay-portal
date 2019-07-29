@@ -66,23 +66,29 @@ export default function SearchContainer({
 	};
 
 	const refetchOnDelete = actions =>
-		actions.map(action => ({
-			...action,
-			callback: row => {
-				action.callback(row).then(confirmed => {
-					if (!confirmed) {
-						return;
-					}
-
-					if (page > 1 && items.length === 1) {
-						goBackPage();
-						return;
-					}
-
-					refetch();
-				});
+		actions.map(action => {
+			if (!action.callback) {
+				return action;
 			}
-		}));
+
+			return {
+				...action,
+				callback: item => {
+					action.callback(item).then(confirmed => {
+						if (!confirmed) {
+							return;
+						}
+
+						if (page > 1 && items.length === 1) {
+							goBackPage();
+							return;
+						}
+
+						refetch();
+					});
+				}
+			};
+		});
 
 	if (!items || items.length === 0) {
 		return <EmptyState {...emptyState} />;
@@ -93,7 +99,7 @@ export default function SearchContainer({
 			<Table
 				actions={refetchOnDelete(actions)}
 				columns={columns}
-				rows={formatter(items)}
+				items={formatter(items)}
 			/>
 
 			<div className="taglib-search-iterator-page-iterator-bottom">

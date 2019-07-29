@@ -1793,7 +1793,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		while (iterator.hasNext()) {
 			Bundle bundle = iterator.next();
 
-			if (_configurationBundleSymbolicNames.contains(bundle.getSymbolicName())) {
+			if (_configurationBundleSymbolicNames.contains(
+					bundle.getSymbolicName())) {
+
 				bundle.start();
 
 				iterator.remove();

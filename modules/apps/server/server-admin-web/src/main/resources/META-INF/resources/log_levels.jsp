@@ -17,28 +17,21 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String[] tab2Names = {"update-categories", "add-category"};
-
-if (!ArrayUtil.contains(tab2Names, tabs2)) {
-	tabs2 = tab2Names[0];
-}
-
 int delta = ParamUtil.getInteger(request, SearchContainer.DEFAULT_DELTA_PARAM, SearchContainer.DEFAULT_DELTA);
 String keywords = ParamUtil.getString(request, "keywords");
 
-PortletURL serverURL = renderResponse.createRenderURL();
+PortletURL searchURL = renderResponse.createRenderURL();
 
-serverURL.setParameter("mvcRenderCommandName", "/server_admin/view");
-serverURL.setParameter("tabs1", tabs1);
-serverURL.setParameter("tabs2", tabs2);
-serverURL.setParameter("delta", String.valueOf(delta));
+searchURL.setParameter("mvcRenderCommandName", "/server_admin/view");
+searchURL.setParameter("tabs1", tabs1);
+searchURL.setParameter("delta", String.valueOf(delta));
 
-PortletURL clearResultsURL = PortletURLUtil.clone(serverURL, liferayPortletResponse);
+PortletURL clearResultsURL = PortletURLUtil.clone(searchURL, liferayPortletResponse);
 
 clearResultsURL.setParameter("navigation", (String)null);
 clearResultsURL.setParameter("keywords", StringPool.BLANK);
 
-SearchContainer loggerSearchContainer = new SearchContainer(liferayPortletRequest, serverURL, null, null);
+SearchContainer loggerSearchContainer = new SearchContainer(liferayPortletRequest, searchURL, null, null);
 
 Map currentLoggerNames = new TreeMap();
 
@@ -71,117 +64,84 @@ while (itr.hasNext()) {
 
 loggerSearchContainer.setResults(ListUtil.subList(currentLoggerNamesList, loggerSearchContainer.getStart(), loggerSearchContainer.getEnd()));
 loggerSearchContainer.setTotal(currentLoggerNamesList.size());
+
+PortletURL addLogCategoryURL = renderResponse.createRenderURL();
+
+addLogCategoryURL.setParameter("mvcRenderCommandName", "/server_admin/add_log_category");
+addLogCategoryURL.setParameter("redirect", currentURL);
+
+CreationMenu creationMenu = new CreationMenu() {
+	{
+		addPrimaryDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref(addLogCategoryURL);
+				dropdownItem.setLabel(LanguageUtil.get(request, "add-category"));
+			});
+	}
+};
 %>
 
-<div class="server-admin-tabs">
-	<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-		<aui:nav cssClass="navbar-nav">
+<clay:management-toolbar
+	clearResultsURL="<%= String.valueOf(clearResultsURL) %>"
+	creationMenu="<%= creationMenu %>"
+	itemsTotal="<%= loggerSearchContainer.getTotal() %>"
+	searchActionURL="<%= String.valueOf(searchURL) %>"
+	searchFormName="searchFm"
+	selectable="<%= false %>"
+	showCreationMenu="<%= true %>"
+	showSearch="<%= true %>"
+/>
+
+<div class="container-fluid-1280">
+	<liferay-ui:search-container
+		searchContainer="<%= loggerSearchContainer %>"
+	>
+		<liferay-ui:search-container-row
+			className="java.util.Map.Entry"
+			modelVar="entry"
+		>
 
 			<%
-			for (String tab2Name : tab2Names) {
-				serverURL.setParameter("tabs2", tab2Name);
+			String name = (String)entry.getKey();
 			%>
 
-				<aui:nav-item href="<%= serverURL.toString() %>" label="<%= tab2Name %>" selected="<%= tabs2.equals(tab2Name) %>" />
-
-			<%
-			}
-
-			serverURL.setParameter("tabs2", tabs2);
-			%>
-
-		</aui:nav>
-
-		<c:if test='<%= tabs2.equals("update-categories") %>'>
-			<clay:management-toolbar
-				clearResultsURL="<%= String.valueOf(clearResultsURL) %>"
-				itemsTotal="<%= loggerSearchContainer.getTotal() %>"
-				searchActionURL="<%= String.valueOf(serverURL) %>"
-				searchFormName="searchFm"
-				selectable="<%= false %>"
-				showSearch="<%= true %>"
+			<liferay-ui:search-container-column-text
+				name="category"
+				value="<%= HtmlUtil.escape(name) %>"
 			/>
-		</c:if>
-	</aui:nav-bar>
 
-	<c:choose>
-		<c:when test='<%= tabs2.equals("add-category") %>'>
-			<aui:fieldset-group markupView="lexicon">
-				<aui:fieldset>
-					<aui:input cssClass="lfr-input-text-container" label="logger-name" name="loggerName" type="text" />
-
-					<aui:select label="log-level" name="priority">
-
-						<%
-						for (int i = 0; i < Levels.ALL_LEVELS.length; i++) {
-						%>
-
-							<aui:option label="<%= Levels.ALL_LEVELS[i] %>" selected="<%= Level.INFO.equals(Levels.ALL_LEVELS[i]) %>" />
-
-						<%
-						}
-						%>
-
-					</aui:select>
-				</aui:fieldset>
-			</aui:fieldset-group>
-
-			<aui:button-row>
-				<aui:button cssClass="save-server-button" data-cmd="addLogLevel" value="save" />
-			</aui:button-row>
-		</c:when>
-		<c:otherwise>
-			<liferay-ui:search-container
-				searchContainer="<%= loggerSearchContainer %>"
+			<liferay-ui:search-container-column-text
+				name="level"
 			>
-				<liferay-ui:search-container-row
-					className="java.util.Map.Entry"
-					modelVar="entry"
-				>
+
+				<%
+				Logger logger = (Logger)entry.getValue();
+
+				Level level = logger.getLevel();
+				%>
+
+				<select name="<%= renderResponse.getNamespace() + "logLevel" + HtmlUtil.escapeAttribute(name) %>">
 
 					<%
-					String name = (String)entry.getKey();
+					for (int j = 0; j < Levels.ALL_LEVELS.length; j++) {
 					%>
 
-					<liferay-ui:search-container-column-text
-						name="category"
-						value="<%= HtmlUtil.escape(name) %>"
-					/>
+						<option <%= level.equals(Levels.ALL_LEVELS[j]) ? "selected" : StringPool.BLANK %> value="<%= Levels.ALL_LEVELS[j] %>"><%= Levels.ALL_LEVELS[j] %></option>
 
-					<liferay-ui:search-container-column-text
-						name="level"
-					>
+					<%
+					}
+					%>
 
-						<%
-						Logger logger = (Logger)entry.getValue();
+				</select>
+			</liferay-ui:search-container-column-text>
+		</liferay-ui:search-container-row>
 
-						Level level = logger.getLevel();
-						%>
+		<liferay-ui:search-iterator
+			markupView="lexicon"
+		/>
+	</liferay-ui:search-container>
 
-						<select name="<%= renderResponse.getNamespace() + "logLevel" + HtmlUtil.escapeAttribute(name) %>">
-
-							<%
-							for (int j = 0; j < Levels.ALL_LEVELS.length; j++) {
-							%>
-
-								<option <%= level.equals(Levels.ALL_LEVELS[j]) ? "selected" : StringPool.BLANK %> value="<%= Levels.ALL_LEVELS[j] %>"><%= Levels.ALL_LEVELS[j] %></option>
-
-							<%
-							}
-							%>
-
-						</select>
-					</liferay-ui:search-container-column-text>
-				</liferay-ui:search-container-row>
-
-				<liferay-ui:search-iterator
-					markupView="lexicon"
-				/>
-			</liferay-ui:search-container>
-
-			<aui:button-row>
-				<aui:button cssClass="save-server-button" data-cmd="updateLogLevels" value="save" />
-			</aui:button-row>
-		</c:otherwise>
-	</c:choose>
+	<aui:button-row>
+		<aui:button cssClass="save-server-button" data-cmd="updateLogLevels" value="save" />
+	</aui:button-row>
 </div>

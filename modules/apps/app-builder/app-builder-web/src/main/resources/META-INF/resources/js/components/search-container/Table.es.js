@@ -14,11 +14,12 @@
 
 import ClayTable from '@clayui/table';
 import React from 'react';
+import {Link} from 'react-router-dom';
 import DropDown from './DropDown.es';
 
 const {Body, Cell, Head, Row} = ClayTable;
 
-export default function Table({actions, columns, rows}) {
+export default function Table({actions, columns, items}) {
 	return (
 		<div className="table-responsive">
 			<ClayTable hover={false} responsive={false}>
@@ -40,22 +41,38 @@ export default function Table({actions, columns, rows}) {
 					</Row>
 				</Head>
 				<Body>
-					{rows.map(row => (
-						<Row data-testid="row" key={row.id}>
-							{columns.map((column, index) => (
-								<Cell
-									className={
-										index > 0 && 'table-cell-expand-smaller'
-									}
-									expanded={index === 0}
-									headingTitle={index === 0}
-									key={index}
-								>
-									{row[Object.keys(column)[0]]}
-								</Cell>
-							))}
+					{items.map(item => (
+						<Row data-testid="item" key={item.id}>
+							{columns.map((column, index) => {
+								let content = item[Object.keys(column)[0]];
+
+								if (
+									typeof content === 'object' &&
+									content.link
+								) {
+									content = (
+										<Link to={content.link(item)}>
+											{content.name}
+										</Link>
+									);
+								}
+
+								return (
+									<Cell
+										className={
+											index > 0 &&
+											'table-cell-expand-smaller'
+										}
+										expanded={index === 0}
+										headingTitle={index === 0}
+										key={index}
+									>
+										{content}
+									</Cell>
+								);
+							})}
 							<Cell>
-								<DropDown actions={actions} row={row} />
+								<DropDown actions={actions} item={item} />
 							</Cell>
 						</Row>
 					))}

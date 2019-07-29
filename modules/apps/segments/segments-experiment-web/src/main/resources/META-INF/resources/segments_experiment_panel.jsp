@@ -15,3 +15,34 @@
 --%>
 
 <%@ include file="/init.jsp" %>
+
+<%
+SegmentsExperimentDisplayContext segmentsExperimentDisplayContext = (SegmentsExperimentDisplayContext)request.getAttribute(SegmentsExperimentWebKeys.SEGMENTS_EXPERIMENT_DISPLAY_CONTEXT);
+
+String segmentsExperimentRootId = renderResponse.getNamespace() + "-segments-experiment-root";
+%>
+
+<div id="<%= segmentsExperimentRootId %>"></div>
+
+<aui:script require='<%= npmResolvedPackageName + "/js/index.es as segmentsExperimentsApp" %>'>
+	segmentsExperimentsApp.default(
+		'<%= segmentsExperimentRootId %>',
+		{
+			segmentsExperiences: <%= segmentsExperimentDisplayContext.getSegmentsExperiencesJSONArray(locale) %>,
+			segmentsExperiment: <%= segmentsExperimentDisplayContext.getSegmentsExperimentJSONObject() %>,
+			selectedSegmentsExperienceId: '<%= segmentsExperimentDisplayContext.getSelectedSegmentsExperienceId() %>'
+		},
+		{
+			endpoints: {
+				createSegmentsExperimentURL: '/segments.segmentsexperiment/add-segments-experiment',
+				editSegmentsExperimentURL: '/segments.segmentsexperiment/update-segments-experiment'
+			},
+			namespace: '<portlet:namespace />',
+			page: {
+				classPK: '<%= themeDisplay.getPlid() %>',
+				classNameId: '<%= PortalUtil.getClassNameId(Layout.class.getName()) %>'
+			},
+			spritemap: '<%= themeDisplay.getPathThemeImages() + "/lexicon/icons.svg" %>'
+		}
+	);
+</aui:script>

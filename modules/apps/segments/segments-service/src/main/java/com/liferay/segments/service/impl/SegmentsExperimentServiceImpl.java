@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.segments.constants.SegmentsActionKeys;
 import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.model.SegmentsExperiment;
@@ -51,6 +52,20 @@ public class SegmentsExperimentServiceImpl
 	}
 
 	@Override
+	public List<SegmentsExperiment> getSegmentsExperienceSegmentsExperiments(
+			long segmentsExperienceId, long classNameId, long classPK,
+			int status)
+		throws PortalException {
+
+		LayoutPermissionUtil.check(
+			getPermissionChecker(), classPK, ActionKeys.UPDATE);
+
+		return segmentsExperimentLocalService.
+			getSegmentsExperienceSegmentsExperiments(
+				segmentsExperienceId, classNameId, classPK, status);
+	}
+
+	@Override
 	public SegmentsExperiment getSegmentsExperiment(long segmentsExperimentId)
 		throws PortalException {
 
@@ -70,6 +85,21 @@ public class SegmentsExperimentServiceImpl
 
 		return segmentsExperimentPersistence.filterFindByG_C_C(
 			groupId, classNameId, _getPublishedLayoutClassPK(classPK));
+	}
+
+	@Override
+	public SegmentsExperiment updateSegmentsExperiment(
+			long segmentsExperimentId, String name, String description)
+		throws PortalException {
+
+		_segmentsExperimentResourcePermission.check(
+			getPermissionChecker(),
+			segmentsExperimentLocalService.getSegmentsExperiment(
+				segmentsExperimentId),
+			ActionKeys.UPDATE);
+
+		return segmentsExperimentLocalService.updateSegmentsExperiment(
+			segmentsExperimentId, name, description);
 	}
 
 	private long _getPublishedLayoutClassPK(long classPK) {

@@ -18,11 +18,7 @@ import {NavLink, withRouter} from 'react-router-dom';
 
 const {Item} = ClayNavigationBar;
 
-function NavigationBar({
-	match: {
-		params: {dataDefinitionId}
-	}
-}) {
+function NavigationBar({match: {url}}) {
 	const blur = event => {
 		event.target.blur();
 	};
@@ -38,7 +34,7 @@ function NavigationBar({
 					activeClassName="active"
 					className="nav-link"
 					onClick={blur}
-					to={`/custom-object/${dataDefinitionId}/form-views`}
+					to={`${url}/form-views`}
 				>
 					{Liferay.Language.get('form-views')}
 				</NavLink>
@@ -48,7 +44,7 @@ function NavigationBar({
 					activeClassName="active"
 					className="nav-link"
 					onClick={blur}
-					to={`/custom-object/${dataDefinitionId}/table-views`}
+					to={`${url}/table-views`}
 				>
 					{Liferay.Language.get('table-views')}
 				</NavLink>
@@ -58,7 +54,7 @@ function NavigationBar({
 					activeClassName="active"
 					className="nav-link"
 					onClick={blur}
-					to={`/custom-object/${dataDefinitionId}/deployments`}
+					to={`${url}/deployments`}
 				>
 					{Liferay.Language.get('deployments')}
 				</NavLink>

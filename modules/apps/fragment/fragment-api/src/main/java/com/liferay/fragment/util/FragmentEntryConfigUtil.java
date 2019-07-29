@@ -14,6 +14,10 @@
 
 package com.liferay.fragment.util;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.fragment.util.configuration.FragmentConfigurationField;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -24,7 +28,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Rubén Pulido
@@ -34,129 +43,211 @@ public class FragmentEntryConfigUtil {
 	public static JSONObject getConfigurationDefaultValuesJSONObject(
 		String configuration) {
 
+		List<FragmentConfigurationField> fragmentConfigurationFields =
+			getFragmentConfigurationFields(configuration);
+
 		JSONObject defaultValuesJSONObject = JSONFactoryUtil.createJSONObject();
 
-		JSONArray fieldSetsJSONArray = _getFieldSetsJSONArray(configuration);
+		for (FragmentConfigurationField fragmentConfigurationField :
+				fragmentConfigurationFields) {
 
-		if (fieldSetsJSONArray == null) {
-			return null;
-		}
-
-		for (int i = 0; i < fieldSetsJSONArray.length(); i++) {
-			JSONObject configurationFieldSetJSONObject =
-				fieldSetsJSONArray.getJSONObject(i);
-
-			JSONArray configurationFieldSetFieldsJSONArray =
-				configurationFieldSetJSONObject.getJSONArray("fields");
-
-			for (int j = 0; j < configurationFieldSetFieldsJSONArray.length();
-				 j++) {
-
-				JSONObject configurationFieldSetFieldJSONObject =
-					configurationFieldSetFieldsJSONArray.getJSONObject(j);
-
-				defaultValuesJSONObject.put(
-					configurationFieldSetFieldJSONObject.getString("name"),
-					_getFieldValue(configurationFieldSetFieldJSONObject, null));
-			}
+			defaultValuesJSONObject.put(
+				fragmentConfigurationField.getName(),
+				getFieldValue(fragmentConfigurationField, null));
 		}
 
 		return defaultValuesJSONObject;
 	}
 
-	public static Object getFieldValue(
-		String configuration, String fieldName, String value) {
+	public static Map<String, Object> getContextObjects(
+		JSONObject configurationValuesJSONObject, String configuration) {
 
-		JSONObject configurationFieldSetFieldJSONObject =
-			_getConfigurationFieldSetFieldJSONObject(configuration, fieldName);
+		HashMap<String, Object> contextObjects = new HashMap<>();
 
-		if (configurationFieldSetFieldJSONObject == null) {
-			return value;
+		List<FragmentConfigurationField> fragmentConfigurationFields =
+			getFragmentConfigurationFields(configuration);
+
+		for (FragmentConfigurationField fragmentConfigurationField :
+				fragmentConfigurationFields) {
+
+			String name = fragmentConfigurationField.getName();
+
+			Object contextObject = _getContextObject(
+				fragmentConfigurationField.getType(),
+				configurationValuesJSONObject.getString(name));
+
+			if (contextObject != null) {
+				contextObjects.put(
+					name + _CONTEXT_OBJECT_SUFFIX, contextObject);
+			}
 		}
 
-		return _getFieldValue(configurationFieldSetFieldJSONObject, value);
+		return contextObjects;
 	}
 
-	private static JSONObject _getConfigurationFieldSetFieldJSONObject(
-		String configuration, String fieldName) {
+	public static Object getFieldValue(
+		FragmentConfigurationField fragmentConfigurationField, String value) {
+
+		value = GetterUtil.getString(
+			value, fragmentConfigurationField.getDefaultValue());
+
+		if (StringUtil.equalsIgnoreCase(
+				fragmentConfigurationField.getType(), "checkbox")) {
+
+			return _getFieldValue("bool", value);
+		}
+		else if (StringUtil.equalsIgnoreCase(
+					fragmentConfigurationField.getType(), "colorPalette")) {
+
+			return _getFieldValue("object", value);
+		}
+		else if (StringUtil.equalsIgnoreCase(
+					fragmentConfigurationField.getType(), "itemSelector")) {
+
+			return _getAssetEntryJSONObject(value);
+		}
+		else if (StringUtil.equalsIgnoreCase(
+					fragmentConfigurationField.getType(), "select")) {
+
+			String dataType = fragmentConfigurationField.getDataType();
+
+			if (Validator.isNull(dataType)) {
+				_log.error(
+					fragmentConfigurationField.getName() +
+						" field has an invalid data type");
+
+				return null;
+			}
+
+			return _getFieldValue(dataType, value);
+		}
+
+		return _getFieldValue("string", value);
+	}
+
+	public static List<FragmentConfigurationField>
+		getFragmentConfigurationFields(String configuration) {
 
 		JSONArray fieldSetsJSONArray = _getFieldSetsJSONArray(configuration);
 
 		if (fieldSetsJSONArray == null) {
+			return Collections.emptyList();
+		}
+
+		List<FragmentConfigurationField> fragmentConfigurationFields =
+			new ArrayList<>();
+
+		Iterator<JSONObject> iteratorFieldSet = fieldSetsJSONArray.iterator();
+
+		iteratorFieldSet.forEachRemaining(
+			fieldSetJSONObject -> {
+				JSONArray fieldSetFieldsJSONArray =
+					fieldSetJSONObject.getJSONArray("fields");
+
+				Iterator<JSONObject> iteratorFieldSetFields =
+					fieldSetFieldsJSONArray.iterator();
+
+				iteratorFieldSetFields.forEachRemaining(
+					fieldSetFieldsJSONObject -> fragmentConfigurationFields.add(
+						new FragmentConfigurationField(
+							fieldSetFieldsJSONObject)));
+			});
+
+		return fragmentConfigurationFields;
+	}
+
+	private static Object _getAssetEntry(String value) {
+		if (Validator.isNull(value)) {
 			return null;
 		}
 
-		for (int i = 0; i < fieldSetsJSONArray.length(); i++) {
-			JSONObject configurationFieldSetJSONObject =
-				fieldSetsJSONArray.getJSONObject(i);
+		try {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
-			JSONArray configurationFieldSetFieldsJSONArray =
-				configurationFieldSetJSONObject.getJSONArray("fields");
+			String className = GetterUtil.getString(
+				jsonObject.getString("className"));
+			long classPK = GetterUtil.getLong(jsonObject.getString("classPK"));
 
-			for (int j = 0; j < configurationFieldSetFieldsJSONArray.length();
-				 j++) {
+			AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
+				className, classPK);
 
-				JSONObject configurationFieldSetFieldJSONObject =
-					configurationFieldSetFieldsJSONArray.getJSONObject(j);
+			if (assetEntry != null) {
+				AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
 
-				if (Objects.equals(
-						fieldName,
-						configurationFieldSetFieldJSONObject.get("name"))) {
-
-					return configurationFieldSetFieldJSONObject;
-				}
+				return assetRenderer.getAssetObject();
+			}
+		}
+		catch (Exception e) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to get asset entry: " + value, e);
 			}
 		}
 
 		return null;
 	}
 
-	private static JSONArray _getFieldSetsJSONArray(String configuration) {
-		JSONObject configurationJSONObject = null;
+	private static JSONObject _getAssetEntryJSONObject(String value) {
+		if (Validator.isNull(value)) {
+			return JSONFactoryUtil.createJSONObject();
+		}
 
 		try {
-			configurationJSONObject = JSONFactoryUtil.createJSONObject(
-				configuration);
+			JSONObject configurationValueJSONObject =
+				JSONFactoryUtil.createJSONObject(value);
+
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				JSONFactoryUtil.looseSerialize(_getAssetEntry(value)));
+
+			jsonObject.put(
+				"className",
+				GetterUtil.getString(
+					configurationValueJSONObject.getString("className"))
+			).put(
+				"classNameId",
+				GetterUtil.getString(
+					configurationValueJSONObject.getString("classNameId"))
+			).put(
+				"classPK",
+				GetterUtil.getLong(
+					configurationValueJSONObject.getString("classPK"))
+			);
+
+			return jsonObject;
 		}
 		catch (JSONException jsone) {
-			_log.error(
-				"Unable to parse configuration JSON object: " + configuration,
-				jsone);
-
-			return null;
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to serialize asset entry to JSON: " + value, jsone);
+			}
 		}
 
-		return configurationJSONObject.getJSONArray("fieldSets");
+		return null;
 	}
 
-	private static Object _getFieldValue(
-		JSONObject configurationFieldSetFieldJSONObject, String value) {
-
-		String dataType = configurationFieldSetFieldJSONObject.getString(
-			"dataType");
-
-		value = GetterUtil.getString(
-			value,
-			configurationFieldSetFieldJSONObject.getString("defaultValue"));
-
-		if (Validator.isNotNull(dataType)) {
-			return _getFieldValue(dataType, value);
+	private static Object _getContextObject(String type, String value) {
+		if (StringUtil.equalsIgnoreCase(type, "itemSelector")) {
+			return _getAssetEntry(value);
 		}
 
-		if (StringUtil.equalsIgnoreCase(
-				configurationFieldSetFieldJSONObject.getString("type"),
-				"checkbox")) {
+		return null;
+	}
 
-			return _getFieldValue("bool", value);
+	private static JSONArray _getFieldSetsJSONArray(String configuration) {
+		try {
+			JSONObject configurationJSONObject =
+				JSONFactoryUtil.createJSONObject(configuration);
+
+			return configurationJSONObject.getJSONArray("fieldSets");
 		}
-		else if (StringUtil.equalsIgnoreCase(
-					configurationFieldSetFieldJSONObject.getString("type"),
-					"colorPalette")) {
-
-			return _getFieldValue("object", value);
+		catch (JSONException jsone) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to parse configuration JSON: " + configuration,
+					jsone);
+			}
 		}
 
-		return _getFieldValue("string", value);
+		return null;
 	}
 
 	private static Object _getFieldValue(String dataType, String value) {
@@ -174,9 +265,10 @@ public class FragmentEntryConfigUtil {
 				return JSONFactoryUtil.createJSONObject(value);
 			}
 			catch (JSONException jsone) {
-				_log.error(
-					"Unable to parse configuration JSON object: " + value,
-					jsone);
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Unable to parse configuration JSON: " + value, jsone);
+				}
 			}
 		}
 		else if (StringUtil.equalsIgnoreCase(dataType, "string")) {
@@ -185,6 +277,8 @@ public class FragmentEntryConfigUtil {
 
 		return null;
 	}
+
+	private static final String _CONTEXT_OBJECT_SUFFIX = "Object";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		FragmentEntryConfigUtil.class);

@@ -19,17 +19,18 @@ import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.internal.util.KBArticleSiblingNavigationHelper;
+import com.liferay.knowledge.base.internal.util.KBSectionEscapeUtil;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBArticleSearchDisplay;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.model.impl.KBArticleSearchDisplayImpl;
+import com.liferay.knowledge.base.service.KBFolderService;
 import com.liferay.knowledge.base.service.base.KBArticleServiceBaseImpl;
-import com.liferay.knowledge.base.util.AdminHelper;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.knowledge.base.util.comparator.KBArticleModifiedDateComparator;
 import com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -40,20 +41,17 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.rss.export.RSSExporter;
 import com.liferay.rss.model.SyndContent;
 import com.liferay.rss.model.SyndEntry;
@@ -70,10 +68,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Peter Shin
  * @author Brian Wing Shun Chan
  */
+@Component(
+	property = {
+		"json.web.service.context.name=kb",
+		"json.web.service.context.path=KBArticle"
+	},
+	service = AopService.class
+)
 public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 
 	@Override
@@ -322,7 +330,7 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 		String name = descriptiveName;
 		String description = descriptiveName;
 
-		String feedURL = PortalUtil.getLayoutFullURL(themeDisplay);
+		String feedURL = _portal.getLayoutFullURL(themeDisplay);
 
 		List<KBArticle> kbArticles = getGroupKBArticles(
 			group.getGroupId(), status, 0, rssDelta,
@@ -653,7 +661,7 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 		long groupId, String[] sections, int status, int start, int end,
 		OrderByComparator<KBArticle> orderByComparator) {
 
-		String[] array = _adminHelper.escapeSections(sections);
+		String[] array = KBSectionEscapeUtil.escapeSections(sections);
 
 		for (int i = 0; i < array.length; i++) {
 			array[i] = StringUtil.quote(array[i], StringPool.PERCENT);
@@ -676,7 +684,7 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 	public int getSectionsKBArticlesCount(
 		long groupId, String[] sections, int status) {
 
-		String[] array = _adminHelper.escapeSections(sections);
+		String[] array = KBSectionEscapeUtil.escapeSections(sections);
 
 		for (int i = 0; i < array.length; i++) {
 			array[i] = StringUtil.quote(array[i], StringPool.PERCENT);
@@ -855,7 +863,7 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 				return kbArticle.getGroupId();
 			}
 
-			KBFolder kbFolder = kbFolderService.fetchKBFolder(resourcePrimKey);
+			KBFolder kbFolder = _kbFolderService.fetchKBFolder(resourcePrimKey);
 
 			if (kbFolder == null) {
 				throw new PrincipalException();
@@ -879,7 +887,7 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 			return kbArticle.getGroupId();
 		}
 
-		KBFolder kbFolder = kbFolderService.fetchKBFolder(resourcePrimKey);
+		KBFolder kbFolder = _kbFolderService.fetchKBFolder(resourcePrimKey);
 
 		if ((kbFolder == null) || (kbFolder.getGroupId() != groupId)) {
 			throw new PrincipalException();
@@ -904,7 +912,7 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 		for (KBArticle kbArticle : kbArticles) {
 			SyndEntry syndEntry = _syndModelFactory.createSyndEntry();
 
-			String author = PortalUtil.getUserName(kbArticle);
+			String author = _portal.getUserName(kbArticle);
 
 			syndEntry.setAuthor(author);
 
@@ -1076,29 +1084,32 @@ public class KBArticleServiceImpl extends KBArticleServiceBaseImpl {
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleServiceImpl.class);
 
-	private static volatile PortletResourcePermission
-		_adminPortletResourcePermission =
-			PortletResourcePermissionFactory.getInstance(
-				KBArticleServiceImpl.class, "_adminPortletResourcePermission",
-				KBConstants.RESOURCE_NAME_ADMIN);
-	private static volatile PortletResourcePermission
-		_displayPortletResourcePermission =
-			PortletResourcePermissionFactory.getInstance(
-				KBArticleServiceImpl.class, "_displayPortletResourcePermission",
-				KBConstants.RESOURCE_NAME_DISPLAY);
-	private static volatile ModelResourcePermission<KBArticle>
-		_kbArticleModelResourcePermission =
-			ModelResourcePermissionFactory.getInstance(
-				KBArticleServiceImpl.class, "_kbArticleModelResourcePermission",
-				KBArticle.class);
+	@Reference(
+		target = "(resource.name=" + KBConstants.RESOURCE_NAME_ADMIN + ")"
+	)
+	private PortletResourcePermission _adminPortletResourcePermission;
 
-	@BeanReference(type = AdminHelper.class)
-	private AdminHelper _adminHelper;
+	@Reference(
+		target = "(resource.name=" + KBConstants.RESOURCE_NAME_DISPLAY + ")"
+	)
+	private PortletResourcePermission _displayPortletResourcePermission;
 
-	@ServiceReference(type = RSSExporter.class)
+	@Reference(
+		target = "(model.class.name=com.liferay.knowledge.base.model.KBArticle)"
+	)
+	private ModelResourcePermission<KBArticle>
+		_kbArticleModelResourcePermission;
+
+	@Reference
+	private KBFolderService _kbFolderService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
 	private RSSExporter _rssExporter;
 
-	@ServiceReference(type = SyndModelFactory.class)
+	@Reference
 	private SyndModelFactory _syndModelFactory;
 
 }

@@ -54,12 +54,15 @@
 			position: static;
 		}
 
+		& > .dropdown-menu {
+			min-width: $floatingToolbarPanelMinWidth;
+		}
+
 		&--fixed {
 			padding: $fragmentsEditorSpacing;
 
 			.dropdown-menu {
 				max-width: none;
-				width: 312px;
 
 				&:after {
 					padding: 0;

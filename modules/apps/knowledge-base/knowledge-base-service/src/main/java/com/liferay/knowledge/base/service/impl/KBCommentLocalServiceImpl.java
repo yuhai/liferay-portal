@@ -23,10 +23,13 @@ import com.liferay.knowledge.base.internal.util.AdminSubscriptionSenderFactory;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBComment;
 import com.liferay.knowledge.base.model.KBTemplate;
+import com.liferay.knowledge.base.service.KBArticleLocalService;
+import com.liferay.knowledge.base.service.KBTemplateLocalService;
 import com.liferay.knowledge.base.service.base.KBCommentLocalServiceBaseImpl;
 import com.liferay.knowledge.base.util.comparator.KBCommentCreateDateComparator;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -44,7 +47,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.ratings.kernel.model.RatingsEntry;
 
 import java.text.DateFormat;
@@ -53,9 +55,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Peter Shin
  */
+@Component(
+	property = "model.class.name=com.liferay.knowledge.base.model.KBComment",
+	service = AopService.class
+)
 public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 	@Override
@@ -93,7 +102,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 		// Social
 
-		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+		JSONObject extraDataJSONObject = _jSONFactory.createJSONObject();
 
 		putTitle(extraDataJSONObject, kbComment);
 
@@ -292,7 +301,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 		// Social
 
-		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+		JSONObject extraDataJSONObject = _jSONFactory.createJSONObject();
 
 		putTitle(extraDataJSONObject, kbComment);
 
@@ -383,7 +392,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 			long groupId)
 		throws ConfigurationException {
 
-		return configurationProvider.getConfiguration(
+		return _configurationProvider.getConfiguration(
 			KBGroupServiceConfiguration.class,
 			new GroupServiceSettingsLocator(groupId, KBConstants.SERVICE_NAME));
 	}
@@ -447,7 +456,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 		String body = getEmailKBArticleSuggestionNotificationBody(
 			kbComment.getStatus(), kbGroupServiceConfiguration);
 
-		KBArticle kbArticle = kbArticleLocalService.getLatestKBArticle(
+		KBArticle kbArticle = _kbArticleLocalService.getLatestKBArticle(
 			kbComment.getClassPK(), WorkflowConstants.STATUS_APPROVED);
 
 		String kbArticleContent = StringUtil.replace(
@@ -498,13 +507,13 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 		try {
 			if (className.equals(KBArticle.class.getName())) {
-				kbArticle = kbArticleLocalService.getLatestKBArticle(
+				kbArticle = _kbArticleLocalService.getLatestKBArticle(
 					kbComment.getClassPK(), WorkflowConstants.STATUS_APPROVED);
 
 				jsonObject.put("title", kbArticle.getTitle());
 			}
 			else if (className.equals(KBTemplate.class.getName())) {
-				kbTemplate = kbTemplateLocalService.getKBTemplate(
+				kbTemplate = _kbTemplateLocalService.getKBTemplate(
 					kbComment.getClassPK());
 
 				jsonObject.put("title", kbTemplate.getTitle());
@@ -521,9 +530,6 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 		}
 	}
 
-	@ServiceReference(type = ConfigurationProvider.class)
-	protected ConfigurationProvider configurationProvider;
-
 	private String _getFormattedKBCommentCreateDate(
 		KBComment kbComment, Locale locale) {
 
@@ -534,5 +540,17 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBCommentLocalServiceImpl.class);
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private JSONFactory _jSONFactory;
+
+	@Reference
+	private KBArticleLocalService _kbArticleLocalService;
+
+	@Reference
+	private KBTemplateLocalService _kbTemplateLocalService;
 
 }

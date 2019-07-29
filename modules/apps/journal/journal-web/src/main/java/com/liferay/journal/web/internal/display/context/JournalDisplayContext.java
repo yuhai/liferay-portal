@@ -45,6 +45,8 @@ import com.liferay.journal.web.internal.search.EntriesMover;
 import com.liferay.journal.web.internal.search.JournalSearcher;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalArticleActionDropdownItemsProvider;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalFolderActionDropdownItems;
+import com.liferay.journal.web.internal.util.JournalArticleTranslation;
+import com.liferay.journal.web.internal.util.JournalArticleTranslationRowChecker;
 import com.liferay.journal.web.internal.util.JournalChangeTrackingHelperUtil;
 import com.liferay.journal.web.internal.util.JournalPortletUtil;
 import com.liferay.message.boards.model.MBMessage;
@@ -66,6 +68,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
@@ -81,9 +84,12 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -92,6 +98,7 @@ import com.liferay.trash.TrashHelper;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -238,6 +245,66 @@ public class JournalDisplayContext {
 		throws Exception {
 
 		return getArticleActionDropdownItems(article);
+	}
+
+	public SearchContainer getArticleTranslationsSearchContainer()
+		throws Exception {
+
+		if (_articleTranslationsSearchContainer != null) {
+			return _articleTranslationsSearchContainer;
+		}
+
+		PortletURL portletURL = PortletURLUtil.clone(
+			PortletURLUtil.getCurrent(
+				_liferayPortletRequest, _liferayPortletResponse),
+			_liferayPortletResponse);
+
+		portletURL.setParameter("mvcPath", "/select_article_translations.jsp");
+
+		SearchContainer articleTranslationsSearchContainer =
+			new SearchContainer(_liferayPortletRequest, portletURL, null, null);
+
+		articleTranslationsSearchContainer.setId("articleTranslations");
+		articleTranslationsSearchContainer.setRowChecker(
+			new JournalArticleTranslationRowChecker(_liferayPortletResponse));
+
+		List<JournalArticleTranslation> articleTranslations = new ArrayList<>();
+
+		JournalArticle article = getArticle();
+
+		String keywords = getKeywords();
+
+		for (String languageId : article.getAvailableLanguageIds()) {
+			JournalArticleTranslation articleTranslation =
+				new JournalArticleTranslation(
+					StringUtil.equalsIgnoreCase(
+						article.getDefaultLanguageId(), languageId),
+					LocaleUtil.fromLanguageId(languageId));
+
+			if (Validator.isNotNull(keywords) &&
+				!StringUtil.containsIgnoreCase(
+					LocaleUtil.getLongDisplayName(
+						articleTranslation.getLocale(), Collections.emptySet()),
+					keywords, StringPool.BLANK)) {
+
+				continue;
+			}
+
+			articleTranslations.add(articleTranslation);
+		}
+
+		articleTranslationsSearchContainer.setTotal(articleTranslations.size());
+
+		articleTranslationsSearchContainer.setResults(
+			ListUtil.subList(
+				articleTranslations,
+				articleTranslationsSearchContainer.getStart(),
+				articleTranslationsSearchContainer.getEnd()));
+
+		_articleTranslationsSearchContainer =
+			articleTranslationsSearchContainer;
+
+		return _articleTranslationsSearchContainer;
 	}
 
 	public List<DropdownItem> getArticleVersionActionDropdownItems(
@@ -415,6 +482,10 @@ public class JournalDisplayContext {
 		}
 
 		return WorkflowConstants.STATUS_APPROVED;
+	}
+
+	public String getDeleteTranslationsEventName() {
+		return _liferayPortletResponse.getNamespace() + "selectTranslations";
 	}
 
 	public String getDisplayStyle() {
@@ -1282,6 +1353,7 @@ public class JournalDisplayContext {
 	private JournalArticle _article;
 	private JournalArticleDisplay _articleDisplay;
 	private SearchContainer _articleSearchContainer;
+	private SearchContainer _articleTranslationsSearchContainer;
 	private final AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
 	private String _ddmStructureKey;
