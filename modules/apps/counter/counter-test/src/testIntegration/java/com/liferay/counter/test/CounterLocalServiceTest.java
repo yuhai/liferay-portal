@@ -15,7 +15,7 @@
 package com.liferay.counter.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
+import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.counter.kernel.service.persistence.CounterFinder;
 import com.liferay.counter.model.CounterRegister;
 import com.liferay.counter.service.persistence.impl.CounterFinderImpl;
@@ -56,14 +56,14 @@ public class CounterLocalServiceTest {
 
 	@Before
 	public void setUp() {
-		CounterLocalServiceUtil.reset(_COUNTER_NAME);
+		_counterLocalService.reset(_COUNTER_NAME);
 
-		CounterLocalServiceUtil.reset(_COUNTER_NAME, 0);
+		_counterLocalService.reset(_COUNTER_NAME, 0);
 	}
 
 	@After
 	public void tearDown() {
-		CounterLocalServiceUtil.reset(_COUNTER_NAME);
+		_counterLocalService.reset(_COUNTER_NAME);
 	}
 
 	@Test
@@ -92,8 +92,7 @@ public class CounterLocalServiceTest {
 					List<Long> ids = new ArrayList<>();
 
 					for (int j = 0; j < _INCREMENT_COUNT; j++) {
-						ids.add(
-							CounterLocalServiceUtil.increment(_COUNTER_NAME));
+						ids.add(_counterLocalService.increment(_COUNTER_NAME));
 					}
 
 					return ids.toArray(new Long[0]);
@@ -139,4 +138,6 @@ public class CounterLocalServiceTest {
 	@Inject
 	private CounterFinder _counterFinder;
 
+	@Inject
+	private CounterLocalService _counterLocalService;
 }
