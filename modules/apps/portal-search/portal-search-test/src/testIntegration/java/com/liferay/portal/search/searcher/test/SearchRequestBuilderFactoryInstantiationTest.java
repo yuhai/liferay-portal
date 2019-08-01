@@ -43,6 +43,8 @@ public class SearchRequestBuilderFactoryInstantiationTest {
 		SearchRequestBuilder searchRequestBuilder =
 			_searchRequestBuilderFactory.builder();
 
+		
+		
 		Assert.assertNotNull(searchRequestBuilder);
 	}
 
