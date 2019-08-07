@@ -328,6 +328,7 @@ Provide-Capability:\
 	@../../../lib/development/activation.jar,\
 	@../../../lib/development/jms.jar,\
 	@../../../lib/development/mail.jar,\
+	@../../../lib/development/hsql.jar,\
 	@../../../lib/development/persistence.jar,\
 	@../../../lib/development/servlet-api.jar,\
 	@../../../lib/global/portlet.jar,\

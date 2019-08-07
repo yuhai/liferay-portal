@@ -12,32 +12,40 @@
  * details.
  */
 
-package com.liferay.counter.service;
+package com.liferay.counter.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
-import com.liferay.petra.process.ClassPathUtil;
+import com.liferay.petra.process.ProcessCallable;
+import com.liferay.petra.process.ProcessChannel;
+import com.liferay.petra.process.ProcessConfig;
+import com.liferay.petra.process.ProcessException;
+import com.liferay.petra.process.ProcessExecutor;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.cache.key.SimpleCacheKeyGenerator;
 import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessChannel;
-import com.liferay.portal.kernel.process.ProcessConfig;
-import com.liferay.portal.kernel.process.ProcessException;
-import com.liferay.portal.kernel.process.ProcessExecutor;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.ClassTestRule;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.rule.HypersonicServerClassTestRule;
+import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.InitUtil;
+import com.liferay.portal.util.PortalClassPathUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
 
+import java.io.File;
+
 import java.lang.management.ManagementFactory;
+
+import java.net.URL;
+
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,10 +61,12 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 
 /**
  * @author Shuyang Zhou
  */
+@RunWith(Arquillian.class)
 public class CounterLocalServiceTest {
 
 	@ClassRule
@@ -114,8 +124,6 @@ public class CounterLocalServiceTest {
 
 	@Test
 	public void testConcurrentIncrement() throws Exception {
-		String classPath = ClassPathUtil.getJVMClassPath(true);
-
 		List<String> arguments = new ArrayList<>();
 
 		arguments.add("-Dliferay.mode=test");
@@ -130,12 +138,28 @@ public class CounterLocalServiceTest {
 		arguments.add("-Xmx1024m");
 		arguments.add("-XX:MaxPermSize=200m");
 
+		ProcessConfig portalProcessConfig =
+			PortalClassPathUtil.getPortalProcessConfig();
+
+		ProtectionDomain protectionDomain =
+			CounterLocalServiceTest.class.getProtectionDomain();
+
+		CodeSource codeSource = protectionDomain.getCodeSource();
+
+		URL url = codeSource.getLocation();
+
+		File file = new File(url.toURI());
+
 		ProcessConfig.Builder builder = new ProcessConfig.Builder();
 
 		builder.setArguments(arguments);
-		builder.setBootstrapClassPath(classPath);
+		builder.setBootstrapClassPath(
+			portalProcessConfig.getBootstrapClassPath());
 		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
-		builder.setRuntimeClassPath(classPath);
+		builder.setRuntimeClassPath(
+			StringBundler.concat(
+				file.getPath(), File.pathSeparator,
+				portalProcessConfig.getRuntimeClassPath()));
 
 		ProcessConfig processConfig = builder.build();
 
@@ -144,7 +168,9 @@ public class CounterLocalServiceTest {
 		for (int i = 0; i < _PROCESS_COUNT; i++) {
 			ProcessCallable<Long[]> processCallable =
 				new IncrementProcessCallable(
-					"Increment Process-" + i, _COUNTER_NAME, _INCREMENT_COUNT);
+					"Increment Process-" + i,
+					SystemProperties.get("catalina.base"), _COUNTER_NAME,
+					_INCREMENT_COUNT);
 
 			ProcessChannel<Long[]> processChannel = _processExecutor.execute(
 				processConfig, processCallable);
@@ -175,7 +201,8 @@ public class CounterLocalServiceTest {
 		}
 	}
 
-	private static final String _COUNTER_NAME = StringUtil.randomString();
+	private static final String _COUNTER_NAME =
+		CounterLocalServiceTest.class.getName();
 
 	private static final int _INCREMENT_COUNT = 10000;
 
@@ -188,9 +215,11 @@ public class CounterLocalServiceTest {
 		implements ProcessCallable<Long[]> {
 
 		public IncrementProcessCallable(
-			String processName, String counterName, int incrementCount) {
+			String processName, String catalinaBase, String counterName,
+			int incrementCount) {
 
 			_processName = processName;
+			_catalinaBase = catalinaBase;
 			_counterName = counterName;
 			_incrementCount = incrementCount;
 		}
@@ -202,8 +231,7 @@ public class CounterLocalServiceTest {
 			System.setProperty(
 				PropsKeys.COUNTER_INCREMENT + "." + _counterName, "1");
 
-			System.setProperty("catalina.base", ".");
-			System.setProperty("external-properties", "portal-test.properties");
+			System.setProperty("catalina.base", _catalinaBase);
 
 			// C3PO
 
@@ -254,6 +282,7 @@ public class CounterLocalServiceTest {
 
 		private static final long serialVersionUID = 1L;
 
+		private final String _catalinaBase;
 		private final String _counterName;
 		private final int _incrementCount;
 		private final String _processName;

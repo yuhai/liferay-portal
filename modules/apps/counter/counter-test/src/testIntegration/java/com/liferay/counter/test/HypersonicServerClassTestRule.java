@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.test.rule;
+package com.liferay.counter.test;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
@@ -40,6 +40,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -73,7 +74,7 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 
 		server.stop();
 
-		deleteFolder(Paths.get(_HYPERSONIC_TEMP_DIR_NAME));
+		_deleteFolder(Paths.get(_HYPERSONIC_TEMP_DIR_NAME));
 	}
 
 	@Override
@@ -160,19 +161,6 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 		return Collections.emptyList();
 	}
 
-	protected void copyFile(
-			String fileName, Path fromFolderPath, Path toFolderPath)
-		throws IOException {
-
-		Path filePath = fromFolderPath.resolve(fileName);
-
-		if (Files.exists(filePath)) {
-			Files.createDirectories(toFolderPath);
-
-			Files.copy(filePath, toFolderPath.resolve(fileName));
-		}
-	}
-
 	@Override
 	protected org.junit.runners.model.Statement createClassStatement(
 		org.junit.runners.model.Statement statement, Description description) {
@@ -184,7 +172,10 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 		return super.createClassStatement(statement, description);
 	}
 
-	protected void deleteFolder(Path folderPath) throws IOException {
+	private HypersonicServerClassTestRule() {
+	}
+
+	private void _deleteFolder(Path folderPath) throws IOException {
 		if (!Files.exists(folderPath)) {
 			return;
 		}
@@ -218,9 +209,6 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 				}
 
 			});
-	}
-
-	private HypersonicServerClassTestRule() {
 	}
 
 	private static final String _DATABASE_NAME;
