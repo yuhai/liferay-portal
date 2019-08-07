@@ -34,6 +34,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.Statement;
 
 import java.util.Arrays;
@@ -64,14 +65,8 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 	public void afterClass(Description description, Server server)
 		throws Exception {
 
-		try (Connection connection = JDBCDriver.getConnection(
-				DATABASE_URL_BASE + _DATABASE_NAME,
-				new Properties() {
-					{
-						put("password", "");
-						put("user", "sa");
-					}
-				});
+		try (Connection connection = DriverManager.getConnection(
+				DATABASE_URL_BASE + _DATABASE_NAME, "sa", "");
 			Statement statement = connection.createStatement()) {
 
 			statement.execute("SHUTDOWN COMPACT");
@@ -124,14 +119,8 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 
 		};
 
-		try (Connection connection = JDBCDriver.getConnection(
-				PropsValues.JDBC_DEFAULT_URL,
-				new Properties() {
-					{
-						put("password", "");
-						put("user", "sa");
-					}
-				});
+		try (Connection connection = DriverManager.getConnection(
+				PropsValues.JDBC_DEFAULT_URL, "sa", "");
 			Statement statement = connection.createStatement()) {
 
 			statement.execute(
