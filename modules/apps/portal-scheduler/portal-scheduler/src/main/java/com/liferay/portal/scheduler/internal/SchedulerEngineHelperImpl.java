@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.scheduler.StorageTypeAware;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerAdapter;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
@@ -582,7 +583,13 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 						_bundleContext.getService(
 							serviceRegistration.getReference());
 
-			schedulerEventMessageListenerWrapper.setSchedulerEntry(
+			SchedulerEventMessageListenerAdapter
+				schedulerEventMessageListenerAdapter =
+					(SchedulerEventMessageListenerAdapter)
+						schedulerEventMessageListenerWrapper.
+							getSchedulerEventMessageListener();
+
+			schedulerEventMessageListenerAdapter.setSchedulerEntry(
 				schedulerEntry);
 
 			serviceRegistration.setProperties(properties);
@@ -590,14 +597,20 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			return;
 		}
 
+		SchedulerEventMessageListenerAdapter
+			schedulerEventMessageListenerAdapter =
+				new SchedulerEventMessageListenerAdapter();
+
+		schedulerEventMessageListenerAdapter.setMessageListener(
+			messageListener);
+		schedulerEventMessageListenerAdapter.setSchedulerEntry(schedulerEntry);
+
 		SchedulerEventMessageListenerWrapper
 			schedulerEventMessageListenerWrapper =
 				new SchedulerEventMessageListenerWrapper();
 
-		schedulerEventMessageListenerWrapper.setMessageListener(
-			messageListener);
-
-		schedulerEventMessageListenerWrapper.setSchedulerEntry(schedulerEntry);
+		schedulerEventMessageListenerWrapper.setSchedulerEventMessageListener(
+			schedulerEventMessageListenerAdapter);
 
 		serviceRegistration = _bundleContext.registerService(
 			SchedulerEventMessageListener.class,
