@@ -26,7 +26,8 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener;
-import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerAdapter;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 import com.liferay.portal.kernel.workflow.WorkflowEngineManager;
@@ -150,11 +151,11 @@ public class KaleoWorkflowMessagingConfigurator {
 	}
 
 	protected void registerSchedulerEventMessageListener() {
-		SchedulerEventMessageListenerWrapper
-			schedulerEventMessageListenerWrapper =
-				new SchedulerEventMessageListenerWrapper();
+		SchedulerEventMessageListenerAdapter
+			schedulerEventMessageListenerAdapter =
+				new SchedulerEventMessageListenerAdapter();
 
-		schedulerEventMessageListenerWrapper.setMessageListener(
+		schedulerEventMessageListenerAdapter.setMessageListener(
 			_timerMessageListener);
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
@@ -164,8 +165,8 @@ public class KaleoWorkflowMessagingConfigurator {
 
 		_schedulerEventMessageListenerServiceRegistration =
 			_bundleContext.registerService(
-				MessageListener.class, schedulerEventMessageListenerWrapper,
-				properties);
+				SchedulerEventMessageListener.class,
+				schedulerEventMessageListenerAdapter, properties);
 	}
 
 	protected void registerWorkflowDefinitionLinkDestination() {
@@ -327,7 +328,7 @@ public class KaleoWorkflowMessagingConfigurator {
 
 	private final Map<String, MessageListener> _proxyMessageListeners =
 		new HashMap<>();
-	private ServiceRegistration<MessageListener>
+	private ServiceRegistration<SchedulerEventMessageListener>
 		_schedulerEventMessageListenerServiceRegistration;
 	private final Map<String, ServiceRegistration<Destination>>
 		_serviceRegistrations = new HashMap<>();
