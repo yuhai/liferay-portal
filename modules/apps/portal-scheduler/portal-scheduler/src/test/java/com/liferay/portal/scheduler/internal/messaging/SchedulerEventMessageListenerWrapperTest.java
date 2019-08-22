@@ -12,11 +12,14 @@
  * details.
  */
 
-package com.liferay.portal.kernel.scheduler.messaging;
+package com.liferay.portal.scheduler.internal.messaging;
 
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.scheduler.SchedulerEntry;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
@@ -71,10 +74,22 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 		SchedulerEventMessageListenerWrapper
 			schedulerEventMessageListenerWrapper =
-				new SchedulerEventMessageListenerWrapper();
+				new SchedulerEventMessageListenerWrapper(
+					new SchedulerEventMessageListener() {
 
-		schedulerEventMessageListenerWrapper.setMessageListener(
-			_testMessageListener);
+						@Override
+						public SchedulerEntry getSchedulerEntry() {
+							return null;
+						}
+
+						@Override
+						public void receive(Message message)
+							throws MessageListenerException {
+
+							_testMessageListener.receive(message);
+						}
+
+					});
 
 		FutureTask<Void> futureTask1 = _createFutureTask(
 			schedulerEventMessageListenerWrapper, _testMessage1);
@@ -116,10 +131,22 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 		SchedulerEventMessageListenerWrapper
 			schedulerEventMessageListenerWrapper =
-				new SchedulerEventMessageListenerWrapper();
+				new SchedulerEventMessageListenerWrapper(
+					new SchedulerEventMessageListener() {
 
-		schedulerEventMessageListenerWrapper.setMessageListener(
-			_testMessageListener);
+						@Override
+						public SchedulerEntry getSchedulerEntry() {
+							return null;
+						}
+
+						@Override
+						public void receive(Message message)
+							throws MessageListenerException {
+
+							_testMessageListener.receive(message);
+						}
+
+					});
 
 		Registry registry = RegistryUtil.getRegistry();
 
@@ -172,10 +199,22 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 		SchedulerEventMessageListenerWrapper
 			schedulerEventMessageListenerWrapper =
-				new SchedulerEventMessageListenerWrapper();
+				new SchedulerEventMessageListenerWrapper(
+					new SchedulerEventMessageListener() {
 
-		schedulerEventMessageListenerWrapper.setMessageListener(
-			_testMessageListener);
+						@Override
+						public SchedulerEntry getSchedulerEntry() {
+							return null;
+						}
+
+						@Override
+						public void receive(Message message)
+							throws MessageListenerException {
+
+							_testMessageListener.receive(message);
+						}
+
+					});
 
 		FutureTask<Void> futureTask1 = _createFutureTask(
 			schedulerEventMessageListenerWrapper, _testMessage1);

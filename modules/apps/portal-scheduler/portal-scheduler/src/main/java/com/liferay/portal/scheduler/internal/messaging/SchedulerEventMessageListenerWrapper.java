@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.kernel.scheduler.messaging;
+package com.liferay.portal.scheduler.internal.messaging;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
@@ -30,6 +29,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerState;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -41,13 +41,15 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Shuyang Zhou
- * @deprecated As of Mueller (7.2.x), replaced by {@link
- * com.liferay.portal.scheduler.internal.messaging.
- * SchedulerEventMessageListenerWrapper}
  */
-@Deprecated
 public class SchedulerEventMessageListenerWrapper
 	implements SchedulerEventMessageListener {
+
+	public SchedulerEventMessageListenerWrapper(
+		SchedulerEventMessageListener schedulerEventMessageListener) {
+
+		_schedulerEventMessageListener = schedulerEventMessageListener;
+	}
 
 	@Override
 	public SchedulerEntry getSchedulerEntry() {
@@ -110,28 +112,6 @@ public class SchedulerEventMessageListenerWrapper
 		finally {
 			_lock.unlock();
 		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setMessageListener(MessageListener messageListener) {
-		_messageListener = messageListener;
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setSchedulerEntry(SchedulerEntry schedulerEntry) {
-		_schedulerEntry = schedulerEntry;
-	}
-
-	public void setSchedulerEventMessageListener(
-		SchedulerEventMessageListener schedulerEventMessageListener) {
-
-		_schedulerEventMessageListener = schedulerEventMessageListener;
 	}
 
 	protected void handleException(Message message, Exception exception) {
@@ -214,21 +194,6 @@ public class SchedulerEventMessageListenerWrapper
 		SchedulerEventMessageListenerWrapper.class);
 
 	private final Lock _lock = new ReentrantLock();
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	@SuppressWarnings("unused")
-	private MessageListener _messageListener;
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	@SuppressWarnings("unused")
-	private volatile SchedulerEntry _schedulerEntry;
-
-	private SchedulerEventMessageListener _schedulerEventMessageListener;
+	private final SchedulerEventMessageListener _schedulerEventMessageListener;
 
 }
