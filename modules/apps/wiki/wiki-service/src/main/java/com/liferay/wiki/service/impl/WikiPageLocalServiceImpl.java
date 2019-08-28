@@ -180,6 +180,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		WikiNode node = wikiNodePersistence.findByPrimaryKey(nodeId);
 		Date now = new Date();
 
+		System.out.println("hello");
+
 		long pageId = counterLocalService.increment();
 
 		content = SanitizerUtil.sanitize(
