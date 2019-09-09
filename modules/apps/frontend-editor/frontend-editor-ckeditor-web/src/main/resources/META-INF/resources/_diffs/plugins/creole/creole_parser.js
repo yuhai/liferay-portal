@@ -58,11 +58,10 @@
 	};
 
 	Parse.Simple.Base.prototype = {
-		ruleConstructor: null,
 		grammar: null,
 		options: null,
 
-		parse: function(node, data, options) {
+		parse(node, data, options) {
 			if (options) {
 				for (var i in this.options) {
 					if (typeof options[i] == 'undefined') {
@@ -77,7 +76,9 @@
 			if (options && options.forIE) {
 				node.innerHTML = node.innerHTML.replace(/\r?\n/g, '\r\n');
 			}
-		}
+		},
+
+		ruleConstructor: null
 	};
 
 	Parse.Simple.Base.prototype.constructor = Parse.Simple.Base;
@@ -98,51 +99,7 @@
 	Parse.Simple.Base.prototype.ruleConstructor = Parse.Simple.Base.Rule;
 
 	Parse.Simple.Base.Rule.prototype = {
-		regex: null,
-		capture: null,
-		replaceRegex: null,
-		replaceString: null,
-		tag: null,
-		attrs: null,
-		children: null,
-
-		match: function(data, options) {
-			return data.match(this.regex);
-		},
-
-		build: function(node, r, options) {
-			var data;
-			if (this.capture !== null) {
-				data = r[this.capture];
-			}
-
-			var target;
-			if (this.tag) {
-				target = document.createElement(this.tag);
-				node.appendChild(target);
-			} else {
-				target = node;
-			}
-
-			if (data) {
-				if (this.replaceRegex) {
-					data = data.replace(this.replaceRegex, this.replaceString);
-				}
-				this.apply(target, data, options);
-			}
-
-			if (this.attrs) {
-				for (var i in this.attrs) {
-					target.setAttribute(i, this.attrs[i]);
-					if (options && options.forIE && i == 'class') {
-						target.className = this.attrs[i];
-					}
-				}
-			}
-			return this;
-		},
-
-		apply: function(node, data, options) {
+		apply(node, data, options) {
 			var tail = '' + data;
 			var matches = [];
 
@@ -153,7 +110,7 @@
 			while (true) {
 				var best = false;
 				var rule = false;
-				for (var i = 0; i < this.children.length; i++) {
+				for (let i = 0; i < this.children.length; i++) {
 					if (typeof matches[i] == 'undefined') {
 						if (!this.children[i].match) {
 							this.children[i] = new this.constructor(
@@ -190,7 +147,7 @@
 
 				var chopped = best.index + best[0].length;
 				tail = tail.substring(chopped);
-				for (var i = 0; i < this.children.length; i++) {
+				for (let i = 0; i < this.children.length; i++) {
 					if (matches[i]) {
 						if (matches[i].index >= chopped) {
 							matches[i].index -= chopped;
@@ -204,15 +161,61 @@
 			return this;
 		},
 
+		attrs: null,
+
+		build(node, r, options) {
+			var data;
+			if (this.capture !== null) {
+				data = r[this.capture];
+			}
+
+			var target;
+			if (this.tag) {
+				target = document.createElement(this.tag);
+				node.appendChild(target);
+			} else {
+				target = node;
+			}
+
+			if (data) {
+				if (this.replaceRegex) {
+					data = data.replace(this.replaceRegex, this.replaceString);
+				}
+				this.apply(target, data, options);
+			}
+
+			if (this.attrs) {
+				for (var i in this.attrs) {
+					target.setAttribute(i, this.attrs[i]);
+					if (options && options.forIE && i == 'class') {
+						target.className = this.attrs[i];
+					}
+				}
+			}
+			return this;
+		},
+
+		capture: null,
+		children: null,
+
 		fallback: {
-			apply: function(node, data, options) {
+			apply(node, data, options) {
 				if (options && options.forIE) {
 					// workaround for bad IE
 					data = data.replace(/\n/g, ' \r');
 				}
 				node.appendChild(document.createTextNode(data));
 			}
-		}
+		},
+
+		match(data) {
+			return data.match(this.regex);
+		},
+
+		regex: null,
+		replaceRegex: null,
+		replaceString: null,
+		tag: null
 	};
 
 	Parse.Simple.Base.Rule.prototype.constructor = Parse.Simple.Base.Rule;
@@ -246,76 +249,9 @@
 		};
 
 		var g = {
-			hr: {tag: 'hr', regex: /(^|\n)\s*----\s*(\n|$)/},
+			br: {regex: /\\\\/, tag: 'br'},
 
-			br: {tag: 'br', regex: /\\\\/},
-
-			preBlock: {
-				tag: 'pre',
-				capture: 2,
-				regex: /(^|\n)\{\{\{\n((.*\n)*?)\}\}\}(\n|$)/,
-				replaceRegex: /^ ([ \t]*\}\}\})/gm,
-				replaceString: '$1'
-			},
-			tt: {
-				tag: 'tt',
-				regex: /\{\{\{(.*?\}\}\}+)/,
-				capture: 1,
-				replaceRegex: /\}\}\}$/,
-				replaceString: ''
-			},
-
-			ulist: {
-				tag: 'ul',
-				capture: 0,
-				regex: /(^|\n)([ \t]*\*[^*#].*(\n|$)([ \t]*[^\s*#].*(\n|$))*([ \t]*[*#]{2}.*(\n|$))*)+/
-			},
-			olist: {
-				tag: 'ol',
-				capture: 0,
-				regex: /(^|\n)([ \t]*#[^*#].*(\n|$)([ \t]*[^\s*#].*(\n|$))*([ \t]*[*#]{2}.*(\n|$))*)+/
-			},
-			li: {
-				tag: 'li',
-				capture: 0,
-				regex: /[ \t]*([*#]).+(\n[ \t]*[^*#\s].*)*(\n[ \t]*[*#]{2}.+)*/,
-				replaceRegex: /(^|\n)[ \t]*[*#]/g,
-				replaceString: '$1'
-			},
-
-			table: {
-				tag: 'table',
-				capture: 0,
-				attrs: {class: 'cke_show_border'},
-				regex: /(^|\n)(\|.*?[ \t]*(\n|$))+/
-			},
-			tr: {tag: 'tr', capture: 2, regex: /(^|\n)(\|.*?)\|?[ \t]*(\n|$)/},
-			th: {tag: 'th', regex: /\|+=([^|]*)/, capture: 1},
-			td: {
-				tag: 'td',
-				capture: 1,
-				regex:
-					'\\|([^|~\\[{]*((~(.|(?=\\n)|$)|' +
-					'(?:\\[\\[' +
-					rx.link +
-					'(\\|' +
-					rx.linkText +
-					')?\\]\\][^|~\\[{]*)*' +
-					(options && options.strict ? '' : '|' + rx.img) +
-					'|[\\[{])[^|~]*)*)'
-			},
-
-			singleLine: {regex: /.+/, capture: 0},
-			paragraph: {tag: 'p', capture: 0, regex: /(^|\n)(\s*\S.*(\n|$))/},
-			text: {capture: 0, regex: /(^|\n)(\s*[^\s].*(\n|$))+/},
-
-			strong: {
-				tag: 'strong',
-				capture: 1,
-				regex: /\*\*([^*~]*((\*(?!\*)|~(.|(?=\n)|$))[^*~]*)*)(\*\*|\n|$)/
-			},
 			em: {
-				tag: 'em',
 				capture: 1,
 				regex:
 					'\\/\\/(((?!' +
@@ -326,12 +262,28 @@
 					'|\\/(?!\\/)|~(.|(?=\\n)|$))' +
 					'((?!' +
 					rx.uriPrefix +
-					')[^\\/~])*)*)(\\/\\/|\\n|$)'
+					')[^\\/~])*)*)(\\/\\/|\\n|$)',
+				tag: 'em'
 			},
 
+			escapedSequence: {
+				attrs: {class: 'escaped'},
+				capture: 1,
+				regex: '~(' + rx.rawUri + '|.)',
+				tag: 'span'
+			},
+
+			escapedSymbol: {
+				attrs: {class: 'escaped'},
+				capture: 1,
+				regex: /~(.)/,
+				tag: 'span'
+			},
+
+			hr: {regex: /(^|\n)\s*----\s*(\n|$)/, tag: 'hr'},
+
 			img: {
-				regex: rx.img,
-				build: function(node, r, options) {
+				build(node, r, options) {
 					var imagePath = r[1];
 					var imagePathPrefix = options ? options.imagePrefix : '';
 
@@ -345,31 +297,24 @@
 					img.src = imagePath;
 					if (r[2]) {
 						img.alt = r[2].replace(/~(.)/g, '$1');
-					}
-					else if (options && options.defaultImageText) {
+					} else if (options && options.defaultImageText) {
 						img.alt = options.defaultImageText;
 					}
 					node.appendChild(img);
-				}
+				},
+				regex: rx.img
 			},
 
-			namedUri: {
-				regex: '\\[\\[(' + rx.uri + ')\\|(' + rx.linkText + ')\\]\\]',
-				build: function(node, r, options) {
-					var link = document.createElement('a');
-					link.href = r[1];
-					if (options && options.isPlainUri) {
-						link.appendChild(document.createTextNode(r[2]));
-					} else {
-						this.apply(link, r[2], options);
-					}
-					node.appendChild(link);
-				}
+			li: {
+				capture: 0,
+				regex: /[ \t]*([*#]).+(\n[ \t]*[^*#\s].*)*(\n[ \t]*[*#]{2}.+)*/,
+				replaceRegex: /(^|\n)[ \t]*[*#]/g,
+				replaceString: '$1',
+				tag: 'li'
 			},
 
 			namedLink: {
-				regex: '\\[\\[(' + rx.link + ')\\|(' + rx.linkText + ')\\]\\]',
-				build: function(node, r, options) {
+				build(node, r, options) {
 					var link = document.createElement('a');
 
 					link.href =
@@ -384,33 +329,102 @@
 					this.apply(link, r[2], options);
 
 					node.appendChild(link);
-				}
+				},
+				regex: '\\[\\[(' + rx.link + ')\\|(' + rx.linkText + ')\\]\\]'
 			},
 
-			unnamedUri: {regex: '\\[\\[(' + rx.uri + ')\\]\\]', build: 'dummy'},
-			unnamedLink: {
-				regex: '\\[\\[(' + rx.link + ')\\]\\]',
-				build: 'dummy'
+			namedUri: {
+				build(node, r, options) {
+					var link = document.createElement('a');
+					link.href = r[1];
+					if (options && options.isPlainUri) {
+						link.appendChild(document.createTextNode(r[2]));
+					} else {
+						this.apply(link, r[2], options);
+					}
+					node.appendChild(link);
+				},
+				regex: '\\[\\[(' + rx.uri + ')\\|(' + rx.linkText + ')\\]\\]'
 			},
+
+			olist: {
+				capture: 0,
+				regex: /(^|\n)([ \t]*#[^*#].*(\n|$)([ \t]*[^\s*#].*(\n|$))*([ \t]*[*#]{2}.*(\n|$))*)+/,
+				tag: 'ol'
+			},
+
+			paragraph: {capture: 0, regex: /(^|\n)(\s*\S.*(\n|$))/, tag: 'p'},
+
+			preBlock: {
+				capture: 2,
+				regex: /(^|\n)\{\{\{\n((.*\n)*?)\}\}\}(\n|$)/,
+				replaceRegex: /^ ([ \t]*\}\}\})/gm,
+				replaceString: '$1',
+				tag: 'pre'
+			},
+
+			rawUri: {build: 'dummy', regex: '(' + rx.rawUri + ')'},
+
+			singleLine: {capture: 0, regex: /.+/},
+
+			strong: {
+				capture: 1,
+				regex: /\*\*([^*~]*((\*(?!\*)|~(.|(?=\n)|$))[^*~]*)*)(\*\*|\n|$)/,
+				tag: 'strong'
+			},
+
+			table: {
+				attrs: {class: 'cke_show_border'},
+				capture: 0,
+				regex: /(^|\n)(\|.*?[ \t]*(\n|$))+/,
+				tag: 'table'
+			},
+
+			td: {
+				capture: 1,
+				regex:
+					'\\|([^|~\\[{]*((~(.|(?=\\n)|$)|' +
+					'(?:\\[\\[' +
+					rx.link +
+					'(\\|' +
+					rx.linkText +
+					')?\\]\\][^|~\\[{]*)*' +
+					(options && options.strict ? '' : '|' + rx.img) +
+					'|[\\[{])[^|~]*)*)',
+				tag: 'td'
+			},
+
+			text: {capture: 0, regex: /(^|\n)(\s*[^\s].*(\n|$))+/},
+
+			th: {capture: 1, regex: /\|+=([^|]*)/, tag: 'th'},
+
+			tr: {capture: 2, regex: /(^|\n)(\|.*?)\|?[ \t]*(\n|$)/, tag: 'tr'},
+
+			tt: {
+				capture: 1,
+				regex: /\{\{\{(.*?\}\}\}+)/,
+				replaceRegex: /\}\}\}$/,
+				replaceString: '',
+				tag: 'tt'
+			},
+
+			ulist: {
+				capture: 0,
+				regex: /(^|\n)([ \t]*\*[^*#].*(\n|$)([ \t]*[^\s*#].*(\n|$))*([ \t]*[*#]{2}.*(\n|$))*)+/,
+				tag: 'ul'
+			},
+
 			unnamedInterwikiLink: {
-				regex: '\\[\\[(' + rx.interwikiLink + ')\\]\\]',
-				build: 'dummy'
+				build: 'dummy',
+				regex: '\\[\\[(' + rx.interwikiLink + ')\\]\\]'
 			},
 
-			rawUri: {regex: '(' + rx.rawUri + ')', build: 'dummy'},
-
-			escapedSequence: {
-				regex: '~(' + rx.rawUri + '|.)',
-				capture: 1,
-				tag: 'span',
-				attrs: {class: 'escaped'}
+			unnamedLink: {
+				build: 'dummy',
+				regex: '\\[\\[(' + rx.link + ')\\]\\]'
 			},
-			escapedSymbol: {
-				regex: /~(.)/,
-				capture: 1,
-				tag: 'span',
-				attrs: {class: 'escaped'}
-			}
+
+			unnamedUri: {build: 'dummy', regex: '\\[\\[(' + rx.uri + ')\\]\\]'}
 		};
 		g.unnamedUri.build = g.rawUri.build = function(node, r, options) {
 			if (!options) {
@@ -429,13 +443,7 @@
 			);
 		};
 		g.namedInterwikiLink = {
-			regex:
-				'\\[\\[(' +
-				rx.interwikiLink +
-				')\\|(' +
-				rx.linkText +
-				')\\]\\]',
-			build: function(node, r, options) {
+			build(node, r, options) {
 				var link = document.createElement('a');
 
 				var m, f;
@@ -461,7 +469,9 @@
 				this.apply(link, r[2], options);
 
 				node.appendChild(link);
-			}
+			},
+			regex:
+				'\\[\\[(' + rx.interwikiLink + ')\\|(' + rx.linkText + ')\\]\\]'
 		};
 		g.unnamedInterwikiLink.build = function(node, r, options) {
 			g.namedInterwikiLink.build.call(
@@ -478,13 +488,13 @@
 
 		for (var i = 1; i <= 6; i++) {
 			g['h' + i] = {
-				tag: 'h' + i,
 				capture: 2,
 				regex:
 					'(^|\\n)[ \\t]*={' +
 					i +
 					'}[ \\t]*' +
-					'([^\\n=][^~]*?(~(.|(?=\\n)|$))*)[ \\t]*=*\\s*(\\n|$)'
+					'([^\\n=][^~]*?(~(.|(?=\\n)|$))*)[ \\t]*=*\\s*(\\n|$)',
+				tag: 'h' + i
 			};
 		}
 

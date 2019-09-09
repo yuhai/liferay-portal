@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLFileVersionPreview}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileVersionPreview
  * @generated
  */
-@ProviderType
 public class DLFileVersionPreviewWrapper
 	extends BaseModelWrapper<DLFileVersionPreview>
 	implements DLFileVersionPreview, ModelWrapper<DLFileVersionPreview> {
@@ -149,6 +146,11 @@ public class DLFileVersionPreviewWrapper
 		return model.getPrimaryKey();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a dl file version preview model instance should use the <code>DLFileVersionPreview</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

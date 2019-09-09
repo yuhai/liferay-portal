@@ -18,6 +18,128 @@ AUI.add(
 		var STR_DASH = '-';
 
 		Liferay.RecurrenceUtil = {
+			_createConfirmationPanel(title, bodyContent, footerContent) {
+				return Liferay.Util.Window.getWindow({
+					dialog: {
+						bodyContent,
+						destroyOnHide: true,
+						height: 400,
+						hideOn: [],
+						resizable: false,
+						toolbars: {
+							footer: footerContent
+						},
+						width: 700
+					},
+					title
+				});
+			},
+
+			_createConfirmationPanelContent(description, options) {
+				var instance = this;
+
+				var contentNode = A.Node.create(
+					A.Lang.sub(instance.RECURRING_EVENT_MODAL_TEMPLATE, {
+						description
+					})
+				);
+
+				A.each(options, function(option) {
+					var optionRow = A.Lang.sub(
+						instance.RECURRING_EVENT_MODAL_ITEM_TEMPLATE,
+						{
+							confirmationDescription:
+								option.confirmationDescription,
+							confirmationDescriptionComplement:
+								option.confirmationDescriptionComplement || ''
+						}
+					);
+
+					var optionRowNode = A.Node.create(optionRow);
+
+					new A.Button(option.button).render(optionRowNode.one('td'));
+
+					optionRowNode.appendTo(contentNode.one('table'));
+				});
+
+				return contentNode;
+			},
+
+			_getConfirmationPanelButtons(
+				onlyThisInstanceFn,
+				allFollowingFn,
+				allEventsInFn,
+				cancelFn
+			) {
+				var instance = this;
+
+				var buttons;
+
+				var getButtonConfig = function(label, callback, cssClass) {
+					return {
+						cssClass,
+						label,
+						on: {
+							click() {
+								if (callback) {
+									callback.apply(this, arguments);
+								}
+
+								instance.confirmationPanel.hide();
+							}
+						}
+					};
+				};
+
+				buttons = {
+					confirmations: [
+						{
+							button: getButtonConfig(
+								Liferay.Language.get('single-event'),
+								onlyThisInstanceFn,
+								'btn-sm'
+							),
+							confirmationDescription: Liferay.Language.get(
+								'only-this-event-will-be-modified-the-rest-of-the-series-will-not-change'
+							)
+						},
+						{
+							button: getButtonConfig(
+								Liferay.Language.get('following-events'),
+								allFollowingFn,
+								'btn-sm'
+							),
+							confirmationDescription: Liferay.Language.get(
+								'this-event-and-any-future-events-in-the-series-will-be-modified'
+							),
+							confirmationDescriptionComplement: Liferay.Language.get(
+								'any-previous-edits-to-future-events-will-be-overwritten'
+							)
+						},
+						{
+							button: getButtonConfig(
+								Liferay.Language.get('entire-series'),
+								allEventsInFn,
+								'btn-sm'
+							),
+							confirmationDescription: Liferay.Language.get(
+								'the-modification-will-change-the-entire-series-of-events'
+							),
+							confirmationDescriptionComplement: Liferay.Language.get(
+								'any-events-edited-previously-will-not-be-affected-by-this-modification'
+							)
+						}
+					],
+					dismiss: getButtonConfig(
+						Liferay.Language.get('cancel'),
+						cancelFn,
+						'btn-link'
+					)
+				};
+
+				return buttons;
+			},
+
 			FREQUENCY: {
 				DAILY: 'DAILY',
 				MONTHLY: 'MONTHLY',
@@ -46,7 +168,7 @@ AUI.add(
 
 			WEEKDAY_LABELS: {},
 
-			getSummary: function(recurrence) {
+			getSummary(recurrence) {
 				var instance = this;
 
 				var key;
@@ -132,7 +254,7 @@ AUI.add(
 				return A.Lang.sub(instance.RECURRENCE_SUMMARIES[key], params);
 			},
 
-			openConfirmationPanel: function(
+			openConfirmationPanel(
 				actionName,
 				onlyThisInstanceFn,
 				allFollowingFn,
@@ -178,132 +300,6 @@ AUI.add(
 				);
 
 				return instance.confirmationPanel.render().show();
-			},
-
-			_createConfirmationPanel: function(
-				title,
-				bodyContent,
-				footerContent
-			) {
-				return Liferay.Util.Window.getWindow({
-					dialog: {
-						bodyContent: bodyContent,
-						destroyOnHide: true,
-						height: 400,
-						hideOn: [],
-						resizable: false,
-						toolbars: {
-							footer: footerContent
-						},
-						width: 700
-					},
-					title: title
-				});
-			},
-
-			_createConfirmationPanelContent: function(description, options) {
-				var instance = this;
-
-				var contentNode = A.Node.create(
-					A.Lang.sub(instance.RECURRING_EVENT_MODAL_TEMPLATE, {
-						description: description
-					})
-				);
-
-				A.each(options, function(option) {
-					var optionRow = A.Lang.sub(
-						instance.RECURRING_EVENT_MODAL_ITEM_TEMPLATE,
-						{
-							confirmationDescription:
-								option.confirmationDescription,
-							confirmationDescriptionComplement:
-								option.confirmationDescriptionComplement || ''
-						}
-					);
-
-					var optionRowNode = A.Node.create(optionRow);
-
-					new A.Button(option.button).render(optionRowNode.one('td'));
-
-					optionRowNode.appendTo(contentNode.one('table'));
-				});
-
-				return contentNode;
-			},
-
-			_getConfirmationPanelButtons: function(
-				onlyThisInstanceFn,
-				allFollowingFn,
-				allEventsInFn,
-				cancelFn
-			) {
-				var instance = this;
-
-				var buttons;
-
-				var getButtonConfig = function(label, callback, cssClass) {
-					return {
-						cssClass: cssClass,
-						label: label,
-						on: {
-							click: function() {
-								if (callback) {
-									callback.apply(this, arguments);
-								}
-
-								instance.confirmationPanel.hide();
-							}
-						}
-					};
-				};
-
-				buttons = {
-					confirmations: [
-						{
-							button: getButtonConfig(
-								Liferay.Language.get('single-event'),
-								onlyThisInstanceFn,
-								'btn-sm'
-							),
-							confirmationDescription: Liferay.Language.get(
-								'only-this-event-will-be-modified-the-rest-of-the-series-will-not-change'
-							)
-						},
-						{
-							button: getButtonConfig(
-								Liferay.Language.get('following-events'),
-								allFollowingFn,
-								'btn-sm'
-							),
-							confirmationDescription: Liferay.Language.get(
-								'this-event-and-any-future-events-in-the-series-will-be-modified'
-							),
-							confirmationDescriptionComplement: Liferay.Language.get(
-								'any-previous-edits-to-future-events-will-be-overwritten'
-							)
-						},
-						{
-							button: getButtonConfig(
-								Liferay.Language.get('entire-series'),
-								allEventsInFn,
-								'btn-sm'
-							),
-							confirmationDescription: Liferay.Language.get(
-								'the-modification-will-change-the-entire-series-of-events'
-							),
-							confirmationDescriptionComplement: Liferay.Language.get(
-								'any-events-edited-previously-will-not-be-affected-by-this-modification'
-							)
-						}
-					],
-					dismiss: getButtonConfig(
-						Liferay.Language.get('cancel'),
-						cancelFn,
-						'btn-link'
-					)
-				};
-
-				return buttons;
 			}
 		};
 	},

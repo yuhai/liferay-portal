@@ -59,12 +59,89 @@ AUI.add(
 
 			EXTENDS: Liferay.TogglerKeyFilter,
 
-			NAME: NAME,
+			NAME,
 
 			NS: NAME,
 
 			prototype: {
-				initializer: function() {
+				_childrenEventHandler(event) {
+					var instance = this;
+
+					var host = instance.get(STR_HOST);
+
+					var target = event.currentTarget;
+
+					var header = target
+						.ancestor(instance.get('parents'))
+						.one(host.get(STR_HEADER));
+
+					var toggler = header.getData(STR_TOGGLER);
+
+					if (!toggler) {
+						host.createAll();
+
+						toggler = header.getData(STR_TOGGLER);
+					}
+
+					toggler.collapse();
+
+					header.focus();
+
+					instance._focusManager.set('activeDescendant', header);
+				},
+
+				_getDescendants() {
+					var instance = this;
+
+					var result =
+						instance.get(STR_HOST).get(STR_HEADER) + ':visible';
+
+					var children = instance.get(STR_CHILDREN);
+
+					if (children) {
+						result += ', ' + children + ':visible';
+					}
+
+					return result;
+				},
+
+				_headerEventHandler(event) {
+					var instance = this;
+
+					instance._focusManager.refresh();
+
+					return TogglerInteraction.superclass._headerEventHandler.call(
+						instance,
+						event
+					);
+				},
+
+				_onExpandedChange(event) {
+					var instance = this;
+
+					if (event.silent) {
+						var host = instance.get(STR_HOST);
+
+						var container = host.get(STR_CONTAINER);
+
+						var headerCssClass = host.get(STR_HEADER) + ':visible';
+
+						instance._focusManager.refresh();
+
+						instance._focusManager.set(
+							'activeDescendant',
+							container.one(headerCssClass)
+						);
+					}
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -92,83 +169,6 @@ AUI.add(
 					];
 
 					instance._focusManager = container.focusManager;
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_childrenEventHandler: function(event) {
-					var instance = this;
-
-					var host = instance.get(STR_HOST);
-
-					var target = event.currentTarget;
-
-					var header = target
-						.ancestor(instance.get('parents'))
-						.one(host.get(STR_HEADER));
-
-					var toggler = header.getData(STR_TOGGLER);
-
-					if (!toggler) {
-						host.createAll();
-
-						toggler = header.getData(STR_TOGGLER);
-					}
-
-					toggler.collapse();
-
-					header.focus();
-
-					instance._focusManager.set('activeDescendant', header);
-				},
-
-				_getDescendants: function() {
-					var instance = this;
-
-					var result =
-						instance.get(STR_HOST).get(STR_HEADER) + ':visible';
-
-					var children = instance.get(STR_CHILDREN);
-
-					if (children) {
-						result += ', ' + children + ':visible';
-					}
-
-					return result;
-				},
-
-				_headerEventHandler: function(event) {
-					var instance = this;
-
-					instance._focusManager.refresh();
-
-					return TogglerInteraction.superclass._headerEventHandler.call(
-						instance,
-						event
-					);
-				},
-
-				_onExpandedChange: function(event) {
-					var instance = this;
-
-					if (event.silent) {
-						var host = instance.get(STR_HOST);
-
-						var container = host.get(STR_CONTAINER);
-
-						var headerCssClass = host.get(STR_HEADER) + ':visible';
-
-						instance._focusManager.refresh();
-
-						instance._focusManager.set(
-							'activeDescendant',
-							container.one(headerCssClass)
-						);
-					}
 				}
 			}
 		});

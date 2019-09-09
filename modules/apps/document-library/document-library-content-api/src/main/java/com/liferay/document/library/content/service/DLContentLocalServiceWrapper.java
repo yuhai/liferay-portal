@@ -16,8 +16,6 @@ package com.liferay.document.library.content.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DLContentLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLContentLocalService
  * @generated
  */
-@ProviderType
 public class DLContentLocalServiceWrapper
 	implements DLContentLocalService, ServiceWrapper<DLContentLocalService> {
 
@@ -35,6 +32,11 @@ public class DLContentLocalServiceWrapper
 		_dlContentLocalService = dlContentLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DLContentLocalServiceUtil} to access the document library content local service. Add custom service methods to <code>com.liferay.document.library.content.service.impl.DLContentLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.document.library.content.model.DLContent addContent(
 		long companyId, long repositoryId, String path, String version,

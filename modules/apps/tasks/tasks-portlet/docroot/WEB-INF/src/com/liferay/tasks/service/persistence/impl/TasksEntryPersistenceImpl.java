@@ -50,8 +50,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The persistence implementation for the tasks entry service.
  *
@@ -62,11 +60,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Ryan Park
  * @generated
  */
-@ProviderType
 public class TasksEntryPersistenceImpl
 	extends BasePersistenceImpl<TasksEntry> implements TasksEntryPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>TasksEntryUtil</code> to access the tasks entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

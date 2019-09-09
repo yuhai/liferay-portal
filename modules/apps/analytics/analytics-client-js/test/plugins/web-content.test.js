@@ -52,7 +52,7 @@ describe('WebContent Plugin', () => {
 	});
 
 	describe('webContentViewed event', () => {
-		it('should be fired for every webContent on the page', () => {
+		it('is fired for every webContent on the page', () => {
 			const webContentElement = createWebContentElement();
 
 			const domContentLoaded = new Event('DOMContentLoaded');
@@ -79,7 +79,7 @@ describe('WebContent Plugin', () => {
 	});
 
 	describe('webContentClicked event', () => {
-		it('should be fired when clicking an image inside a webContent', () => {
+		it('is fired when clicking an image inside a webContent', () => {
 			const webContentElement = createWebContentElement();
 
 			const imageInsideWebContent = document.createElement('img');
@@ -103,7 +103,7 @@ describe('WebContent Plugin', () => {
 			document.body.removeChild(webContentElement);
 		});
 
-		it('should be fired when clicking a link inside a webContent', () => {
+		it('is fired when clicking a link inside a webContent', () => {
 			const webContentElement = createWebContentElement();
 			const text = 'Link inside a WebContent';
 
@@ -130,7 +130,7 @@ describe('WebContent Plugin', () => {
 			document.body.removeChild(webContentElement);
 		});
 
-		it('should be fired when clicking any other element inside a webContent', () => {
+		it('is fired when clicking any other element inside a webContent', () => {
 			const webContentElement = createWebContentElement();
 
 			const paragraphInsideWebContent = document.createElement('p');

@@ -16,8 +16,6 @@ package com.liferay.segments.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SegmentsExperimentRelLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperimentRelLocalService
  * @generated
  */
-@ProviderType
 public class SegmentsExperimentRelLocalServiceWrapper
 	implements SegmentsExperimentRelLocalService,
 			   ServiceWrapper<SegmentsExperimentRelLocalService> {
@@ -36,6 +33,11 @@ public class SegmentsExperimentRelLocalServiceWrapper
 		_segmentsExperimentRelLocalService = segmentsExperimentRelLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentRelLocalServiceUtil} to access the segments experiment rel local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperimentRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.segments.model.SegmentsExperimentRel
 			addSegmentsExperimentRel(
@@ -244,6 +246,16 @@ public class SegmentsExperimentRelLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.segments.model.SegmentsExperimentRel
+			fetchSegmentsExperimentRel(
+				long segmentsExperimentId, long segmentsExperienceId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsExperimentRelLocalService.fetchSegmentsExperimentRel(
+			segmentsExperimentId, segmentsExperienceId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
@@ -349,6 +361,17 @@ public class SegmentsExperimentRelLocalServiceWrapper
 
 		return _segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
 			segmentsExperimentRelId, split);
+	}
+
+	@Override
+	public com.liferay.segments.model.SegmentsExperimentRel
+			updateSegmentsExperimentRel(
+				long segmentsExperimentId, long segmentsExperienceId,
+				double split)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
+			segmentsExperimentId, segmentsExperienceId, split);
 	}
 
 	@Override

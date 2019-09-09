@@ -15,6 +15,7 @@
 package com.liferay.account.admin.web.internal.display.context;
 
 import com.liferay.account.admin.web.internal.display.AccountDisplay;
+import com.liferay.account.admin.web.internal.security.permission.resource.AccountEntryPermission;
 import com.liferay.account.admin.web.internal.security.permission.resource.AccountPermission;
 import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
@@ -23,12 +24,14 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -118,11 +121,44 @@ public class ViewAccountsManagementToolbarDisplayContext
 				dropdownItem.setQuickAction(true);
 
 				return dropdownItem;
+			},
+			() -> {
+				DropdownItem dropdownItem = new DropdownItem();
+
+				dropdownItem.putData("action", "deleteAccounts");
+
+				PortletURL deleteAccountsURL =
+					liferayPortletResponse.createActionURL();
+
+				deleteAccountsURL.setParameter(
+					ActionRequest.ACTION_NAME, "/account_admin/delete_account");
+				deleteAccountsURL.setParameter("navigation", getNavigation());
+
+				dropdownItem.putData(
+					"deleteAccountsURL", deleteAccountsURL.toString());
+
+				dropdownItem.setIcon("times-circle");
+				dropdownItem.setLabel(LanguageUtil.get(request, "delete"));
+				dropdownItem.setQuickAction(true);
+
+				return dropdownItem;
 			});
 	}
 
-	public List<String> getAvailableActions(AccountDisplay accountDisplay) {
+	public List<String> getAvailableActions(AccountDisplay accountDisplay)
+		throws PortalException {
+
 		List<String> availableActions = new ArrayList<>();
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (!AccountEntryPermission.contains(
+				themeDisplay.getPermissionChecker(),
+				accountDisplay.getAccountId(), ActionKeys.DELETE)) {
+
+			return availableActions;
+		}
 
 		if (accountDisplay.isActive()) {
 			availableActions.add("deactivateAccounts");
@@ -130,6 +166,8 @@ public class ViewAccountsManagementToolbarDisplayContext
 		else {
 			availableActions.add("activateAccounts");
 		}
+
+		availableActions.add("deleteAccounts");
 
 		return availableActions;
 	}

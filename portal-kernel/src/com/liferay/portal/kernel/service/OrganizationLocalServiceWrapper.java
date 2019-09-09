@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link OrganizationLocalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OrganizationLocalService
  * @generated
  */
-@ProviderType
 public class OrganizationLocalServiceWrapper
 	implements OrganizationLocalService,
 			   ServiceWrapper<OrganizationLocalService> {
@@ -34,6 +32,11 @@ public class OrganizationLocalServiceWrapper
 		_organizationLocalService = organizationLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link OrganizationLocalServiceUtil} to access the organization local service. Add custom service methods to <code>com.liferay.portal.service.impl.OrganizationLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void addGroupOrganization(long groupId, long organizationId) {
 		_organizationLocalService.addGroupOrganization(groupId, organizationId);
@@ -82,7 +85,8 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Organization addOrganization(
-			long userId, long parentOrganizationId, String name, boolean site)
+			long userId, long parentOrganizationId, java.lang.String name,
+			boolean site)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.addOrganization(
@@ -117,9 +121,10 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Organization addOrganization(
-			long userId, long parentOrganizationId, String name, String type,
-			long regionId, long countryId, long statusId, String comments,
-			boolean site, ServiceContext serviceContext)
+			long userId, long parentOrganizationId, java.lang.String name,
+			java.lang.String type, long regionId, long countryId, long statusId,
+			java.lang.String comments, boolean site,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.addOrganization(
@@ -443,7 +448,7 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Organization fetchOrganization(
-		long companyId, String name) {
+		long companyId, java.lang.String name) {
 
 		return _organizationLocalService.fetchOrganization(companyId, name);
 	}
@@ -458,7 +463,7 @@ public class OrganizationLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Organization
 		fetchOrganizationByReferenceCode(
-			long companyId, String externalReferenceCode) {
+			long companyId, java.lang.String externalReferenceCode) {
 
 		return _organizationLocalService.fetchOrganizationByReferenceCode(
 			companyId, externalReferenceCode);
@@ -473,7 +478,8 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Organization
-		fetchOrganizationByUuidAndCompanyId(String uuid, long companyId) {
+		fetchOrganizationByUuidAndCompanyId(
+			java.lang.String uuid, long companyId) {
 
 		return _organizationLocalService.fetchOrganizationByUuidAndCompanyId(
 			uuid, companyId);
@@ -487,7 +493,7 @@ public class OrganizationLocalServiceWrapper
 	}
 
 	@Override
-	public String[] getChildrenTypes(String type) {
+	public java.lang.String[] getChildrenTypes(java.lang.String type) {
 		return _organizationLocalService.getChildrenTypes(type);
 	}
 
@@ -591,7 +597,7 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Organization getOrganization(
-			long companyId, String name)
+			long companyId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.getOrganization(companyId, name);
@@ -607,7 +613,8 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Organization
-			getOrganizationByUuidAndCompanyId(String uuid, long companyId)
+			getOrganizationByUuidAndCompanyId(
+				java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.getOrganizationByUuidAndCompanyId(
@@ -623,7 +630,7 @@ public class OrganizationLocalServiceWrapper
 	 <code>0</code> if the organization could not be found
 	 */
 	@Override
-	public long getOrganizationId(long companyId, String name) {
+	public long getOrganizationId(long companyId, java.lang.String name) {
 		return _organizationLocalService.getOrganizationId(companyId, name);
 	}
 
@@ -708,8 +715,8 @@ public class OrganizationLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Organization>
 		getOrganizations(
-			long companyId, long parentOrganizationId, String name, int start,
-			int end) {
+			long companyId, long parentOrganizationId, java.lang.String name,
+			int start, int end) {
 
 		return _organizationLocalService.getOrganizations(
 			companyId, parentOrganizationId, name, start, end);
@@ -717,7 +724,7 @@ public class OrganizationLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Organization>
-		getOrganizations(long companyId, String treePath) {
+		getOrganizations(long companyId, java.lang.String treePath) {
 
 		return _organizationLocalService.getOrganizations(companyId, treePath);
 	}
@@ -753,7 +760,7 @@ public class OrganizationLocalServiceWrapper
 	 * @return the organizations and users belonging to the parent organization
 	 */
 	@Override
-	public java.util.List<Object> getOrganizationsAndUsers(
+	public java.util.List<java.lang.Object> getOrganizationsAndUsers(
 		long companyId, long parentOrganizationId, int status, int start,
 		int end, com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
 
@@ -808,7 +815,7 @@ public class OrganizationLocalServiceWrapper
 
 	@Override
 	public int getOrganizationsCount(
-		long companyId, long parentOrganizationId, String name) {
+		long companyId, long parentOrganizationId, java.lang.String name) {
 
 		return _organizationLocalService.getOrganizationsCount(
 			companyId, parentOrganizationId, name);
@@ -820,7 +827,7 @@ public class OrganizationLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _organizationLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -913,7 +920,7 @@ public class OrganizationLocalServiceWrapper
 	}
 
 	@Override
-	public String[] getTypes() {
+	public java.lang.String[] getTypes() {
 		return _organizationLocalService.getTypes();
 	}
 
@@ -1113,17 +1120,17 @@ public class OrganizationLocalServiceWrapper
 	}
 
 	@Override
-	public boolean isCountryEnabled(String type) {
+	public boolean isCountryEnabled(java.lang.String type) {
 		return _organizationLocalService.isCountryEnabled(type);
 	}
 
 	@Override
-	public boolean isCountryRequired(String type) {
+	public boolean isCountryRequired(java.lang.String type) {
 		return _organizationLocalService.isCountryRequired(type);
 	}
 
 	@Override
-	public boolean isRootable(String type) {
+	public boolean isRootable(java.lang.String type) {
 		return _organizationLocalService.isRootable(type);
 	}
 
@@ -1178,9 +1185,9 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(
-		long companyId, long parentOrganizationId, String keywords,
-		java.util.LinkedHashMap<String, Object> params, int start, int end,
-		com.liferay.portal.kernel.search.Sort sort) {
+		long companyId, long parentOrganizationId, java.lang.String keywords,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort) {
 
 		return _organizationLocalService.search(
 			companyId, parentOrganizationId, keywords, params, start, end,
@@ -1224,9 +1231,11 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Organization> search(
-		long companyId, long parentOrganizationId, String keywords, String type,
-		Long regionId, Long countryId,
-		java.util.LinkedHashMap<String, Object> params, int start, int end) {
+		long companyId, long parentOrganizationId, java.lang.String keywords,
+		java.lang.String type, java.lang.Long regionId,
+		java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end) {
 
 		return _organizationLocalService.search(
 			companyId, parentOrganizationId, keywords, type, regionId,
@@ -1273,9 +1282,11 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Organization> search(
-		long companyId, long parentOrganizationId, String keywords, String type,
-		Long regionId, Long countryId,
-		java.util.LinkedHashMap<String, Object> params, int start, int end,
+		long companyId, long parentOrganizationId, java.lang.String keywords,
+		java.lang.String type, java.lang.Long regionId,
+		java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator
 			<com.liferay.portal.kernel.model.Organization> obc) {
 
@@ -1328,10 +1339,11 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Organization> search(
-		long companyId, long parentOrganizationId, String name, String type,
-		String street, String city, String zip, Long regionId, Long countryId,
-		java.util.LinkedHashMap<String, Object> params, boolean andOperator,
-		int start, int end) {
+		long companyId, long parentOrganizationId, java.lang.String name,
+		java.lang.String type, java.lang.String street, java.lang.String city,
+		java.lang.String zip, java.lang.Long regionId, java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andOperator, int start, int end) {
 
 		return _organizationLocalService.search(
 			companyId, parentOrganizationId, name, type, street, city, zip,
@@ -1385,10 +1397,11 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Organization> search(
-		long companyId, long parentOrganizationId, String name, String type,
-		String street, String city, String zip, Long regionId, Long countryId,
-		java.util.LinkedHashMap<String, Object> params, boolean andOperator,
-		int start, int end,
+		long companyId, long parentOrganizationId, java.lang.String name,
+		java.lang.String type, java.lang.String street, java.lang.String city,
+		java.lang.String zip, java.lang.Long regionId, java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andOperator, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator
 			<com.liferay.portal.kernel.model.Organization> obc) {
 
@@ -1438,10 +1451,12 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(
-		long companyId, long parentOrganizationId, String name, String type,
-		String street, String city, String zip, String region, String country,
-		java.util.LinkedHashMap<String, Object> params, boolean andSearch,
-		int start, int end, com.liferay.portal.kernel.search.Sort sort) {
+		long companyId, long parentOrganizationId, java.lang.String name,
+		java.lang.String type, java.lang.String street, java.lang.String city,
+		java.lang.String zip, java.lang.String region, java.lang.String country,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort) {
 
 		return _organizationLocalService.search(
 			companyId, parentOrganizationId, name, type, street, city, zip,
@@ -1471,9 +1486,10 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public int searchCount(
-		long companyId, long parentOrganizationId, String keywords, String type,
-		Long regionId, Long countryId,
-		java.util.LinkedHashMap<String, Object> params) {
+		long companyId, long parentOrganizationId, java.lang.String keywords,
+		java.lang.String type, java.lang.Long regionId,
+		java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params) {
 
 		return _organizationLocalService.searchCount(
 			companyId, parentOrganizationId, keywords, type, regionId,
@@ -1510,9 +1526,11 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public int searchCount(
-		long companyId, long parentOrganizationId, String name, String type,
-		String street, String city, String zip, Long regionId, Long countryId,
-		java.util.LinkedHashMap<String, Object> params, boolean andOperator) {
+		long companyId, long parentOrganizationId, java.lang.String name,
+		java.lang.String type, java.lang.String street, java.lang.String city,
+		java.lang.String zip, java.lang.Long regionId, java.lang.Long countryId,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andOperator) {
 
 		return _organizationLocalService.searchCount(
 			companyId, parentOrganizationId, name, type, street, city, zip,
@@ -1522,9 +1540,11 @@ public class OrganizationLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult
 		<com.liferay.portal.kernel.model.Organization> searchOrganizations(
-				long companyId, long parentOrganizationId, String keywords,
-				java.util.LinkedHashMap<String, Object> params, int start,
-				int end, com.liferay.portal.kernel.search.Sort sort)
+				long companyId, long parentOrganizationId,
+				java.lang.String keywords,
+				java.util.LinkedHashMap<java.lang.String, java.lang.Object>
+					params,
+				int start, int end, com.liferay.portal.kernel.search.Sort sort)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.searchOrganizations(
@@ -1535,10 +1555,13 @@ public class OrganizationLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult
 		<com.liferay.portal.kernel.model.Organization> searchOrganizations(
-				long companyId, long parentOrganizationId, String name,
-				String type, String street, String city, String zip,
-				String region, String country,
-				java.util.LinkedHashMap<String, Object> params,
+				long companyId, long parentOrganizationId,
+				java.lang.String name, java.lang.String type,
+				java.lang.String street, java.lang.String city,
+				java.lang.String zip, java.lang.String region,
+				java.lang.String country,
+				java.util.LinkedHashMap<java.lang.String, java.lang.Object>
+					params,
 				boolean andSearch, int start, int end,
 				com.liferay.portal.kernel.search.Sort sort)
 			throws com.liferay.portal.kernel.exception.PortalException {
@@ -1569,8 +1592,9 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.search.Hits searchOrganizationsAndUsers(
-			long companyId, long parentOrganizationId, String keywords,
-			int status, java.util.LinkedHashMap<String, Object> params,
+			long companyId, long parentOrganizationId,
+			java.lang.String keywords, int status,
+			java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 			int start, int end, com.liferay.portal.kernel.search.Sort[] sorts)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -1596,8 +1620,9 @@ public class OrganizationLocalServiceWrapper
 	 */
 	@Override
 	public int searchOrganizationsAndUsersCount(
-			long companyId, long parentOrganizationId, String keywords,
-			int status, java.util.LinkedHashMap<String, Object> params)
+			long companyId, long parentOrganizationId,
+			java.lang.String keywords, int status,
+			java.util.LinkedHashMap<java.lang.String, java.lang.Object> params)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.searchOrganizationsAndUsersCount(
@@ -1654,7 +1679,7 @@ public class OrganizationLocalServiceWrapper
 	public void updateAsset(
 			long userId,
 			com.liferay.portal.kernel.model.Organization organization,
-			long[] assetCategoryIds, String[] assetTagNames)
+			long[] assetCategoryIds, java.lang.String[] assetTagNames)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_organizationLocalService.updateAsset(
@@ -1687,9 +1712,10 @@ public class OrganizationLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.Organization updateOrganization(
 			long companyId, long organizationId, long parentOrganizationId,
-			String name, String type, long regionId, long countryId,
-			long statusId, String comments, boolean hasLogo, byte[] logoBytes,
-			boolean site, ServiceContext serviceContext)
+			java.lang.String name, java.lang.String type, long regionId,
+			long countryId, long statusId, java.lang.String comments,
+			boolean hasLogo, byte[] logoBytes, boolean site,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationLocalService.updateOrganization(

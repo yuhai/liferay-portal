@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the counter local service.
  *
@@ -34,12 +32,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.counter.service.impl.CounterLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class CounterLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements CounterLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CounterLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.counter.kernel.service.CounterLocalServiceUtil</code>.

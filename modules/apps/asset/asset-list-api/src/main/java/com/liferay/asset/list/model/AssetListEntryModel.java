@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetListEntryModel
 	extends BaseModel<AssetListEntry>, ShardedModel, StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset list entry model instance should use the {@link AssetListEntry} interface instead.

@@ -43,7 +43,7 @@ import javax.sql.DataSource;
 public abstract class AccountServiceBaseImpl
 	extends BaseServiceImpl implements AccountService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AccountService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.AccountServiceUtil</code>.

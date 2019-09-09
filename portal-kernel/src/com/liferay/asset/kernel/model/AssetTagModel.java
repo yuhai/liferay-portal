@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetTagModel
 	extends BaseModel<AssetTag>, ShardedModel, StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset tag model instance should use the {@link AssetTag} interface instead.

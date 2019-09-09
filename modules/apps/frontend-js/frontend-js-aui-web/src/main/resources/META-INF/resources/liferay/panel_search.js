@@ -45,28 +45,7 @@ AUI.add(
 			NAME: 'panelsearch',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					var nodeList = instance.get('nodeList');
-
-					instance._categories = nodeList.all(
-						instance.get('categorySelector')
-					);
-
-					var applicationSearch = new Liferay.SearchFilter({
-						inputNode: instance.get('inputNode'),
-						nodeList: nodeList,
-						nodeSelector: instance.get('nodeSelector')
-					});
-
-					instance._nodes = applicationSearch._nodes;
-					instance._search = applicationSearch;
-
-					instance._bindUISearch();
-				},
-
-				_bindUISearch: function() {
+				_bindUISearch() {
 					var instance = this;
 
 					instance._eventHandles = instance._eventHandles || [];
@@ -87,16 +66,16 @@ AUI.add(
 					);
 				},
 
-				_onSearchInputKeyDown: function(event) {
+				_onSearchInputKeyDown(event) {
 					if (event.isKey('ENTER')) {
 						event.halt();
 					}
 				},
 
-				_setItemsVisibility: function(visible) {
+				_setItemsVisibility(visible) {
 					var instance = this;
 
-					instance._nodes.each(function(item, index) {
+					instance._nodes.each(function(item) {
 						var contentItem = item;
 
 						var nodeContainerSelector = instance.get(
@@ -113,7 +92,7 @@ AUI.add(
 					});
 				},
 
-				_updateList: function(event) {
+				_updateList(event) {
 					var instance = this;
 
 					var categories = instance._categories;
@@ -123,7 +102,7 @@ AUI.add(
 					if (!instance._collapsedCategories) {
 						instance._collapsedCategories = [];
 
-						categories.each(function(item, index) {
+						categories.each(function(item) {
 							var header = item.one('.list-group-heading');
 
 							if (header && header.hasClass('collapsed')) {
@@ -139,8 +118,7 @@ AUI.add(
 
 						if (instance._collapsedCategories) {
 							instance._collapsedCategories.forEach(function(
-								item,
-								index
+								item
 							) {
 								item.one('.list-group-heading').addClass(
 									'collapsed'
@@ -159,7 +137,7 @@ AUI.add(
 
 						instance._setItemsVisibility(false);
 
-						event.results.forEach(function(item, index) {
+						event.results.forEach(function(item) {
 							var node = item.raw.node;
 
 							var nodeContainerSelector = instance.get(
@@ -190,6 +168,27 @@ AUI.add(
 							}
 						});
 					}
+				},
+
+				initializer() {
+					var instance = this;
+
+					var nodeList = instance.get('nodeList');
+
+					instance._categories = nodeList.all(
+						instance.get('categorySelector')
+					);
+
+					var applicationSearch = new Liferay.SearchFilter({
+						inputNode: instance.get('inputNode'),
+						nodeList,
+						nodeSelector: instance.get('nodeSelector')
+					});
+
+					instance._nodes = applicationSearch._nodes;
+					instance._search = applicationSearch;
+
+					instance._bindUISearch();
 				}
 			}
 		});

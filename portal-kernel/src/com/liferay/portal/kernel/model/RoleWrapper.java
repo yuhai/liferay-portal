@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Role}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Role
  * @generated
  */
-@ProviderType
 public class RoleWrapper
 	extends BaseModelWrapper<Role> implements Role, ModelWrapper<Role> {
 
@@ -500,6 +497,11 @@ public class RoleWrapper
 		return model.isTeam();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a role model instance should use the <code>Role</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

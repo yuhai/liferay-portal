@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CTProcessModel
 	extends BaseModel<CTProcess>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ct process model instance should use the {@link CTProcess} interface instead.

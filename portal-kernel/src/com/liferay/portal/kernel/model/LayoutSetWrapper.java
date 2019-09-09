@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link LayoutSet}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSet
  * @generated
  */
-@ProviderType
 public class LayoutSetWrapper
 	extends BaseModelWrapper<LayoutSet>
 	implements LayoutSet, ModelWrapper<LayoutSet> {
@@ -453,6 +450,11 @@ public class LayoutSetWrapper
 		return model.isPrivateLayout();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a layout set model instance should use the <code>LayoutSet</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

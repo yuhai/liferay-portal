@@ -40,7 +40,7 @@ import java.util.Set;
 public interface VersionedEntryVersionPersistence
 	extends BasePersistence<VersionedEntryVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link VersionedEntryVersionUtil} to access the versioned entry version persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

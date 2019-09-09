@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsExperimentRelModel
 	extends BaseModel<SegmentsExperimentRel>, GroupedModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a segments experiment rel model instance should use the {@link SegmentsExperimentRel} interface instead.

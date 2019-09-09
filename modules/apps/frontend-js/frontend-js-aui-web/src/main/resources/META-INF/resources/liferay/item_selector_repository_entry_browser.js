@@ -77,43 +77,7 @@ AUI.add(
 			NAME: 'itemselectorrepositoryentrybrowser',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._itemViewer = new A.LiferayItemViewer({
-						btnCloseCaption: instance.get('closeCaption'),
-						editItemURL: instance.get('editItemURL'),
-						links: instance.all('.item-preview'),
-						uploadItemURL: instance.get('uploadItemURL')
-					});
-
-					instance._uploadItemViewer = new A.LiferayItemViewer({
-						btnCloseCaption: instance.get('closeCaption'),
-						links: '',
-						uploadItemURL: instance.get('uploadItemURL')
-					});
-
-					instance._itemSelectorUploader = new A.LiferayItemSelectorUploader(
-						{
-							rootNode: instance.rootNode
-						}
-					);
-
-					instance._bindUI();
-					instance._renderUI();
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					instance._itemViewer.destroy();
-					instance._uploadItemViewer.destroy();
-					instance._itemSelectorUploader.destroy();
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_afterVisibleChange: function(event) {
+				_afterVisibleChange(event) {
 					var instance = this;
 
 					if (!event.newVal) {
@@ -121,7 +85,7 @@ AUI.add(
 					}
 				},
 
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					var itemViewer = instance._itemViewer;
@@ -203,7 +167,7 @@ AUI.add(
 					}
 				},
 
-				_ddEventHandler: function(event) {
+				_ddEventHandler(event) {
 					var instance = this;
 
 					var dataTransfer = event._event.dataTransfer;
@@ -239,7 +203,7 @@ AUI.add(
 					}
 				},
 
-				_getUploadErrorMessage: function(error) {
+				_getUploadErrorMessage(error) {
 					var instance = this;
 
 					var message = Liferay.Language.get(
@@ -319,9 +283,7 @@ AUI.add(
 					return message;
 				},
 
-				_getUploadFileMetadata: function(file) {
-					var instance = this;
-
+				_getUploadFileMetadata(file) {
 					return {
 						groups: [
 							{
@@ -347,7 +309,7 @@ AUI.add(
 					};
 				},
 
-				_onInputFileChanged: function(event) {
+				_onInputFileChanged(event) {
 					var instance = this;
 
 					var file = event.currentTarget.getDOMNode().files[0];
@@ -355,7 +317,7 @@ AUI.add(
 					instance._validateFile(file);
 				},
 
-				_onItemSelected: function(itemViewer) {
+				_onItemSelected(itemViewer) {
 					var instance = this;
 
 					var link = itemViewer
@@ -370,13 +332,13 @@ AUI.add(
 					});
 				},
 
-				_onItemUploadCancel: function(event) {
+				_onItemUploadCancel() {
 					var instance = this;
 
 					instance._uploadItemViewer.hide();
 				},
 
-				_onItemUploadComplete: function(itemData) {
+				_onItemUploadComplete(itemData) {
 					var instance = this;
 
 					var uploadItemViewer = instance._uploadItemViewer;
@@ -386,7 +348,7 @@ AUI.add(
 					instance._onItemSelected(uploadItemViewer);
 				},
 
-				_onItemUploadError: function(event) {
+				_onItemUploadError(event) {
 					var instance = this;
 
 					instance._uploadItemViewer.hide();
@@ -398,7 +360,7 @@ AUI.add(
 					instance._showError(errorMessage);
 				},
 
-				_previewFile: function(file) {
+				_previewFile(file) {
 					var instance = this;
 
 					if (A.config.win.FileReader) {
@@ -412,7 +374,7 @@ AUI.add(
 					}
 				},
 
-				_renderUI: function() {
+				_renderUI() {
 					var instance = this;
 
 					var rootNode = instance.rootNode;
@@ -421,7 +383,7 @@ AUI.add(
 					instance._uploadItemViewer.render(rootNode);
 				},
 
-				_showError: function(message) {
+				_showError(message) {
 					var instance = this;
 
 					new Liferay.Alert({
@@ -432,12 +394,12 @@ AUI.add(
 						},
 						duration: 250,
 						icon: 'exclamation-full',
-						message: message,
+						message,
 						type: 'danger'
 					}).render(instance.rootNode);
 				},
 
-				_showFile: function(file, preview) {
+				_showFile(file, preview) {
 					var instance = this;
 
 					var returnType = instance.get('uploadItemReturnType');
@@ -450,8 +412,8 @@ AUI.add(
 
 					var linkNode = A.Node.create(
 						Lang.sub(UPLOAD_ITEM_LINK_TPL, {
-							preview: preview,
-							returnType: returnType,
+							preview,
+							returnType,
 							title: file.name,
 							value: preview
 						})
@@ -474,7 +436,7 @@ AUI.add(
 					);
 				},
 
-				_validateFile: function(file) {
+				_validateFile(file) {
 					var instance = this;
 
 					var errorMessage = '';
@@ -524,6 +486,42 @@ AUI.add(
 
 						instance._showError(errorMessage);
 					}
+				},
+
+				destructor() {
+					var instance = this;
+
+					instance._itemViewer.destroy();
+					instance._uploadItemViewer.destroy();
+					instance._itemSelectorUploader.destroy();
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._itemViewer = new A.LiferayItemViewer({
+						btnCloseCaption: instance.get('closeCaption'),
+						editItemURL: instance.get('editItemURL'),
+						links: instance.all('.item-preview'),
+						uploadItemURL: instance.get('uploadItemURL')
+					});
+
+					instance._uploadItemViewer = new A.LiferayItemViewer({
+						btnCloseCaption: instance.get('closeCaption'),
+						links: '',
+						uploadItemURL: instance.get('uploadItemURL')
+					});
+
+					instance._itemSelectorUploader = new A.LiferayItemSelectorUploader(
+						{
+							rootNode: instance.rootNode
+						}
+					);
+
+					instance._bindUI();
+					instance._renderUI();
 				}
 			}
 		});

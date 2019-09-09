@@ -17,6 +17,7 @@
 <%@ include file="/info/item/renderer/init.jsp" %>
 
 <%
+AssetRenderer assetRenderer = (AssetRenderer)request.getAttribute(WebKeys.ASSET_RENDERER);
 JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_ARTICLE);
 %>
 
@@ -26,12 +27,19 @@ JournalArticle article = (JournalArticle)request.getAttribute(WebKeys.JOURNAL_AR
 	</c:if>
 
 	<%
-	String summary = article.getDescription();
-
-	if (Validator.isNull(summary)) {
-		summary = article.getContent();
-	}
+	String summary = assetRenderer.getSummary(renderRequest, renderResponse);
 	%>
 
-	<%= summary %>
+	<c:choose>
+		<c:when test="<%= Validator.isNull(summary) %>">
+
+			<%
+			assetRenderer.include(request, response, "abstract");
+			%>
+
+		</c:when>
+		<c:otherwise>
+			<%= summary %>
+		</c:otherwise>
+	</c:choose>
 </div>

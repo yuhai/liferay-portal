@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface RepositoryEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link RepositoryEntryLocalServiceUtil} to access the repository entry local service. Add custom service methods to <code>com.liferay.portal.service.impl.RepositoryEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

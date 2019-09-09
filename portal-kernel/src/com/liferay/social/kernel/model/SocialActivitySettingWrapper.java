@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SocialActivitySetting}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivitySetting
  * @generated
  */
-@ProviderType
 public class SocialActivitySettingWrapper
 	extends BaseModelWrapper<SocialActivitySetting>
 	implements SocialActivitySetting, ModelWrapper<SocialActivitySetting> {
@@ -192,6 +189,11 @@ public class SocialActivitySettingWrapper
 		return model.getValue();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a social activity setting model instance should use the <code>SocialActivitySetting</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

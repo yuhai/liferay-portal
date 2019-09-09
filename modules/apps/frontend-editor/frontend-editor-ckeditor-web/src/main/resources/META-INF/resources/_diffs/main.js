@@ -48,7 +48,148 @@ AUI.add(
 			NAME: 'inline-editor-ckeditor',
 
 			prototype: {
-				initializer: function(config) {
+				_attachScrollListener() {
+					var instance = this;
+
+					if (!instance._scrollHandle) {
+						instance._scrollHandle = A.getWin().on(
+							'scroll',
+							instance._updateNoticePosition,
+							instance
+						);
+					}
+				},
+
+				_destructor() {
+					var instance = this;
+
+					A.Array.invoke(instance._eventHandles, 'removeListener');
+
+					if (instance._scrollHandle) {
+						instance._scrollHandle.detach();
+					}
+				},
+
+				_getAutoSaveTimeout() {
+					var instance = this;
+
+					var editor = instance.get(EDITOR);
+
+					return editor.config.autoSaveTimeout;
+				},
+
+				_getCloseNoticeTimeout() {
+					var instance = this;
+
+					var editor = instance.get(EDITOR);
+
+					return editor.config.closeNoticeTimeout;
+				},
+
+				_onEditorBlur() {
+					var instance = this;
+
+					instance.stopSaveTask();
+
+					if (instance.isContentDirty()) {
+						instance.save();
+					}
+				},
+
+				_onEditorFocus() {
+					var instance = this;
+
+					var originalContentNode = A.one(
+						'#' +
+							instance.get(EDITOR_NAME) +
+							instance.get(EDITOR_SUFFIX)
+					);
+
+					if (!originalContentNode.text()) {
+						originalContentNode.text(this.get(EDITOR).getData());
+					}
+
+					var notice = instance.getEditNotice();
+
+					if (
+						notice.get(VISIBLE) &&
+						notice.get(BOUNDING_BOX).getData(EDITOR) !==
+							instance.get(EDITOR_NAME)
+					) {
+						notice.hide();
+
+						if (instance._scrollHandle) {
+							instance._scrollHandle.detach();
+
+							instance._scrollHandle = null;
+						}
+					}
+
+					instance.startSaveTask();
+
+					instance._attachScrollListener();
+
+					instance.resetDirty();
+				},
+
+				_restoreContent() {
+					var instance = this;
+
+					var originalContentNode = A.one(
+						'#' +
+							instance.get(EDITOR_NAME) +
+							instance.get(EDITOR_SUFFIX)
+					);
+
+					var originalContent = originalContentNode.text();
+
+					instance.get(EDITOR).setData(originalContent);
+
+					if (instance.isContentDirty()) {
+						instance.save();
+					}
+				},
+
+				_updateNoticePosition() {
+					var instance = this;
+
+					var notice = instance.getEditNotice();
+
+					if (notice.get(VISIBLE)) {
+						var editorToolbarNode = A.one(
+							instance.get(EDITOR_PREFIX) +
+								instance.get(EDITOR_NAME)
+						);
+
+						var editorToolbarVisible =
+							editorToolbarNode.getStyle('display') !== 'none';
+
+						var align = {
+							node: WIN,
+							points: POINTS_WINDOW_CENTER
+						};
+
+						if (editorToolbarVisible) {
+							var noticePosition = POINT_TL;
+							var containerPostion = POINT_BL;
+
+							if (
+								Lang.toInt(editorToolbarNode.getStyle('top')) >
+								instance.get('toolbarTopOffset')
+							) {
+								noticePosition = POINT_BL;
+								containerPostion = POINT_TL;
+							}
+
+							align.node = editorToolbarNode;
+							align.points = [noticePosition, containerPostion];
+						}
+
+						notice.set(ALIGN, align);
+					}
+				},
+
+				initializer() {
 					var instance = this;
 
 					var editor = instance.get(EDITOR);
@@ -87,159 +228,16 @@ AUI.add(
 					);
 				},
 
-				isContentDirty: function() {
+				isContentDirty() {
 					var instance = this;
 
 					return instance.get(EDITOR).checkDirty();
 				},
 
-				resetDirty: function() {
+				resetDirty() {
 					var instance = this;
 
 					instance.get(EDITOR).resetDirty();
-				},
-
-				_attachScrollListener: function() {
-					var instance = this;
-
-					var notice = instance.getEditNotice();
-
-					if (!instance._scrollHandle) {
-						instance._scrollHandle = A.getWin().on(
-							'scroll',
-							instance._updateNoticePosition,
-							instance
-						);
-					}
-				},
-
-				_destructor: function() {
-					var instance = this;
-
-					A.Array.invoke(instance._eventHandles, 'removeListener');
-
-					if (instance._scrollHandle) {
-						instance._scrollHandle.detach();
-					}
-				},
-
-				_getAutoSaveTimeout: function() {
-					var instance = this;
-
-					var editor = instance.get(EDITOR);
-
-					return editor.config.autoSaveTimeout;
-				},
-
-				_getCloseNoticeTimeout: function() {
-					var instance = this;
-
-					var editor = instance.get(EDITOR);
-
-					return editor.config.closeNoticeTimeout;
-				},
-
-				_onEditorBlur: function() {
-					var instance = this;
-
-					instance.stopSaveTask();
-
-					if (instance.isContentDirty()) {
-						instance.save();
-					}
-				},
-
-				_onEditorFocus: function() {
-					var instance = this;
-
-					var originalContentNode = A.one(
-						'#' +
-							instance.get(EDITOR_NAME) +
-							instance.get(EDITOR_SUFFIX)
-					);
-
-					if (!originalContentNode.text()) {
-						originalContentNode.text(this.get(EDITOR).getData());
-					}
-
-					var notice = instance.getEditNotice();
-
-					if (
-						notice.get(VISIBLE) &&
-						notice.get(BOUNDING_BOX).getData(EDITOR) !==
-							instance.get(EDITOR_NAME)
-					) {
-						notice.hide();
-
-						if (instance._scrollHandle) {
-							instance._scrollHandle.detach();
-
-							instance._scrollHandle = null;
-						}
-					}
-
-					instance.startSaveTask();
-
-					instance._attachScrollListener();
-
-					instance.resetDirty();
-				},
-
-				_restoreContent: function() {
-					var instance = this;
-
-					var originalContentNode = A.one(
-						'#' +
-							instance.get(EDITOR_NAME) +
-							instance.get(EDITOR_SUFFIX)
-					);
-
-					var originalContent = originalContentNode.text();
-
-					instance.get(EDITOR).setData(originalContent);
-
-					if (instance.isContentDirty()) {
-						instance.save();
-					}
-				},
-
-				_updateNoticePosition: function() {
-					var instance = this;
-
-					var notice = instance.getEditNotice();
-
-					if (notice.get(VISIBLE)) {
-						var editorToolbarNode = A.one(
-							instance.get(EDITOR_PREFIX) +
-								instance.get(EDITOR_NAME)
-						);
-
-						var editorToolbarVisible =
-							editorToolbarNode.getStyle('display') !== 'none';
-
-						var align = {
-							node: WIN,
-							points: POINTS_WINDOW_CENTER
-						};
-
-						if (editorToolbarVisible) {
-							var noticePosition = POINT_TL;
-							var containerPostion = POINT_BL;
-
-							if (
-								Lang.toInt(editorToolbarNode.getStyle('top')) >
-								instance.get('toolbarTopOffset')
-							) {
-								noticePosition = POINT_BL;
-								containerPostion = POINT_TL;
-							}
-
-							align.node = editorToolbarNode;
-							align.points = [noticePosition, containerPostion];
-						}
-
-						notice.set(ALIGN, align);
-					}
 				}
 			}
 		});

@@ -16,8 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the remote service utility for UserGroupGroupRole. This utility wraps
  * <code>com.liferay.portal.service.impl.UserGroupGroupRoleServiceImpl</code> and is an
@@ -30,13 +28,18 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see UserGroupGroupRoleService
  * @generated
  */
-@ProviderType
 public class UserGroupGroupRoleServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.UserGroupGroupRoleServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 */
+
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link UserGroupGroupRoleServiceUtil} to access the user group group role remote service. Add custom service methods to <code>com.liferay.portal.service.impl.UserGroupGroupRoleServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addUserGroupGroupRoles(
 			long userGroupId, long groupId, long[] roleIds)

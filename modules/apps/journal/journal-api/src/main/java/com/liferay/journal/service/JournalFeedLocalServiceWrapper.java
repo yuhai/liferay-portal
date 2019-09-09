@@ -16,8 +16,6 @@ package com.liferay.journal.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link JournalFeedLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see JournalFeedLocalService
  * @generated
  */
-@ProviderType
 public class JournalFeedLocalServiceWrapper
 	implements JournalFeedLocalService,
 			   ServiceWrapper<JournalFeedLocalService> {
@@ -36,6 +33,11 @@ public class JournalFeedLocalServiceWrapper
 		_journalFeedLocalService = journalFeedLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link JournalFeedLocalServiceUtil} to access the journal feed local service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFeedLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.journal.model.JournalFeed addFeed(
 			long userId, long groupId, String feedId, boolean autoFeedId,

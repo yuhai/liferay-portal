@@ -23,8 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLFileEntry}.
@@ -34,7 +32,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileEntry
  * @generated
  */
-@ProviderType
 public class DLFileEntryWrapper
 	extends BaseModelWrapper<DLFileEntry>
 	implements DLFileEntry, ModelWrapper<DLFileEntry> {
@@ -827,6 +824,11 @@ public class DLFileEntryWrapper
 		return model.isManualCheckInRequired();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a document library file entry model instance should use the <code>DLFileEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

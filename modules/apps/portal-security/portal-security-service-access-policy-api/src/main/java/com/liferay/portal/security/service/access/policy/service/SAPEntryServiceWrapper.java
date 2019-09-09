@@ -16,8 +16,6 @@ package com.liferay.portal.security.service.access.policy.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SAPEntryService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SAPEntryService
  * @generated
  */
-@ProviderType
 public class SAPEntryServiceWrapper
 	implements SAPEntryService, ServiceWrapper<SAPEntryService> {
 
@@ -33,6 +30,11 @@ public class SAPEntryServiceWrapper
 		_sapEntryService = sapEntryService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SAPEntryServiceUtil} to access the sap entry remote service. Add custom service methods to <code>com.liferay.portal.security.service.access.policy.service.impl.SAPEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.security.service.access.policy.model.SAPEntry
 			addSAPEntry(

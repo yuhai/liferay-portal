@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link FriendlyURLEntry}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see FriendlyURLEntry
  * @generated
  */
-@ProviderType
 public class FriendlyURLEntryWrapper
 	extends BaseModelWrapper<FriendlyURLEntry>
 	implements FriendlyURLEntry, ModelWrapper<FriendlyURLEntry> {
@@ -280,6 +277,11 @@ public class FriendlyURLEntryWrapper
 		return model.isMain();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a friendly url entry model instance should use the <code>FriendlyURLEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

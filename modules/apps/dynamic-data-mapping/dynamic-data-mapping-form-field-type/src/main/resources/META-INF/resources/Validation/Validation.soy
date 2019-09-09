@@ -10,9 +10,9 @@
 	{@param? errorMessage: string}
 	{@param? label: string}
 	{@param? localizationMode: bool}
-	{@param? parameterMessage: string}
+	{@param? parameter: string}
 	{@param? readOnly: bool}
-	{@param? selectedValidation: [parameterMessage: string, value: string]}
+	{@param? selectedValidation: [name: string, parameterMessage: string]}
 	{@param? validations: list<[
 		checked: bool,
 		disabled: bool,
@@ -33,7 +33,7 @@
 		{param label: $label /}
 		{param localizationMode: $localizationMode /}
 		{param name: $name /}
-		{param parameterMessage: $parameterMessage /}
+		{param parameter: $parameter /}
 		{param readOnly: $readOnly /}
 		{param selectedValidation: $selectedValidation /}
 		{param spritemap: $spritemap /}
@@ -50,9 +50,9 @@
 	{@param? errorMessage: string}
 	{@param? label: string}
 	{@param? localizationMode: bool}
-	{@param? parameterMessage: string}
+	{@param? parameter: string}
 	{@param? readOnly: bool}
-	{@param? selectedValidation: [parameterMessage: string, value: string]}
+	{@param? selectedValidation: [name: string, parameterMessage: string]}
 	{@param spritemap: string}
 	{@param? validations: list<[
 		checked: bool,
@@ -95,7 +95,7 @@
 			{param readOnly: $readOnly or $localizationMode /}
 			{param ref: 'selectedValidation' /}
 			{param spritemap: $spritemap /}
-			{param value: [$selectedValidation?.value] /}
+			{param value: [$selectedValidation?.name] /}
 			{param visible: $enableValidation /}
 		{/call}
 
@@ -108,13 +108,13 @@
 				{param label kind="text"}
 					{msg desc=""}the-value{/msg}
 				{/param}
-				{param name: $name + '_parameterMessage' /}
+				{param name: $name + '_parameter' /}
 				{param placeholder: $selectedValidation?.parameterMessage /}
-				{param readOnly: $readOnly or $localizationMode /}
-				{param ref: 'parameterMessage' /}
+				{param readOnly: $readOnly /}
+				{param ref: 'parameter' /}
 				{param required: false /}
 				{param spritemap: $spritemap /}
-				{param value: $parameterMessage /}
+				{param value: $parameter /}
 				{param visible: $enableValidation /}
 			{/call}
 		{elseif $selectedValidation?.parameterMessage}
@@ -126,13 +126,13 @@
 				{param label kind="text"}
 					{msg desc=""}the-value{/msg}
 				{/param}
-				{param name: $name + '_parameterMessage' /}
+				{param name: $name + '_parameter' /}
 				{param placeholder: $selectedValidation?.parameterMessage /}
-				{param readOnly: $readOnly or $localizationMode /}
-				{param ref: 'parameterMessage' /}
+				{param readOnly: $readOnly /}
+				{param ref: 'parameter' /}
 				{param required: false /}
 				{param spritemap: $spritemap /}
-				{param value: $parameterMessage /}
+				{param value: $parameter /}
 				{param visible: $enableValidation /}
 			{/call}
 		{/if}

@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.source.formatter.checks.util.GradleSourceUtil;
 
 import java.io.IOException;
@@ -146,18 +145,6 @@ public class GradleDependencyVersionCheck extends BaseFileCheck {
 		return matcher.group();
 	}
 
-	private String _getModulesPropertiesContent(String absolutePath)
-		throws IOException {
-
-		if (!isPortalSource()) {
-			return getPortalContent(
-				_MODULES_PROPERTIES_FILE_NAME, absolutePath);
-		}
-
-		return getContent(
-			_MODULES_PROPERTIES_FILE_NAME, ToolsUtil.PORTAL_MAX_DIR_LEVEL);
-	}
-
 	private synchronized Map<String, Integer> _getPublishedMajorVersionsMap(
 			String absolutePath)
 		throws IOException {
@@ -166,7 +153,7 @@ public class GradleDependencyVersionCheck extends BaseFileCheck {
 			return _publishedMajorVersionsMap;
 		}
 
-		String content = _getModulesPropertiesContent(absolutePath);
+		String content = getModulesPropertiesContent(absolutePath);
 
 		if (Validator.isNull(content)) {
 			_publishedMajorVersionsMap = Collections.emptyMap();
@@ -181,8 +168,15 @@ public class GradleDependencyVersionCheck extends BaseFileCheck {
 		for (String line : lines) {
 			String[] array = StringUtil.split(line, StringPool.EQUAL);
 
-			if (array.length == 2) {
-				bundleVersionsMap.put(array[0], array[1]);
+			if (array.length != 2) {
+				continue;
+			}
+
+			String key = array[0];
+
+			if (key.startsWith("bundle.version[")) {
+				bundleVersionsMap.put(
+					key.substring(12, key.length() - 1), array[1]);
 			}
 		}
 
@@ -236,9 +230,6 @@ public class GradleDependencyVersionCheck extends BaseFileCheck {
 
 		return false;
 	}
-
-	private static final String _MODULES_PROPERTIES_FILE_NAME =
-		"modules/modules.properties";
 
 	private static final Pattern _dependencyNamePattern = Pattern.compile(
 		".*, name: \"([^\"]*)\".*");

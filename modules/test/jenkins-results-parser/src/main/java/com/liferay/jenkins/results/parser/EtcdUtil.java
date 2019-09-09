@@ -96,7 +96,7 @@ public class EtcdUtil {
 		}
 
 		public String getKey() {
-			return _etcdNode.getKey();
+			return _key;
 		}
 
 		public long getModifiedIndex() {
@@ -143,14 +143,38 @@ public class EtcdUtil {
 		private Node(String etcdServerURL, EtcdKeysResponse.EtcdNode etcdNode) {
 			_etcdServerURL = etcdServerURL;
 			_etcdNode = etcdNode;
+			_key = etcdNode.getKey();
 		}
 
 		private synchronized void _refreshEtcdNode() {
-			_etcdNode = _getEtcdNode(getEtcdServerURL(), getKey());
+			Retryable<EtcdKeysResponse.EtcdNode> etcdNodeRefreshRetryable =
+				new Retryable<EtcdKeysResponse.EtcdNode>(
+					false, _RETRIES_SIZE_MAX_DEFAULT,
+					_SECONDS_RETRY_PERIOD_DEFAULT, true) {
+
+					public EtcdKeysResponse.EtcdNode execute() {
+						EtcdKeysResponse.EtcdNode etcdNode = _getEtcdNode(
+							getEtcdServerURL(), getKey());
+
+						if (etcdNode == null) {
+							throw new RuntimeException(
+								JenkinsResultsParserUtil.combine(
+									"Unable to get Etcd node from ",
+									getEtcdServerURL(), " with key ",
+									getKey()));
+						}
+
+						return etcdNode;
+					}
+
+				};
+
+			_etcdNode = etcdNodeRefreshRetryable.executeWithRetries();
 		}
 
 		private EtcdKeysResponse.EtcdNode _etcdNode;
 		private final String _etcdServerURL;
+		private final String _key;
 
 	}
 

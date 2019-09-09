@@ -69,7 +69,7 @@ public interface LVEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService,
 			VersionService<LVEntry, LVEntryVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LVEntryLocalServiceUtil} to access the lv entry local service. Add custom service methods to <code>com.liferay.portal.tools.service.builder.test.service.impl.LVEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

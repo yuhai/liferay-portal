@@ -33,7 +33,336 @@
 	var defaultVideoWidth = 400;
 
 	CKEDITOR.plugins.add('itemselector', {
-		init: function(editor) {
+		_bindBrowseButton(
+			editor,
+			dialogDefinition,
+			tabName,
+			commandName,
+			targetField
+		) {
+			var tab = dialogDefinition.getContents(tabName);
+
+			if (tab) {
+				var browseButton = tab.get('browse');
+
+				if (browseButton) {
+					browseButton.onClick = function() {
+						editor.execCommand(commandName, function(newVal) {
+							dialogDefinition.dialog.setValueOf(
+								tabName,
+								targetField,
+								newVal
+							);
+						});
+					};
+				}
+			}
+		},
+
+		_commitAudioValue(value, node) {
+			var instance = this;
+
+			node.setAttribute('data-document-url', value);
+
+			var audioUrl = Liferay.Util.addParams(
+				'audioPreview=1&type=mp3',
+				value
+			);
+
+			node.setAttribute('data-audio-url', audioUrl);
+
+			var audioOggUrl = Liferay.Util.addParams(
+				'audioPreview=1&type=ogg',
+				value
+			);
+
+			node.setAttribute('data-audio-ogg-url', audioOggUrl);
+
+			return instance._audioTPL.output({
+				oggUrl: audioOggUrl,
+				url: audioUrl
+			});
+		},
+
+		_commitMediaValue(value, editor, type) {
+			var instance = this;
+
+			var mediaPlugin = editor.plugins.media;
+
+			if (mediaPlugin) {
+				var eventName = editor.name + 'selectItem';
+
+				Liferay.Util.getWindow(eventName).onceAfter(
+					'destroy',
+					function() {
+						mediaPlugin.onOkCallback(
+							{
+								commitContent: instance._getCommitMediaValueFn(
+									value,
+									editor,
+									type
+								)
+							},
+							editor,
+							type
+						);
+					}
+				);
+			}
+		},
+
+		_commitVideoValue(value, node, extraStyles) {
+			var instance = this;
+
+			node.setAttribute('data-document-url', value);
+
+			var videoUrl = Liferay.Util.addParams(
+				'videoPreview=1&type=mp4',
+				value
+			);
+
+			node.setAttribute('data-video-url', videoUrl);
+
+			var videoOgvUrl = Liferay.Util.addParams(
+				'videoPreview=1&type=ogv',
+				value
+			);
+
+			node.setAttribute('data-video-ogv-url', videoOgvUrl);
+
+			var videoHeight = defaultVideoHeight;
+
+			node.setAttribute('data-height', videoHeight);
+
+			var videoWidth = defaultVideoWidth;
+
+			node.setAttribute('data-width', videoWidth);
+
+			var poster = Liferay.Util.addParams('videoThumbnail=1', value);
+
+			node.setAttribute('data-poster', poster);
+
+			extraStyles.backgroundImage = 'url(' + poster + ')';
+			extraStyles.height = videoHeight + 'px';
+			extraStyles.width = videoWidth + 'px';
+
+			return instance._videoTPL.output({
+				height: videoHeight,
+				ogvUrl: videoOgvUrl,
+				poster,
+				url: videoUrl,
+				width: videoWidth
+			});
+		},
+
+		_getCommitMediaValueFn(value, editor, type) {
+			var instance = this;
+
+			var commitValueFn = function(node, extraStyles) {
+				var mediaScript;
+
+				if (type === 'audio') {
+					mediaScript = instance._commitAudioValue(
+						value,
+						node,
+						extraStyles
+					);
+				} else if (type === 'video') {
+					mediaScript = instance._commitVideoValue(
+						value,
+						node,
+						extraStyles
+					);
+				}
+
+				var mediaPlugin = editor.plugins.media;
+
+				if (mediaPlugin) {
+					mediaPlugin.applyMediaScript(node, type, mediaScript);
+				}
+			};
+
+			return commitValueFn;
+		},
+
+		_getItemSelectorDialog(editor, url, callback) {
+			var instance = this;
+
+			var eventName = editor.name + 'selectItem';
+
+			var itemSelectorDialog = instance._itemSelectorDialog;
+
+			if (itemSelectorDialog) {
+				itemSelectorDialog.set('eventName', eventName);
+				itemSelectorDialog.set('url', url);
+				itemSelectorDialog.set('zIndex', CKEDITOR.getNextZIndex());
+
+				callback(itemSelectorDialog);
+			} else {
+				AUI().use('liferay-item-selector-dialog', function(A) {
+					itemSelectorDialog = new A.LiferayItemSelectorDialog({
+						eventName,
+						url,
+						zIndex: CKEDITOR.getNextZIndex()
+					});
+
+					instance._itemSelectorDialog = itemSelectorDialog;
+
+					callback(itemSelectorDialog);
+				});
+			}
+		},
+
+		_getItemSrc(editor, selectedItem) {
+			var itemSrc = selectedItem.value;
+
+			if (selectedItem.returnType === STR_FILE_ENTRY_RETURN_TYPE) {
+				try {
+					var itemValue = JSON.parse(selectedItem.value);
+
+					itemSrc = editor.config.attachmentURLPrefix
+						? editor.config.attachmentURLPrefix +
+						  encodeURIComponent(itemValue.title)
+						: itemValue.url;
+				} catch (e) {}
+			}
+
+			return itemSrc;
+		},
+
+		_isEmptySelection(editor) {
+			var selection = editor.getSelection();
+
+			var ranges = selection.getRanges();
+
+			return (
+				selection.getType() === CKEDITOR.SELECTION_NONE ||
+				(ranges.length === 1 && (ranges[0].collapsed || IE9AndLater))
+			);
+		},
+
+		_onSelectedAudioChange(editor, callback, event) {
+			var instance = this;
+
+			var selectedItem = event.newVal;
+
+			if (selectedItem) {
+				var audioSrc = instance._getItemSrc(editor, selectedItem);
+
+				if (audioSrc) {
+					if (typeof callback === 'function') {
+						callback(audioSrc);
+					} else {
+						instance._commitMediaValue(audioSrc, editor, 'audio');
+					}
+				}
+			}
+		},
+
+		_onSelectedImageChange(editor, callback, event) {
+			var instance = this;
+
+			var selectedItem = event.newVal;
+
+			if (selectedItem) {
+				var eventName = editor.name + 'selectItem';
+				var imageSrc = instance._getItemSrc(editor, selectedItem);
+
+				Liferay.Util.getWindow(eventName).onceAfter(
+					'destroy',
+					function() {
+						if (imageSrc) {
+							if (typeof callback === 'function') {
+								callback(imageSrc, selectedItem);
+							} else {
+								var elementOuterHtml =
+									'<img src="' + imageSrc + '">';
+
+								editor.insertHtml(elementOuterHtml);
+
+								if (instance._isEmptySelection(editor)) {
+									if (IE9AndLater) {
+										var usingAlloyEditor =
+											typeof editor.window.$
+												.AlloyEditor === 'undefined';
+
+										if (!usingAlloyEditor) {
+											var emptySelectionMarkup = '&nbsp;';
+
+											emptySelectionMarkup =
+												elementOuterHtml +
+												emptySelectionMarkup;
+
+											editor.insertHtml(
+												emptySelectionMarkup
+											);
+										}
+
+										var element = new CKEDITOR.dom.element(
+											'br'
+										);
+
+										editor.insertElement(element);
+										editor.getSelection();
+
+										editor.fire('editorInteraction', {
+											nativeEvent: {},
+											selectionData: {
+												element,
+												region: element.getClientRect()
+											}
+										});
+									} else {
+										editor.execCommand('enter');
+									}
+								}
+
+								editor.focus();
+							}
+						}
+					}
+				);
+			}
+		},
+
+		_onSelectedLinkChange(editor, callback, event) {
+			var selectedItem = event.newVal;
+
+			if (selectedItem) {
+				var eventName = editor.name + 'selectItem';
+
+				var linkUrl = selectedItem.value;
+
+				Liferay.Util.getWindow(eventName).onceAfter(
+					'destroy',
+					function() {
+						if (typeof callback === 'function') {
+							callback(linkUrl, selectedItem);
+						}
+					}
+				);
+			}
+		},
+
+		_onSelectedVideoChange(editor, callback, event) {
+			var instance = this;
+
+			var selectedItem = event.newVal;
+
+			if (selectedItem) {
+				var videoSrc = instance._getItemSrc(editor, selectedItem);
+
+				if (videoSrc) {
+					if (typeof callback === 'function') {
+						callback(videoSrc);
+					} else {
+						instance._commitMediaValue(videoSrc, editor, 'video');
+					}
+				}
+			}
+		},
+
+		init(editor) {
 			var instance = this;
 
 			instance._audioTPL = new CKEDITOR.template(TPL_AUDIO_SCRIPT);
@@ -41,7 +370,7 @@
 
 			editor.addCommand('audioselector', {
 				canUndo: false,
-				exec: function(editor, callback) {
+				exec(editor, callback) {
 					var onSelectedAudioChangeFn = AUI().bind(
 						'_onSelectedAudioChange',
 						instance,
@@ -65,7 +394,7 @@
 
 			editor.addCommand('imageselector', {
 				canUndo: false,
-				exec: function(editor, callback) {
+				exec(editor, callback) {
 					var onSelectedImageChangeFn = AUI().bind(
 						'_onSelectedImageChange',
 						instance,
@@ -89,7 +418,7 @@
 
 			editor.addCommand('linkselector', {
 				canUndo: false,
-				exec: function(editor, callback) {
+				exec(editor, callback) {
 					var onSelectedLinkChangeFn = AUI().bind(
 						'_onSelectedLinkChange',
 						instance,
@@ -113,7 +442,7 @@
 
 			editor.addCommand('videoselector', {
 				canUndo: false,
-				exec: function(editor, callback) {
+				exec(editor, callback) {
 					var onSelectedVideoChangeFn = AUI().bind(
 						'_onSelectedVideoChange',
 						instance,
@@ -208,337 +537,6 @@
 					instance._itemSelectorDialog.destroy();
 				}
 			});
-		},
-
-		_bindBrowseButton: function(
-			editor,
-			dialogDefinition,
-			tabName,
-			commandName,
-			targetField
-		) {
-			var tab = dialogDefinition.getContents(tabName);
-
-			if (tab) {
-				var browseButton = tab.get('browse');
-
-				if (browseButton) {
-					browseButton.onClick = function() {
-						editor.execCommand(commandName, function(newVal) {
-							dialogDefinition.dialog.setValueOf(
-								tabName,
-								targetField,
-								newVal
-							);
-						});
-					};
-				}
-			}
-		},
-
-		_commitAudioValue: function(value, node, extraStyles) {
-			var instance = this;
-
-			node.setAttribute('data-document-url', value);
-
-			var audioUrl = Liferay.Util.addParams(
-				'audioPreview=1&type=mp3',
-				value
-			);
-
-			node.setAttribute('data-audio-url', audioUrl);
-
-			var audioOggUrl = Liferay.Util.addParams(
-				'audioPreview=1&type=ogg',
-				value
-			);
-
-			node.setAttribute('data-audio-ogg-url', audioOggUrl);
-
-			return instance._audioTPL.output({
-				oggUrl: audioOggUrl,
-				url: audioUrl
-			});
-		},
-
-		_commitMediaValue: function(value, editor, type) {
-			var instance = this;
-
-			var mediaPlugin = editor.plugins.media;
-
-			if (mediaPlugin) {
-				var eventName = editor.name + 'selectItem';
-
-				Liferay.Util.getWindow(eventName).onceAfter(
-					'destroy',
-					function() {
-						mediaPlugin.onOkCallback(
-							{
-								commitContent: instance._getCommitMediaValueFn(
-									value,
-									editor,
-									type
-								)
-							},
-							editor,
-							type
-						);
-					}
-				);
-			}
-		},
-
-		_commitVideoValue: function(value, node, extraStyles) {
-			var instance = this;
-
-			node.setAttribute('data-document-url', value);
-
-			var videoUrl = Liferay.Util.addParams(
-				'videoPreview=1&type=mp4',
-				value
-			);
-
-			node.setAttribute('data-video-url', videoUrl);
-
-			var videoOgvUrl = Liferay.Util.addParams(
-				'videoPreview=1&type=ogv',
-				value
-			);
-
-			node.setAttribute('data-video-ogv-url', videoOgvUrl);
-
-			var videoHeight = defaultVideoHeight;
-
-			node.setAttribute('data-height', videoHeight);
-
-			var videoWidth = defaultVideoWidth;
-
-			node.setAttribute('data-width', videoWidth);
-
-			var poster = Liferay.Util.addParams('videoThumbnail=1', value);
-
-			node.setAttribute('data-poster', poster);
-
-			extraStyles.backgroundImage = 'url(' + poster + ')';
-			extraStyles.height = videoHeight + 'px';
-			extraStyles.width = videoWidth + 'px';
-
-			return instance._videoTPL.output({
-				height: videoHeight,
-				ogvUrl: videoOgvUrl,
-				poster: poster,
-				url: videoUrl,
-				width: videoWidth
-			});
-		},
-
-		_getCommitMediaValueFn: function(value, editor, type) {
-			var instance = this;
-
-			var commitValueFn = function(node, extraStyles) {
-				var mediaScript;
-
-				if (type === 'audio') {
-					mediaScript = instance._commitAudioValue(
-						value,
-						node,
-						extraStyles
-					);
-				} else if (type === 'video') {
-					mediaScript = instance._commitVideoValue(
-						value,
-						node,
-						extraStyles
-					);
-				}
-
-				var mediaPlugin = editor.plugins.media;
-
-				if (mediaPlugin) {
-					mediaPlugin.applyMediaScript(node, type, mediaScript);
-				}
-			};
-
-			return commitValueFn;
-		},
-
-		_getItemSelectorDialog: function(editor, url, callback) {
-			var instance = this;
-
-			var eventName = editor.name + 'selectItem';
-
-			var itemSelectorDialog = instance._itemSelectorDialog;
-
-			if (itemSelectorDialog) {
-				itemSelectorDialog.set('eventName', eventName);
-				itemSelectorDialog.set('url', url);
-				itemSelectorDialog.set('zIndex', CKEDITOR.getNextZIndex());
-
-				callback(itemSelectorDialog);
-			} else {
-				AUI().use('liferay-item-selector-dialog', function(A) {
-					itemSelectorDialog = new A.LiferayItemSelectorDialog({
-						eventName: eventName,
-						url: url,
-						zIndex: CKEDITOR.getNextZIndex()
-					});
-
-					instance._itemSelectorDialog = itemSelectorDialog;
-
-					callback(itemSelectorDialog);
-				});
-			}
-		},
-
-		_getItemSrc: function(editor, selectedItem) {
-			var itemSrc = selectedItem.value;
-
-			if (selectedItem.returnType === STR_FILE_ENTRY_RETURN_TYPE) {
-				try {
-					var itemValue = JSON.parse(selectedItem.value);
-
-					itemSrc = editor.config.attachmentURLPrefix
-						? editor.config.attachmentURLPrefix +
-						  encodeURIComponent(itemValue.title)
-						: itemValue.url;
-				} catch (e) {}
-			}
-
-			return itemSrc;
-		},
-
-		_isEmptySelection: function(editor) {
-			var selection = editor.getSelection();
-
-			var ranges = selection.getRanges();
-
-			return (
-				selection.getType() === CKEDITOR.SELECTION_NONE ||
-				(ranges.length === 1 && (ranges[0].collapsed || IE9AndLater))
-			);
-		},
-
-		_onSelectedAudioChange: function(editor, callback, event) {
-			var instance = this;
-
-			var selectedItem = event.newVal;
-
-			if (selectedItem) {
-				var audioSrc = instance._getItemSrc(editor, selectedItem);
-
-				if (audioSrc) {
-					if (typeof callback === 'function') {
-						callback(audioSrc);
-					} else {
-						instance._commitMediaValue(audioSrc, editor, 'audio');
-					}
-				}
-			}
-		},
-
-		_onSelectedImageChange: function(editor, callback, event) {
-			var instance = this;
-
-			var selectedItem = event.newVal;
-
-			if (selectedItem) {
-				var eventName = editor.name + 'selectItem';
-				var imageSrc = instance._getItemSrc(editor, selectedItem);
-
-				Liferay.Util.getWindow(eventName).onceAfter(
-					'destroy',
-					function() {
-						if (imageSrc) {
-							if (typeof callback === 'function') {
-								callback(imageSrc, selectedItem);
-							} else {
-								var elementOuterHtml =
-									'<img src="' + imageSrc + '">';
-
-								editor.insertHtml(elementOuterHtml);
-
-								if (instance._isEmptySelection(editor)) {
-									if (IE9AndLater) {
-										var usingAlloyEditor =
-											typeof editor.window.$
-												.AlloyEditor === 'undefined';
-
-										if (!usingAlloyEditor) {
-											var emptySelectionMarkup = '&nbsp;';
-
-											emptySelectionMarkup =
-												elementOuterHtml +
-												emptySelectionMarkup;
-
-											editor.insertHtml(
-												emptySelectionMarkup
-											);
-										}
-
-										var element = new CKEDITOR.dom.element(
-											'br'
-										);
-
-										editor.insertElement(element);
-										editor.getSelection();
-
-										editor.fire('editorInteraction', {
-											nativeEvent: {},
-											selectionData: {
-												element: element,
-												region: element.getClientRect()
-											}
-										});
-									} else {
-										editor.execCommand('enter');
-									}
-								}
-
-								editor.focus();
-							}
-						}
-					}
-				);
-			}
-		},
-
-		_onSelectedLinkChange: function(editor, callback, event) {
-			var instance = this;
-
-			var selectedItem = event.newVal;
-
-			if (selectedItem) {
-				var eventName = editor.name + 'selectItem';
-
-				var linkUrl = selectedItem.value;
-
-				Liferay.Util.getWindow(eventName).onceAfter(
-					'destroy',
-					function() {
-						if (typeof callback === 'function') {
-							callback(linkUrl, selectedItem);
-						}
-					}
-				);
-			}
-		},
-
-		_onSelectedVideoChange: function(editor, callback, event) {
-			var instance = this;
-
-			var selectedItem = event.newVal;
-
-			if (selectedItem) {
-				var videoSrc = instance._getItemSrc(editor, selectedItem);
-
-				if (videoSrc) {
-					if (typeof callback === 'function') {
-						callback(videoSrc);
-					} else {
-						instance._commitMediaValue(videoSrc, editor, 'video');
-					}
-				}
-			}
 		}
 	});
 })();

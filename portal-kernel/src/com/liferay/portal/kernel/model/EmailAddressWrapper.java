@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link EmailAddress}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see EmailAddress
  * @generated
  */
-@ProviderType
 public class EmailAddressWrapper
 	extends BaseModelWrapper<EmailAddress>
 	implements EmailAddress, ModelWrapper<EmailAddress> {
@@ -320,6 +317,11 @@ public class EmailAddressWrapper
 		return model.isPrimary();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a email address model instance should use the <code>EmailAddress</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

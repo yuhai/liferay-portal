@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FragmentEntryLinkPersistence
 	extends BasePersistence<FragmentEntryLink> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link FragmentEntryLinkUtil} to access the fragment entry link persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

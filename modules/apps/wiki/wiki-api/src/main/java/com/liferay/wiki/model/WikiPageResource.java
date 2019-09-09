@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WikiPageResource
 	extends PersistedModel, WikiPageResourceModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.wiki.model.impl.WikiPageResourceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

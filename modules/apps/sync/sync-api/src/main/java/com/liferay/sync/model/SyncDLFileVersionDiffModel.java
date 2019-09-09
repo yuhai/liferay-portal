@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SyncDLFileVersionDiffModel
 	extends BaseModel<SyncDLFileVersionDiff> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a sync dl file version diff model instance should use the {@link SyncDLFileVersionDiff} interface instead.

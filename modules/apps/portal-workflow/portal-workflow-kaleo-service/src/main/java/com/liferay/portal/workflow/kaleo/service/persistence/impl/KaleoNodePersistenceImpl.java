@@ -54,7 +54,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -71,11 +70,10 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = KaleoNodePersistence.class)
-@ProviderType
 public class KaleoNodePersistenceImpl
 	extends BasePersistenceImpl<KaleoNode> implements KaleoNodePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>KaleoNodeUtil</code> to access the kaleo node persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

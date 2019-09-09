@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link LayoutSetBranchService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetBranchService
  * @generated
  */
-@ProviderType
 public class LayoutSetBranchServiceWrapper
 	implements LayoutSetBranchService, ServiceWrapper<LayoutSetBranchService> {
 
@@ -33,11 +31,16 @@ public class LayoutSetBranchServiceWrapper
 		_layoutSetBranchService = layoutSetBranchService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link LayoutSetBranchServiceUtil} to access the layout set branch remote service. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutSetBranchServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetBranch addLayoutSetBranch(
-			long groupId, boolean privateLayout, String name,
-			String description, boolean master, long copyLayoutSetBranchId,
-			ServiceContext serviceContext)
+			long groupId, boolean privateLayout, java.lang.String name,
+			java.lang.String description, boolean master,
+			long copyLayoutSetBranchId, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetBranchService.addLayoutSetBranch(
@@ -66,7 +69,7 @@ public class LayoutSetBranchServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _layoutSetBranchService.getOSGiServiceIdentifier();
 	}
 
@@ -83,8 +86,8 @@ public class LayoutSetBranchServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSetBranch
 			updateLayoutSetBranch(
-				long groupId, long layoutSetBranchId, String name,
-				String description, ServiceContext serviceContext)
+				long groupId, long layoutSetBranchId, java.lang.String name,
+				java.lang.String description, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetBranchService.updateLayoutSetBranch(

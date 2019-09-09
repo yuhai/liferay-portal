@@ -20,14 +20,17 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -43,13 +46,15 @@ import com.liferay.segments.provider.SegmentsEntryProviderRegistry;
 import com.liferay.segments.service.SegmentsEntryService;
 import com.liferay.segments.web.internal.security.permission.resource.SegmentsEntryPermission;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -75,21 +80,166 @@ public class EditSegmentsEntryDisplayContext {
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		_locale = _themeDisplay.getLocale();
 	}
 
-	public Set<Locale> getAvailableLocales() throws PortalException {
-		if (_availableLocales != null) {
-			return _availableLocales;
+	public String getBackURL() {
+		if (_backURL != null) {
+			return _backURL;
 		}
 
-		_availableLocales = LanguageUtil.getAvailableLocales(getGroupId());
+		_backURL = ParamUtil.getString(
+			_httpServletRequest, "backURL", getRedirect());
 
-		return _availableLocales;
+		return _backURL;
 	}
 
-	public JSONArray getContributorsJSONArray() throws PortalException {
+	public Map<String, Object> getData() throws Exception {
+		if (_data != null) {
+			return _data;
+		}
+
+		_data = new HashMap<>();
+
+		_data.put("context", getContext());
+		_data.put("props", getProps());
+
+		return _data;
+	}
+
+	public String getRedirect() {
+		if (_redirect != null) {
+			return _redirect;
+		}
+
+		_redirect = ParamUtil.getString(_httpServletRequest, "redirect");
+
+		if (Validator.isNull(_redirect)) {
+			PortletURL portletURL = _renderResponse.createRenderURL();
+
+			_redirect = portletURL.toString();
+		}
+
+		return _redirect;
+	}
+
+	public long getSegmentsEntryId() {
+		if (_segmentsEntryId != null) {
+			return _segmentsEntryId;
+		}
+
+		_segmentsEntryId = ParamUtil.getLong(
+			_httpServletRequest, "segmentsEntryId");
+
+		return _segmentsEntryId;
+	}
+
+	public String getSegmentsEntryKey() throws PortalException {
+		if (_segmentsEntryKey != null) {
+			return _segmentsEntryKey;
+		}
+
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry == null) {
+			_segmentsEntryKey = StringPool.BLANK;
+		}
+		else {
+			_segmentsEntryKey = segmentsEntry.getSegmentsEntryKey();
+		}
+
+		return _segmentsEntryKey;
+	}
+
+	public String getTitle(Locale locale) throws PortalException {
+		if (_title != null) {
+			return _title;
+		}
+
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry != null) {
+			_title = segmentsEntry.getName(locale);
+		}
+		else {
+			String type = ResourceActionsUtil.getModelResource(
+				locale, getType());
+
+			_title = LanguageUtil.format(
+				_httpServletRequest, "new-x-segment", type, false);
+		}
+
+		return _title;
+	}
+
+	public String getType() throws PortalException {
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry != null) {
+			return segmentsEntry.getType();
+		}
+
+		return ParamUtil.getString(
+			_httpServletRequest, "type", User.class.getName());
+	}
+
+	protected Map<String, Object> getContext() {
+		Map<String, Object> context = new HashMap<>();
+
+		context.put(
+			"assetsPath",
+			PortalUtil.getPathContext(_renderRequest) + "/assets");
+		context.put("namespace", _renderResponse.getNamespace());
+		context.put(
+			"requestFieldValueNameURL", _getSegmentsFieldValueNameURL());
+
+		return context;
+	}
+
+	protected Map<String, Object> getProps() throws Exception {
+		Map<String, Object> props = new HashMap<>();
+
+		props.put("availableLocales", _getAvailableLocales());
+		props.put("contributors", _getContributorsJSONArray());
+		props.put("defaultLanguageId", _getDefaultLanguageId());
+		props.put("formId", _renderResponse.getNamespace() + "editSegmentFm");
+		props.put("hasUpdatePermission", _hasUpdatePermission());
+		props.put("initialMembersCount", _getSegmentsEntryClassPKsCount());
+		props.put("initialSegmentActive", _isInitialSegmentActive());
+		props.put("initialSegmentName", _getInitialSegmentsNameJSONObject());
+		props.put("locale", _locale.toString());
+		props.put("portletNamespace", _renderResponse.getNamespace());
+		props.put("previewMembersURL", _getPreviewMembersURL());
+		props.put("propertyGroups", _getPropertyGroupsJSONArray());
+		props.put("redirect", HtmlUtil.escape(getRedirect()));
+		props.put(
+			"requestMembersCountURL", _getSegmentsEntryClassPKsCountURL());
+		props.put("showInEditMode", _isShowInEditMode());
+		props.put("source", _getSource());
+
+		return props;
+	}
+
+	private Map<String, String> _getAvailableLocales() throws PortalException {
+		Map<String, String> availableLocales = new HashMap<>();
+
+		for (Locale availableLocale :
+				LanguageUtil.getAvailableLocales(_getGroupId())) {
+
+			String availableLanguageId = LocaleUtil.toLanguageId(
+				availableLocale);
+
+			availableLocales.put(
+				availableLanguageId, availableLocale.getDisplayName(_locale));
+		}
+
+		return availableLocales;
+	}
+
+	private JSONArray _getContributorsJSONArray() throws PortalException {
 		List<SegmentsCriteriaContributor> segmentsCriteriaContributors =
-			getSegmentsCriteriaContributors();
+			_getSegmentsCriteriaContributors();
 
 		JSONArray contributorsJSONArray = JSONFactoryUtil.createJSONArray();
 
@@ -97,7 +247,7 @@ public class EditSegmentsEntryDisplayContext {
 				segmentsCriteriaContributors) {
 
 			Criteria.Criterion criterion =
-				segmentsCriteriaContributor.getCriterion(getCriteria());
+				segmentsCriteriaContributor.getCriterion(_getCriteria());
 
 			JSONObject contributorJSONObject = JSONUtil.put(
 				"conjunctionId", _getCriterionConjunction(criterion)
@@ -121,8 +271,8 @@ public class EditSegmentsEntryDisplayContext {
 		return contributorsJSONArray;
 	}
 
-	public Criteria getCriteria() throws PortalException {
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
+	private Criteria _getCriteria() throws PortalException {
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
 
 		if ((segmentsEntry == null) ||
 			(segmentsEntry.getCriteriaObj() == null)) {
@@ -131,247 +281,6 @@ public class EditSegmentsEntryDisplayContext {
 		}
 
 		return segmentsEntry.getCriteriaObj();
-	}
-
-	public String getDefaultLanguageId() throws PortalException {
-		if (_defaultLanguageId != null) {
-			return _defaultLanguageId;
-		}
-
-		Locale siteDefaultLocale = null;
-
-		try {
-			siteDefaultLocale = PortalUtil.getSiteDefaultLocale(getGroupId());
-		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
-
-			siteDefaultLocale = LocaleUtil.getSiteDefault();
-		}
-
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry == null) {
-			_defaultLanguageId = LocaleUtil.toLanguageId(siteDefaultLocale);
-		}
-		else {
-			_defaultLanguageId = LocalizationUtil.getDefaultLanguageId(
-				segmentsEntry.getName(), siteDefaultLocale);
-		}
-
-		return _defaultLanguageId;
-	}
-
-	public long getGroupId() throws PortalException {
-		if (_groupId != null) {
-			return _groupId;
-		}
-
-		_groupId = BeanParamUtil.getLong(
-			getSegmentsEntry(), _httpServletRequest, "groupId",
-			_themeDisplay.getScopeGroupId());
-
-		return _groupId;
-	}
-
-	public JSONArray getPropertyGroupsJSONArray(Locale locale)
-		throws PortalException {
-
-		List<SegmentsCriteriaContributor> segmentsCriteriaContributors =
-			getSegmentsCriteriaContributors();
-
-		JSONArray jsonContributorsArray = JSONFactoryUtil.createJSONArray();
-
-		for (SegmentsCriteriaContributor segmentsCriteriaContributor :
-				segmentsCriteriaContributors) {
-
-			JSONObject jsonContributorObject = JSONUtil.put(
-				"entityName", segmentsCriteriaContributor.getEntityName()
-			).put(
-				"name", segmentsCriteriaContributor.getLabel(locale)
-			).put(
-				"properties",
-				JSONFactoryUtil.createJSONArray(
-					JSONFactoryUtil.looseSerializeDeep(
-						segmentsCriteriaContributor.getFields(_renderRequest)))
-			).put(
-				"propertyKey", segmentsCriteriaContributor.getKey()
-			);
-
-			jsonContributorsArray.put(jsonContributorObject);
-		}
-
-		return jsonContributorsArray;
-	}
-
-	public String getRedirect() {
-		if (_redirect != null) {
-			return _redirect;
-		}
-
-		_redirect = ParamUtil.getString(_httpServletRequest, "redirect");
-
-		if (Validator.isNull(_redirect)) {
-			PortletURL portletURL = _renderResponse.createRenderURL();
-
-			_redirect = portletURL.toString();
-		}
-
-		return _redirect;
-	}
-
-	public List<SegmentsCriteriaContributor> getSegmentsCriteriaContributors()
-		throws PortalException {
-
-		return _segmentsCriteriaContributorRegistry.
-			getSegmentsCriteriaContributors(getType());
-	}
-
-	public SegmentsEntry getSegmentsEntry() throws PortalException {
-		if (_segmentsEntry != null) {
-			return _segmentsEntry;
-		}
-
-		long segmentsEntryId = getSegmentsEntryId();
-
-		if (segmentsEntryId > 0) {
-			_segmentsEntry = _segmentsEntryService.getSegmentsEntry(
-				segmentsEntryId);
-		}
-
-		return _segmentsEntry;
-	}
-
-	public int getSegmentsEntryClassPKsCount() {
-		try {
-			if (_segmentsEntryClassPKsCount != null) {
-				return _segmentsEntryClassPKsCount;
-			}
-
-			SegmentsEntry segmentsEntry = null;
-
-			segmentsEntry = getSegmentsEntry();
-
-			if (segmentsEntry == null) {
-				return 0;
-			}
-
-			_segmentsEntryClassPKsCount =
-				_segmentsEntryProviderRegistry.getSegmentsEntryClassPKsCount(
-					segmentsEntry.getSegmentsEntryId());
-
-			return _segmentsEntryClassPKsCount;
-		}
-		catch (PortalException pe) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to get the segments entry class PKs count", pe);
-			}
-
-			return 0;
-		}
-	}
-
-	public long getSegmentsEntryId() {
-		if (_segmentsEntryId != null) {
-			return _segmentsEntryId;
-		}
-
-		_segmentsEntryId = ParamUtil.getLong(
-			_httpServletRequest, "segmentsEntryId");
-
-		return _segmentsEntryId;
-	}
-
-	public String getSegmentsEntryKey() throws PortalException {
-		if (_segmentsEntryKey != null) {
-			return _segmentsEntryKey;
-		}
-
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry == null) {
-			_segmentsEntryKey = StringPool.BLANK;
-		}
-		else {
-			_segmentsEntryKey = segmentsEntry.getSegmentsEntryKey();
-		}
-
-		return _segmentsEntryKey;
-	}
-
-	public String getSource() throws PortalException {
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry != null) {
-			return segmentsEntry.getSource();
-		}
-
-		return ParamUtil.getString(
-			_httpServletRequest, "source",
-			SegmentsEntryConstants.SOURCE_DEFAULT);
-	}
-
-	public String getTitle(Locale locale) throws PortalException {
-		if (_title != null) {
-			return _title;
-		}
-
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry != null) {
-			_title = segmentsEntry.getName(locale);
-		}
-		else {
-			String type = ResourceActionsUtil.getModelResource(
-				locale, getType());
-
-			_title = LanguageUtil.format(
-				_httpServletRequest, "new-x-segment", type, false);
-		}
-
-		return _title;
-	}
-
-	public String getType() throws PortalException {
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry != null) {
-			return segmentsEntry.getType();
-		}
-
-		return ParamUtil.getString(
-			_httpServletRequest, "type", User.class.getName());
-	}
-
-	public boolean hasUpdatePermission() throws PortalException {
-		if (_hasUpdatePermission != null) {
-			return _hasUpdatePermission;
-		}
-
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry != null) {
-			_hasUpdatePermission = SegmentsEntryPermission.contains(
-				_themeDisplay.getPermissionChecker(), segmentsEntry,
-				ActionKeys.UPDATE);
-		}
-		else {
-			_hasUpdatePermission = true;
-		}
-
-		return _hasUpdatePermission;
-	}
-
-	public boolean isShowInEditMode() {
-		if (_showInEditMode != null) {
-			return _showInEditMode;
-		}
-
-		_showInEditMode = ParamUtil.getBoolean(
-			_httpServletRequest, "showInEditMode", true);
-
-		return _showInEditMode;
 	}
 
 	private String _getCriterionConjunction(Criteria.Criterion criterion) {
@@ -390,26 +299,197 @@ public class EditSegmentsEntryDisplayContext {
 		return criterion.getFilterString();
 	}
 
+	private String _getDefaultLanguageId() throws PortalException {
+		Locale siteDefaultLocale = null;
+
+		try {
+			siteDefaultLocale = PortalUtil.getSiteDefaultLocale(_getGroupId());
+		}
+		catch (PortalException pe) {
+			_log.error(pe, pe);
+
+			siteDefaultLocale = LocaleUtil.getSiteDefault();
+		}
+
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry == null) {
+			return LocaleUtil.toLanguageId(siteDefaultLocale);
+		}
+
+		return LocalizationUtil.getDefaultLanguageId(
+			segmentsEntry.getName(), siteDefaultLocale);
+	}
+
+	private long _getGroupId() throws PortalException {
+		return BeanParamUtil.getLong(
+			_getSegmentsEntry(), _httpServletRequest, "groupId",
+			_themeDisplay.getScopeGroupId());
+	}
+
+	private JSONObject _getInitialSegmentsNameJSONObject()
+		throws PortalException {
+
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry == null) {
+			return null;
+		}
+
+		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
+
+		return JSONFactoryUtil.createJSONObject(
+			jsonSerializer.serializeDeep(segmentsEntry.getNameMap()));
+	}
+
+	private String _getPreviewMembersURL() throws Exception {
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "previewSegmentsEntryUsers");
+		portletURL.setParameter(
+			"segmentsEntryId", String.valueOf(getSegmentsEntryId()));
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	private JSONArray _getPropertyGroupsJSONArray() throws PortalException {
+		List<SegmentsCriteriaContributor> segmentsCriteriaContributors =
+			_getSegmentsCriteriaContributors();
+
+		JSONArray jsonContributorsArray = JSONFactoryUtil.createJSONArray();
+
+		for (SegmentsCriteriaContributor segmentsCriteriaContributor :
+				segmentsCriteriaContributors) {
+
+			JSONObject jsonContributorObject = JSONUtil.put(
+				"entityName", segmentsCriteriaContributor.getEntityName()
+			).put(
+				"name", segmentsCriteriaContributor.getLabel(_locale)
+			).put(
+				"properties",
+				JSONFactoryUtil.createJSONArray(
+					JSONFactoryUtil.looseSerializeDeep(
+						segmentsCriteriaContributor.getFields(_renderRequest)))
+			).put(
+				"propertyKey", segmentsCriteriaContributor.getKey()
+			);
+
+			jsonContributorsArray.put(jsonContributorObject);
+		}
+
+		return jsonContributorsArray;
+	}
+
+	private List<SegmentsCriteriaContributor> _getSegmentsCriteriaContributors()
+		throws PortalException {
+
+		return _segmentsCriteriaContributorRegistry.
+			getSegmentsCriteriaContributors(getType());
+	}
+
+	private SegmentsEntry _getSegmentsEntry() throws PortalException {
+		long segmentsEntryId = getSegmentsEntryId();
+
+		if (segmentsEntryId > 0) {
+			return _segmentsEntryService.getSegmentsEntry(segmentsEntryId);
+		}
+
+		return null;
+	}
+
+	private int _getSegmentsEntryClassPKsCount() {
+		try {
+			SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+			if (segmentsEntry != null) {
+				return _segmentsEntryProviderRegistry.
+					getSegmentsEntryClassPKsCount(
+						segmentsEntry.getSegmentsEntryId());
+			}
+		}
+		catch (PortalException pe) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get the segments entry class PKs count", pe);
+			}
+		}
+
+		return 0;
+	}
+
+	private String _getSegmentsEntryClassPKsCountURL() {
+		ResourceURL resourceURL = _renderResponse.createResourceURL();
+
+		resourceURL.setResourceID("getSegmentsEntryClassPKsCount");
+
+		return resourceURL.toString();
+	}
+
+	private String _getSegmentsFieldValueNameURL() {
+		ResourceURL resourceURL = _renderResponse.createResourceURL();
+
+		resourceURL.setResourceID("getSegmentsFieldValueName");
+
+		return resourceURL.toString();
+	}
+
+	private String _getSource() throws PortalException {
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry != null) {
+			return segmentsEntry.getSource();
+		}
+
+		return ParamUtil.getString(
+			_httpServletRequest, "source",
+			SegmentsEntryConstants.SOURCE_DEFAULT);
+	}
+
+	private boolean _hasUpdatePermission() throws PortalException {
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry != null) {
+			return SegmentsEntryPermission.contains(
+				_themeDisplay.getPermissionChecker(), segmentsEntry,
+				ActionKeys.UPDATE);
+		}
+
+		return true;
+	}
+
+	private boolean _isInitialSegmentActive() throws PortalException {
+		SegmentsEntry segmentsEntry = _getSegmentsEntry();
+
+		if (segmentsEntry != null) {
+			return segmentsEntry.isActive();
+		}
+
+		return false;
+	}
+
+	private boolean _isShowInEditMode() {
+		return ParamUtil.getBoolean(
+			_httpServletRequest, "showInEditMode", true);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditSegmentsEntryDisplayContext.class);
 
-	private Set<Locale> _availableLocales;
-	private String _defaultLanguageId;
-	private Long _groupId;
-	private Boolean _hasUpdatePermission;
+	private String _backURL;
+	private Map<String, Object> _data;
 	private final HttpServletRequest _httpServletRequest;
+	private final Locale _locale;
 	private String _redirect;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final SegmentsCriteriaContributorRegistry
 		_segmentsCriteriaContributorRegistry;
-	private SegmentsEntry _segmentsEntry;
-	private Integer _segmentsEntryClassPKsCount;
 	private Long _segmentsEntryId;
 	private String _segmentsEntryKey;
 	private final SegmentsEntryProviderRegistry _segmentsEntryProviderRegistry;
 	private final SegmentsEntryService _segmentsEntryService;
-	private Boolean _showInEditMode;
 	private final ThemeDisplay _themeDisplay;
 	private String _title;
 

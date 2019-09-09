@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ResourcePermissionModel
 	extends BaseModel<ResourcePermission>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a resource permission model instance should use the {@link ResourcePermission} interface instead.

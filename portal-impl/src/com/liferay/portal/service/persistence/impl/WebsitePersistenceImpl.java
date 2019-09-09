@@ -52,8 +52,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The persistence implementation for the website service.
  *
@@ -64,11 +62,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
 public class WebsitePersistenceImpl
 	extends BasePersistenceImpl<Website> implements WebsitePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>WebsiteUtil</code> to access the website persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

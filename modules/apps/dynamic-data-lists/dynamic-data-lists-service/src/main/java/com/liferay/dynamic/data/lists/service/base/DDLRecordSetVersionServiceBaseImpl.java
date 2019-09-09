@@ -46,7 +46,7 @@ public abstract class DDLRecordSetVersionServiceBaseImpl
 	extends BaseServiceImpl
 	implements DDLRecordSetVersionService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDLRecordSetVersionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.lists.service.DDLRecordSetVersionServiceUtil</code>.

@@ -21,8 +21,6 @@
 
 	A.use('io-base', function(A) {
 		Language.get = A.cached(function(key, extraParams) {
-			var instance = this;
-
 			var url =
 				themeDisplay.getPathContext() +
 				'/language/' +
@@ -46,10 +44,10 @@
 			var value = '';
 
 			A.io(url, {
-				headers: headers,
+				headers,
 				method: 'GET',
 				on: {
-					complete: function(i, o) {
+					complete(i, o) {
 						value = o.responseText;
 					}
 				},

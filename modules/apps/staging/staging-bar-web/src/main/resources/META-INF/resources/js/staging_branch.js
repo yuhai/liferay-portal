@@ -19,29 +19,8 @@ AUI.add(
 
 		var StagingBar = Liferay.StagingBar;
 
-		var MAP_TEXT_REVISION = {
-			redo: Liferay.Language.get(
-				'are-you-sure-you-want-to-redo-your-last-changes'
-			),
-			undo: Liferay.Language.get(
-				'are-you-sure-you-want-to-undo-your-last-changes'
-			)
-		};
-
 		A.mix(StagingBar, {
-			addBranch: function(dialogTitle) {
-				var instance = this;
-
-				var branchDialog = instance._getBranchDialog();
-
-				if (Lang.isValue(dialogTitle)) {
-					branchDialog.set('title', dialogTitle);
-				}
-
-				branchDialog.show();
-			},
-
-			_getBranchDialog: function() {
+			_getBranchDialog() {
 				var instance = this;
 
 				var branchDialog = instance._branchDialog;
@@ -62,6 +41,18 @@ AUI.add(
 				}
 
 				return branchDialog;
+			},
+
+			addBranch(dialogTitle) {
+				var instance = this;
+
+				var branchDialog = instance._getBranchDialog();
+
+				if (Lang.isValue(dialogTitle)) {
+					branchDialog.set('title', dialogTitle);
+				}
+
+				branchDialog.show();
 			}
 		});
 	},

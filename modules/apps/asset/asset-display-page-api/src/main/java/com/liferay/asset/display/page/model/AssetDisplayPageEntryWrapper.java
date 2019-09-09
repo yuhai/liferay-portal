@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetDisplayPageEntry}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetDisplayPageEntry
  * @generated
  */
-@ProviderType
 public class AssetDisplayPageEntryWrapper
 	extends BaseModelWrapper<AssetDisplayPageEntry>
 	implements AssetDisplayPageEntry, ModelWrapper<AssetDisplayPageEntry> {
@@ -309,6 +306,11 @@ public class AssetDisplayPageEntryWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset display page entry model instance should use the <code>AssetDisplayPageEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

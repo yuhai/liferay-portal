@@ -43,7 +43,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface LayoutPageTemplateStructureService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutPageTemplateStructureServiceUtil} to access the layout page template structure remote service. Add custom service methods to <code>com.liferay.layout.page.template.service.impl.LayoutPageTemplateStructureServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

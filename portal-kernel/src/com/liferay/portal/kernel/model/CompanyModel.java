@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface CompanyModel extends BaseModel<Company>, MVCCModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a company model instance should use the {@link Company} interface instead.

@@ -39,8 +39,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the OrgGroupRole service. Represents a row in the &quot;OrgGroupRole&quot; database table, with each column mapped to a property of this class.
  *
@@ -52,11 +50,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OrgGroupRoleImpl
  * @generated
  */
-@ProviderType
 public class OrgGroupRoleModelImpl
 	extends BaseModelImpl<OrgGroupRole> implements OrgGroupRoleModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a org group role model instance should use the <code>OrgGroupRole</code> interface instead.

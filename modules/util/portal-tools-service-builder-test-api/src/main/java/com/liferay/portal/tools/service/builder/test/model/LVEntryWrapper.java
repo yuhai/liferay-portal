@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -35,7 +33,6 @@ import java.util.Objects;
  * @see LVEntry
  * @generated
  */
-@ProviderType
 public class LVEntryWrapper implements LVEntry, ModelWrapper<LVEntry> {
 
 	public LVEntryWrapper(LVEntry lvEntry) {
@@ -304,6 +301,11 @@ public class LVEntryWrapper implements LVEntry, ModelWrapper<LVEntry> {
 		return _lvEntry.isNew();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a lv entry model instance should use the <code>LVEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		_lvEntry.persist();

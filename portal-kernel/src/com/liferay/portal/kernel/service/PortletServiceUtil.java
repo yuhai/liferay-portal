@@ -16,8 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the remote service utility for Portlet. This utility wraps
  * <code>com.liferay.portal.service.impl.PortletServiceImpl</code> and is an
@@ -30,10 +28,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PortletService
  * @generated
  */
-@ProviderType
 public class PortletServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.PortletServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

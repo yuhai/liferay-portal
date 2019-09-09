@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ClassName}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ClassName
  * @generated
  */
-@ProviderType
 public class ClassNameWrapper
 	extends BaseModelWrapper<ClassName>
 	implements ClassName, ModelWrapper<ClassName> {
@@ -121,6 +118,11 @@ public class ClassNameWrapper
 		return model.getValue();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a class name model instance should use the <code>ClassName</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

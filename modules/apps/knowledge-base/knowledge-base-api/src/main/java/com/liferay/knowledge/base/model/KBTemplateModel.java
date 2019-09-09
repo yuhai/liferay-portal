@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KBTemplateModel
 	extends BaseModel<KBTemplate>, ShardedModel, StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kb template model instance should use the {@link KBTemplate} interface instead.

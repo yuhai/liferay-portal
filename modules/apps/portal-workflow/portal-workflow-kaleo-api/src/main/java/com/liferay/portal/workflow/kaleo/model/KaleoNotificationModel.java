@@ -40,7 +40,7 @@ public interface KaleoNotificationModel
 	extends BaseModel<KaleoNotification>, GroupedModel, MVCCModel,
 			ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kaleo notification model instance should use the {@link KaleoNotification} interface instead.

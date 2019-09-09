@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link UserTrackerLocalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see UserTrackerLocalService
  * @generated
  */
-@ProviderType
 public class UserTrackerLocalServiceWrapper
 	implements UserTrackerLocalService,
 			   ServiceWrapper<UserTrackerLocalService> {
@@ -34,11 +32,16 @@ public class UserTrackerLocalServiceWrapper
 		_userTrackerLocalService = userTrackerLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link UserTrackerLocalServiceUtil} to access the user tracker local service. Add custom service methods to <code>com.liferay.portal.service.impl.UserTrackerLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.UserTracker addUserTracker(
 		long companyId, long userId, java.util.Date modifiedDate,
-		String sessionId, String remoteAddr, String remoteHost,
-		String userAgent,
+		java.lang.String sessionId, java.lang.String remoteAddr,
+		java.lang.String remoteHost, java.lang.String userAgent,
 		java.util.List<com.liferay.portal.kernel.model.UserTrackerPath>
 			userTrackerPaths) {
 
@@ -229,7 +232,7 @@ public class UserTrackerLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _userTrackerLocalService.getOSGiServiceIdentifier();
 	}
 

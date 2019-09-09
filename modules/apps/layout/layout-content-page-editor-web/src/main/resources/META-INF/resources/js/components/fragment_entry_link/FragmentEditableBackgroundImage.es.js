@@ -34,7 +34,6 @@ import {
 } from '../../utils/constants';
 import {getAssetFieldValue} from '../../utils/FragmentsEditorFetchUtils.es';
 import getConnectedComponent from '../../store/ConnectedComponent.es';
-import {OPEN_ASSET_TYPE_DIALOG} from '../../actions/actions.es';
 import {openImageSelector} from '../../utils/FragmentsEditorDialogUtils';
 import {prefixSegmentsExperienceId} from '../../utils/prefixSegmentsExperienceId.es';
 import {updateEditableValueAction} from '../../actions/updateEditableValue.es';
@@ -260,7 +259,7 @@ class FragmentEditableBackgroundImage extends Component {
 
 		if (item === this.element && this._active) {
 			openImageSelector({
-				callback: url => this._updateFragmentBackgroundImage(url),
+				callback: image => this._updateFragmentBackgroundImage(image),
 				imageSelectorURL: this.imageSelectorURL,
 				portletNamespace: this.portletNamespace
 			});
@@ -281,20 +280,9 @@ class FragmentEditableBackgroundImage extends Component {
 			panelId === FLOATING_TOOLBAR_BUTTONS.fragmentBackgroundImage.panelId
 		) {
 			openImageSelector({
-				callback: url => this._updateFragmentBackgroundImage(url),
+				callback: image => this._updateFragmentBackgroundImage(image),
 				imageSelectorURL: this.imageSelectorURL,
 				portletNamespace: this.portletNamespace
-			});
-		} else if (
-			panelId === FLOATING_TOOLBAR_BUTTONS.map.panelId &&
-			this.mappingFieldsURL &&
-			!this.selectedMappingTypes.type
-		) {
-			event.preventDefault();
-
-			this.store.dispatch({
-				type: OPEN_ASSET_TYPE_DIALOG,
-				value: true
 			});
 		}
 	}
@@ -360,11 +348,11 @@ class FragmentEditableBackgroundImage extends Component {
 	 * Dispatches action to update editableValues with new background image url
 	 * @param {string} backgroundImageURL
 	 */
-	_updateFragmentBackgroundImage(backgroundImageURL) {
+	_updateFragmentBackgroundImage(image) {
 		this.store.dispatch(
 			updateEditableValueAction({
 				editableId: this.editableId,
-				editableValueContent: backgroundImageURL,
+				editableValueContent: image,
 				editableValueId: this.languageId || DEFAULT_LANGUAGE_ID_KEY,
 				fragmentEntryLinkId: this.fragmentEntryLinkId,
 				processor: BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,

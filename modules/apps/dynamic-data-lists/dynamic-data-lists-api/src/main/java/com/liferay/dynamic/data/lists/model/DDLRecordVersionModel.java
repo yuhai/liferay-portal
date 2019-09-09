@@ -40,7 +40,7 @@ public interface DDLRecordVersionModel
 	extends BaseModel<DDLRecordVersion>, MVCCModel, ShardedModel,
 			WorkflowedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddl record version model instance should use the {@link DDLRecordVersion} interface instead.

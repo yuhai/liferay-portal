@@ -52,7 +52,6 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -69,12 +68,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = KaleoTaskAssignmentPersistence.class)
-@ProviderType
 public class KaleoTaskAssignmentPersistenceImpl
 	extends BasePersistenceImpl<KaleoTaskAssignment>
 	implements KaleoTaskAssignmentPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>KaleoTaskAssignmentUtil</code> to access the kaleo task assignment persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

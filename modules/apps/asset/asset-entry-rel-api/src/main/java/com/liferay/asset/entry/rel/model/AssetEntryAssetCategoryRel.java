@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetEntryAssetCategoryRel
 	extends AssetEntryAssetCategoryRelModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.asset.entry.rel.model.impl.AssetEntryAssetCategoryRelImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SubscriptionLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SubscriptionLocalServiceUtil} to access the subscription local service. Add custom service methods to <code>com.liferay.portal.service.impl.SubscriptionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

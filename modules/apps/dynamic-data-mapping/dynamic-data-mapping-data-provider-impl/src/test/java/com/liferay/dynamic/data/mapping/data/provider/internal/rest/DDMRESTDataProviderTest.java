@@ -541,15 +541,6 @@ public class DDMRESTDataProviderTest extends PowerMockito {
 	}
 
 	@Test
-	public void testGetSettings() {
-		Class<?> settings = _ddmRESTDataProvider.getSettings();
-
-		Assert.assertEquals(
-			DDMRESTDataProviderSettings.class.getCanonicalName(),
-			settings.getCanonicalName());
-	}
-
-	@Test
 	public void testListOutputWithoutPagination() {
 		DocumentContext documentContext = mock(DocumentContext.class);
 

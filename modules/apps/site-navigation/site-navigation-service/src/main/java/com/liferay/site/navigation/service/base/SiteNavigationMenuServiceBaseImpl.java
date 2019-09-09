@@ -46,7 +46,7 @@ public abstract class SiteNavigationMenuServiceBaseImpl
 	extends BaseServiceImpl
 	implements SiteNavigationMenuService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>SiteNavigationMenuService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.site.navigation.service.SiteNavigationMenuServiceUtil</code>.

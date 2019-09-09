@@ -44,7 +44,7 @@ public interface AppBuilderAppModel
 	extends BaseModel<AppBuilderApp>, GroupedModel, LocalizedModel,
 			ShardedModel, StagedAuditedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a app builder app model instance should use the {@link AppBuilderApp} interface instead.

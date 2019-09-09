@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ExpandoRowModel extends BaseModel<ExpandoRow>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a expando row model instance should use the {@link ExpandoRow} interface instead.

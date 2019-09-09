@@ -22,8 +22,10 @@ import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.segments.asah.rest.dto.v1_0.Experiment;
+import com.liferay.segments.asah.rest.dto.v1_0.ExperimentRun;
 import com.liferay.segments.asah.rest.dto.v1_0.Status;
 import com.liferay.segments.asah.rest.resource.v1_0.ExperimentResource;
+import com.liferay.segments.asah.rest.resource.v1_0.ExperimentRunResource;
 import com.liferay.segments.asah.rest.resource.v1_0.StatusResource;
 
 import javax.annotation.Generated;
@@ -50,6 +52,14 @@ public class Mutation {
 			experimentResourceComponentServiceObjects;
 	}
 
+	public static void setExperimentRunResourceComponentServiceObjects(
+		ComponentServiceObjects<ExperimentRunResource>
+			experimentRunResourceComponentServiceObjects) {
+
+		_experimentRunResourceComponentServiceObjects =
+			experimentRunResourceComponentServiceObjects;
+	}
+
 	public static void setStatusResourceComponentServiceObjects(
 		ComponentServiceObjects<StatusResource>
 			statusResourceComponentServiceObjects) {
@@ -70,6 +80,19 @@ public class Mutation {
 				experimentId));
 
 		return true;
+	}
+
+	@GraphQLField
+	public ExperimentRun createExperimentRun(
+			@GraphQLName("experimentId") Long experimentId,
+			@GraphQLName("experimentRun") ExperimentRun experimentRun)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_experimentRunResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			experimentRunResource -> experimentRunResource.postExperimentRun(
+				experimentId, experimentRun));
 	}
 
 	@GraphQLField
@@ -134,6 +157,19 @@ public class Mutation {
 		experimentResource.setContextUser(_user);
 	}
 
+	private void _populateResourceContext(
+			ExperimentRunResource experimentRunResource)
+		throws Exception {
+
+		experimentRunResource.setContextAcceptLanguage(_acceptLanguage);
+		experimentRunResource.setContextCompany(_company);
+		experimentRunResource.setContextHttpServletRequest(_httpServletRequest);
+		experimentRunResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		experimentRunResource.setContextUriInfo(_uriInfo);
+		experimentRunResource.setContextUser(_user);
+	}
+
 	private void _populateResourceContext(StatusResource statusResource)
 		throws Exception {
 
@@ -147,6 +183,8 @@ public class Mutation {
 
 	private static ComponentServiceObjects<ExperimentResource>
 		_experimentResourceComponentServiceObjects;
+	private static ComponentServiceObjects<ExperimentRunResource>
+		_experimentRunResourceComponentServiceObjects;
 	private static ComponentServiceObjects<StatusResource>
 		_statusResourceComponentServiceObjects;
 

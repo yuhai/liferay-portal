@@ -51,40 +51,7 @@ AUI.add(
 			NS: 'covercropper',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					var host = instance.get(STR_HOST);
-
-					instance._image = host.one(instance.get('imageSelector'));
-					instance._imageContainer = host.one(
-						instance.get('imageContainerSelector')
-					);
-
-					var dd = new A.DD.Drag({
-						node: instance._image,
-						on: {
-							'drag:drag': A.bind('_constrainDrag', instance),
-							'drag:end': A.bind('_onImageUpdated', instance)
-						}
-					}).plug(A.Plugin.DDConstrained, {
-						constrain: instance._getConstrain()
-					});
-
-					instance._dd = dd;
-
-					instance._bindUI();
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					instance._dd.destroy();
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					instance._eventHandles = [
@@ -96,7 +63,7 @@ AUI.add(
 					];
 				},
 
-				_constrainDrag: function(event) {
+				_constrainDrag(event) {
 					var instance = this;
 
 					var direction = instance.get(STR_DIRECTION);
@@ -137,7 +104,7 @@ AUI.add(
 					}
 				},
 
-				_getConstrain: function() {
+				_getConstrain() {
 					var instance = this;
 
 					var constrain = {};
@@ -167,7 +134,7 @@ AUI.add(
 					return constrain;
 				},
 
-				_onImageUpdated: function(event) {
+				_onImageUpdated() {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -191,6 +158,39 @@ AUI.add(
 					);
 
 					cropRegionNode.val(JSON.stringify(cropRegion));
+				},
+
+				destructor() {
+					var instance = this;
+
+					instance._dd.destroy();
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
+					var instance = this;
+
+					var host = instance.get(STR_HOST);
+
+					instance._image = host.one(instance.get('imageSelector'));
+					instance._imageContainer = host.one(
+						instance.get('imageContainerSelector')
+					);
+
+					var dd = new A.DD.Drag({
+						node: instance._image,
+						on: {
+							'drag:drag': A.bind('_constrainDrag', instance),
+							'drag:end': A.bind('_onImageUpdated', instance)
+						}
+					}).plug(A.Plugin.DDConstrained, {
+						constrain: instance._getConstrain()
+					});
+
+					instance._dd = dd;
+
+					instance._bindUI();
 				}
 			}
 		});

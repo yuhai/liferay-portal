@@ -16,7 +16,7 @@ AUI.add(
 	'liferay-product-navigation-control-menu',
 	function(A) {
 		var ControlMenu = {
-			init: function(containerId) {
+			init(containerId) {
 				var instance = this;
 
 				var controlMenu = A.one(containerId);
@@ -30,7 +30,7 @@ AUI.add(
 
 					var eventHandle = controlMenu.on(
 						['focus', 'mousemove', 'touchstart'],
-						function(event) {
+						function() {
 							Liferay.fire('initLayout');
 
 							eventHandle.detach();

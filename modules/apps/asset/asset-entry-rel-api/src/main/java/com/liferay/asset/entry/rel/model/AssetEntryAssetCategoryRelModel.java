@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetEntryAssetCategoryRelModel
 	extends BaseModel<AssetEntryAssetCategoryRel> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset entry asset category rel model instance should use the {@link AssetEntryAssetCategoryRel} interface instead.

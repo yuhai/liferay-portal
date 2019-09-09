@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface UserModel
 	extends BaseModel<User>, MVCCModel, ShardedModel, StagedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a user model instance should use the {@link User} interface instead.

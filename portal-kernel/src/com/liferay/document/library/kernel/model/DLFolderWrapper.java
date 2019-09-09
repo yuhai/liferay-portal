@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLFolder}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFolder
  * @generated
  */
-@ProviderType
 public class DLFolderWrapper
 	extends BaseModelWrapper<DLFolder>
 	implements DLFolder, ModelWrapper<DLFolder> {
@@ -753,6 +750,11 @@ public class DLFolderWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a document library folder model instance should use the <code>DLFolder</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

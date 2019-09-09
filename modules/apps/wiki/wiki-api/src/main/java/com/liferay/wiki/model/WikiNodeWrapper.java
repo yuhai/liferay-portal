@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link WikiNode}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WikiNode
  * @generated
  */
-@ProviderType
 public class WikiNodeWrapper
 	extends BaseModelWrapper<WikiNode>
 	implements WikiNode, ModelWrapper<WikiNode> {
@@ -550,6 +547,11 @@ public class WikiNodeWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a wiki node model instance should use the <code>WikiNode</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

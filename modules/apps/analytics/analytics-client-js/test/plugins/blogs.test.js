@@ -52,7 +52,7 @@ describe('Blogs Plugin', () => {
 	});
 
 	describe('blogViewed event', () => {
-		it('should be fired for every blog on the page', () => {
+		it('is fired for every blog on the page', () => {
 			const blogElement = createBlogElement();
 
 			const domContentLoaded = new Event('DOMContentLoaded');
@@ -78,7 +78,7 @@ describe('Blogs Plugin', () => {
 	});
 
 	describe('blogClicked event', () => {
-		it('should be fired when clicking an image inside a blog', () => {
+		it('is fired when clicking an image inside a blog', () => {
 			const blogElement = createBlogElement();
 
 			const imageInsideBlog = document.createElement('img');
@@ -102,7 +102,7 @@ describe('Blogs Plugin', () => {
 			document.body.removeChild(blogElement);
 		});
 
-		it('should be fired when clicking a link inside a blog', () => {
+		it('is fired when clicking a link inside a blog', () => {
 			const blogElement = createBlogElement();
 			const text = 'Link inside a Blog';
 
@@ -129,7 +129,7 @@ describe('Blogs Plugin', () => {
 			document.body.removeChild(blogElement);
 		});
 
-		it('should be fired when clicking any other element inside a blog', () => {
+		it('is fired when clicking any other element inside a blog', () => {
 			const blogElement = createBlogElement();
 
 			const paragraphInsideBlog = document.createElement('p');

@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Gadget}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Gadget
  * @generated
  */
-@ProviderType
 public class GadgetWrapper
 	extends BaseModelWrapper<Gadget> implements Gadget, ModelWrapper<Gadget> {
 
@@ -216,6 +213,11 @@ public class GadgetWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a gadget model instance should use the <code>Gadget</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

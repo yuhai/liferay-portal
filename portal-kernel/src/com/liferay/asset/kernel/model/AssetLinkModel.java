@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AssetLinkModel extends BaseModel<AssetLink>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset link model instance should use the {@link AssetLink} interface instead.

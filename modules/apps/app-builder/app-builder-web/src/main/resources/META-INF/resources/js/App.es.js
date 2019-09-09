@@ -13,12 +13,14 @@
  */
 
 import React from 'react';
+import {DragDropContext as dragDropContext} from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import {Route, HashRouter as Router, Switch} from 'react-router-dom';
 import {AppContextProvider} from './AppContext.es';
 import ListCustomObjects from './pages/custom-object/ListCustomObjects.es';
 import ViewCustomObject from './pages/custom-object/ViewCustomObject.es';
 
-export default ({basePortletURL}) => {
+export default dragDropContext(HTML5Backend)(({basePortletURL}) => {
 	return (
 		<AppContextProvider basePortletURL={basePortletURL}>
 			<Router>
@@ -33,4 +35,4 @@ export default ({basePortletURL}) => {
 			</Router>
 		</AppContextProvider>
 	);
-};
+});

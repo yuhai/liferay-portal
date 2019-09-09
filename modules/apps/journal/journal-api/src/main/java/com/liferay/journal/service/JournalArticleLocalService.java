@@ -75,7 +75,7 @@ public interface JournalArticleLocalService
 	extends BaseLocalService, PersistedModelLocalService,
 			PersistedResourcedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link JournalArticleLocalServiceUtil} to access the journal article local service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalArticleLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

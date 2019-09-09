@@ -16,8 +16,6 @@ package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link KBArticleService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KBArticleService
  * @generated
  */
-@ProviderType
 public class KBArticleServiceWrapper
 	implements KBArticleService, ServiceWrapper<KBArticleService> {
 
@@ -33,6 +30,11 @@ public class KBArticleServiceWrapper
 		_kbArticleService = kbArticleService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link KBArticleServiceUtil} to access the kb article remote service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBArticleServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.knowledge.base.model.KBArticle addKBArticle(
 			String portletId, long parentResourceClassNameId,

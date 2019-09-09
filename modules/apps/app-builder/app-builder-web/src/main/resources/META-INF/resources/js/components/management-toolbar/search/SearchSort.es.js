@@ -88,9 +88,13 @@ export default ({columns, disabled}) => {
 							{columns.map((columnObject, index) => (
 								<Item
 									active={column === columnObject.key}
-									href="javascript:;"
+									href=""
 									key={index}
-									onClick={() => sort(asc, columnObject.key)}
+									onClick={event => {
+										event.preventDefault();
+
+										sort(asc, columnObject.key);
+									}}
 								>
 									{columnObject.value}
 								</Item>

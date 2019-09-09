@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SiteNavigationMenuItem
 	extends PersistedModel, SiteNavigationMenuItemModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

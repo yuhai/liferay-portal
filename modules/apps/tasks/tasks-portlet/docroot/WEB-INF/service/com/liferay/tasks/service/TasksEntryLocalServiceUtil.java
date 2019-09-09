@@ -16,8 +16,6 @@ package com.liferay.tasks.service;
 
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for TasksEntry. This utility wraps
  * <code>com.liferay.tasks.service.impl.TasksEntryLocalServiceImpl</code> and
@@ -30,13 +28,18 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see TasksEntryLocalService
  * @generated
  */
-@ProviderType
 public class TasksEntryLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.tasks.service.impl.TasksEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 */
+
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link TasksEntryLocalServiceUtil} to access the tasks entry local service. Add custom service methods to <code>com.liferay.tasks.service.impl.TasksEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.tasks.model.TasksEntry addTasksEntry(
 			long userId, String title, int priority, long assigneeUserId,

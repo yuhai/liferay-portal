@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link User}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see User
  * @generated
  */
-@ProviderType
 public class UserWrapper
 	extends BaseModelWrapper<User> implements User, ModelWrapper<User> {
 
@@ -1404,6 +1401,11 @@ public class UserWrapper
 		return model.isTermsOfUseComplete();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a user model instance should use the <code>User</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

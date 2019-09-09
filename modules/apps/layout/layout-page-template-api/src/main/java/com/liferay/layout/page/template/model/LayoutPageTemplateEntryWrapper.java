@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link LayoutPageTemplateEntry}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutPageTemplateEntry
  * @generated
  */
-@ProviderType
 public class LayoutPageTemplateEntryWrapper
 	extends BaseModelWrapper<LayoutPageTemplateEntry>
 	implements LayoutPageTemplateEntry, ModelWrapper<LayoutPageTemplateEntry> {
@@ -578,6 +575,11 @@ public class LayoutPageTemplateEntryWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a layout page template entry model instance should use the <code>LayoutPageTemplateEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

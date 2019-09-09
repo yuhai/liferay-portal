@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link BookmarksEntry}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see BookmarksEntry
  * @generated
  */
-@ProviderType
 public class BookmarksEntryWrapper
 	extends BaseModelWrapper<BookmarksEntry>
 	implements BookmarksEntry, ModelWrapper<BookmarksEntry> {
@@ -581,6 +578,11 @@ public class BookmarksEntryWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a bookmarks entry model instance should use the <code>BookmarksEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

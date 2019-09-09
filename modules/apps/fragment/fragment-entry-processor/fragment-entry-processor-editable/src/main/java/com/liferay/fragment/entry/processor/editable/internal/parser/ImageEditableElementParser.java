@@ -18,9 +18,13 @@ import com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProces
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -111,6 +115,19 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 		Element replaceableElement = elements.get(0);
 
+		if (value.startsWith(StringPool.OPEN_CURLY_BRACE)) {
+			try {
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
+
+				value = jsonObject.getString("url");
+			}
+			catch (JSONException jsone) {
+				_log.error("Unable to parse JSON value " + value);
+
+				value = StringPool.BLANK;
+			}
+		}
+
 		replaceableElement.attr("src", _html.unescape(value));
 
 		if (configJSONObject == null) {
@@ -171,6 +188,9 @@ public class ImageEditableElementParser implements EditableElementParser {
 		EditableFragmentEntryProcessor.class,
 		"/META-INF/resources/fragment/entry/processor/editable" +
 			"/image_field_template.tmpl");
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ImageEditableElementParser.class);
 
 	@Reference
 	private Html _html;

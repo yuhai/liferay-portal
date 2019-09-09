@@ -59,7 +59,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -76,11 +75,10 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = WikiNodePersistence.class)
-@ProviderType
 public class WikiNodePersistenceImpl
 	extends BasePersistenceImpl<WikiNode> implements WikiNodePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>WikiNodeUtil</code> to access the wiki node persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

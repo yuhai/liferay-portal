@@ -51,7 +51,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface DDMDataProviderInstanceService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMDataProviderInstanceServiceUtil} to access the ddm data provider instance remote service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMDataProviderInstanceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

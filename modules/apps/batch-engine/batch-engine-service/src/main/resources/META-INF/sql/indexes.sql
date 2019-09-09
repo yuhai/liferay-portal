@@ -1,0 +1,1 @@
+create index IX_B445235B on BatchEngineTask (uuid_[$COLUMN_LENGTH:75$], companyId);

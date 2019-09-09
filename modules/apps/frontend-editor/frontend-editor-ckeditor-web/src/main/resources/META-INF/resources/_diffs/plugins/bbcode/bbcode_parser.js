@@ -30,7 +30,8 @@
 	BBCodeUtil.unescape = A.rbind('unescapeHTML', LString, entities);
 })();
 (function() {
-	var REGEX_BBCODE = /(?:\[((?:[a-z]|\*){1,16})(?:[=\s]([^\x00-\x1F'<>\[\]]{1,2083}))?\])|(?:\[\/([a-z]{1,16})\])/gi;
+	// eslint-disable-next-line no-control-regex
+	var REGEX_BBCODE = /(?:\[((?:[a-z]|\*){1,16})(?:[=\s]([^\x00-\x1F'<>[\]]{1,2083}))?\])|(?:\[\/([a-z]{1,16})\])/gi;
 
 	var Lexer = function(data) {
 		var instance = this;
@@ -41,11 +42,11 @@
 	Lexer.prototype = {
 		constructor: Lexer,
 
-		getLastIndex: function() {
+		getLastIndex() {
 			return REGEX_BBCODE.lastIndex;
 		},
 
-		getNextToken: function() {
+		getNextToken() {
 			var instance = this;
 
 			return REGEX_BBCODE.exec(instance._data);
@@ -109,9 +110,132 @@
 	};
 
 	Parser.prototype = {
+		_handleData(token, data) {
+			var instance = this;
+
+			var length = data.length;
+
+			var lastIndex = length;
+
+			if (token) {
+				lastIndex = instance._lexer.getLastIndex();
+
+				length = lastIndex;
+
+				var tokenItem = token[1] || token[3];
+
+				if (instance._isValidTag(tokenItem)) {
+					length = token.index;
+				}
+			}
+
+			if (length > instance._dataPointer) {
+				instance._result.push({
+					type: Parser.TOKEN_DATA,
+					value: data.substring(instance._dataPointer, length)
+				});
+			}
+
+			instance._dataPointer = lastIndex;
+		},
+
+		_handleTagEnd(token) {
+			var instance = this;
+
+			var pos = 0;
+
+			var stack = instance._stack;
+
+			var tagName;
+
+			if (token) {
+				if (isString(token)) {
+					tagName = token;
+				} else {
+					tagName = token[3];
+				}
+
+				tagName = tagName.toLowerCase();
+
+				for (pos = stack.length - 1; pos >= 0; pos--) {
+					if (stack[pos] == tagName) {
+						break;
+					}
+				}
+			}
+
+			if (pos >= 0) {
+				var tokenTagEnd = Parser.TOKEN_TAG_END;
+
+				for (var i = stack.length - 1; i >= pos; i--) {
+					instance._result.push({
+						type: tokenTagEnd,
+						value: stack[i]
+					});
+				}
+
+				stack.length = pos;
+			}
+		},
+
+		_handleTagStart(token) {
+			var instance = this;
+
+			var tagName = token[1].toLowerCase();
+
+			if (instance._isValidTag(tagName)) {
+				var stack = instance._stack;
+
+				if (hasOwnProperty.call(ELEMENTS_BLOCK, tagName)) {
+					var lastTag;
+
+					while (
+						(lastTag = stack.last()) &&
+						hasOwnProperty.call(ELEMENTS_INLINE, lastTag)
+					) {
+						instance._handleTagEnd(lastTag);
+					}
+				}
+
+				if (
+					hasOwnProperty.call(ELEMENTS_CLOSE_SELF, tagName) &&
+					stack.last() == tagName
+				) {
+					instance._handleTagEnd(tagName);
+				}
+
+				stack.push(tagName);
+
+				instance._result.push({
+					attribute: token[2],
+					type: Parser.TOKEN_TAG_START,
+					value: tagName
+				});
+			}
+		},
+
+		_isValidTag(tagName) {
+			var valid = false;
+
+			if (tagName && tagName.length) {
+				valid = REGEX_TAG_NAME.test(tagName);
+			}
+
+			return valid;
+		},
+
+		_reset() {
+			var instance = this;
+
+			instance._stack.length = 0;
+			instance._result.length = 0;
+
+			instance._dataPointer = 0;
+		},
+
 		constructor: Parser,
 
-		init: function() {
+		init() {
 			var instance = this;
 
 			var stack = [];
@@ -131,7 +255,7 @@
 			instance._dataPointer = 0;
 		},
 
-		parse: function(data) {
+		parse(data) {
 			var instance = this;
 
 			var lexer = new Liferay.BBCodeLexer(data);
@@ -174,129 +298,6 @@
 			instance._reset();
 
 			return result;
-		},
-
-		_handleData: function(token, data) {
-			var instance = this;
-
-			var length = data.length;
-
-			var lastIndex = length;
-
-			if (token) {
-				lastIndex = instance._lexer.getLastIndex();
-
-				length = lastIndex;
-
-				var tokenItem = token[1] || token[3];
-
-				if (instance._isValidTag(tokenItem)) {
-					length = token.index;
-				}
-			}
-
-			if (length > instance._dataPointer) {
-				instance._result.push({
-					type: Parser.TOKEN_DATA,
-					value: data.substring(instance._dataPointer, length)
-				});
-			}
-
-			instance._dataPointer = lastIndex;
-		},
-
-		_handleTagEnd: function(token) {
-			var instance = this;
-
-			var pos = 0;
-
-			var stack = instance._stack;
-
-			var tagName;
-
-			if (token) {
-				if (isString(token)) {
-					tagName = token;
-				} else {
-					tagName = token[3];
-				}
-
-				tagName = tagName.toLowerCase();
-
-				for (pos = stack.length - 1; pos >= 0; pos--) {
-					if (stack[pos] == tagName) {
-						break;
-					}
-				}
-			}
-
-			if (pos >= 0) {
-				var tokenTagEnd = Parser.TOKEN_TAG_END;
-
-				for (var i = stack.length - 1; i >= pos; i--) {
-					instance._result.push({
-						type: tokenTagEnd,
-						value: stack[i]
-					});
-				}
-
-				stack.length = pos;
-			}
-		},
-
-		_handleTagStart: function(token) {
-			var instance = this;
-
-			var tagName = token[1].toLowerCase();
-
-			if (instance._isValidTag(tagName)) {
-				var stack = instance._stack;
-
-				if (hasOwnProperty.call(ELEMENTS_BLOCK, tagName)) {
-					var lastTag;
-
-					while (
-						(lastTag = stack.last()) &&
-						hasOwnProperty.call(ELEMENTS_INLINE, lastTag)
-					) {
-						instance._handleTagEnd(lastTag);
-					}
-				}
-
-				if (
-					hasOwnProperty.call(ELEMENTS_CLOSE_SELF, tagName) &&
-					stack.last() == tagName
-				) {
-					instance._handleTagEnd(tagName);
-				}
-
-				stack.push(tagName);
-
-				instance._result.push({
-					attribute: token[2],
-					type: Parser.TOKEN_TAG_START,
-					value: tagName
-				});
-			}
-		},
-
-		_isValidTag: function(tagName) {
-			var valid = false;
-
-			if (tagName && tagName.length) {
-				valid = REGEX_TAG_NAME.test(tagName);
-			}
-
-			return valid;
-		},
-
-		_reset: function() {
-			var instance = this;
-
-			instance._stack.length = 0;
-			instance._result.length = 0;
-
-			instance._dataPointer = 0;
 		}
 	};
 
@@ -329,34 +330,30 @@
 	};
 
 	var MAP_HANDLERS = {
+		'*': '_handleListItem',
 		b: '_handleStrong',
+		center: '_handleTextAlign',
 		code: '_handleCode',
+		color: '_handleColor',
+		colour: '_handleColor',
 		email: '_handleEmail',
 		font: '_handleFont',
 		i: '_handleEm',
 		img: '_handleImage',
+		justify: '_handleTextAlign',
+		left: '_handleTextAlign',
+		li: '_handleListItem',
 		list: '_handleList',
+		q: '_handleQuote',
+		quote: '_handleQuote',
+		right: '_handleTextAlign',
 		s: '_handleStrikeThrough',
 		size: '_handleSize',
 		table: '_handleTable',
 		td: '_handleTableCell',
 		th: '_handleTableHeader',
 		tr: '_handleTableRow',
-		url: '_handleURL',
-
-		color: '_handleColor',
-		colour: '_handleColor',
-
-		'*': '_handleListItem',
-		li: '_handleListItem',
-
-		q: '_handleQuote',
-		quote: '_handleQuote',
-
-		center: '_handleTextAlign',
-		justify: '_handleTextAlign',
-		left: '_handleTextAlign',
-		right: '_handleTextAlign'
+		url: '_handleURL'
 	};
 
 	var MAP_IMAGE_ATTRIBUTES = {
@@ -375,10 +372,10 @@
 
 	var MAP_ORDERED_LIST_STYLES = {
 		1: 'list-style-type: decimal;',
-		a: 'list-style-type: lower-alpha;',
-		i: 'list-style-type: lower-roman;',
 		A: 'list-style-type: upper-alpha;',
-		I: 'list-style-type: upper-roman;'
+		I: 'list-style-type: upper-roman;',
+		a: 'list-style-type: lower-alpha;',
+		i: 'list-style-type: lower-roman;'
 	};
 
 	var MAP_TOKENS_EXCLUDE_NEW_LINE = {
@@ -402,7 +399,7 @@
 
 	var REGEX_ESCAPE_REGEX = /[-[\]{}()*+?.,\\^$|#\s]/g;
 
-	var REGEX_IMAGE_SRC = /^(?:https?:\/\/|\/)[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-z]{1,2048}$/i;
+	var REGEX_IMAGE_SRC = /^(?:https?:\/\/|\/)[-;/?:@&=+$,_.!~*'()%0-9a-z]{1,2048}$/i;
 
 	var REGEX_LASTCHAR_NEWLINE = /\r?\n$/;
 
@@ -412,7 +409,7 @@
 
 	var REGEX_STRING_IS_NEW_LINE = /^\r?\n$/;
 
-	var REGEX_URI = /^[-;\/\?:@&=\+\$,_\.!~\*'\(\)%0-9a-zÀ-ÿ#]{1,2048}$|\${\S+}/i;
+	var REGEX_URI = /^[-;/?:@&=+$,_.!~*'()%0-9a-zÀ-ÿ#]{1,2048}$|\${\S+}/i;
 
 	var STR_BLANK = '';
 
@@ -475,58 +472,9 @@
 	};
 
 	Converter.prototype = {
-		constructor: Converter,
-
-		init: function(config) {
-			var instance = this;
-
-			instance._parser = new Parser(config.parser);
-
-			instance._config = config;
-
-			instance._result = [];
-			instance._stack = [];
-		},
-
-		convert: function(data) {
-			var instance = this;
-
-			var parsedData = instance._parser.parse(data);
-
-			instance._parsedData = parsedData;
-
-			var length = parsedData.length;
-
-			for (
-				instance._tokenPointer = 0;
-				instance._tokenPointer < length;
-				instance._tokenPointer++
-			) {
-				var token = parsedData[instance._tokenPointer];
-
-				var type = token.type;
-
-				if (type === TOKEN_TAG_START) {
-					instance._handleTagStart(token);
-				} else if (type === TOKEN_TAG_END) {
-					instance._handleTagEnd(token);
-				} else if (type === TOKEN_DATA) {
-					instance._handleData(token);
-				} else {
-					throw 'Internal error. Invalid token type';
-				}
-			}
-
-			var result = instance._result.join(STR_BLANK);
-
-			instance._reset();
-
-			return result;
-		},
-
 		_escapeHTML: A.Lang.String.escapeHTML,
 
-		_extractData: function(toTagName, consume) {
+		_extractData(toTagName, consume) {
 			var instance = this;
 
 			var result = [];
@@ -554,11 +502,11 @@
 			return result.join(STR_BLANK);
 		},
 
-		_getFontSize: function(fontSize) {
+		_getFontSize(fontSize) {
 			return MAP_FONT_SIZE[fontSize] || MAP_FONT_SIZE.defaultSize;
 		},
 
-		_handleCode: function(token) {
+		_handleCode() {
 			var instance = this;
 
 			instance._noParse = true;
@@ -568,7 +516,7 @@
 			instance._result.push(STR_NEW_LINE);
 		},
 
-		_handleColor: function(token) {
+		_handleColor(token) {
 			var instance = this;
 
 			var colorName = token.attribute;
@@ -587,7 +535,7 @@
 			instance._stack.push(STR_TAG_SPAN_CLOSE);
 		},
 
-		_handleData: function(token) {
+		_handleData(token) {
 			var instance = this;
 
 			var emoticonImages = instance._config.emoticonImages;
@@ -621,13 +569,13 @@
 			instance._result.push(value);
 		},
 
-		_handleEm: function(token) {
+		_handleEm() {
 			var instance = this;
 
 			instance._handleSimpleTag('em');
 		},
 
-		_handleEmail: function(token) {
+		_handleEmail(token) {
 			var instance = this;
 
 			var href = STR_BLANK;
@@ -650,7 +598,7 @@
 			instance._stack.push(STR_TAG_A_CLOSE);
 		},
 
-		_handleFont: function(token) {
+		_handleFont(token) {
 			var instance = this;
 
 			var fontName = token.attribute;
@@ -667,7 +615,7 @@
 			instance._stack.push(STR_TAG_SPAN_CLOSE);
 		},
 
-		_handleImage: function(token) {
+		_handleImage(token) {
 			var instance = this;
 
 			var imageSrc = STR_BLANK;
@@ -680,13 +628,13 @@
 
 			var result = tplImage.output({
 				attributes: instance._handleImageAttributes(token, token.value),
-				imageSrc: imageSrc
+				imageSrc
 			});
 
 			instance._result.push(result);
 		},
 
-		_handleImageAttributes: function(token) {
+		_handleImageAttributes(token) {
 			var instance = this;
 
 			var attrs = STR_BLANK;
@@ -715,7 +663,7 @@
 			return attrs;
 		},
 
-		_handleList: function(token) {
+		_handleList(token) {
 			var instance = this;
 
 			var listAttributes = STR_BLANK;
@@ -758,13 +706,13 @@
 			instance._stack.push(STR_TAG_END_OPEN + tag + STR_TAG_END_CLOSE);
 		},
 
-		_handleListItem: function(token) {
+		_handleListItem() {
 			var instance = this;
 
 			instance._handleSimpleTag('li');
 		},
 
-		_handleNewLine: function(value) {
+		_handleNewLine(value) {
 			var instance = this;
 
 			var nextToken;
@@ -806,7 +754,7 @@
 			return value;
 		},
 
-		_handleQuote: function(token) {
+		_handleQuote(token) {
 			var instance = this;
 
 			var cite = token.attribute;
@@ -824,7 +772,7 @@
 			instance._stack.push('</blockquote>');
 		},
 
-		_handleSimpleTag: function(tagName) {
+		_handleSimpleTag(tagName) {
 			var instance = this;
 
 			instance._result.push(STR_TAG_OPEN, tagName, STR_TAG_END_CLOSE);
@@ -834,13 +782,13 @@
 			);
 		},
 
-		_handleSimpleTags: function(token) {
+		_handleSimpleTags(token) {
 			var instance = this;
 
 			instance._handleSimpleTag(token.value);
 		},
 
-		_handleSize: function(token) {
+		_handleSize(token) {
 			var instance = this;
 
 			var size = token.attribute;
@@ -860,43 +808,43 @@
 			instance._stack.push(STR_TAG_SPAN_CLOSE);
 		},
 
-		_handleStrikeThrough: function(token) {
+		_handleStrikeThrough() {
 			var instance = this;
 
 			instance._handleSimpleTag('strike');
 		},
 
-		_handleStrong: function(token) {
+		_handleStrong() {
 			var instance = this;
 
 			instance._handleSimpleTag('strong');
 		},
 
-		_handleTable: function(token) {
+		_handleTable() {
 			var instance = this;
 
 			instance._handleSimpleTag('table');
 		},
 
-		_handleTableCell: function(token) {
+		_handleTableCell() {
 			var instance = this;
 
 			instance._handleSimpleTag('td');
 		},
 
-		_handleTableHeader: function(token) {
+		_handleTableHeader() {
 			var instance = this;
 
 			instance._handleSimpleTag('th');
 		},
 
-		_handleTableRow: function(token) {
+		_handleTableRow() {
 			var instance = this;
 
 			instance._handleSimpleTag('tr');
 		},
 
-		_handleTagEnd: function(token) {
+		_handleTagEnd(token) {
 			var instance = this;
 
 			var tagName = token.value;
@@ -908,7 +856,7 @@
 			}
 		},
 
-		_handleTagStart: function(token) {
+		_handleTagStart(token) {
 			var instance = this;
 
 			var tagName = token.value;
@@ -918,7 +866,7 @@
 			instance[handlerName](token);
 		},
 
-		_handleTextAlign: function(token) {
+		_handleTextAlign(token) {
 			var instance = this;
 
 			instance._result.push(
@@ -930,7 +878,7 @@
 			instance._stack.push(STR_TAG_P_CLOSE);
 		},
 
-		_handleURL: function(token) {
+		_handleURL(token) {
 			var instance = this;
 
 			var href = STR_BLANK;
@@ -949,7 +897,7 @@
 			instance._stack.push(STR_TAG_A_CLOSE);
 		},
 
-		_reset: function() {
+		_reset() {
 			var instance = this;
 
 			instance._result.length = 0;
@@ -958,6 +906,55 @@
 			instance._parsedData = null;
 
 			instance._noParse = false;
+		},
+
+		constructor: Converter,
+
+		convert(data) {
+			var instance = this;
+
+			var parsedData = instance._parser.parse(data);
+
+			instance._parsedData = parsedData;
+
+			var length = parsedData.length;
+
+			for (
+				instance._tokenPointer = 0;
+				instance._tokenPointer < length;
+				instance._tokenPointer++
+			) {
+				var token = parsedData[instance._tokenPointer];
+
+				var type = token.type;
+
+				if (type === TOKEN_TAG_START) {
+					instance._handleTagStart(token);
+				} else if (type === TOKEN_TAG_END) {
+					instance._handleTagEnd(token);
+				} else if (type === TOKEN_DATA) {
+					instance._handleData(token);
+				} else {
+					throw 'Internal error. Invalid token type';
+				}
+			}
+
+			var result = instance._result.join(STR_BLANK);
+
+			instance._reset();
+
+			return result;
+		},
+
+		init(config) {
+			var instance = this;
+
+			instance._parser = new Parser(config.parser);
+
+			instance._config = config;
+
+			instance._result = [];
+			instance._stack = [];
 		}
 	};
 

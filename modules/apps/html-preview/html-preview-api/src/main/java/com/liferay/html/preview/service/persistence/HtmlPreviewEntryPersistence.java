@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface HtmlPreviewEntryPersistence
 	extends BasePersistence<HtmlPreviewEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link HtmlPreviewEntryUtil} to access the html preview entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

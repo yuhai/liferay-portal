@@ -48,7 +48,7 @@ public abstract class DLFileVersionServiceBaseImpl
 	extends BaseServiceImpl
 	implements DLFileVersionService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLFileVersionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLFileVersionServiceUtil</code>.

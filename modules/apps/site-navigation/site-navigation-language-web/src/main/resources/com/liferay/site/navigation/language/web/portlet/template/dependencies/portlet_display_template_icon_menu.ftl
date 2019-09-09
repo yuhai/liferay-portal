@@ -14,10 +14,13 @@
 				<#if !entry.isSelected() && !entry.isDisabled()>
 					<#assign
 						entryLocale = entry.getLocale()
-
-						displayName = entry.getLongDisplayName() + "-" + entryLocale.getDisplayCountry(entryLocale)
+						displayName = stringUtil.toLowerCase(entryLocale.getDisplayLanguage(entryLocale)) + "-" + entryLocale.getDisplayCountry(entryLocale)
 						normalizedDefaultLanguageId = stringUtil.toLowerCase(stringUtil.replace(entry.getLanguageId(), "_", "-"))
 					/>
+
+					<#if languageUtil.isBetaLocale(entryLocale)>
+						<#assign displayName += " [beta]" />
+					</#if>
 
 					<@liferay_ui["icon"]
 						icon=normalizedDefaultLanguageId

@@ -57,8 +57,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the password policy local service.
  *
@@ -70,12 +68,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portal.service.impl.PasswordPolicyLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class PasswordPolicyLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements PasswordPolicyLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PasswordPolicyLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.PasswordPolicyLocalServiceUtil</code>.

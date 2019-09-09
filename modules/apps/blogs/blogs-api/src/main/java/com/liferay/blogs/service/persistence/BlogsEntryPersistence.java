@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface BlogsEntryPersistence extends BasePersistence<BlogsEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BlogsEntryUtil} to access the blogs entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

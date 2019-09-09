@@ -16,8 +16,6 @@ package com.liferay.powwow.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link PowwowMeetingService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PowwowMeetingService
  * @generated
  */
-@ProviderType
 public class PowwowMeetingServiceWrapper
 	implements PowwowMeetingService, ServiceWrapper<PowwowMeetingService> {
 
@@ -35,6 +32,11 @@ public class PowwowMeetingServiceWrapper
 		_powwowMeetingService = powwowMeetingService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PowwowMeetingServiceUtil} to access the powwow meeting remote service. Add custom service methods to <code>com.liferay.powwow.service.impl.PowwowMeetingServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.powwow.model.PowwowMeeting addPowwowMeeting(
 			long groupId, String portletId, long powwowServerId, String name,

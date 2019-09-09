@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LockLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LockLocalServiceUtil} to access the lock local service. Add custom service methods to <code>com.liferay.portal.lock.service.impl.LockLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

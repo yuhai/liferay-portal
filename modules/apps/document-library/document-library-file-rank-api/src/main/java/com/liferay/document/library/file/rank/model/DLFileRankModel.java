@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface DLFileRankModel extends BaseModel<DLFileRank>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a document library file rank model instance should use the {@link DLFileRank} interface instead.

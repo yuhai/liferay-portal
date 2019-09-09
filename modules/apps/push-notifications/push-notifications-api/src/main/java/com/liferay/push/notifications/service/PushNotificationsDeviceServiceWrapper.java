@@ -16,8 +16,6 @@ package com.liferay.push.notifications.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link PushNotificationsDeviceService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PushNotificationsDeviceService
  * @generated
  */
-@ProviderType
 public class PushNotificationsDeviceServiceWrapper
 	implements PushNotificationsDeviceService,
 			   ServiceWrapper<PushNotificationsDeviceService> {
@@ -36,6 +33,11 @@ public class PushNotificationsDeviceServiceWrapper
 		_pushNotificationsDeviceService = pushNotificationsDeviceService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PushNotificationsDeviceServiceUtil} to access the push notifications device remote service. Add custom service methods to <code>com.liferay.push.notifications.service.impl.PushNotificationsDeviceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.push.notifications.model.PushNotificationsDevice
 			addPushNotificationsDevice(String token, String platform)

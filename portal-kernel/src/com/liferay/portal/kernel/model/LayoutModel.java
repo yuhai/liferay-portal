@@ -39,7 +39,7 @@ public interface LayoutModel
 	extends AttachedModel, BaseModel<Layout>, LocalizedModel, MVCCModel,
 			ShardedModel, StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout model instance should use the {@link Layout} interface instead.

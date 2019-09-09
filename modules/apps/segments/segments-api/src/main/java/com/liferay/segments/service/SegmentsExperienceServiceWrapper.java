@@ -16,8 +16,6 @@ package com.liferay.segments.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SegmentsExperienceService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperienceService
  * @generated
  */
-@ProviderType
 public class SegmentsExperienceServiceWrapper
 	implements SegmentsExperienceService,
 			   ServiceWrapper<SegmentsExperienceService> {
@@ -36,6 +33,11 @@ public class SegmentsExperienceServiceWrapper
 		_segmentsExperienceService = segmentsExperienceService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SegmentsExperienceServiceUtil} to access the segments experience remote service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperienceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.segments.model.SegmentsExperience addSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
@@ -55,6 +57,15 @@ public class SegmentsExperienceServiceWrapper
 
 		return _segmentsExperienceService.deleteSegmentsExperience(
 			segmentsExperienceId);
+	}
+
+	@Override
+	public com.liferay.segments.model.SegmentsExperience
+			fetchSegmentsExperience(long groupId, String segmentsExperienceKey)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsExperienceService.fetchSegmentsExperience(
+			groupId, segmentsExperienceKey);
 	}
 
 	/**

@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FragmentCollectionModel
 	extends BaseModel<FragmentCollection>, ShardedModel, StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a fragment collection model instance should use the {@link FragmentCollection} interface instead.

@@ -41,33 +41,7 @@ AUI.add(
 			NAME: 'itemselectorurl',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._itemViewer = new A.LiferayItemViewer({
-						btnCloseCaption: instance.get('closeCaption'),
-						caption: '',
-						links: '',
-						renderControls: false,
-						renderSidebar: false
-					});
-
-					instance._inputNode = instance.one('#urlInput');
-					instance._buttonNode = instance.one('#previewBtn');
-
-					instance._bindUI();
-					instance._renderUI();
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					instance._itemViewer.destroy();
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_afterVisibleChange: function(event) {
+				_afterVisibleChange(event) {
 					var instance = this;
 
 					if (!event.newVal) {
@@ -75,7 +49,7 @@ AUI.add(
 					}
 				},
 
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					var itemViewer = instance._itemViewer;
@@ -104,7 +78,7 @@ AUI.add(
 					];
 				},
 
-				_onInput: function(event) {
+				_onInput(event) {
 					var instance = this;
 
 					Liferay.Util.toggleDisabled(
@@ -113,7 +87,7 @@ AUI.add(
 					);
 				},
 
-				_onItemSelected: function() {
+				_onItemSelected() {
 					var instance = this;
 
 					var itemViewer = instance._itemViewer;
@@ -130,7 +104,7 @@ AUI.add(
 					});
 				},
 
-				_previewItem: function() {
+				_previewItem() {
 					var instance = this;
 
 					var url = instance._inputNode.val();
@@ -151,12 +125,38 @@ AUI.add(
 					}
 				},
 
-				_renderUI: function() {
+				_renderUI() {
 					var instance = this;
 
 					var rootNode = instance.rootNode;
 
 					instance._itemViewer.render(rootNode);
+				},
+
+				destructor() {
+					var instance = this;
+
+					instance._itemViewer.destroy();
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._itemViewer = new A.LiferayItemViewer({
+						btnCloseCaption: instance.get('closeCaption'),
+						caption: '',
+						links: '',
+						renderControls: false,
+						renderSidebar: false
+					});
+
+					instance._inputNode = instance.one('#urlInput');
+					instance._buttonNode = instance.one('#previewBtn');
+
+					instance._bindUI();
+					instance._renderUI();
 				}
 			}
 		});

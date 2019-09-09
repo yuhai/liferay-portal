@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Lock}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Lock
  * @generated
  */
-@ProviderType
 public class LockWrapper
 	extends BaseModelWrapper<Lock> implements Lock, ModelWrapper<Lock> {
 
@@ -300,6 +297,11 @@ public class LockWrapper
 		return model.isNeverExpires();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a lock model instance should use the <code>Lock</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

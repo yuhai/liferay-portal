@@ -19,12 +19,19 @@ import ClayButton from '@clayui/button';
 import {SplitPicker} from './SplitPicker/SplitPicker.es';
 import {SliderWithLabel} from './SliderWithLabel.es';
 import {SegmentsVariantType} from '../types.es';
-import {percentageNumberToIndex} from '../util/percentages.es';
+import {
+	INITIAL_CONFIDENCE_LEVEL,
+	MAX_CONFIDENCE_LEVEL,
+	MIN_CONFIDENCE_LEVEL,
+	percentageNumberToIndex
+} from '../util/percentages.es';
 import BusyButton from './BusyButton/BusyButton.es';
 
 function ReviewExperimentModal({onRun, variants, visible, setVisible}) {
 	const [busy, setBusy] = useState(false);
-	const [confidenceLevel, setConfidenceLevel] = useState(50);
+	const [confidenceLevel, setConfidenceLevel] = useState(
+		INITIAL_CONFIDENCE_LEVEL
+	);
 	const [draftVariants, setDraftVariants] = useState(
 		variants.map(variant => {
 			return {...variant, split: parseInt(100 / variants.length, 10)};
@@ -72,6 +79,8 @@ function ReviewExperimentModal({onRun, variants, visible, setVisible}) {
 						label={Liferay.Language.get(
 							'confidence-level-required'
 						)}
+						max={MAX_CONFIDENCE_LEVEL}
+						min={MIN_CONFIDENCE_LEVEL}
 						onValueChange={setConfidenceLevel}
 						value={confidenceLevel}
 					/>

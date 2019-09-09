@@ -29,7 +29,7 @@ Liferay.Portlet.ready(
 	node: the Alloy Node object of the current portlet
 	*/
 
-	function(portletId, node) {}
+	function(_portletId, _node) {}
 );
 
 Liferay.on(

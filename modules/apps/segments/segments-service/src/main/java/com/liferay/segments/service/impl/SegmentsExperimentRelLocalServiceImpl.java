@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.segments.constants.SegmentsExperimentConstants;
 import com.liferay.segments.exception.LockedSegmentsExperimentException;
@@ -123,7 +124,7 @@ public class SegmentsExperimentRelLocalServiceImpl
 
 		// Segments experience
 
-		if (force || !segmentsExperimentRel.isControl()) {
+		if (force || !segmentsExperimentRel.isActive()) {
 			_segmentsExperienceLocalService.deleteSegmentsExperience(
 				segmentsExperimentRel.getSegmentsExperienceId());
 		}
@@ -145,6 +146,15 @@ public class SegmentsExperimentRelLocalServiceImpl
 			segmentsExperimentRelLocalService.deleteSegmentsExperimentRel(
 				segmentsExperimentRel, true);
 		}
+	}
+
+	@Override
+	public SegmentsExperimentRel fetchSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId)
+		throws PortalException {
+
+		return segmentsExperimentRelPersistence.fetchByS_S(
+			segmentsExperimentId, segmentsExperienceId);
 	}
 
 	@Override
@@ -173,11 +183,19 @@ public class SegmentsExperimentRelLocalServiceImpl
 			segmentsExperimentRelPersistence.findByPrimaryKey(
 				segmentsExperimentRelId);
 
-		_validateSegmentsExperimentRelSplit(split);
+		return _updateSegmentsExperimentRelSplit(segmentsExperimentRel, split);
+	}
 
-		segmentsExperimentRel.setSplit(split);
+	@Override
+	public SegmentsExperimentRel updateSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId, double split)
+		throws PortalException {
 
-		return segmentsExperimentRelPersistence.update(segmentsExperimentRel);
+		SegmentsExperimentRel segmentsExperimentRel =
+			segmentsExperimentRelPersistence.findByS_S(
+				segmentsExperimentId, segmentsExperienceId);
+
+		return _updateSegmentsExperimentRelSplit(segmentsExperimentRel, split);
 	}
 
 	@Override
@@ -206,6 +224,28 @@ public class SegmentsExperimentRelLocalServiceImpl
 
 		_segmentsExperienceLocalService.updateSegmentsExperience(
 			segmentsExperience);
+
+		return segmentsExperimentRelPersistence.update(segmentsExperimentRel);
+	}
+
+	private SegmentsExperimentRel _updateSegmentsExperimentRelSplit(
+			SegmentsExperimentRel segmentsExperimentRel, double split)
+		throws PortalException {
+
+		_validateSegmentsExperimentRelSplit(split);
+
+		segmentsExperimentRel.setSplit(split);
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.popServiceContext();
+
+		if (serviceContext == null) {
+			serviceContext = new ServiceContext();
+		}
+
+		serviceContext.setAttribute("updateAsah", Boolean.FALSE);
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		return segmentsExperimentRelPersistence.update(segmentsExperimentRel);
 	}

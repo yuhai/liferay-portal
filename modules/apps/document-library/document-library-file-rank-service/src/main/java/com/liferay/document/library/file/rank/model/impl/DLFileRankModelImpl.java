@@ -45,8 +45,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the DLFileRank service. Represents a row in the &quot;DLFileRank&quot; database table, with each column mapped to a property of this class.
  *
@@ -58,11 +56,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileRankImpl
  * @generated
  */
-@ProviderType
 public class DLFileRankModelImpl
 	extends BaseModelImpl<DLFileRank> implements DLFileRankModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a document library file rank model instance should use the <code>DLFileRank</code> interface instead.

@@ -131,7 +131,7 @@
 					'liferay-autocomplete-input-caretindex': {
 						condition: {
 							name: 'liferay-autocomplete-input-caretindex',
-							test: function() {
+							test() {
 								return SUPPORTS_INPUT_SELECTION;
 							},
 							trigger: 'liferay-autocomplete-textarea'
@@ -142,7 +142,7 @@
 					'liferay-autocomplete-input-caretindex-sel': {
 						condition: {
 							name: 'liferay-autocomplete-input-caretindex-sel',
-							test: function() {
+							test() {
 								return !SUPPORTS_INPUT_SELECTION;
 							},
 							trigger: 'liferay-autocomplete-textarea'
@@ -153,7 +153,7 @@
 					'liferay-autocomplete-input-caretoffset': {
 						condition: {
 							name: 'liferay-autocomplete-input-caretoffset',
-							test: function(A) {
+							test(A) {
 								return !(A.UA.ie && A.UA.ie < 9);
 							},
 							trigger: 'liferay-autocomplete-textarea'
@@ -164,7 +164,7 @@
 					'liferay-autocomplete-input-caretoffset-sel': {
 						condition: {
 							name: 'liferay-autocomplete-input-caretoffset-sel',
-							test: function(A) {
+							test(A) {
 								return A.UA.ie && A.UA.ie < 9;
 							},
 							trigger: 'liferay-autocomplete-textarea'
@@ -209,7 +209,7 @@
 					'liferay-form-placeholders': {
 						condition: {
 							name: 'liferay-form-placeholders',
-							test: function(A) {
+							test() {
 								return !('placeholder' in INPUT_EL);
 							},
 							trigger: 'liferay-form'
@@ -461,7 +461,7 @@
 					},
 					'liferay-resize-rtl': {
 						condition: {
-							test: function(A) {
+							test() {
 								return document.documentElement.dir === 'rtl';
 							},
 							trigger: 'resize-base'

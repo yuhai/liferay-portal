@@ -49,7 +49,7 @@ AUI.add(
 		var SimpleColorPicker = A.Component.create({
 			ATTRS: {
 				color: {
-					setter: function(val) {
+					setter(val) {
 						return val.toUpperCase();
 					},
 					validator: Lang.isString,
@@ -61,7 +61,7 @@ AUI.add(
 				},
 
 				pallete: {
-					setter: function(val) {
+					setter(val) {
 						return AArray.invoke(val, 'toUpperCase');
 					},
 					validator: Lang.isArray,
@@ -99,26 +99,7 @@ AUI.add(
 			UI_ATTRS: ['color', 'pallete'],
 
 			prototype: {
-				renderUI: function() {
-					var instance = this;
-
-					instance._renderPallete();
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					var contentBox = instance.get('contentBox');
-
-					contentBox.delegate(
-						'click',
-						instance._onClickColor,
-						STR_DOT + CSS_SIMPLE_COLOR_PICKER_ITEM,
-						instance
-					);
-				},
-
-				_onClickColor: function(event) {
+				_onClickColor(event) {
 					var instance = this;
 
 					var pallete = instance.get('pallete');
@@ -129,7 +110,7 @@ AUI.add(
 					);
 				},
 
-				_renderPallete: function() {
+				_renderPallete() {
 					var instance = this;
 
 					instance.items = A.NodeList.create(
@@ -141,7 +122,7 @@ AUI.add(
 					instance.get('contentBox').setContent(instance.items);
 				},
 
-				_uiSetColor: function(val) {
+				_uiSetColor(val) {
 					var instance = this;
 
 					var pallete = instance.get('pallete');
@@ -157,12 +138,31 @@ AUI.add(
 					}
 				},
 
-				_uiSetPallete: function(val) {
+				_uiSetPallete() {
 					var instance = this;
 
 					if (instance.get('rendered')) {
 						instance._renderPallete();
 					}
+				},
+
+				bindUI() {
+					var instance = this;
+
+					var contentBox = instance.get('contentBox');
+
+					contentBox.delegate(
+						'click',
+						instance._onClickColor,
+						STR_DOT + CSS_SIMPLE_COLOR_PICKER_ITEM,
+						instance
+					);
+				},
+
+				renderUI() {
+					var instance = this;
+
+					instance._renderPallete();
 				}
 			}
 		});

@@ -16,8 +16,6 @@ package com.liferay.screens.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ScreensDDMStructureVersionService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ScreensDDMStructureVersionService
  * @generated
  */
-@ProviderType
 public class ScreensDDMStructureVersionServiceWrapper
 	implements ScreensDDMStructureVersionService,
 			   ServiceWrapper<ScreensDDMStructureVersionService> {
@@ -36,6 +33,11 @@ public class ScreensDDMStructureVersionServiceWrapper
 		_screensDDMStructureVersionService = screensDDMStructureVersionService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ScreensDDMStructureVersionServiceUtil} to access the screens ddm structure version remote service. Add custom service methods to <code>com.liferay.screens.service.impl.ScreensDDMStructureVersionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.json.JSONObject getDDMStructureVersion(
 			long structureId)

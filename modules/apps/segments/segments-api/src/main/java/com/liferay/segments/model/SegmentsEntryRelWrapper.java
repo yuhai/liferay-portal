@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SegmentsEntryRel}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsEntryRel
  * @generated
  */
-@ProviderType
 public class SegmentsEntryRelWrapper
 	extends BaseModelWrapper<SegmentsEntryRel>
 	implements SegmentsEntryRel, ModelWrapper<SegmentsEntryRel> {
@@ -252,6 +249,11 @@ public class SegmentsEntryRelWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a segments entry rel model instance should use the <code>SegmentsEntryRel</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

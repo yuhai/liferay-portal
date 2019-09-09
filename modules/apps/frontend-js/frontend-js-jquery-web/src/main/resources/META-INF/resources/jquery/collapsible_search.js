@@ -43,13 +43,13 @@
 	CollapsibleSearch.TRANSITION_DURATION = 500;
 
 	CollapsibleSearch.prototype = {
-		blur: function(event) {
+		blur(event) {
 			var $input = $(event.currentTarget);
 
 			$input.closest('.basic-search').removeClass('focus');
 		},
 
-		close: function(event) {
+		close(event) {
 			var instance = this;
 
 			var basicSearch = $(event.currentTarget).closest('.basic-search');
@@ -82,7 +82,7 @@
 			}
 		},
 
-		destroy: function() {
+		destroy() {
 			var instance = this;
 
 			instance.$close.off('click.lexicon.close.collapsible-search');
@@ -91,13 +91,13 @@
 			instance.$submit.off('click.lexicon.submit.collapsible-search');
 		},
 
-		focus: function(event) {
+		focus(event) {
 			$(event.currentTarget)
 				.closest('.basic-search')
 				.addClass('focus');
 		},
 
-		submit: function(event) {
+		submit(event) {
 			var instance = this;
 
 			if (window.innerWidth < CollapsibleSearch.BREAKPOINT) {

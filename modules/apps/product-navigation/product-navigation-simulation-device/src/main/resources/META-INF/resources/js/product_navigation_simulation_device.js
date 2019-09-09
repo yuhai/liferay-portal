@@ -17,7 +17,6 @@ AUI.add(
 	function(A) {
 		var AObject = A.Object;
 		var Lang = A.Lang;
-		var Util = Liferay.Util;
 
 		var BODY = A.getBody();
 
@@ -101,69 +100,7 @@ AUI.add(
 			NAME: 'simulationdevice',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._eventHandles = [];
-
-					instance._dialogId = A.guid();
-
-					instance._simulationDeviceNode = A.Node.create(
-						Lang.sub(TPL_SIMULATION_DEVICE)
-					);
-
-					BODY.append(instance._simulationDeviceNode);
-
-					var devices = instance.get('devices');
-
-					AObject.some(devices, function(item, index) {
-						var selected = item.selected;
-
-						if (selected) {
-							instance._openDeviceDialog(item);
-						}
-
-						return selected;
-					});
-
-					var simulationDeviceContainer = instance.byId(
-						'simulationDeviceContainer'
-					);
-
-					instance._deviceItems = simulationDeviceContainer.all(
-						SELECTOR_DEVICE_ITEM
-					);
-
-					instance._simulationDeviceContainer = simulationDeviceContainer;
-
-					instance._bindUI();
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-
-					instance._simulationDeviceNode.remove();
-				},
-
-				hideDeviceDialog: function() {
-					var instance = this;
-
-					var dialog = Liferay.Util.getWindow(instance._dialogId);
-
-					dialog.hide();
-				},
-
-				showDeviceDialog: function() {
-					var instance = this;
-
-					var dialog = Liferay.Util.getWindow(instance._dialogId);
-
-					dialog.show();
-				},
-
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					var eventHandles = instance._eventHandles;
@@ -210,7 +147,7 @@ AUI.add(
 					}
 				},
 
-				_normalizeDialogAttrs: function(device, rotation) {
+				_normalizeDialogAttrs(device, rotation) {
 					var instance = this;
 
 					var dialogAutoHeight = false;
@@ -259,7 +196,7 @@ AUI.add(
 					};
 				},
 
-				_onDeviceClick: function(event) {
+				_onDeviceClick(event) {
 					var instance = this;
 
 					var deviceList = instance.get(STR_DEVICES);
@@ -303,7 +240,7 @@ AUI.add(
 					}
 				},
 
-				_onResize: function(event) {
+				_onResize(event) {
 					var instance = this;
 
 					var eventInfo = event.info;
@@ -331,13 +268,13 @@ AUI.add(
 					instance._sizeStatusContent.html(info);
 				},
 
-				_onResizeEnd: function(event) {
+				_onResizeEnd() {
 					var instance = this;
 
 					instance._sizeStatus.hide();
 				},
 
-				_onResizeStart: function(event) {
+				_onResizeStart() {
 					var instance = this;
 
 					var sizeStatus = instance._sizeStatus;
@@ -374,7 +311,7 @@ AUI.add(
 					sizeStatus.show();
 				},
 
-				_onSizeInput: function(event) {
+				_onSizeInput() {
 					var instance = this;
 
 					var inputHeight = instance.get(STR_INPUT_HEIGHT).val();
@@ -386,13 +323,13 @@ AUI.add(
 					Liferay.Util.getWindow(instance._dialogId);
 
 					instance._openDeviceDialog({
-						height: height,
+						height,
 						resizable: true,
-						width: width
+						width
 					});
 				},
 
-				_openDeviceDialog: function(device, rotation) {
+				_openDeviceDialog(device, rotation) {
 					var instance = this;
 
 					var dialog = Liferay.Util.getWindow(instance._dialogId);
@@ -415,10 +352,10 @@ AUI.add(
 							},
 							autoSizeNode: simulationDeviceNode,
 							constrain: simulationDeviceNode,
-							height: height,
+							height,
 							hideOn: [],
 							render: simulationDeviceNode,
-							width: width
+							width
 						};
 
 						Liferay.Util.openWindow(
@@ -431,7 +368,10 @@ AUI.add(
 								title: Liferay.Language.get(
 									'simulation-peview'
 								),
-								uri: WIN.location.href
+								uri: Liferay.Util.addParams(
+									'p_l_mode=preview',
+									WIN.location.href
+								)
 							},
 							function(dialogWindow) {
 								var dialogBoundingBox = dialogWindow.get(
@@ -445,7 +385,7 @@ AUI.add(
 
 								dialogWindow.plug(A.Plugin.SizeAnim, {
 									after: {
-										end: function(event) {
+										end() {
 											var selectedDevice =
 												instance._selectedDevice;
 
@@ -461,10 +401,10 @@ AUI.add(
 													false
 											);
 										},
-										start: function(event) {
+										start() {
 											AObject.each(
 												instance.get(STR_DEVICES),
-												function(item, index) {
+												function(item) {
 													if (item.skin) {
 														dialogBoundingBox.removeClass(
 															item.skin
@@ -514,14 +454,76 @@ AUI.add(
 						dialog.setAttrs(dialogAttrs);
 
 						dialog.iframe.node.setStyles({
-							height: height,
-							width: width
+							height,
+							width
 						});
 
 						dialog.show();
 					}
 
 					instance._selectedDevice = device;
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+
+					instance._simulationDeviceNode.remove();
+				},
+
+				hideDeviceDialog() {
+					var instance = this;
+
+					var dialog = Liferay.Util.getWindow(instance._dialogId);
+
+					dialog.hide();
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._eventHandles = [];
+
+					instance._dialogId = A.guid();
+
+					instance._simulationDeviceNode = A.Node.create(
+						Lang.sub(TPL_SIMULATION_DEVICE)
+					);
+
+					BODY.append(instance._simulationDeviceNode);
+
+					var devices = instance.get('devices');
+
+					AObject.some(devices, function(item) {
+						var selected = item.selected;
+
+						if (selected) {
+							instance._openDeviceDialog(item);
+						}
+
+						return selected;
+					});
+
+					var simulationDeviceContainer = instance.byId(
+						'simulationDeviceContainer'
+					);
+
+					instance._deviceItems = simulationDeviceContainer.all(
+						SELECTOR_DEVICE_ITEM
+					);
+
+					instance._simulationDeviceContainer = simulationDeviceContainer;
+
+					instance._bindUI();
+				},
+
+				showDeviceDialog() {
+					var instance = this;
+
+					var dialog = Liferay.Util.getWindow(instance._dialogId);
+
+					dialog.show();
 				}
 			}
 		});

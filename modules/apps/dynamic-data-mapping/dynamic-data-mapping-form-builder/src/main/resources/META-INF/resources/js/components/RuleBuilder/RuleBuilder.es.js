@@ -29,6 +29,12 @@ class RuleBuilder extends Component {
 		this._fetchRoles();
 	}
 
+	isViewMode() {
+		const {mode} = this.state;
+
+		return mode === 'view';
+	}
+
 	render() {
 		const {
 			dataProviderInstanceParameterSettingsURL,

@@ -15,7 +15,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function SliderWithLabel({label, subTitle, value, onValueChange}) {
+function SliderWithLabel({
+	label,
+	subTitle,
+	value,
+	onValueChange,
+	max = 100,
+	min = 0
+}) {
 	return (
 		<label className="form-group-autofit">
 			<span className="form-group-item">
@@ -29,8 +36,8 @@ function SliderWithLabel({label, subTitle, value, onValueChange}) {
 			<div className="form-group-item flex-row">
 				<input
 					className="w-100"
-					max={100}
-					min={0}
+					max={max}
+					min={min}
 					onChange={_handleValueChange}
 					type="range"
 					value={value}
@@ -54,6 +61,8 @@ function SliderWithLabel({label, subTitle, value, onValueChange}) {
 
 SliderWithLabel.propTypes = {
 	label: PropTypes.string.isRequired,
+	max: PropTypes.number,
+	min: PropTypes.number,
 	onValueChange: PropTypes.func.isRequired,
 	subTitle: PropTypes.string,
 	value: PropTypes.number.isRequired

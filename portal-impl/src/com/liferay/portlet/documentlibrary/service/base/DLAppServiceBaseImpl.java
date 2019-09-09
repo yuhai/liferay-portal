@@ -46,7 +46,7 @@ import javax.sql.DataSource;
 public abstract class DLAppServiceBaseImpl
 	extends BaseServiceImpl implements DLAppService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLAppService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLAppServiceUtil</code>.

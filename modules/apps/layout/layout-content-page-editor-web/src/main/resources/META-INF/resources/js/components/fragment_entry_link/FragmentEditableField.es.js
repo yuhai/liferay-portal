@@ -25,7 +25,6 @@ import {
 	CLEAR_FRAGMENT_EDITOR,
 	DISABLE_FRAGMENT_EDITOR,
 	ENABLE_FRAGMENT_EDITOR,
-	OPEN_ASSET_TYPE_DIALOG,
 	UPDATE_CONFIG_ATTRIBUTES
 } from '../../actions/actions.es';
 import {
@@ -405,7 +404,8 @@ class FragmentEditableField extends PortletBase {
 				.dispatch(enableSavingChangesStatusAction())
 				.dispatch({
 					config: {
-						[EDITABLE_FIELD_CONFIG_KEYS.imageSource]: newValue
+						[EDITABLE_FIELD_CONFIG_KEYS.imageSource]: newValue.url,
+						[EDITABLE_FIELD_CONFIG_KEYS.imageTitle]: newValue.title
 					},
 					editableId: this.editableId,
 					fragmentEntryLinkId: this.fragmentEntryLinkId,
@@ -434,24 +434,12 @@ class FragmentEditableField extends PortletBase {
 	 * @private
 	 */
 	_handleFloatingToolbarButtonClicked(event, data) {
-		const {panelId, type} = data;
+		const {type} = data;
 
 		if (type === 'editor') {
 			this.store.dispatch({
 				type: ENABLE_FRAGMENT_EDITOR,
 				value: this._getItemId()
-			});
-		} else if (
-			type === 'panel' &&
-			panelId === FLOATING_TOOLBAR_BUTTONS.map.panelId &&
-			this.mappingFieldsURL &&
-			!this.selectedMappingTypes.type
-		) {
-			event.preventDefault();
-
-			this.store.dispatch({
-				type: OPEN_ASSET_TYPE_DIALOG,
-				value: true
 			});
 		}
 	}

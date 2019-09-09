@@ -45,7 +45,7 @@ public abstract class ScreensRatingsEntryServiceBaseImpl
 	extends BaseServiceImpl
 	implements ScreensRatingsEntryService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ScreensRatingsEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.screens.service.ScreensRatingsEntryServiceUtil</code>.

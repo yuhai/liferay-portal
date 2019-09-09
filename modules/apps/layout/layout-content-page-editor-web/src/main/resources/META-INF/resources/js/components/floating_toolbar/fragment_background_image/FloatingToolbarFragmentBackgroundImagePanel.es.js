@@ -38,7 +38,7 @@ class FloatingToolbarFragmentBackgroundImagePanel extends Component {
 	 */
 	_handleSelectButtonClick() {
 		openImageSelector({
-			callback: url => this._updateFragmentBackgroundImage(url),
+			callback: image => this._updateFragmentBackgroundImage(image),
 			imageSelectorURL: this.imageSelectorURL,
 			portletNamespace: this.portletNamespace
 		});
@@ -57,11 +57,11 @@ class FloatingToolbarFragmentBackgroundImagePanel extends Component {
 	 * Dispatches action to update editableValues with new background image url
 	 * @param {string} backgroundImageURL
 	 */
-	_updateFragmentBackgroundImage(backgroundImageURL) {
+	_updateFragmentBackgroundImage(image) {
 		this.store.dispatch(
 			updateEditableValueAction({
 				editableId: this.item.editableId,
-				editableValueContent: backgroundImageURL,
+				editableValueContent: image,
 				editableValueId: this.languageId || DEFAULT_LANGUAGE_ID_KEY,
 				fragmentEntryLinkId: this.item.fragmentEntryLinkId,
 				processor: BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,

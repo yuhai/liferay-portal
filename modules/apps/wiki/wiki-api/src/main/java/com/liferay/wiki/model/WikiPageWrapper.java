@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link WikiPage}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WikiPage
  * @generated
  */
-@ProviderType
 public class WikiPageWrapper
 	extends BaseModelWrapper<WikiPage>
 	implements WikiPage, ModelWrapper<WikiPage> {
@@ -836,6 +833,11 @@ public class WikiPageWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a wiki page model instance should use the <code>WikiPage</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

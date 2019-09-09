@@ -17,8 +17,6 @@ package com.liferay.calendar.model.impl;
 import com.liferay.calendar.model.CalendarNotificationTemplate;
 import com.liferay.calendar.service.CalendarNotificationTemplateLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the CalendarNotificationTemplate service. Represents a row in the &quot;CalendarNotificationTemplate&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,12 +29,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CalendarNotificationTemplate
  * @generated
  */
-@ProviderType
 public abstract class CalendarNotificationTemplateBaseImpl
 	extends CalendarNotificationTemplateModelImpl
 	implements CalendarNotificationTemplate {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a calendar notification template model instance should use the <code>CalendarNotificationTemplate</code> interface instead.

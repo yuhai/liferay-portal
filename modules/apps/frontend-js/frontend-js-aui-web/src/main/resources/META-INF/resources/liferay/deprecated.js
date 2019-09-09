@@ -144,7 +144,7 @@
 
 				var defaultType = 'text';
 
-				el.all('input').each(function(item, index) {
+				el.all('input').each(function(item) {
 					var type = item.get('type') || defaultType;
 
 					item.addClass(type);
@@ -502,7 +502,7 @@
 						if (!el || !A.DOM.inDoc(el)) {
 							A.on(
 								'available',
-								function(event) {
+								function() {
 									el = A.one(window[elString]);
 
 									if (el) {

@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PluginSettingPersistence
 	extends BasePersistence<PluginSetting> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PluginSettingUtil} to access the plugin setting persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

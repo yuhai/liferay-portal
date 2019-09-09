@@ -70,7 +70,7 @@ describe('Custom Asset Plugin', () => {
 	});
 
 	describe('assetViewed event', () => {
-		it('should be fired for every custom asset on the page', () => {
+		it('is fired for every custom asset on the page', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const domContentLoaded = new Event('DOMContentLoaded');
@@ -94,7 +94,7 @@ describe('Custom Asset Plugin', () => {
 			document.body.removeChild(customAssetElement);
 		});
 
-		it('should be fired with formEnabled if there is form element every custom asset on the page', () => {
+		it('is fired with formEnabled if there is form element every custom asset on the page', () => {
 			const customAssetElement = createCustomAssetElementWithForm();
 
 			const domContentLoaded = new Event('DOMContentLoaded');
@@ -122,7 +122,7 @@ describe('Custom Asset Plugin', () => {
 	});
 
 	describe('assetClicked event', () => {
-		it('should be fired when clicking an image inside a custom asset', () => {
+		it('is fired when clicking an image inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const imageInsideCustomAsset = document.createElement('img');
@@ -146,7 +146,7 @@ describe('Custom Asset Plugin', () => {
 			document.body.removeChild(customAssetElement);
 		});
 
-		it('should be fired when clicking a link inside a custom asset', () => {
+		it('is fired when clicking a link inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 			const text = 'Link inside a Custom Asset';
 
@@ -173,7 +173,7 @@ describe('Custom Asset Plugin', () => {
 			document.body.removeChild(customAssetElement);
 		});
 
-		it('should be fired when clicking any other element inside a custom asset', () => {
+		it('is fired when clicking any other element inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const paragraphInsideCustomAsset = document.createElement('p');
@@ -200,7 +200,7 @@ describe('Custom Asset Plugin', () => {
 	});
 
 	describe('assetDownloaded', () => {
-		it('should be fired when clicking a link inside a custom asset', () => {
+		it('is fired when clicking a link inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 			const text = 'Link inside a Custom Asset';
 

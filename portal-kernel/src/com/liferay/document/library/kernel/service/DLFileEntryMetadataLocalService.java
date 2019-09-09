@@ -59,7 +59,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileEntryMetadataLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileEntryMetadataLocalServiceUtil} to access the document library file entry metadata local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileEntryMetadataLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

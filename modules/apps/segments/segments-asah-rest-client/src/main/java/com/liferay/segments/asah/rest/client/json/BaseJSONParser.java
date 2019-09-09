@@ -20,10 +20,10 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -136,7 +136,7 @@ public abstract class BaseJSONParser<T> {
 
 		_assertStartsWithAndEndsWith("{", "}");
 
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new TreeMap<>();
 
 		_setCaptureStart();
 
@@ -373,7 +373,17 @@ public abstract class BaseJSONParser<T> {
 			return _readValueAsString();
 		}
 		else if (parseMaps && _lastChar == '{') {
-			return parseToMap(_readValueAsStringJSON());
+			try {
+				Class<? extends BaseJSONParser> clazz = getClass();
+
+				BaseJSONParser baseJSONParser = clazz.newInstance();
+
+				return baseJSONParser.parseToMap(_readValueAsStringJSON());
+			}
+			catch (Exception e) {
+				throw new IllegalArgumentException(
+					"Expected JSON object or map");
+			}
 		}
 		else if (_lastChar == '{') {
 			return _readValueAsStringJSON();

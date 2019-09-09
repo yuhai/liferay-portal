@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link LayoutPageTemplateStructure}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutPageTemplateStructure
  * @generated
  */
-@ProviderType
 public class LayoutPageTemplateStructureWrapper
 	extends BaseModelWrapper<LayoutPageTemplateStructure>
 	implements LayoutPageTemplateStructure,
@@ -271,6 +268,11 @@ public class LayoutPageTemplateStructureWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a layout page template structure model instance should use the <code>LayoutPageTemplateStructure</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

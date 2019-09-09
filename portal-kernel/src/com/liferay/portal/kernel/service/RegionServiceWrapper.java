@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link RegionService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see RegionService
  * @generated
  */
-@ProviderType
 public class RegionServiceWrapper
 	implements RegionService, ServiceWrapper<RegionService> {
 
@@ -31,9 +29,15 @@ public class RegionServiceWrapper
 		_regionService = regionService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link RegionServiceUtil} to access the region remote service. Add custom service methods to <code>com.liferay.portal.service.impl.RegionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.Region addRegion(
-			long countryId, String regionCode, String name, boolean active)
+			long countryId, java.lang.String regionCode, java.lang.String name,
+			boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _regionService.addRegion(countryId, regionCode, name, active);
@@ -46,7 +50,7 @@ public class RegionServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Region fetchRegion(
-		long countryId, String regionCode) {
+		long countryId, java.lang.String regionCode) {
 
 		return _regionService.fetchRegion(countryId, regionCode);
 	}
@@ -57,7 +61,7 @@ public class RegionServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _regionService.getOSGiServiceIdentifier();
 	}
 
@@ -70,7 +74,7 @@ public class RegionServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Region getRegion(
-			long countryId, String regionCode)
+			long countryId, java.lang.String regionCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _regionService.getRegion(countryId, regionCode);

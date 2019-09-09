@@ -47,8 +47,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the MBMailingList service. Represents a row in the &quot;MBMailingList&quot; database table, with each column mapped to a property of this class.
  *
@@ -60,11 +58,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBMailingListImpl
  * @generated
  */
-@ProviderType
 public class MBMailingListModelImpl
 	extends BaseModelImpl<MBMailingList> implements MBMailingListModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a message boards mailing list model instance should use the <code>MBMailingList</code> interface instead.

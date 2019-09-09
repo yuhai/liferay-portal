@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KBArticle}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KBArticle
  * @generated
  */
-@ProviderType
 public class KBArticleWrapper
 	extends BaseModelWrapper<KBArticle>
 	implements KBArticle, ModelWrapper<KBArticle> {
@@ -740,6 +737,11 @@ public class KBArticleWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kb article model instance should use the <code>KBArticle</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

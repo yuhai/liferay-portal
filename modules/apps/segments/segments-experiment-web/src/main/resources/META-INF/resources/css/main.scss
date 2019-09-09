@@ -1,5 +1,7 @@
 @import 'mixins';
 
+@import './click-goal';
+
 .lfr-segments-experiment-panel {
 	&.open-admin-panel.sidenav-menu-slider {
 		visibility: visible;

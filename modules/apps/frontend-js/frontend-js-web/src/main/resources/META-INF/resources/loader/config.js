@@ -19,7 +19,7 @@
 
 	window.__CONFIG__ = {
 		basePath: '',
-		combine: combine,
+		combine,
 		reportMismatchedAnonymousModules: 'warn',
 		url: combine
 			? LiferayAUI.getComboPath()

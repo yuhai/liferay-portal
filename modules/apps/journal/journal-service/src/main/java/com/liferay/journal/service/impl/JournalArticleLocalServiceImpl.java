@@ -136,7 +136,6 @@ import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupSubscriptionCheckSubscriptionSender;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -6932,10 +6931,9 @@ public class JournalArticleLocalServiceImpl
 
 			// Subscriptions
 
-			if ((article.getVersion() == 1.0) &&
-				isLatestVersion(
-					article.getGroupId(), article.getArticleId(),
-					article.getVersion())) {
+			if (article.equals(
+					getOldestArticle(
+						article.getGroupId(), article.getArticleId()))) {
 
 				action = "add";
 			}
@@ -8318,9 +8316,13 @@ public class JournalArticleLocalServiceImpl
 			article);
 
 		try {
-			PortletRequestModel portletRequestModel = new PortletRequestModel(
-				serviceContext.getLiferayPortletRequest(),
-				serviceContext.getLiferayPortletResponse());
+			PortletRequestModel portletRequestModel = null;
+
+			if (!ExportImportThreadLocal.isImportInProcess()) {
+				portletRequestModel = new PortletRequestModel(
+					serviceContext.getLiferayPortletRequest(),
+					serviceContext.getLiferayPortletResponse());
+			}
 
 			JournalArticleDisplay articleDisplay = getArticleDisplay(
 				article, article.getDDMTemplateKey(), Constants.VIEW,
@@ -9148,10 +9150,6 @@ public class JournalArticleLocalServiceImpl
 					continue;
 				}
 			}
-
-			friendlyURL =
-				FriendlyURLNormalizerUtil.normalizeWithPeriodsAndSlashes(
-					friendlyURL);
 
 			String urlTitle = friendlyURLEntryLocalService.getUniqueUrlTitle(
 				groupId,

@@ -25,20 +25,27 @@ import com.liferay.portal.kernel.util.GetterUtil;
 public class DDMFormFieldTypesThreadLocal {
 
 	public static boolean isFieldTypesRequested() {
+		ThreadLocalCache<Boolean> threadLocalCache = _getThreadLocalCache();
+
 		return GetterUtil.getBoolean(
-			_threadLocalCache.get("fieldTypesRequested"));
+			threadLocalCache.get("fieldTypesRequested"));
 	}
 
 	public static void removeAll() {
-		_threadLocalCache.removeAll();
+		ThreadLocalCache<Boolean> threadLocalCache = _getThreadLocalCache();
+
+		threadLocalCache.removeAll();
 	}
 
 	public static void setFieldTypesRequested(boolean fieldTypesRequested) {
-		_threadLocalCache.put("fieldTypesRequested", fieldTypesRequested);
+		ThreadLocalCache<Boolean> threadLocalCache = _getThreadLocalCache();
+
+		threadLocalCache.put("fieldTypesRequested", fieldTypesRequested);
 	}
 
-	private static final ThreadLocalCache<Boolean> _threadLocalCache =
-		ThreadLocalCacheManager.getThreadLocalCache(
+	private static ThreadLocalCache<Boolean> _getThreadLocalCache() {
+		return ThreadLocalCacheManager.getThreadLocalCache(
 			Lifecycle.REQUEST, DDMFormFieldTypesThreadLocal.class.getName());
+	}
 
 }

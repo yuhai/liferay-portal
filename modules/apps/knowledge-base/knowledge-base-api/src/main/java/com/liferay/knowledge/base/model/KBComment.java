@@ -31,7 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface KBComment extends KBCommentModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.knowledge.base.model.impl.KBCommentImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

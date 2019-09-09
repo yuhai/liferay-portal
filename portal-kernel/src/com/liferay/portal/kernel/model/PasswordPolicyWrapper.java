@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link PasswordPolicy}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PasswordPolicy
  * @generated
  */
-@ProviderType
 public class PasswordPolicyWrapper
 	extends BaseModelWrapper<PasswordPolicy>
 	implements PasswordPolicy, ModelWrapper<PasswordPolicy> {
@@ -758,6 +755,11 @@ public class PasswordPolicyWrapper
 		return model.isRequireUnlock();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a password policy model instance should use the <code>PasswordPolicy</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -35,44 +35,6 @@ AUI.add(
 			NAME: 'date-picker-sanitizer',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance.eventHandlers = [];
-
-					instance.bindUI();
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					var datePickers = instance.get('datePickers');
-
-					instance.eventHandlers = A.map(datePickers, function(item) {
-						return item.on(
-							'selectionChange',
-							A.bind(
-								instance._onDatePickerSelectionChange,
-								instance
-							)
-						);
-					});
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					instance.unlink();
-
-					instance.eventHandlers = null;
-				},
-
-				unlink: function() {
-					var instance = this;
-
-					AArray.invoke(instance.eventHandlers, 'detach');
-				},
-
 				_onDatePickerSelectionChange: function _onDatePickerSelectionChange(
 					event
 				) {
@@ -98,6 +60,44 @@ AUI.add(
 						datePicker.deselectDates();
 						datePicker.selectDates([defaultDate]);
 					}
+				},
+
+				bindUI() {
+					var instance = this;
+
+					var datePickers = instance.get('datePickers');
+
+					instance.eventHandlers = A.map(datePickers, function(item) {
+						return item.on(
+							'selectionChange',
+							A.bind(
+								instance._onDatePickerSelectionChange,
+								instance
+							)
+						);
+					});
+				},
+
+				destructor() {
+					var instance = this;
+
+					instance.unlink();
+
+					instance.eventHandlers = null;
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance.eventHandlers = [];
+
+					instance.bindUI();
+				},
+
+				unlink() {
+					var instance = this;
+
+					AArray.invoke(instance.eventHandlers, 'detach');
 				}
 			}
 		});

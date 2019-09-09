@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PowwowParticipant
 	extends PersistedModel, PowwowParticipantModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.powwow.model.impl.PowwowParticipantImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -16,8 +16,6 @@ package com.liferay.mobile.device.rules.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link MDRRuleService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MDRRuleService
  * @generated
  */
-@ProviderType
 public class MDRRuleServiceWrapper
 	implements MDRRuleService, ServiceWrapper<MDRRuleService> {
 
@@ -33,6 +30,11 @@ public class MDRRuleServiceWrapper
 		_mdrRuleService = mdrRuleService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MDRRuleServiceUtil} to access the mdr rule remote service. Add custom service methods to <code>com.liferay.mobile.device.rules.service.impl.MDRRuleServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRRule addRule(
 			long ruleGroupId, java.util.Map<java.util.Locale, String> nameMap,

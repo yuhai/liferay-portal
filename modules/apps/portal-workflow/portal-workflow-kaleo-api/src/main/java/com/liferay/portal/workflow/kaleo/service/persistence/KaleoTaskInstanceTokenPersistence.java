@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTaskInstanceTokenPersistence
 	extends BasePersistence<KaleoTaskInstanceToken> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoTaskInstanceTokenUtil} to access the kaleo task instance token persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

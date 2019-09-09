@@ -139,7 +139,9 @@ public class RESTBuilder {
 		context.put("stringUtil", StringUtil_IW.getInstance());
 		context.put("validator", Validator_IW.getInstance());
 
-		_createApplicationFile(context);
+		if (_configYAML.isGenerateREST()) {
+			_createApplicationFile(context);
+		}
 
 		if (Validator.isNotNull(_configYAML.getClientDir())) {
 			_createClientBaseJSONParserFile(context);
@@ -182,9 +184,12 @@ public class RESTBuilder {
 
 			context.put("openAPIYAML", openAPIYAML);
 
-			_createGraphQLMutationFile(context, escapedVersion);
-			_createGraphQLQueryFile(context, escapedVersion);
-			_createGraphQLServletDataFile(context, escapedVersion);
+			if (_configYAML.isGenerateGraphQL()) {
+				_createGraphQLMutationFile(context, escapedVersion);
+				_createGraphQLQueryFile(context, escapedVersion);
+				_createGraphQLServletDataFile(context, escapedVersion);
+			}
+
 			_createOpenAPIResourceFile(context, escapedVersion);
 			_createPropertiesFile(context, escapedVersion, "openapi");
 
@@ -987,6 +992,10 @@ public class RESTBuilder {
 
 		Map<String, PathItem> pathItems = openAPIYAML.getPathItems();
 
+		if (pathItems == null) {
+			return s;
+		}
+
 		for (Map.Entry<String, PathItem> entry1 : pathItems.entrySet()) {
 			String path = entry1.getKey();
 
@@ -1096,7 +1105,13 @@ public class RESTBuilder {
 				fieldValue = fieldValue + '\n' + line;
 			}
 
-			line = s.substring(y + 1, s.indexOf("\n", y + 1));
+			if (s.indexOf('\n', y + 1) == -1) {
+				y = s.length();
+
+				break;
+			}
+
+			line = s.substring(y + 1, s.indexOf('\n', y + 1));
 
 			y = s.indexOf('\n', y + 1);
 		}
@@ -1214,6 +1229,10 @@ public class RESTBuilder {
 		OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(s);
 
 		Map<String, PathItem> pathItems = openAPIYAML.getPathItems();
+
+		if (pathItems == null) {
+			return s;
+		}
 
 		for (Map.Entry<String, PathItem> entry : pathItems.entrySet()) {
 			String path = entry.getKey();

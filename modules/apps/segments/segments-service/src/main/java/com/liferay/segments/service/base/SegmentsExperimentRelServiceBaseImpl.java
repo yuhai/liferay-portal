@@ -52,7 +52,7 @@ public abstract class SegmentsExperimentRelServiceBaseImpl
 	implements SegmentsExperimentRelService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>SegmentsExperimentRelService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.segments.service.SegmentsExperimentRelServiceUtil</code>.

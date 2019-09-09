@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Company}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Company
  * @generated
  */
-@ProviderType
 public class CompanyWrapper
 	extends BaseModelWrapper<Company>
 	implements Company, ModelWrapper<Company> {
@@ -409,6 +406,11 @@ public class CompanyWrapper
 		return model.isSystem();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a company model instance should use the <code>Company</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

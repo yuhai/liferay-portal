@@ -63,11 +63,13 @@ function init(callback, imageSelectorURL, portletNamespace) {
 
 /**
  * @param {HTMLElement} element
- * @param {string} [backgroundImageURL='']
+ * @param {object} [backgroundImage={}]
  */
-function render(element, backgroundImageURL = '') {
-	element.style.backgroundImage = backgroundImageURL
-		? `url("${backgroundImageURL}")`
+function render(element, backgroundImage = '') {
+	element.style.backgroundImage = backgroundImage
+		? `url("${
+				backgroundImage.url ? backgroundImage.url : backgroundImage
+		  }")`
 		: '';
 	element.style.backgroundSize = 'cover';
 }

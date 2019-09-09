@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SyncDLObjectModel
 	extends BaseModel<SyncDLObject>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a sync dl object model instance should use the {@link SyncDLObject} interface instead.

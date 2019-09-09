@@ -61,7 +61,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -78,12 +77,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = SegmentsExperiencePersistence.class)
-@ProviderType
 public class SegmentsExperiencePersistenceImpl
 	extends BasePersistenceImpl<SegmentsExperience>
 	implements SegmentsExperiencePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>SegmentsExperienceUtil</code> to access the segments experience persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

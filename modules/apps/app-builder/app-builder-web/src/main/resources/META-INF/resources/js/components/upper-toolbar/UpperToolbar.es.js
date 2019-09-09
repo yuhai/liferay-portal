@@ -17,7 +17,7 @@ import Button from '../button/Button.es';
 
 const UpperToolbar = ({children}) => {
 	return (
-		<nav className="component-tbar subnav-tbar-light tbar tbar-article">
+		<nav className="component-tbar subnav-tbar-light tbar">
 			<div className="container-fluid container-fluid-max-xl">
 				<ul className="tbar-nav">{children}</ul>
 			</div>
@@ -35,16 +35,22 @@ const UpperToolbarButton = ({children, ...otherProps}) => {
 	);
 };
 
-const UpperToolbarInput = props => {
+const UpperToolbarInput = ({
+	onChange = () => {},
+	placeholder,
+	...otherProps
+}) => {
 	return (
 		<UpperToolbarItem expand={true}>
 			<div className="input-group">
 				<div className="input-group-item">
 					<input
-						aria-label={props.placeholder}
+						aria-label={placeholder}
 						className="form-control form-control-inline"
-						{...props}
+						onChange={onChange}
+						placeholder={placeholder}
 						type="text"
+						{...otherProps}
 					/>
 				</div>
 			</div>

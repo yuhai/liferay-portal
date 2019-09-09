@@ -17,8 +17,6 @@ package com.liferay.asset.entry.rel.model.impl;
 import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel;
 import com.liferay.asset.entry.rel.service.AssetEntryAssetCategoryRelLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the AssetEntryAssetCategoryRel service. Represents a row in the &quot;AssetEntryAssetCategoryRel&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,12 +29,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetEntryAssetCategoryRel
  * @generated
  */
-@ProviderType
 public abstract class AssetEntryAssetCategoryRelBaseImpl
 	extends AssetEntryAssetCategoryRelModelImpl
 	implements AssetEntryAssetCategoryRel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset entry asset category rel model instance should use the <code>AssetEntryAssetCategoryRel</code> interface instead.

@@ -16,8 +16,6 @@ package com.liferay.site.navigation.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SiteNavigationMenuItemLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SiteNavigationMenuItemLocalService
  * @generated
  */
-@ProviderType
 public class SiteNavigationMenuItemLocalServiceWrapper
 	implements SiteNavigationMenuItemLocalService,
 			   ServiceWrapper<SiteNavigationMenuItemLocalService> {
@@ -37,6 +34,11 @@ public class SiteNavigationMenuItemLocalServiceWrapper
 			siteNavigationMenuItemLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SiteNavigationMenuItemLocalServiceUtil} to access the site navigation menu item local service. Add custom service methods to <code>com.liferay.site.navigation.service.impl.SiteNavigationMenuItemLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.site.navigation.model.SiteNavigationMenuItem
 			addSiteNavigationMenuItem(

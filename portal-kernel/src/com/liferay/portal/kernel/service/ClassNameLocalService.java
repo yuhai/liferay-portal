@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ClassNameLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link ClassNameLocalServiceUtil} to access the class name local service. Add custom service methods to <code>com.liferay.portal.service.impl.ClassNameLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

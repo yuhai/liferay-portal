@@ -14,4 +14,10 @@
 		<field name="logoId" type="long" />
 		<field name="status" type="int" />
 	</model>
+	<model name="com.liferay.account.model.AccountEntryUserRel">
+		<field name="accountEntryUserRelId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="accountEntryId" type="long" />
+	</model>
 </model-hints>

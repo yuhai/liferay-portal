@@ -43,12 +43,116 @@ AUI.add(
 
 			EXTENDS: A.Base,
 
-			NAME: NAME,
+			NAME,
 
 			NS: NAME,
 
 			prototype: {
-				initializer: function() {
+				_createProgressBar() {
+					var instance = this;
+
+					var rootNode = instance.rootNode;
+
+					var progressbarNode = A.Node.create(
+						A.Lang.sub(TPL_PROGRESS_BAR, [instance.NS])
+					);
+
+					rootNode.append(progressbarNode);
+
+					instance._progressBarNode = progressbarNode;
+
+					var progressbar = new A.ProgressBar({
+						boundingBox: progressbarNode.one('.' + CSS_PROGRESS),
+						height: PROGRESS_HEIGHT
+					}).render();
+
+					instance._progressBar = progressbar;
+				},
+
+				_getUploader() {
+					var instance = this;
+
+					var uploader = instance._uploader;
+
+					if (!uploader) {
+						uploader = new A.Uploader({
+							fileFieldName: 'imageSelectorFileName'
+						});
+
+						instance._uploader = uploader;
+					}
+
+					return uploader;
+				},
+
+				_onCancel() {
+					var instance = this;
+
+					instance._currentFile.cancelUpload();
+
+					instance._stopProgress();
+
+					instance.fire('itemUploadCancel');
+				},
+
+				_onUploadComplete(event) {
+					var instance = this;
+
+					instance._stopProgress();
+
+					var data = JSON.parse(event.data);
+
+					var eventName = data.success
+						? 'itemUploadComplete'
+						: 'itemUploadError';
+
+					instance.fire(eventName, data);
+				},
+
+				_onUploadError(event) {
+					var instance = this;
+
+					event.target.cancelUpload();
+
+					instance._stopProgress();
+
+					instance.fire('itemUploadError', event.details[0]);
+				},
+
+				_onUploadProgress(event) {
+					var instance = this;
+
+					var percentLoaded = Math.round(event.percentLoaded);
+
+					instance._progressBar.set(
+						STR_VALUE,
+						Math.ceil(percentLoaded)
+					);
+				},
+
+				_stopProgress() {
+					var instance = this;
+
+					instance._progressBar.set(STR_VALUE, 0);
+
+					instance.rootNode.removeClass(CSS_UPLOADING);
+				},
+
+				destructor() {
+					var instance = this;
+
+					if (instance._uploader) {
+						instance._uploader.destroy();
+					}
+
+					if (instance._progressBar) {
+						instance._progressBar.destroy();
+					}
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
 					var instance = this;
 
 					var uploader = instance._getUploader();
@@ -79,21 +183,7 @@ AUI.add(
 					];
 				},
 
-				destructor: function() {
-					var instance = this;
-
-					if (instance._uploader) {
-						instance._uploader.destroy();
-					}
-
-					if (instance._progressBar) {
-						instance._progressBar.destroy();
-					}
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				startUpload: function(file, url) {
+				startUpload(file, url) {
 					var instance = this;
 
 					file = new A.FileHTML5(file);
@@ -109,96 +199,6 @@ AUI.add(
 						.html(file.get('name'));
 
 					instance.rootNode.addClass(CSS_UPLOADING);
-				},
-
-				_createProgressBar: function() {
-					var instance = this;
-
-					var rootNode = instance.rootNode;
-
-					var progressbarNode = A.Node.create(
-						A.Lang.sub(TPL_PROGRESS_BAR, [instance.NS])
-					);
-
-					rootNode.append(progressbarNode);
-
-					instance._progressBarNode = progressbarNode;
-
-					var progressbar = new A.ProgressBar({
-						boundingBox: progressbarNode.one('.' + CSS_PROGRESS),
-						height: PROGRESS_HEIGHT
-					}).render();
-
-					instance._progressBar = progressbar;
-				},
-
-				_getUploader: function() {
-					var instance = this;
-
-					var uploader = instance._uploader;
-
-					if (!uploader) {
-						uploader = new A.Uploader({
-							fileFieldName: 'imageSelectorFileName'
-						});
-
-						instance._uploader = uploader;
-					}
-
-					return uploader;
-				},
-
-				_onCancel: function() {
-					var instance = this;
-
-					instance._currentFile.cancelUpload();
-
-					instance._stopProgress();
-
-					instance.fire('itemUploadCancel');
-				},
-
-				_onUploadComplete: function(event) {
-					var instance = this;
-
-					instance._stopProgress();
-
-					var data = JSON.parse(event.data);
-
-					var eventName = data.success
-						? 'itemUploadComplete'
-						: 'itemUploadError';
-
-					instance.fire(eventName, data);
-				},
-
-				_onUploadError: function(event) {
-					var instance = this;
-
-					event.target.cancelUpload();
-
-					instance._stopProgress();
-
-					instance.fire('itemUploadError', event.details[0]);
-				},
-
-				_onUploadProgress: function(event) {
-					var instance = this;
-
-					var percentLoaded = Math.round(event.percentLoaded);
-
-					instance._progressBar.set(
-						STR_VALUE,
-						Math.ceil(percentLoaded)
-					);
-				},
-
-				_stopProgress: function() {
-					var instance = this;
-
-					instance._progressBar.set(STR_VALUE, 0);
-
-					instance.rootNode.removeClass(CSS_UPLOADING);
 				}
 			}
 		});

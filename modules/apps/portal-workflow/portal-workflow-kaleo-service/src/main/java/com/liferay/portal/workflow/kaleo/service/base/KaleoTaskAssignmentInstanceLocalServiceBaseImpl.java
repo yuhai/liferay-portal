@@ -65,7 +65,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -79,13 +78,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.portal.workflow.kaleo.service.impl.KaleoTaskAssignmentInstanceLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class KaleoTaskAssignmentInstanceLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements KaleoTaskAssignmentInstanceLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoTaskAssignmentInstanceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalServiceUtil</code>.

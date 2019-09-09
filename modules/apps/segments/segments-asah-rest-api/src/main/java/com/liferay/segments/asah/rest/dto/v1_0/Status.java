@@ -32,6 +32,8 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.constraints.NotEmpty;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -41,6 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("Status")
 @JsonFilter("Liferay.Vulcan")
+@Schema(requiredProperties = {"status"})
 @XmlRootElement(name = "Status")
 public class Status {
 
@@ -70,7 +73,36 @@ public class Status {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotEmpty
 	protected String status;
+
+	@Schema
+	public Long getWinnerVariantId() {
+		return winnerVariantId;
+	}
+
+	public void setWinnerVariantId(Long winnerVariantId) {
+		this.winnerVariantId = winnerVariantId;
+	}
+
+	@JsonIgnore
+	public void setWinnerVariantId(
+		UnsafeSupplier<Long, Exception> winnerVariantIdUnsafeSupplier) {
+
+		try {
+			winnerVariantId = winnerVariantIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long winnerVariantId;
 
 	@Override
 	public boolean equals(Object object) {
@@ -111,6 +143,16 @@ public class Status {
 			sb.append(_escape(status));
 
 			sb.append("\"");
+		}
+
+		if (winnerVariantId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"winnerVariantId\": ");
+
+			sb.append(winnerVariantId);
 		}
 
 		sb.append("}");

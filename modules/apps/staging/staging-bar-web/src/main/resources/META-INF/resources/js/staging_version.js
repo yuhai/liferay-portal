@@ -32,13 +32,7 @@ AUI.add(
 		};
 
 		A.mix(StagingBar, {
-			destructor: function() {
-				var instance = this;
-
-				instance._cleanup();
-			},
-
-			_cleanup: function() {
+			_cleanup() {
 				var instance = this;
 
 				if (instance._eventHandles) {
@@ -46,7 +40,7 @@ AUI.add(
 				}
 			},
 
-			_getNotification: function() {
+			_getNotification() {
 				var instance = this;
 
 				var notification = instance._notification;
@@ -70,7 +64,7 @@ AUI.add(
 				return notification;
 			},
 
-			_onInit: function(event) {
+			_onInit() {
 				var instance = this;
 
 				instance._cleanup();
@@ -111,7 +105,7 @@ AUI.add(
 
 				if (layoutRevisionDetails) {
 					eventHandles.push(
-						Liferay.after('updatedLayout', function(event) {
+						Liferay.after('updatedLayout', function() {
 							Liferay.Util.fetch(
 								instance.markAsReadyForPublicationURL
 							)
@@ -137,7 +131,7 @@ AUI.add(
 				}
 
 				if (layoutRevisionStatus) {
-					Liferay.after('updatedStatus', function(event) {
+					Liferay.after('updatedStatus', function() {
 						Liferay.Util.fetch(instance.layoutRevisionStatusURL)
 							.then(response => {
 								return response.text();
@@ -162,7 +156,7 @@ AUI.add(
 				instance._eventHandles = eventHandles;
 			},
 
-			_onRevisionChange: function(event, type) {
+			_onRevisionChange(event, type) {
 				var instance = this;
 
 				var cmd = MAP_CMD_REVISION[type];
@@ -177,7 +171,7 @@ AUI.add(
 				}
 			},
 
-			_onSubmit: function(event) {
+			_onSubmit(event) {
 				var instance = this;
 
 				var namespace = instance._namespace;
@@ -218,11 +212,11 @@ AUI.add(
 					});
 			},
 
-			_onViewHistory: function(event) {
+			_onViewHistory() {
 				Liferay.Util.openWindow({
 					dialog: {
 						after: {
-							destroy: function(event) {
+							destroy() {
 								window.location.reload();
 							}
 						},
@@ -233,18 +227,14 @@ AUI.add(
 				});
 			},
 
-			_updateRevision: function(
-				cmd,
-				layoutRevisionId,
-				layoutSetBranchId
-			) {
+			_updateRevision(cmd, layoutRevisionId, layoutSetBranchId) {
 				var instance = this;
 
 				var updateLayoutData = {
-					cmd: cmd,
+					cmd,
 					doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
-					layoutRevisionId: layoutRevisionId,
-					layoutSetBranchId: layoutSetBranchId,
+					layoutRevisionId,
+					layoutSetBranchId,
 					p_auth: Liferay.authToken,
 					p_l_id: themeDisplay.getPlid(),
 					p_v_l_s_g_id: themeDisplay.getSiteGroupId()
@@ -263,6 +253,12 @@ AUI.add(
 					.catch(() => {
 						instance._getNotification().show();
 					});
+			},
+
+			destructor() {
+				var instance = this;
+
+				instance._cleanup();
 			}
 		});
 

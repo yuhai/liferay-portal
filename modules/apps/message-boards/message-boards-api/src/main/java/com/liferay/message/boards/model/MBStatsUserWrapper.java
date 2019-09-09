@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MBStatsUser}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBStatsUser
  * @generated
  */
-@ProviderType
 public class MBStatsUserWrapper
 	extends BaseModelWrapper<MBStatsUser>
 	implements MBStatsUser, ModelWrapper<MBStatsUser> {
@@ -184,6 +181,11 @@ public class MBStatsUserWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a message boards stats user model instance should use the <code>MBStatsUser</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

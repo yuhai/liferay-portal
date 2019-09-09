@@ -24,11 +24,14 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.users.admin.kernel.file.uploads.UserFileUploadsSettings;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -62,7 +65,7 @@ public class AccountEntryLocalServiceImpl
 	@Override
 	public AccountEntry addAccountEntry(
 			long userId, long parentAccountEntryId, String name,
-			String description, long logoId, int status)
+			String description, byte[] logoBytes, int status)
 		throws PortalException {
 
 		// Account entry
@@ -81,7 +84,13 @@ public class AccountEntryLocalServiceImpl
 		accountEntry.setParentAccountEntryId(parentAccountEntryId);
 		accountEntry.setName(name);
 		accountEntry.setDescription(description);
-		accountEntry.setLogoId(logoId);
+
+		_portal.updateImageId(
+			accountEntry, true, logoBytes, "logoId",
+			_userFileUploadsSettings.getImageMaxSize(),
+			_userFileUploadsSettings.getImageMaxHeight(),
+			_userFileUploadsSettings.getImageMaxWidth());
+
 		accountEntry.setStatus(status);
 
 		accountEntry = accountEntryPersistence.update(accountEntry);
@@ -156,6 +165,33 @@ public class AccountEntryLocalServiceImpl
 	}
 
 	@Override
+	public AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, byte[] logoBytes,
+			int status)
+		throws PortalException {
+
+		AccountEntry accountEntry = accountEntryPersistence.fetchByPrimaryKey(
+			accountEntryId);
+
+		accountEntry.setParentAccountEntryId(parentAccountEntryId);
+		accountEntry.setName(name);
+		accountEntry.setDescription(description);
+
+		_portal.updateImageId(
+			accountEntry, !deleteLogo, logoBytes, "logoId",
+			_userFileUploadsSettings.getImageMaxSize(),
+			_userFileUploadsSettings.getImageMaxHeight(),
+			_userFileUploadsSettings.getImageMaxWidth());
+
+		accountEntry.setStatus(status);
+
+		accountEntryPersistence.update(accountEntry);
+
+		return accountEntry;
+	}
+
+	@Override
 	public AccountEntry updateStatus(AccountEntry accountEntry, int status) {
 		accountEntry.setStatus(status);
 
@@ -179,5 +215,11 @@ public class AccountEntryLocalServiceImpl
 
 		actionableDynamicQuery.performActions();
 	}
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private UserFileUploadsSettings _userFileUploadsSettings;
 
 }

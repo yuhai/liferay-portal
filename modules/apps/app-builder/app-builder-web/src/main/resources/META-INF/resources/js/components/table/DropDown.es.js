@@ -23,17 +23,23 @@ const {ItemList} = ClayDropDown;
 export default ({actions, item}) => {
 	const [active, setActive] = useState(false);
 
+	const DropdownButton = (
+		<Button className="page-link" displayType="unstyled">
+			<ClayIcon symbol="ellipsis-v" />
+		</Button>
+	);
+
+	if (actions.length === 0) {
+		return DropdownButton;
+	}
+
 	return (
 		<ClayDropDown
 			active={active}
 			alignmentPosition={Align.RightCenter}
 			className="dropdown-action"
 			onActiveChange={newVal => setActive(newVal)}
-			trigger={
-				<Button className="page-link" displayType="unstyled">
-					<ClayIcon symbol="ellipsis-v" />
-				</Button>
-			}
+			trigger={DropdownButton}
 		>
 			<ItemList>
 				{actions.map((action, index) => (

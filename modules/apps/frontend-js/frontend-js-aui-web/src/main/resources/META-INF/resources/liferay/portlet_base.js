@@ -42,7 +42,7 @@ AUI.add(
 			rootNode: {
 				getter: '_getRootNode',
 				setter: '_setRootNode',
-				valueFn: function() {
+				valueFn() {
 					var instance = this;
 
 					return A.one('#p_p_id' + instance.NS);
@@ -51,7 +51,36 @@ AUI.add(
 		};
 
 		PortletBase.prototype = {
-			all: function(selector, root) {
+			_formatSelectorNS(ns, selector) {
+				return selector.replace(
+					A.DOM._getRegExp('(#|\\[id=(\\"|\\\'))(?!' + ns + ')', 'g'),
+					'$1' + ns
+				);
+			},
+
+			_getNS() {
+				var instance = this;
+
+				return instance.NS;
+			},
+
+			_getRootNode() {
+				var instance = this;
+
+				return instance.rootNode;
+			},
+
+			_setRootNode(value) {
+				var instance = this;
+
+				var rootNode = A.one(value);
+
+				instance.rootNode = rootNode;
+
+				return rootNode;
+			},
+
+			all(selector, root) {
 				var instance = this;
 
 				root = A.one(root) || instance.rootNode || A;
@@ -61,19 +90,19 @@ AUI.add(
 				);
 			},
 
-			byId: function(id) {
+			byId(id) {
 				var instance = this;
 
 				return A.one('#' + A.Lang.String.prefix(instance.NS, id));
 			},
 
-			ns: function(str) {
+			ns(str) {
 				var instance = this;
 
 				return Liferay.Util.ns(instance.NS, str);
 			},
 
-			one: function(selector, root) {
+			one(selector, root) {
 				var instance = this;
 
 				root = A.one(root) || instance.rootNode || A;
@@ -81,35 +110,6 @@ AUI.add(
 				return root.one(
 					instance._formatSelectorNS(instance.NS, selector)
 				);
-			},
-
-			_formatSelectorNS: function(ns, selector) {
-				return selector.replace(
-					A.DOM._getRegExp('(#|\\[id=(\\"|\\\'))(?!' + ns + ')', 'g'),
-					'$1' + ns
-				);
-			},
-
-			_getNS: function(value) {
-				var instance = this;
-
-				return instance.NS;
-			},
-
-			_getRootNode: function(value) {
-				var instance = this;
-
-				return instance.rootNode;
-			},
-
-			_setRootNode: function(value) {
-				var instance = this;
-
-				var rootNode = A.one(value);
-
-				instance.rootNode = rootNode;
-
-				return rootNode;
 			}
 		};
 

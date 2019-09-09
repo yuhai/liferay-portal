@@ -16,8 +16,6 @@ package com.liferay.screens.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ScreensJournalArticleService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ScreensJournalArticleService
  * @generated
  */
-@ProviderType
 public class ScreensJournalArticleServiceWrapper
 	implements ScreensJournalArticleService,
 			   ServiceWrapper<ScreensJournalArticleService> {
@@ -36,6 +33,11 @@ public class ScreensJournalArticleServiceWrapper
 		_screensJournalArticleService = screensJournalArticleService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ScreensJournalArticleServiceUtil} to access the screens journal article remote service. Add custom service methods to <code>com.liferay.screens.service.impl.ScreensJournalArticleServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public String getJournalArticleContent(
 			long classPK, java.util.Locale locale)

@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ResourcePermission}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ResourcePermission
  * @generated
  */
-@ProviderType
 public class ResourcePermissionWrapper
 	extends BaseModelWrapper<ResourcePermission>
 	implements ResourcePermission, ModelWrapper<ResourcePermission> {
@@ -275,6 +272,11 @@ public class ResourcePermissionWrapper
 		return model.isViewActionId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a resource permission model instance should use the <code>ResourcePermission</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

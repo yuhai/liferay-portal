@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Attachment}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Attachment
  * @generated
  */
-@ProviderType
 public class AttachmentWrapper
 	extends BaseModelWrapper<Attachment>
 	implements Attachment, ModelWrapper<Attachment> {
@@ -224,6 +221,11 @@ public class AttachmentWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a attachment model instance should use the <code>Attachment</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

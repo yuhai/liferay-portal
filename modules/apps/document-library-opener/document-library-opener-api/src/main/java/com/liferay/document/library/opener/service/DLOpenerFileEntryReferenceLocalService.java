@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLOpenerFileEntryReferenceLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLOpenerFileEntryReferenceLocalServiceUtil} to access the dl opener file entry reference local service. Add custom service methods to <code>com.liferay.document.library.opener.service.impl.DLOpenerFileEntryReferenceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

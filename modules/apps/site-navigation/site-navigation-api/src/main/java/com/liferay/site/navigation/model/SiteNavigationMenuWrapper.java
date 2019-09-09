@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SiteNavigationMenu}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SiteNavigationMenu
  * @generated
  */
-@ProviderType
 public class SiteNavigationMenuWrapper
 	extends BaseModelWrapper<SiteNavigationMenu>
 	implements SiteNavigationMenu, ModelWrapper<SiteNavigationMenu> {
@@ -298,6 +295,11 @@ public class SiteNavigationMenuWrapper
 		return model.isPrimary();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a site navigation menu model instance should use the <code>SiteNavigationMenu</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -24,6 +24,7 @@ import com.liferay.dynamic.data.mapping.form.renderer.internal.util.DDMFormTempl
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
@@ -572,7 +573,17 @@ public class DDMFormFieldTemplateContextFactory {
 				errorMessageLocalizedValue.getString(_locale));
 		}
 
-		Map<String, String> validation = new HashMap<>();
+		LocalizedValue parameterLocalizedValue =
+			ddmFormFieldValidation.getParameterLocalizedValue();
+
+		String parameter = StringPool.BLANK;
+
+		if (parameterLocalizedValue != null) {
+			parameter = GetterUtil.getString(
+				parameterLocalizedValue.getString(_locale));
+		}
+
+		Map<String, Object> validation = new HashMap<>();
 
 		validation.put(
 			"dataType",
@@ -580,12 +591,29 @@ public class DDMFormFieldTemplateContextFactory {
 				changedProperties.get("validationDataType"),
 				MapUtil.getString(changedProperties, "dataType")));
 		validation.put("errorMessage", errorMessage);
+
+		DDMFormFieldValidationExpression ddmFormFieldValidationExpression =
+			ddmFormFieldValidation.getDDMFormFieldValidationExpression();
+
 		validation.put(
 			"expression",
-			GetterUtil.getString(ddmFormFieldValidation.getExpression()));
+			new HashMap() {
+				{
+					put(
+						"name",
+						GetterUtil.getString(
+							ddmFormFieldValidationExpression.getName()));
+					put(
+						"value",
+						GetterUtil.getString(
+							ddmFormFieldValidationExpression.getValue()));
+				}
+			});
+
 		validation.put(
 			"fieldName",
 			GetterUtil.getString(changedProperties.get("validationFieldName")));
+		validation.put("parameter", parameter);
 
 		ddmFormFieldTemplateContext.put("validation", validation);
 	}

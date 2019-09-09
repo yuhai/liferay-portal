@@ -40,7 +40,7 @@ import java.util.Set;
 public interface NestedSetsTreeEntryPersistence
 	extends BasePersistence<NestedSetsTreeEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link NestedSetsTreeEntryUtil} to access the nested sets tree entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

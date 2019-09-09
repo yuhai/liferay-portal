@@ -55,8 +55,6 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the DEDataListView service. Represents a row in the &quot;DEDataListView&quot; database table, with each column mapped to a property of this class.
  *
@@ -68,11 +66,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DEDataListViewImpl
  * @generated
  */
-@ProviderType
 public class DEDataListViewModelImpl
 	extends BaseModelImpl<DEDataListView> implements DEDataListViewModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a de data list view model instance should use the <code>DEDataListView</code> interface instead.
@@ -85,7 +82,7 @@ public class DEDataListViewModelImpl
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
 		{"appliedFilters", Types.VARCHAR}, {"ddmStructureId", Types.BIGINT},
-		{"fieldNames", Types.VARCHAR}, {"name", Types.VARCHAR},
+		{"fieldNames", Types.CLOB}, {"name", Types.VARCHAR},
 		{"sortField", Types.VARCHAR}
 	};
 
@@ -103,13 +100,13 @@ public class DEDataListViewModelImpl
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("appliedFilters", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("ddmStructureId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("fieldNames", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("fieldNames", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("sortField", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table DEDataListView (uuid_ VARCHAR(75) null,deDataListViewId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,appliedFilters VARCHAR(75) null,ddmStructureId LONG,fieldNames VARCHAR(75) null,name STRING null,sortField VARCHAR(75) null)";
+		"create table DEDataListView (uuid_ VARCHAR(75) null,deDataListViewId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,appliedFilters VARCHAR(75) null,ddmStructureId LONG,fieldNames TEXT null,name STRING null,sortField VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP = "drop table DEDataListView";
 

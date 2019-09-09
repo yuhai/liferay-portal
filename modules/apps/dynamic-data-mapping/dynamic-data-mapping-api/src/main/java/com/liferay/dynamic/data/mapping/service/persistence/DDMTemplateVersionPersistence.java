@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMTemplateVersionPersistence
 	extends BasePersistence<DDMTemplateVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMTemplateVersionUtil} to access the ddm template version persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

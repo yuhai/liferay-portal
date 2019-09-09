@@ -42,7 +42,7 @@ import java.util.Set;
 public interface BigDecimalEntryPersistence
 	extends BasePersistence<BigDecimalEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BigDecimalEntryUtil} to access the big decimal entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

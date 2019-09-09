@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link PortletPreferencesService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PortletPreferencesService
  * @generated
  */
-@ProviderType
 public class PortletPreferencesServiceWrapper
 	implements PortletPreferencesService,
 			   ServiceWrapper<PortletPreferencesService> {
@@ -34,6 +32,11 @@ public class PortletPreferencesServiceWrapper
 		_portletPreferencesService = portletPreferencesService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PortletPreferencesServiceUtil} to access the portlet preferences remote service. Add custom service methods to <code>com.liferay.portal.service.impl.PortletPreferencesServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void deleteArchivedPreferences(long portletItemId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -47,14 +50,14 @@ public class PortletPreferencesServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _portletPreferencesService.getOSGiServiceIdentifier();
 	}
 
 	@Override
 	public void restoreArchivedPreferences(
 			long groupId, com.liferay.portal.kernel.model.Layout layout,
-			String portletId, long portletItemId,
+			java.lang.String portletId, long portletItemId,
 			javax.portlet.PortletPreferences jxPortletPreferences)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -65,7 +68,7 @@ public class PortletPreferencesServiceWrapper
 	@Override
 	public void restoreArchivedPreferences(
 			long groupId, com.liferay.portal.kernel.model.Layout layout,
-			String portletId,
+			java.lang.String portletId,
 			com.liferay.portal.kernel.model.PortletItem portletItem,
 			javax.portlet.PortletPreferences jxPortletPreferences)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -76,8 +79,9 @@ public class PortletPreferencesServiceWrapper
 
 	@Override
 	public void restoreArchivedPreferences(
-			long groupId, String name,
-			com.liferay.portal.kernel.model.Layout layout, String portletId,
+			long groupId, java.lang.String name,
+			com.liferay.portal.kernel.model.Layout layout,
+			java.lang.String portletId,
 			javax.portlet.PortletPreferences jxPortletPreferences)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -87,7 +91,8 @@ public class PortletPreferencesServiceWrapper
 
 	@Override
 	public void updateArchivePreferences(
-			long userId, long groupId, String name, String portletId,
+			long userId, long groupId, java.lang.String name,
+			java.lang.String portletId,
 			javax.portlet.PortletPreferences jxPortletPreferences)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

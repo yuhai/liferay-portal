@@ -111,7 +111,8 @@ public class DDMFormTemplateContextFactoryHelper {
 			ddmFormField.getDDMFormFieldValidation();
 
 		if ((ddmFormFieldValidation != null) &&
-			Validator.isNotNull(ddmFormFieldValidation.getExpression())) {
+			(ddmFormFieldValidation.getDDMFormFieldValidationExpression() !=
+				null)) {
 
 			return true;
 		}

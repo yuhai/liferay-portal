@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SocialActivityCounter}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivityCounter
  * @generated
  */
-@ProviderType
 public class SocialActivityCounterWrapper
 	extends BaseModelWrapper<SocialActivityCounter>
 	implements SocialActivityCounter, ModelWrapper<SocialActivityCounter> {
@@ -309,6 +306,11 @@ public class SocialActivityCounterWrapper
 		return model.isActivePeriod(periodLength);
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a social activity counter model instance should use the <code>SocialActivityCounter</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

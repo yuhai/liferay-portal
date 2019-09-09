@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsEntryRel
 	extends PersistedModel, SegmentsEntryRelModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.segments.model.impl.SegmentsEntryRelImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

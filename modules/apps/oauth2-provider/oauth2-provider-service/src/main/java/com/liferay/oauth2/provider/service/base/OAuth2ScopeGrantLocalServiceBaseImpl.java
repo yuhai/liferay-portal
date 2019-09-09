@@ -48,7 +48,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -62,13 +61,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.oauth2.provider.service.impl.OAuth2ScopeGrantLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements OAuth2ScopeGrantLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>OAuth2ScopeGrantLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil</code>.

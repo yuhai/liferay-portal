@@ -16,6 +16,7 @@ package com.liferay.asset.service.base;
 
 import com.liferay.asset.model.AssetEntryUsage;
 import com.liferay.asset.service.AssetEntryUsageLocalService;
+import com.liferay.asset.service.persistence.AssetEntryUsageFinder;
 import com.liferay.asset.service.persistence.AssetEntryUsagePersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -46,7 +47,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -60,13 +60,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.asset.service.impl.AssetEntryUsageLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class AssetEntryUsageLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AssetEntryUsageLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetEntryUsageLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.service.AssetEntryUsageLocalServiceUtil</code>.
@@ -422,6 +421,9 @@ public abstract class AssetEntryUsageLocalServiceBaseImpl
 
 	@Reference
 	protected AssetEntryUsagePersistence assetEntryUsagePersistence;
+
+	@Reference
+	protected AssetEntryUsageFinder assetEntryUsageFinder;
 
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService

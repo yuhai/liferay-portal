@@ -45,8 +45,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the KaleoLog service. Represents a row in the &quot;KaleoLog&quot; database table, with each column mapped to a property of this class.
  *
@@ -58,11 +56,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoLogImpl
  * @generated
  */
-@ProviderType
 public class KaleoLogModelImpl
 	extends BaseModelImpl<KaleoLog> implements KaleoLogModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a kaleo log model instance should use the <code>KaleoLog</code> interface instead.

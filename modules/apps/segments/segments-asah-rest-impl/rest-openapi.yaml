@@ -4,26 +4,68 @@ components:
             properties:
                 dateCreated:
                     format: date-time
+                    readOnly: true
                     type: string
                 dateModified:
                     format: date-time
+                    readOnly: true
                     type: string
                 description:
+                    readOnly: true
                     type: string
                 id:
                     readOnly: true
                     type: string
                 name:
+                    readOnly: true
                     type: string
                 siteId:
                     format: int64
+                    readOnly: true
                     type: integer
                 status:
                     type: string
+                winnerVariantId:
+                    format: int64
+                    type: integer
+            type: object
+        ExperimentRun:
+            properties:
+                confidenceLevel:
+                    format: double
+                    maximum: 0.99
+                    minimum: 0.8
+                    type: number
+                experimentVariants:
+                    items:
+                        $ref: '#/components/schemas/ExperimentVariant'
+                    type: array
+                status:
+                    readOnly: true
+                    type: string
+            required:
+                - confidenceLevel
+                - variants
+            type: object
+        ExperimentVariant:
+            properties:
+                id:
+                    type: string
+                trafficSplit:
+                    format: double
+                    maximum: 1
+                    minimum: 0
+                    type: number
+            type: object
         Status:
             properties:
                 status:
                     type: string
+                winnerVariantId:
+                    format: int64
+                    type: integer
+            required:
+                - status
             type: object
 info:
     description: ""
@@ -49,6 +91,35 @@ paths:
                         application/json: {}
                     description: ""
             tags: ["Experiment"]
+    "/experiments/{experimentId}/run":
+        post:
+            operationId: postExperimentRun
+            parameters:
+                - in: path
+                  name: experimentId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ExperimentRun"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ExperimentRun"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ExperimentRun"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ExperimentRun"
+                    description: ""
+            tags: ["ExperimentRun"]
     "/experiments/{experimentId}/status":
         post:
             operationId: postExperimentStatus

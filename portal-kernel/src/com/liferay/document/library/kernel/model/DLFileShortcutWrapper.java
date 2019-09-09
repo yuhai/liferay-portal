@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLFileShortcut}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileShortcut
  * @generated
  */
-@ProviderType
 public class DLFileShortcutWrapper
 	extends BaseModelWrapper<DLFileShortcut>
 	implements DLFileShortcut, ModelWrapper<DLFileShortcut> {
@@ -599,6 +596,11 @@ public class DLFileShortcutWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a document library file shortcut model instance should use the <code>DLFileShortcut</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

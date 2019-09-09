@@ -49,11 +49,11 @@ describe('Analytics MiddleWare Integration', () => {
 	});
 
 	describe('.registerMiddleware', () => {
-		it('should be exposed as an Analytics static method', () => {
+		it('is exposed as an Analytics static method', () => {
 			Analytics.registerMiddleware.should.be.a('function');
 		});
 
-		it('shuld process the given middleware', () => {
+		it('processes the given middleware', () => {
 			const middleware = (req, analytics) => {
 				analytics.should.be.equal(Analytics);
 				req.should.be.a('object');
@@ -72,13 +72,13 @@ describe('Analytics MiddleWare Integration', () => {
 					assert.isTrue(spy.calledOnce);
 				})
 				.catch(e => {
-					console.log('caught', e);
+					console.error('caught', e);
 				});
 		});
 	});
 
 	describe('default middlewares', () => {
-		it('should include document metadata by default', done => {
+		it('includes document metadata by default', done => {
 			let body = null;
 
 			fetchMock.restore();

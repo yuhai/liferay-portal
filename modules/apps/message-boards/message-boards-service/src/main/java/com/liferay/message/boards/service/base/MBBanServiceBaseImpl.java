@@ -46,7 +46,7 @@ public abstract class MBBanServiceBaseImpl
 	extends BaseServiceImpl
 	implements MBBanService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MBBanService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.message.boards.service.MBBanServiceUtil</code>.

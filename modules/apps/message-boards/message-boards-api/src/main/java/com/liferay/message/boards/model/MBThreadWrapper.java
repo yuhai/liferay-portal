@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MBThread}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBThread
  * @generated
  */
-@ProviderType
 public class MBThreadWrapper
 	extends BaseModelWrapper<MBThread>
 	implements MBThread, ModelWrapper<MBThread> {
@@ -718,6 +715,11 @@ public class MBThreadWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a message boards thread model instance should use the <code>MBThread</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

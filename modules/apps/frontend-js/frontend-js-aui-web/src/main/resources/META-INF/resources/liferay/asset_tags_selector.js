@@ -118,9 +118,7 @@ AUI.add(
 				},
 
 				curEntries: {
-					setter: function(value) {
-						var instance = this;
-
+					setter(value) {
 						if (Lang.isString(value)) {
 							value = value.split(',');
 						}
@@ -131,7 +129,7 @@ AUI.add(
 				},
 
 				dataSource: {
-					valueFn: function() {
+					valueFn() {
 						var instance = this;
 
 						return instance._getTagsDataSource();
@@ -148,7 +146,7 @@ AUI.add(
 				},
 
 				hiddenInput: {
-					setter: function(value) {
+					setter(value) {
 						var instance = this;
 
 						return A.one(value + instance.get('guid'));
@@ -176,64 +174,10 @@ AUI.add(
 
 			EXTENDS: A.TextboxList,
 
-			NAME: NAME,
+			NAME,
 
 			prototype: {
-				renderUI: function() {
-					var instance = this;
-
-					AssetTagsSelector.superclass.renderUI.apply(
-						instance,
-						arguments
-					);
-
-					instance._renderIcons();
-
-					instance.inputNode.addClass(CSS_INPUT_NODE);
-
-					instance._overlayAlign.node = instance.entryHolder;
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					AssetTagsSelector.superclass.bindUI.apply(
-						instance,
-						arguments
-					);
-
-					instance._bindTagsSelector();
-
-					var entries = instance.entries;
-
-					entries.after('add', instance._updateHiddenInput, instance);
-					entries.after(
-						'remove',
-						instance._updateHiddenInput,
-						instance
-					);
-				},
-
-				syncUI: function() {
-					var instance = this;
-
-					AssetTagsSelector.superclass.syncUI.apply(
-						instance,
-						arguments
-					);
-
-					var curEntries = instance.get('curEntries');
-
-					curEntries.forEach(instance.add, instance);
-				},
-
-				addEntries: function() {
-					var instance = this;
-
-					instance._addEntries();
-				},
-
-				_addEntries: function() {
+				_addEntries() {
 					var instance = this;
 
 					var text = LString.escapeHTML(instance.inputNode.val());
@@ -242,7 +186,7 @@ AUI.add(
 						if (text.indexOf(',') > -1) {
 							var items = text.split(',');
 
-							items.forEach(function(item, index) {
+							items.forEach(function(item) {
 								instance.entries.add(item, {});
 							});
 						} else {
@@ -253,7 +197,7 @@ AUI.add(
 					Liferay.Util.focusFormField(instance.inputNode);
 				},
 
-				_bindTagsSelector: function() {
+				_bindTagsSelector() {
 					var instance = this;
 
 					var form = instance.inputNode.get('form');
@@ -270,7 +214,7 @@ AUI.add(
 						.on('keypress', instance._onKeyPress, instance);
 				},
 
-				_getEntries: function(callback) {
+				_getEntries(callback) {
 					var instance = this;
 
 					Liferay.Service(
@@ -282,7 +226,7 @@ AUI.add(
 					);
 				},
 
-				_getPopup: function() {
+				_getPopup() {
 					var instance = this;
 
 					if (!instance._popup) {
@@ -336,7 +280,7 @@ AUI.add(
 					return instance._popup;
 				},
 
-				_getTagsDataSource: function() {
+				_getTagsDataSource() {
 					var instance = this;
 
 					var AssetTagSearch = Liferay.Service.bind(
@@ -349,7 +293,7 @@ AUI.add(
 
 					var dataSource = new Liferay.Service.DataSource({
 						on: {
-							request: function(event) {
+							request(event) {
 								var term = decodeURIComponent(event.request);
 
 								var key = term;
@@ -383,19 +327,19 @@ AUI.add(
 					return dataSource;
 				},
 
-				_initSearch: function() {
+				_initSearch() {
 					var instance = this;
 
 					var popup = instance._popup;
 
 					popup.liveSearch = new A.LiveSearch({
 						after: {
-							search: function() {
+							search() {
 								var fieldsets = popup.entriesNode.all(
 									'fieldset'
 								);
 
-								fieldsets.each(function(item, index) {
+								fieldsets.each(function(item) {
 									var visibleEntries = item.one(
 										'label:not(.hide)'
 									);
@@ -410,7 +354,7 @@ AUI.add(
 								});
 							}
 						},
-						data: function(node) {
+						data(node) {
 							var value = node.attr('title');
 
 							return value.toLowerCase();
@@ -420,7 +364,7 @@ AUI.add(
 					});
 				},
 
-				_namespace: function(name) {
+				_namespace(name) {
 					var instance = this;
 
 					return (
@@ -430,7 +374,7 @@ AUI.add(
 					);
 				},
 
-				_onAddEntryClick: function(event) {
+				_onAddEntryClick(event) {
 					var instance = this;
 
 					event.domEvent.preventDefault();
@@ -438,7 +382,7 @@ AUI.add(
 					instance._addEntries();
 				},
 
-				_onCheckboxClick: function(event) {
+				_onCheckboxClick(event) {
 					var instance = this;
 
 					var checkbox = event.currentTarget;
@@ -454,7 +398,7 @@ AUI.add(
 					instance[action](value);
 				},
 
-				_onKeyPress: function(event) {
+				_onKeyPress(event) {
 					var instance = this;
 
 					var charCode = event.charCode;
@@ -474,7 +418,7 @@ AUI.add(
 					}
 				},
 
-				_renderIcons: function() {
+				_renderIcons() {
 					var instance = this;
 
 					var contentBox = instance.get('contentBox');
@@ -508,7 +452,7 @@ AUI.add(
 					instance.entryHolder.placeAfter(iconsBoundingBox);
 				},
 
-				_renderTemplate: function(data) {
+				_renderTemplate(data) {
 					var instance = this;
 
 					var popup = instance._popup;
@@ -530,11 +474,11 @@ AUI.add(
 					popup.liveSearch.refreshIndex();
 				},
 
-				_setGroupIds: function(value) {
+				_setGroupIds(value) {
 					return value.split(',');
 				},
 
-				_showPopup: function(event) {
+				_showPopup(event) {
 					var instance = this;
 
 					event.domEvent.preventDefault();
@@ -546,7 +490,7 @@ AUI.add(
 					popup.show();
 				},
 
-				_showSelectPopup: function(event) {
+				_showSelectPopup(event) {
 					var instance = this;
 
 					instance._showPopup(event);
@@ -560,7 +504,7 @@ AUI.add(
 					});
 				},
 
-				_updateHiddenInput: function(event) {
+				_updateHiddenInput(event) {
 					var instance = this;
 
 					var hiddenInput = instance.get('hiddenInput');
@@ -586,7 +530,7 @@ AUI.add(
 					}
 				},
 
-				_updateSelectList: function(data) {
+				_updateSelectList(data) {
 					var instance = this;
 
 					for (var i = 0; i < data.length; i++) {
@@ -599,6 +543,60 @@ AUI.add(
 					}
 
 					instance._renderTemplate(data);
+				},
+
+				addEntries() {
+					var instance = this;
+
+					instance._addEntries();
+				},
+
+				bindUI() {
+					var instance = this;
+
+					AssetTagsSelector.superclass.bindUI.apply(
+						instance,
+						arguments
+					);
+
+					instance._bindTagsSelector();
+
+					var entries = instance.entries;
+
+					entries.after('add', instance._updateHiddenInput, instance);
+					entries.after(
+						'remove',
+						instance._updateHiddenInput,
+						instance
+					);
+				},
+
+				renderUI() {
+					var instance = this;
+
+					AssetTagsSelector.superclass.renderUI.apply(
+						instance,
+						arguments
+					);
+
+					instance._renderIcons();
+
+					instance.inputNode.addClass(CSS_INPUT_NODE);
+
+					instance._overlayAlign.node = instance.entryHolder;
+				},
+
+				syncUI() {
+					var instance = this;
+
+					AssetTagsSelector.superclass.syncUI.apply(
+						instance,
+						arguments
+					);
+
+					var curEntries = instance.get('curEntries');
+
+					curEntries.forEach(instance.add, instance);
 				}
 			}
 		});

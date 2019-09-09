@@ -25,6 +25,7 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -174,8 +175,30 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 
 		ddmFormFieldValidation.setErrorMessageLocalizedValue(
 			deserializeLocalizedValue(jsonObject.getString("errorMessage")));
-		ddmFormFieldValidation.setExpression(
-			jsonObject.getString("expression"));
+
+		JSONObject expressionJSONObject = jsonObject.getJSONObject(
+			"expression");
+
+		if (expressionJSONObject != null) {
+			ddmFormFieldValidation.setDDMFormFieldValidationExpression(
+				new DDMFormFieldValidationExpression() {
+					{
+						setName(expressionJSONObject.getString("name"));
+						setValue(expressionJSONObject.getString("value"));
+					}
+				});
+		}
+		else {
+			ddmFormFieldValidation.setDDMFormFieldValidationExpression(
+				new DDMFormFieldValidationExpression() {
+					{
+						setValue(jsonObject.getString("expression"));
+					}
+				});
+		}
+
+		ddmFormFieldValidation.setParameterLocalizedValue(
+			deserializeLocalizedValue(jsonObject.getString("parameter")));
 
 		return ddmFormFieldValidation;
 	}

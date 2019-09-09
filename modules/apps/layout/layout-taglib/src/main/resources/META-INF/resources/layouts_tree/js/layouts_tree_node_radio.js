@@ -30,7 +30,24 @@ AUI.add(
 			NAME: 'layoutstreenoderadio',
 
 			prototype: {
-				renderUI: function() {
+				_uiSetChecked(val) {
+					var instance = this;
+
+					instance
+						.get('checkEl')
+						.one('input')
+						.attr('checked', val ? 'checked' : '');
+				},
+
+				_valueCheckEl() {
+					var instance = this;
+
+					var checkName = instance.get('checkName');
+
+					return A.Node.create(TPL_RADIO).attr('name', checkName);
+				},
+
+				renderUI() {
 					var instance = this;
 
 					LayoutsTreeNodeRadio.superclass.renderUI.apply(
@@ -60,23 +77,6 @@ AUI.add(
 
 					instance.get('hitAreaEl').remove();
 					instance.get('iconEl').remove();
-				},
-
-				_uiSetChecked: function(val) {
-					var instance = this;
-
-					instance
-						.get('checkEl')
-						.one('input')
-						.attr('checked', val ? 'checked' : '');
-				},
-
-				_valueCheckEl: function() {
-					var instance = this;
-
-					var checkName = instance.get('checkName');
-
-					return A.Node.create(TPL_RADIO).attr('name', checkName);
 				}
 			}
 		});

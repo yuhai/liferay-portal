@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OAuth2ApplicationPersistence
 	extends BasePersistence<OAuth2Application> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationUtil} to access the o auth2 application persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

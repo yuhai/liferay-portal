@@ -59,7 +59,7 @@ export default withRouter(({backURL, match: {url}, title, tooltip}) => {
 					<li className="control-menu-nav-item">
 						<Link
 							className="control-menu-icon lfr-icon-item"
-							tabindex={1}
+							tabIndex={1}
 							to={backURL}
 						>
 							<span className="icon-monospaced">

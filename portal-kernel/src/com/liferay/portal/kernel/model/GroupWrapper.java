@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Group}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Group
  * @generated
  */
-@ProviderType
 public class GroupWrapper
 	extends BaseModelWrapper<Group> implements Group, ModelWrapper<Group> {
 
@@ -980,6 +977,11 @@ public class GroupWrapper
 		return model.isUserPersonalSite();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a group model instance should use the <code>Group</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

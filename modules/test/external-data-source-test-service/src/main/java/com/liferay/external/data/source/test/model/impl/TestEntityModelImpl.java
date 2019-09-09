@@ -14,8 +14,6 @@
 
 package com.liferay.external.data.source.test.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.external.data.source.test.model.TestEntity;
@@ -54,11 +52,10 @@ import java.util.function.Function;
  * @see TestEntityImpl
  * @generated
  */
-@ProviderType
 public class TestEntityModelImpl
 	extends BaseModelImpl<TestEntity> implements TestEntityModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a test entity model instance should use the <code>TestEntity</code> interface instead.

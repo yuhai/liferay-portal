@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructure}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMStructure
  * @generated
  */
-@ProviderType
 public class DDMStructureWrapper
 	extends BaseModelWrapper<DDMStructure>
 	implements DDMStructure, ModelWrapper<DDMStructure> {
@@ -782,6 +779,11 @@ public class DDMStructureWrapper
 		return model.isFieldTransient(fieldName);
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm structure model instance should use the <code>DDMStructure</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

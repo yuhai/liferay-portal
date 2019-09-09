@@ -81,201 +81,7 @@ AUI.add(
 			NS: 'liferayalloyeditor',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					var editorConfig = instance.get('editorConfig');
-
-					var srcNode = editorConfig.srcNode;
-
-					if (Lang.isString(srcNode)) {
-						srcNode = A.one('#' + srcNode);
-					}
-
-					instance._alloyEditor = AlloyEditor.editable(
-						srcNode.attr('id'),
-						editorConfig
-					);
-					instance._srcNode = srcNode;
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					instance._eventHandles = [
-						Do.after(
-							'_afterGet',
-							instance._srcNode,
-							'get',
-							instance
-						),
-						Do.after(
-							'_afterVal',
-							instance._srcNode,
-							'val',
-							instance
-						)
-					];
-
-					// LPS-84186
-
-					window[
-						instance.get('namespace')
-					]._localeChangeHandle = Liferay.on(
-						'inputLocalized:localeChanged',
-						instance._onLocaleChangedHandler,
-						instance
-					);
-
-					var nativeEditor = instance.getNativeEditor();
-
-					nativeEditor.on(
-						'dataReady',
-						instance._onDataReady,
-						instance
-					);
-					nativeEditor.on('error', instance._onError, instance);
-					nativeEditor.on(
-						'instanceReady',
-						instance._onInstanceReady,
-						instance
-					);
-					nativeEditor.on('setData', instance._onSetData, instance);
-
-					if (instance.get('onBlurMethod')) {
-						nativeEditor.on('blur', instance._onBlur, instance);
-					}
-
-					if (instance.get('onChangeMethod')) {
-						nativeEditor.on('change', instance._onChange, instance);
-					}
-
-					if (instance.get('onFocusMethod')) {
-						nativeEditor.on('focus', instance._onFocus, instance);
-					}
-
-					if (instance.get('useCustomDataProcessor')) {
-						nativeEditor.on(
-							'customDataProcessorLoaded',
-							instance._onCustomDataProcessorLoaded,
-							instance
-						);
-					}
-
-					var editorConfig = instance.get('editorConfig');
-
-					if (
-						editorConfig.disallowedContent &&
-						editorConfig.disallowedContent.indexOf('br') !== -1
-					) {
-						nativeEditor.on('key', instance._onKey, instance);
-					}
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					var editor = instance._alloyEditor;
-
-					if (editor) {
-						editor.destroy();
-					}
-
-					new A.EventHandle(instance._eventHandles).detach();
-
-					// LPS-84186
-
-					var localeChangeHandle =
-						window[instance.get('namespace')]._localeChangeHandle;
-
-					if (localeChangeHandle) {
-						localeChangeHandle.detach();
-
-						delete window[instance.get('namespace')]
-							._localeChangeHandle;
-					}
-
-					instance.instanceReady = false;
-
-					window[instance.get('namespace')].instanceReady = false;
-				},
-
-				focus: function() {
-					var instance = this;
-
-					if (instance.instanceReady) {
-						instance.getNativeEditor().focus();
-					} else {
-						instance.pendingFocus = true;
-					}
-				},
-
-				getCkData: function() {
-					var instance = this;
-
-					var data = instance.getNativeEditor().getData();
-
-					if (
-						CKEDITOR.env.gecko &&
-						CKEDITOR.tools.trim(data) === '<br />'
-					) {
-						data = '';
-					}
-
-					return data;
-				},
-
-				getEditor: function() {
-					var instance = this;
-
-					return instance._alloyEditor;
-				},
-
-				getHTML: function() {
-					var instance = this;
-
-					return instance.get('textMode')
-						? instance.getText()
-						: instance.getCkData();
-				},
-
-				getNativeEditor: function() {
-					var instance = this;
-
-					return instance._alloyEditor.get('nativeEditor');
-				},
-
-				getText: function() {
-					var instance = this;
-
-					var editorName = instance.getNativeEditor().name;
-
-					var editor = CKEDITOR.instances[editorName];
-
-					var text = '';
-
-					if (editor) {
-						text = editor.editable().getText();
-					}
-
-					return text;
-				},
-
-				setHTML: function(value) {
-					var instance = this;
-
-					if (instance.instanceReady) {
-						if (instance._dataReady) {
-							instance.getNativeEditor().setData(value);
-						} else {
-							instance._pendingData = value;
-						}
-					} else {
-						instance.set('contents', value);
-					}
-				},
-
-				_afterGet: function(attrName) {
+				_afterGet(attrName) {
 					var instance = this;
 
 					var alterReturn;
@@ -308,7 +114,7 @@ AUI.add(
 					return alterReturn;
 				},
 
-				_afterVal: function(value) {
+				_afterVal(value) {
 					var instance = this;
 
 					if (value) {
@@ -321,7 +127,7 @@ AUI.add(
 					);
 				},
 
-				_changeLocale: function(localeChange) {
+				_changeLocale(localeChange) {
 					var instance = this;
 
 					var nativeEditor = instance.getNativeEditor();
@@ -332,13 +138,13 @@ AUI.add(
 					editable.changeAttr('lang', localeChange.lang);
 				},
 
-				_getEditorMethod: function(method) {
+				_getEditorMethod(method) {
 					return Lang.isFunction(method)
 						? method
 						: window[method] || method;
 				},
 
-				_initializeData: function() {
+				_initializeData() {
 					var instance = this;
 
 					var contents = instance.get('contents');
@@ -360,7 +166,7 @@ AUI.add(
 					}
 				},
 
-				_onBlur: function(event) {
+				_onBlur(event) {
 					var instance = this;
 
 					var blurFn = instance.get('onBlurMethod');
@@ -370,7 +176,7 @@ AUI.add(
 					}
 				},
 
-				_onChange: function() {
+				_onChange() {
 					var instance = this;
 
 					var changeFn = instance.get('onChangeMethod');
@@ -380,7 +186,7 @@ AUI.add(
 					}
 				},
 
-				_onCustomDataProcessorLoaded: function() {
+				_onCustomDataProcessorLoaded() {
 					var instance = this;
 
 					instance.customDataProcessorLoaded = true;
@@ -390,7 +196,7 @@ AUI.add(
 					}
 				},
 
-				_onDataReady: function(event) {
+				_onDataReady() {
 					var instance = this;
 
 					if (instance._pendingData) {
@@ -404,7 +210,7 @@ AUI.add(
 					}
 				},
 
-				_onError: function(event) {
+				_onError(event) {
 					new Liferay.Notification({
 						closeable: true,
 						delay: {
@@ -418,7 +224,7 @@ AUI.add(
 					}).render();
 				},
 
-				_onFocus: function(event) {
+				_onFocus(event) {
 					var instance = this;
 
 					var focusFn = instance.get('onFocusMethod');
@@ -428,16 +234,14 @@ AUI.add(
 					}
 				},
 
-				_onFocusFix: function(activeElement, nativeEditor) {
-					var instance = this;
-
+				_onFocusFix(activeElement, nativeEditor) {
 					setTimeout(function() {
 						nativeEditor.focusManager.blur(true);
 						activeElement.focus();
 					}, 100);
 				},
 
-				_onInstanceReady: function() {
+				_onInstanceReady() {
 					var instance = this;
 
 					var editorNamespace = instance.get('namespace');
@@ -527,13 +331,13 @@ AUI.add(
 					}
 				},
 
-				_onKey: function(event) {
+				_onKey(event) {
 					if (event.data.keyCode === KEY_ENTER) {
 						event.cancel();
 					}
 				},
 
-				_onLocaleChangedHandler: function(event) {
+				_onLocaleChangedHandler(event) {
 					var instance = this;
 
 					var contentsLanguage = event.item.getAttribute(
@@ -554,14 +358,208 @@ AUI.add(
 					}
 				},
 
-				_onSetData: function(event) {
+				_onSetData() {
 					var instance = this;
 
 					instance._dataReady = false;
 				},
 
-				_validateEditorMethod: function(method) {
+				_validateEditorMethod(method) {
 					return Lang.isString(method) || Lang.isFunction(method);
+				},
+
+				bindUI() {
+					var instance = this;
+
+					instance._eventHandles = [
+						Do.after(
+							'_afterGet',
+							instance._srcNode,
+							'get',
+							instance
+						),
+						Do.after(
+							'_afterVal',
+							instance._srcNode,
+							'val',
+							instance
+						)
+					];
+
+					// LPS-84186
+
+					window[
+						instance.get('namespace')
+					]._localeChangeHandle = Liferay.on(
+						'inputLocalized:localeChanged',
+						instance._onLocaleChangedHandler,
+						instance
+					);
+
+					var nativeEditor = instance.getNativeEditor();
+
+					nativeEditor.on(
+						'dataReady',
+						instance._onDataReady,
+						instance
+					);
+					nativeEditor.on('error', instance._onError, instance);
+					nativeEditor.on(
+						'instanceReady',
+						instance._onInstanceReady,
+						instance
+					);
+					nativeEditor.on('setData', instance._onSetData, instance);
+
+					if (instance.get('onBlurMethod')) {
+						nativeEditor.on('blur', instance._onBlur, instance);
+					}
+
+					if (instance.get('onChangeMethod')) {
+						nativeEditor.on('change', instance._onChange, instance);
+					}
+
+					if (instance.get('onFocusMethod')) {
+						nativeEditor.on('focus', instance._onFocus, instance);
+					}
+
+					if (instance.get('useCustomDataProcessor')) {
+						nativeEditor.on(
+							'customDataProcessorLoaded',
+							instance._onCustomDataProcessorLoaded,
+							instance
+						);
+					}
+
+					var editorConfig = instance.get('editorConfig');
+
+					if (
+						editorConfig.disallowedContent &&
+						editorConfig.disallowedContent.indexOf('br') !== -1
+					) {
+						nativeEditor.on('key', instance._onKey, instance);
+					}
+				},
+
+				destructor() {
+					var instance = this;
+
+					var editor = instance._alloyEditor;
+
+					if (editor) {
+						editor.destroy();
+					}
+
+					new A.EventHandle(instance._eventHandles).detach();
+
+					// LPS-84186
+
+					var localeChangeHandle =
+						window[instance.get('namespace')]._localeChangeHandle;
+
+					if (localeChangeHandle) {
+						localeChangeHandle.detach();
+
+						delete window[instance.get('namespace')]
+							._localeChangeHandle;
+					}
+
+					instance.instanceReady = false;
+
+					window[instance.get('namespace')].instanceReady = false;
+				},
+
+				focus() {
+					var instance = this;
+
+					if (instance.instanceReady) {
+						instance.getNativeEditor().focus();
+					} else {
+						instance.pendingFocus = true;
+					}
+				},
+
+				getCkData() {
+					var instance = this;
+
+					var data = instance.getNativeEditor().getData();
+
+					if (
+						CKEDITOR.env.gecko &&
+						CKEDITOR.tools.trim(data) === '<br />'
+					) {
+						data = '';
+					}
+
+					return data;
+				},
+
+				getEditor() {
+					var instance = this;
+
+					return instance._alloyEditor;
+				},
+
+				getHTML() {
+					var instance = this;
+
+					return instance.get('textMode')
+						? instance.getText()
+						: instance.getCkData();
+				},
+
+				getNativeEditor() {
+					var instance = this;
+
+					return instance._alloyEditor.get('nativeEditor');
+				},
+
+				getText() {
+					var instance = this;
+
+					var editorName = instance.getNativeEditor().name;
+
+					var editor = CKEDITOR.instances[editorName];
+
+					var text = '';
+
+					if (editor) {
+						text = editor.editable().getText();
+					}
+
+					return text;
+				},
+
+				initializer() {
+					var instance = this;
+
+					var editorConfig = instance.get('editorConfig');
+
+					var srcNode = editorConfig.srcNode;
+
+					if (Lang.isString(srcNode)) {
+						srcNode = A.one('#' + srcNode);
+					}
+
+					instance._alloyEditor = AlloyEditor.editable(
+						srcNode.attr('id'),
+						editorConfig
+					);
+					instance._srcNode = srcNode;
+				},
+
+				setHTML(value) {
+					var instance = this;
+
+					if (instance.instanceReady) {
+						if (instance._dataReady) {
+							instance.getNativeEditor().setData(value);
+						} else {
+							instance._pendingData = value;
+						}
+					} else {
+						instance.set('contents', value);
+					}
 				}
 			}
 		});

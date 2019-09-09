@@ -16,8 +16,6 @@ package com.liferay.site.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SiteFriendlyURLLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SiteFriendlyURLLocalService
  * @generated
  */
-@ProviderType
 public class SiteFriendlyURLLocalServiceWrapper
 	implements SiteFriendlyURLLocalService,
 			   ServiceWrapper<SiteFriendlyURLLocalService> {
@@ -36,6 +33,11 @@ public class SiteFriendlyURLLocalServiceWrapper
 		_siteFriendlyURLLocalService = siteFriendlyURLLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SiteFriendlyURLLocalServiceUtil} to access the site friendly url local service. Add custom service methods to <code>com.liferay.site.service.impl.SiteFriendlyURLLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.site.model.SiteFriendlyURL addSiteFriendlyURL(
 			long userId, long companyId, long groupId, String friendlyURL,

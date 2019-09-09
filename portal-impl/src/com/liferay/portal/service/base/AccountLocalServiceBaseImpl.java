@@ -46,8 +46,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the account local service.
  *
@@ -59,12 +57,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portal.service.impl.AccountLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class AccountLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AccountLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AccountLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.AccountLocalServiceUtil</code>.

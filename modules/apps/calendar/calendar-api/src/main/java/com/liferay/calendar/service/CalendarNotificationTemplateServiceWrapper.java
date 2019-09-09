@@ -16,8 +16,6 @@ package com.liferay.calendar.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link CalendarNotificationTemplateService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CalendarNotificationTemplateService
  * @generated
  */
-@ProviderType
 public class CalendarNotificationTemplateServiceWrapper
 	implements CalendarNotificationTemplateService,
 			   ServiceWrapper<CalendarNotificationTemplateService> {
@@ -38,6 +35,11 @@ public class CalendarNotificationTemplateServiceWrapper
 			calendarNotificationTemplateService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link CalendarNotificationTemplateServiceUtil} to access the calendar notification template remote service. Add custom service methods to <code>com.liferay.calendar.service.impl.CalendarNotificationTemplateServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.calendar.model.CalendarNotificationTemplate
 			addCalendarNotificationTemplate(

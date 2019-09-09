@@ -16,8 +16,6 @@ package com.liferay.exportimport.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link StagingLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see StagingLocalService
  * @generated
  */
-@ProviderType
 public class StagingLocalServiceWrapper
 	implements StagingLocalService, ServiceWrapper<StagingLocalService> {
 
@@ -33,6 +30,11 @@ public class StagingLocalServiceWrapper
 		_stagingLocalService = stagingLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link StagingLocalServiceUtil} to access the staging local service. Add custom service methods to <code>com.liferay.portlet.exportimport.service.impl.StagingLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void checkDefaultLayoutSetBranches(
 			long userId, com.liferay.portal.kernel.model.Group liveGroup,

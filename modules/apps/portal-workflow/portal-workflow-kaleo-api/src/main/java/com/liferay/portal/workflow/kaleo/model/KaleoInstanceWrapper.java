@@ -24,8 +24,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KaleoInstance}.
@@ -35,7 +33,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoInstance
  * @generated
  */
-@ProviderType
 public class KaleoInstanceWrapper
 	extends BaseModelWrapper<KaleoInstance>
 	implements KaleoInstance, ModelWrapper<KaleoInstance> {
@@ -397,6 +394,11 @@ public class KaleoInstanceWrapper
 		return model.isCompleted();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kaleo instance model instance should use the <code>KaleoInstance</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

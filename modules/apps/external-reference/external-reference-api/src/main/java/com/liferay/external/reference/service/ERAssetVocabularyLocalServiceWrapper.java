@@ -16,8 +16,6 @@ package com.liferay.external.reference.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ERAssetVocabularyLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ERAssetVocabularyLocalService
  * @generated
  */
-@ProviderType
 public class ERAssetVocabularyLocalServiceWrapper
 	implements ERAssetVocabularyLocalService,
 			   ServiceWrapper<ERAssetVocabularyLocalService> {
@@ -36,6 +33,11 @@ public class ERAssetVocabularyLocalServiceWrapper
 		_erAssetVocabularyLocalService = erAssetVocabularyLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ERAssetVocabularyLocalServiceUtil} to access the er asset vocabulary local service. Add custom service methods to <code>com.liferay.external.reference.service.impl.ERAssetVocabularyLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.asset.kernel.model.AssetVocabulary addOrUpdateVocabulary(
 			String externalReferenceCode, long userId, long groupId,

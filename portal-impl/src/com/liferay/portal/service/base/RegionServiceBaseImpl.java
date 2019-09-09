@@ -44,7 +44,7 @@ import javax.sql.DataSource;
 public abstract class RegionServiceBaseImpl
 	extends BaseServiceImpl implements RegionService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>RegionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.RegionServiceUtil</code>.

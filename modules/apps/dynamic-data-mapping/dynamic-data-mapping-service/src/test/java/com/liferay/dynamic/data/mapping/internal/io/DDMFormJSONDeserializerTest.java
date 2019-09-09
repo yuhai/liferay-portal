@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRespons
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -191,8 +192,12 @@ public class DDMFormJSONDeserializerTest
 			ddmFormField.getDDMFormFieldValidation();
 
 		Assert.assertNotNull(ddmFormFieldValidation);
+
+		DDMFormFieldValidationExpression ddmFormFieldValidationExpression =
+			ddmFormFieldValidation.getDDMFormFieldValidationExpression();
+
 		Assert.assertEquals(
-			"Boolean2282", ddmFormFieldValidation.getExpression());
+			"Boolean2282", ddmFormFieldValidationExpression.getValue());
 
 		LocalizedValue errorMessageLocalizedValue =
 			ddmFormFieldValidation.getErrorMessageLocalizedValue();

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MemberRequest}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MemberRequest
  * @generated
  */
-@ProviderType
 public class MemberRequestWrapper
 	extends BaseModelWrapper<MemberRequest>
 	implements MemberRequest, ModelWrapper<MemberRequest> {
@@ -286,6 +283,11 @@ public class MemberRequestWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a member request model instance should use the <code>MemberRequest</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

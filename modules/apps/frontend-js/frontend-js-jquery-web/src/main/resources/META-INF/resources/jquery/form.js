@@ -138,7 +138,7 @@
 			options = $.extend(
 				true,
 				{
-					url: url,
+					url,
 					success: $.ajaxSettings.success,
 					type: method || $.ajaxSettings.type,
 					iframeSrc: /^https/i.test(window.location.href || '')
@@ -477,10 +477,10 @@
 					responseXML: null,
 					status: 0,
 					statusText: 'n/a',
-					getAllResponseHeaders: function() {},
-					getResponseHeader: function() {},
-					setRequestHeader: function() {},
-					abort: function(status) {
+					getAllResponseHeaders() {},
+					getResponseHeader() {},
+					setRequestHeader() {},
+					abort(status) {
 						var e = status === 'timeout' ? 'timeout' : 'aborted';
 						log('aborting upload... ' + e);
 						this.aborted = 1;

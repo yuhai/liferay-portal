@@ -83,7 +83,7 @@ AUI.add(
 			 * @static
 			 */
 
-			NAME: NAME,
+			NAME,
 
 			prototype: {
 				/**
@@ -94,7 +94,7 @@ AUI.add(
 				 * @protected
 				 */
 
-				initializer: function() {
+				initializer() {
 					var instance = this;
 
 					var contentBox = instance.get('contentBox');

@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FragmentEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link FragmentEntryLocalServiceUtil} to access the fragment entry local service. Add custom service methods to <code>com.liferay.fragment.service.impl.FragmentEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

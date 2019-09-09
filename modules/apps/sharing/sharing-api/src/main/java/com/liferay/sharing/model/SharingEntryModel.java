@@ -41,7 +41,7 @@ public interface SharingEntryModel
 	extends AttachedModel, BaseModel<SharingEntry>, GroupedModel, ShardedModel,
 			StagedAuditedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a sharing entry model instance should use the {@link SharingEntry} interface instead.

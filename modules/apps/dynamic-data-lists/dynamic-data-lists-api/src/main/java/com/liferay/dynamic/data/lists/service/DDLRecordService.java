@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface DDLRecordService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDLRecordServiceUtil} to access the ddl record remote service. Add custom service methods to <code>com.liferay.dynamic.data.lists.service.impl.DDLRecordServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -106,66 +106,7 @@ AUI.add(
 			NAME: 'liferaypreview',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._actionContent = instance.get('actionContent');
-					instance._baseImageURL = instance.get('baseImageURL');
-					instance._currentPreviewImage = instance.get(
-						'currentPreviewImage'
-					);
-					instance._previewFileIndexNode = instance.get(
-						'previewFileIndexNode'
-					);
-					instance._imageListContent = instance.get(
-						'imageListContent'
-					);
-
-					instance._hideLoadingIndicator = A.debounce(function() {
-						instance._getLoadingIndicator().hide();
-					}, 250);
-				},
-
-				renderUI: function() {
-					var instance = this;
-
-					instance._renderToolbar();
-					instance._renderImages();
-
-					instance._actionContent.show();
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					instance.after(
-						'currentIndexChange',
-						instance._afterCurrentIndexChange
-					);
-
-					var imageListContent = instance._imageListContent;
-
-					imageListContent.delegate(
-						'mouseenter',
-						instance._onImageListMouseEnter,
-						'a',
-						instance
-					);
-					imageListContent.delegate(
-						STR_CLICK,
-						instance._onImageListClick,
-						'a',
-						instance
-					);
-
-					imageListContent.on(
-						'scroll',
-						instance._onImageListScroll,
-						instance
-					);
-				},
-
-				_afterCurrentIndexChange: function(event) {
+				_afterCurrentIndexChange(event) {
 					var instance = this;
 
 					instance._uiSetCurrentIndex(
@@ -175,7 +116,7 @@ AUI.add(
 					);
 				},
 
-				_getLoadingCountNode: function() {
+				_getLoadingCountNode() {
 					var instance = this;
 
 					var loadingCountNode = instance._loadingCountNode;
@@ -189,7 +130,7 @@ AUI.add(
 					return loadingCountNode;
 				},
 
-				_getLoadingIndicator: function() {
+				_getLoadingIndicator() {
 					var instance = this;
 
 					var loadingIndicator = instance._loadingIndicator;
@@ -215,7 +156,7 @@ AUI.add(
 					return loadingIndicator;
 				},
 
-				_getMaxOverlay: function() {
+				_getMaxOverlay() {
 					var instance = this;
 
 					var maxOverlay = instance._maxOverlay;
@@ -225,10 +166,10 @@ AUI.add(
 
 						maxOverlay = new A.Modal({
 							after: {
-								render: function(event) {
+								render() {
 									maxOverlayMask.render();
 								},
-								visibleChange: function(event) {
+								visibleChange(event) {
 									maxOverlayMask.set('visible', event.newVal);
 								}
 							},
@@ -253,7 +194,7 @@ AUI.add(
 					return maxOverlay;
 				},
 
-				_getMaxOverlayMask: function() {
+				_getMaxOverlayMask() {
 					var instance = this;
 
 					var maxOverlayMask = instance._maxOverlayMask;
@@ -269,7 +210,7 @@ AUI.add(
 					return maxOverlayMask;
 				},
 
-				_getMaxPreviewControls: function() {
+				_getMaxPreviewControls() {
 					var instance = this;
 
 					var maxPreviewControls = instance._maxPreviewControls;
@@ -296,7 +237,7 @@ AUI.add(
 					return maxPreviewControls;
 				},
 
-				_getMaxPreviewImage: function() {
+				_getMaxPreviewImage() {
 					var instance = this;
 
 					var maxPreviewImage = instance._maxPreviewImage;
@@ -316,7 +257,7 @@ AUI.add(
 					return maxPreviewImage;
 				},
 
-				_maximizePreview: function(event) {
+				_maximizePreview() {
 					var instance = this;
 
 					instance
@@ -330,7 +271,7 @@ AUI.add(
 					instance._getMaxOverlay().show();
 				},
 
-				_onImageListClick: function(event) {
+				_onImageListClick(event) {
 					var instance = this;
 
 					event.preventDefault();
@@ -344,7 +285,7 @@ AUI.add(
 					});
 				},
 
-				_onImageListMouseEnter: function(event) {
+				_onImageListMouseEnter(event) {
 					var instance = this;
 
 					event.preventDefault();
@@ -360,7 +301,7 @@ AUI.add(
 					);
 				},
 
-				_onImageListScroll: function(event) {
+				_onImageListScroll() {
 					var instance = this;
 
 					var imageListContentEl = instance._imageListContent.getDOM();
@@ -396,7 +337,7 @@ AUI.add(
 					}
 				},
 
-				_onMaxPreviewControlsClick: function(event) {
+				_onMaxPreviewControlsClick(event) {
 					var instance = this;
 
 					var target = event.currentTarget;
@@ -420,7 +361,9 @@ AUI.add(
 					}
 				},
 
-				_renderImages: function(maxIndex) {
+				_previewFileCountDown: 0,
+
+				_renderImages(maxIndex) {
 					var instance = this;
 
 					var i = 0;
@@ -474,7 +417,7 @@ AUI.add(
 					instance._hideLoadingIndicator();
 				},
 
-				_renderToolbar: function() {
+				_renderToolbar() {
 					var instance = this;
 
 					instance._toolbar = new A.Toolbar({
@@ -515,7 +458,7 @@ AUI.add(
 					}).render();
 				},
 
-				_setCurrentIndex: function(value) {
+				_setCurrentIndex(value) {
 					var instance = this;
 
 					value = parseInt(value, 10);
@@ -532,7 +475,7 @@ AUI.add(
 					return value;
 				},
 
-				_uiSetCurrentIndex: function(value, src, prevVal) {
+				_uiSetCurrentIndex(value, src, prevVal) {
 					var instance = this;
 
 					var displayedIndex = value + 1;
@@ -565,7 +508,7 @@ AUI.add(
 					}
 				},
 
-				_updateIndex: function(increment) {
+				_updateIndex(increment) {
 					var instance = this;
 
 					var currentIndex = instance.get(STR_CURRENT_INDEX);
@@ -575,7 +518,64 @@ AUI.add(
 					instance.set(STR_CURRENT_INDEX, currentIndex);
 				},
 
-				_previewFileCountDown: 0
+				bindUI() {
+					var instance = this;
+
+					instance.after(
+						'currentIndexChange',
+						instance._afterCurrentIndexChange
+					);
+
+					var imageListContent = instance._imageListContent;
+
+					imageListContent.delegate(
+						'mouseenter',
+						instance._onImageListMouseEnter,
+						'a',
+						instance
+					);
+					imageListContent.delegate(
+						STR_CLICK,
+						instance._onImageListClick,
+						'a',
+						instance
+					);
+
+					imageListContent.on(
+						'scroll',
+						instance._onImageListScroll,
+						instance
+					);
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._actionContent = instance.get('actionContent');
+					instance._baseImageURL = instance.get('baseImageURL');
+					instance._currentPreviewImage = instance.get(
+						'currentPreviewImage'
+					);
+					instance._previewFileIndexNode = instance.get(
+						'previewFileIndexNode'
+					);
+					instance._imageListContent = instance.get(
+						'imageListContent'
+					);
+
+					instance._hideLoadingIndicator = A.debounce(function() {
+						instance._getLoadingIndicator().hide();
+					}, 250);
+				},
+
+				renderUI() {
+					var instance = this;
+
+					instance._renderToolbar();
+					instance._renderImages();
+
+					instance._actionContent.show();
+				}
 			}
 		});
 

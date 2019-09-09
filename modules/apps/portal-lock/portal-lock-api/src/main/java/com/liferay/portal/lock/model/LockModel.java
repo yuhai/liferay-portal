@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface LockModel extends BaseModel<Lock>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a lock model instance should use the {@link Lock} interface instead.

@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BlogsStatsUserPersistence
 	extends BasePersistence<BlogsStatsUser> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BlogsStatsUserUtil} to access the blogs stats user persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

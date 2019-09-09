@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDLRecordSetVersionLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDLRecordSetVersionLocalServiceUtil} to access the ddl record set version local service. Add custom service methods to <code>com.liferay.dynamic.data.lists.service.impl.DDLRecordSetVersionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

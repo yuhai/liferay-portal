@@ -16,7 +16,6 @@ import {containsFragmentEntryLinkId} from '../../../src/main/resources/META-INF/
 
 const LAYOUT_DATA_PERSONALIZATION = [
 	{
-		segmentsExperienceId: 'segmentsExperienceId1',
 		layoutData: {
 			structure: [
 				{
@@ -37,10 +36,10 @@ const LAYOUT_DATA_PERSONALIZATION = [
 					]
 				}
 			]
-		}
+		},
+		segmentsExperienceId: 'segmentsExperienceId1'
 	},
 	{
-		segmentsExperienceId: 'segmentsExperienceId2',
 		layoutData: {
 			structure: [
 				{
@@ -61,7 +60,8 @@ const LAYOUT_DATA_PERSONALIZATION = [
 					]
 				}
 			]
-		}
+		},
+		segmentsExperienceId: 'segmentsExperienceId2'
 	}
 ];
 

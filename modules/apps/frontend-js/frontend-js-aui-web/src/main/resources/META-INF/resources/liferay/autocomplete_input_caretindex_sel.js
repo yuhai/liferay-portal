@@ -37,7 +37,7 @@ AUI.add(
 		var AutcompleteInputCaretIndex = function() {};
 
 		AutcompleteInputCaretIndex.prototype = {
-			_getCaretIndex: function(node) {
+			_getCaretIndex(node) {
 				var instance = this;
 
 				node = node || instance.get(STR_INPUT_NODE);
@@ -104,12 +104,12 @@ AUI.add(
 				}
 
 				return {
-					end: end,
-					start: start
+					end,
+					start
 				};
 			},
 
-			_setCaretIndex: function(node, cursorIndex) {
+			_setCaretIndex(node, cursorIndex) {
 				var instance = this;
 
 				node = node || instance.get(STR_INPUT_NODE);

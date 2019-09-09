@@ -33,7 +33,41 @@ AUI.add(
 		A.mix(
 			Sortable.prototype,
 			{
-				initializer: function() {
+				_onDragHorizontal(event) {
+					var instance = this;
+
+					var pageX = event.pageX;
+
+					var x = instance._x;
+
+					instance._up = pageX < x;
+
+					instance._x = pageX;
+				},
+
+				_setDragMethod() {
+					var instance = this;
+
+					var dragMethod;
+
+					var node = instance
+						.get(STR_CONT)
+						.one(instance.get(STR_NODES));
+
+					var floated = node ? node.getStyle('float') : 'none';
+
+					if (floated === 'left' || floated === 'right') {
+						dragMethod = '_onDragHorizontal';
+					} else {
+						dragMethod = '_onDrag';
+					}
+
+					instance._dragMethod = A.bind(dragMethod, instance);
+				},
+
+				_x: null,
+
+				initializer() {
 					var instance = this;
 
 					var id = 'sortable-' + A.guid();
@@ -84,41 +118,7 @@ AUI.add(
 					instance.delegate = delegate;
 
 					Sortable.reg(instance, id);
-				},
-
-				_onDragHorizontal: function(event) {
-					var instance = this;
-
-					var pageX = event.pageX;
-
-					var x = instance._x;
-
-					instance._up = pageX < x;
-
-					instance._x = pageX;
-				},
-
-				_setDragMethod: function() {
-					var instance = this;
-
-					var dragMethod;
-
-					var node = instance
-						.get(STR_CONT)
-						.one(instance.get(STR_NODES));
-
-					var floated = node ? node.getStyle('float') : 'none';
-
-					if (floated === 'left' || floated === 'right') {
-						dragMethod = '_onDragHorizontal';
-					} else {
-						dragMethod = '_onDrag';
-					}
-
-					instance._dragMethod = A.bind(dragMethod, instance);
-				},
-
-				_x: null
+				}
 			},
 			true
 		);

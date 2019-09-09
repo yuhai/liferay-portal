@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialActivityLimitPersistence
 	extends BasePersistence<SocialActivityLimit> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SocialActivityLimitUtil} to access the social activity limit persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

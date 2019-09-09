@@ -40,6 +40,7 @@ import com.liferay.segments.model.SegmentsExperiment;
 import java.io.Serializable;
 
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -61,7 +62,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsExperimentLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentLocalServiceUtil} to access the segments experiment local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperimentLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -344,12 +345,9 @@ public interface SegmentsExperimentLocalService
 		long segmentsExperienceId, long classNameId, long classPK,
 		int[] statuses);
 
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, double confidenceLevel, int status)
-		throws PortalException;
-
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, int status)
+	public SegmentsExperiment runSegmentsExperiment(
+			long segmentsExperimentId, double confidenceLevel,
+			Map<Long, Double> segmentsExperienceIdSplitMap)
 		throws PortalException;
 
 	public SegmentsExperiment updateSegmentsExperiment(
@@ -367,8 +365,13 @@ public interface SegmentsExperimentLocalService
 	public SegmentsExperiment updateSegmentsExperiment(
 		SegmentsExperiment segmentsExperiment);
 
-	public SegmentsExperiment updateSegmentsExperiment(
-			String segmentsExperimentKey, int status)
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, int status)
+		throws PortalException;
+
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, long winnerSegmentsExperienceId,
+			int status)
 		throws PortalException;
 
 }

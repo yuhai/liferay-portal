@@ -11,3 +11,11 @@ create table AccountEntry (
 	logoId LONG,
 	status INTEGER
 );
+
+create table AccountEntryUserRel (
+	accountEntryUserRelId LONG not null,
+	companyId LONG,
+	userId LONG not null,
+	accountEntryId LONG not null,
+	primary key (accountEntryUserRelId, userId, accountEntryId)
+);

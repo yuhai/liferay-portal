@@ -14,7 +14,6 @@
 
 package com.liferay.document.library.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
@@ -31,10 +30,9 @@ import org.osgi.util.tracker.ServiceTracker;
  * @see DLFileVersionPreviewLocalService
  * @generated
  */
-@ProviderType
 public class DLFileVersionPreviewLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.document.library.service.impl.DLFileVersionPreviewLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

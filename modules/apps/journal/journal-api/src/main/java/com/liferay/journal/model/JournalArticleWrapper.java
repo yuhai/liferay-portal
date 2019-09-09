@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link JournalArticle}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see JournalArticle
  * @generated
  */
-@ProviderType
 public class JournalArticleWrapper
 	extends BaseModelWrapper<JournalArticle>
 	implements JournalArticle, ModelWrapper<JournalArticle> {
@@ -476,6 +473,11 @@ public class JournalArticleWrapper
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
 		return model.getDescription(languageId, useDefault);
+	}
+
+	@Override
+	public String getDescriptionCurrentValue() {
+		return model.getDescriptionCurrentValue();
 	}
 
 	@Override
@@ -1112,6 +1114,11 @@ public class JournalArticleWrapper
 		return model.isTemplateDriven();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a journal article model instance should use the <code>JournalArticle</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -42,7 +42,7 @@ public interface LVEntryLocalizationVersionModel
 	extends BaseModel<LVEntryLocalizationVersion>, ShardedModel,
 			VersionModel<LVEntryLocalization> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a lv entry localization version model instance should use the {@link LVEntryLocalizationVersion} interface instead.

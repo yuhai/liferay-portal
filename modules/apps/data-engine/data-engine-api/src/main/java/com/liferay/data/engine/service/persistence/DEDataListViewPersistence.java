@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataListViewPersistence
 	extends BasePersistence<DEDataListView> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DEDataListViewUtil} to access the de data list view persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

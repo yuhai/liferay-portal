@@ -46,8 +46,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the announcements flag local service.
  *
@@ -59,12 +57,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portlet.announcements.service.impl.AnnouncementsFlagLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class AnnouncementsFlagLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AnnouncementsFlagLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AnnouncementsFlagLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.announcements.kernel.service.AnnouncementsFlagLocalServiceUtil</code>.

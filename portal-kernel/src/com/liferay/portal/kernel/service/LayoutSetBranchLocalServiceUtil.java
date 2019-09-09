@@ -16,8 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for LayoutSetBranch. This utility wraps
  * <code>com.liferay.portal.service.impl.LayoutSetBranchLocalServiceImpl</code> and
@@ -30,10 +28,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetBranchLocalService
  * @generated
  */
-@ProviderType
 public class LayoutSetBranchLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutSetBranchLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

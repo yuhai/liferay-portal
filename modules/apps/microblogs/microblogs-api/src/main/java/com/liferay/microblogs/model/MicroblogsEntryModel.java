@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MicroblogsEntryModel
 	extends AuditedModel, BaseModel<MicroblogsEntry>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a microblogs entry model instance should use the {@link MicroblogsEntry} interface instead.

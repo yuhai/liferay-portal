@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface JournalFolderPersistence
 	extends BasePersistence<JournalFolder> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link JournalFolderUtil} to access the journal folder persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

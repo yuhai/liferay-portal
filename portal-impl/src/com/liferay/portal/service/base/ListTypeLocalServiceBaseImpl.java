@@ -47,8 +47,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the list type local service.
  *
@@ -60,12 +58,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portal.service.impl.ListTypeLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class ListTypeLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements ListTypeLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ListTypeLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.ListTypeLocalServiceUtil</code>.

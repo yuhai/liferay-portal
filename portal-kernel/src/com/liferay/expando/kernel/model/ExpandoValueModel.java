@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ExpandoValueModel
 	extends AttachedModel, BaseModel<ExpandoValue>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a expando value model instance should use the {@link ExpandoValue} interface instead.

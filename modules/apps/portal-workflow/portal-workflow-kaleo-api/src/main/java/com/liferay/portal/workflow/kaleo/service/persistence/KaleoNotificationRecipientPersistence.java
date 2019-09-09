@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoNotificationRecipientPersistence
 	extends BasePersistence<KaleoNotificationRecipient> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoNotificationRecipientUtil} to access the kaleo notification recipient persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

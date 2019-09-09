@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BookmarksEntryPersistence
 	extends BasePersistence<BookmarksEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BookmarksEntryUtil} to access the bookmarks entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -16,8 +16,6 @@ package com.liferay.segments.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SegmentsExperimentRelService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperimentRelService
  * @generated
  */
-@ProviderType
 public class SegmentsExperimentRelServiceWrapper
 	implements SegmentsExperimentRelService,
 			   ServiceWrapper<SegmentsExperimentRelService> {
@@ -36,6 +33,11 @@ public class SegmentsExperimentRelServiceWrapper
 		_segmentsExperimentRelService = segmentsExperimentRelService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentRelServiceUtil} to access the segments experiment rel remote service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperimentRelServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.segments.model.SegmentsExperimentRel
 			addSegmentsExperimentRel(

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Entry}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Entry
  * @generated
  */
-@ProviderType
 public class EntryWrapper
 	extends BaseModelWrapper<Entry> implements Entry, ModelWrapper<Entry> {
 
@@ -241,6 +238,11 @@ public class EntryWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a entry model instance should use the <code>Entry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

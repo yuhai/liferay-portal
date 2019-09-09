@@ -23,8 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link PollsQuestion}.
@@ -34,7 +32,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PollsQuestion
  * @generated
  */
-@ProviderType
 public class PollsQuestionWrapper
 	extends BaseModelWrapper<PollsQuestion>
 	implements PollsQuestion, ModelWrapper<PollsQuestion> {
@@ -469,6 +466,11 @@ public class PollsQuestionWrapper
 		return model.isExpired(serviceContext, defaultCreateDate);
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a polls question model instance should use the <code>PollsQuestion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

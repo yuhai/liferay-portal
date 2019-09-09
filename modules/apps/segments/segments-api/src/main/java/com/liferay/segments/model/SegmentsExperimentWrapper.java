@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SegmentsExperiment}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperiment
  * @generated
  */
-@ProviderType
 public class SegmentsExperimentWrapper
 	extends BaseModelWrapper<SegmentsExperiment>
 	implements SegmentsExperiment, ModelWrapper<SegmentsExperiment> {
@@ -414,6 +411,21 @@ public class SegmentsExperimentWrapper
 		return model.getUuid();
 	}
 
+	@Override
+	public long getWinnerSegmentsExperienceId() {
+		return model.getWinnerSegmentsExperienceId();
+	}
+
+	@Override
+	public String getWinnerSegmentsExperienceKey() {
+		return model.getWinnerSegmentsExperienceKey();
+	}
+
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a segments experiment model instance should use the <code>SegmentsExperiment</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

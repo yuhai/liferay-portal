@@ -1,22 +1,58 @@
 definition {
 
-	macro editTitle {
+	macro AddDocument {
+		Type(
+			locator1 = "TextInput#TITLE",
+			value1 = "${dmDocumentTitle}");
+
+		Click(locator1 = "Button#SAVE");
+
 		Pause(locator1 = "10000");
 
-		SelectWindow(locator1 = "OneDrive#PAGE_TITLE");
+		SelectWindow(locator1 = "OneDrive#DOCUMENTS_PAGE_TITLE");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#WEB_APPLICATION");
 
-		Click(locator1 = "OneDrive#TITLE");
+		AssertTextPresent(
+			locator1 = "OneDrive#DOCUMENTS_SAVE_STATUS",
+			value1 = "Saved");
+
+		Navigator.closeWindow();
+
+		SelectFrameTop();
+	}
+
+	macro deleteDocument {
+		var key_documentTitle = "${dmDocumentTitle}";
+
+		if (IsElementPresent(locator1 = "OneDrive#FILES_TITLE")) {
+			Click.mouseOverClick(locator1 = "OneDrive#FILES_CHECKBOX");
+
+			Click(locator1 = "OneDrive#DELETE");
+
+			Click(locator1 = "OneDrive#DELETE_CONFIRMATION");
+		}
+	}
+
+	macro editTitle {
+		Pause(locator1 = "10000");
+
+		SelectWindow(locator1 = "OneDrive#DOCUMENTS_PAGE_TITLE");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#WEB_APPLICATION");
+
+		Click(locator1 = "OneDrive#DOCUMENTS_TITLE");
 
 		Type(
-			locator1 = "OneDrive#TITLE",
+			locator1 = "OneDrive#DOCUMENTS_TITLE",
 			value1 = "${dmDocumentTitle}");
 
-		Click(locator1 = "OneDrive#CONTENT");
+		KeyPress(
+			locator1 = "OneDrive#DOCUMENTS_TITLE",
+			value1 = "\RETURN");
 
 		AssertTextPresent(
-			locator1 = "OneDrive#SAVE_STATUS",
+			locator1 = "OneDrive#DOCUMENTS_SAVE_STATUS",
 			value1 = "Saved");
 
 		Navigator.closeWindow();
@@ -30,6 +66,23 @@ definition {
 		Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
 
 		MenuItem.click(menuItem = "Edit in Office 365");
+	}
+
+	macro goToOneDrive {
+		Navigator.openSpecificURL(url = "https://liferaycolab-my.sharepoint.com/personal/sharepoint_liferaycolab_onmicrosoft_com/_layouts/15/onedrive.aspx");
+
+		Pause(locator1 = "10000");
+
+		MicrosoftLogin.accountSignIn(
+			userEmail = "${userName}",
+			userPassword = "${userPassword}",
+			windowTitle = "Sign in to your account");
+
+		MicrosoftLogin.confirmMicrosoftApp();
+
+		Pause(locator1 = "10000");
+
+		SelectWindow(locator1 = "OneDrive#PAGE_TITLE");
 	}
 
 }

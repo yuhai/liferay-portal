@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link RecentLayoutRevisionLocalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see RecentLayoutRevisionLocalService
  * @generated
  */
-@ProviderType
 public class RecentLayoutRevisionLocalServiceWrapper
 	implements RecentLayoutRevisionLocalService,
 			   ServiceWrapper<RecentLayoutRevisionLocalService> {
@@ -34,6 +32,11 @@ public class RecentLayoutRevisionLocalServiceWrapper
 		_recentLayoutRevisionLocalService = recentLayoutRevisionLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link RecentLayoutRevisionLocalServiceUtil} to access the recent layout revision local service. Add custom service methods to <code>com.liferay.portal.service.impl.RecentLayoutRevisionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.RecentLayoutRevision
 			addRecentLayoutRevision(
@@ -261,7 +264,7 @@ public class RecentLayoutRevisionLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _recentLayoutRevisionLocalService.getOSGiServiceIdentifier();
 	}
 

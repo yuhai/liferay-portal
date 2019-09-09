@@ -49,7 +49,7 @@ public abstract class PollsVoteServiceBaseImpl
 	extends BaseServiceImpl
 	implements PollsVoteService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PollsVoteService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.polls.service.PollsVoteServiceUtil</code>.

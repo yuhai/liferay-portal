@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BookmarksFolderPersistence
 	extends BasePersistence<BookmarksFolder> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BookmarksFolderUtil} to access the bookmarks folder persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

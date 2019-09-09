@@ -89,12 +89,6 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			return;
 		}
 
-		_fragmentEntryLinkLocalService.
-			deleteLayoutPageTemplateEntryFragmentEntryLinks(
-				layout.getGroupId(),
-				_portal.getClassNameId(Layout.class.getName()),
-				layout.getPlid());
-
 		try {
 			Indexer indexer = IndexerRegistryUtil.getIndexer(Layout.class);
 

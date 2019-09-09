@@ -24,6 +24,8 @@ AUI.add(
 		var STR_BOUNDING_BOX = 'boundingBox';
 
 		var SearchContainer = A.Component.create({
+			_cache: {},
+
 			ATTRS: {
 				id: {
 					value: STR_BLANK
@@ -32,7 +34,7 @@ AUI.add(
 
 			NAME: 'searchcontainer',
 
-			constructor: function(config) {
+			constructor(config) {
 				var id = config.id;
 
 				config.boundingBox = config.boundingBox || '#' + id;
@@ -42,7 +44,7 @@ AUI.add(
 				SearchContainer.superclass.constructor.apply(this, arguments);
 			},
 
-			get: function(id) {
+			get(id) {
 				var instance = this;
 
 				var searchContainer = null;
@@ -51,7 +53,7 @@ AUI.add(
 					searchContainer = instance._cache[id];
 				} else {
 					searchContainer = new SearchContainer({
-						id: id
+						id
 					}).render();
 				}
 
@@ -59,7 +61,168 @@ AUI.add(
 			},
 
 			prototype: {
-				initializer: function() {
+				_addRow() {
+					var instance = this;
+
+					instance._parentContainer.show();
+
+					if (instance._emptyResultsMessage) {
+						instance._emptyResultsMessage.hide();
+					}
+				},
+
+				_deleteRow() {
+					var instance = this;
+
+					var action = 'show';
+
+					if (instance._ids.length == 0) {
+						action = 'hide';
+
+						if (instance._emptyResultsMessage) {
+							instance._emptyResultsMessage.show();
+						}
+					}
+
+					instance._parentContainer[action]();
+				},
+
+				addRow(arr, id) {
+					var instance = this;
+
+					var row;
+
+					if (id) {
+						var template = instance._table.one('.' + CSS_TEMPLATE);
+
+						if (template) {
+							row = template.clone();
+
+							var cells = row.all('> td');
+
+							cells.empty();
+
+							arr.forEach(function(item, index) {
+								var cell = cells.item(index);
+
+								if (cell) {
+									cell.html(item);
+								}
+							});
+
+							template.placeBefore(row);
+
+							row.removeClass(CSS_TEMPLATE);
+
+							instance._ids.push(id);
+						}
+
+						instance.updateDataStore();
+
+						instance.fire('addRow', {
+							id,
+							ids: instance._ids,
+							row,
+							rowData: arr
+						});
+					}
+
+					return row;
+				},
+
+				bindUI() {
+					var instance = this;
+
+					instance.publish('addRow', {
+						defaultFn: instance._addRow
+					});
+
+					instance.publish('deleteRow', {
+						defaultFn: instance._deleteRow
+					});
+				},
+
+				deleteRow(obj, id) {
+					var instance = this;
+
+					if (Lang.isNumber(obj) || Lang.isString(obj)) {
+						var row = null;
+
+						instance._table.all('tr').some(function(item, index) {
+							if (!item.hasClass(CSS_TEMPLATE) && index == obj) {
+								row = item;
+							}
+
+							return row;
+						});
+
+						obj = row;
+					} else {
+						obj = A.one(obj);
+					}
+
+					if (id) {
+						var index = instance._ids.indexOf(id.toString());
+
+						if (index > -1) {
+							instance._ids.splice(index, 1);
+
+							instance.updateDataStore();
+						}
+					}
+
+					instance.fire('deleteRow', {
+						id,
+						ids: instance._ids,
+						row: obj
+					});
+
+					if (obj) {
+						if (obj.get('nodeName').toLowerCase() !== 'tr') {
+							obj = obj.ancestor('tr');
+						}
+
+						// LPS-83031
+
+						setTimeout(function() {
+							obj.remove(true);
+						}, 0);
+					}
+				},
+
+				executeAction(name, params) {
+					var instance = this;
+
+					if (instance._actions[name]) {
+						instance._actions[name](params);
+					}
+				},
+
+				getData(toArray) {
+					var instance = this;
+
+					var ids = instance._ids;
+
+					if (!toArray) {
+						ids = ids.join(',');
+					}
+
+					return ids;
+				},
+
+				getForm() {
+					var instance = this;
+
+					return instance.get(STR_BOUNDING_BOX).ancestor('form');
+				},
+
+				getSize() {
+					var instance = this;
+
+					return instance._ids.length;
+				},
+
+				initializer() {
 					var instance = this;
 
 					instance._ids = [];
@@ -69,7 +232,13 @@ AUI.add(
 					SearchContainer.register(instance);
 				},
 
-				renderUI: function() {
+				registerAction(name, fn) {
+					var instance = this;
+
+					instance._actions[name] = fn;
+				},
+
+				renderUI() {
 					var instance = this;
 
 					var id = instance.get('id');
@@ -108,19 +277,7 @@ AUI.add(
 					}
 				},
 
-				bindUI: function() {
-					var instance = this;
-
-					instance.publish('addRow', {
-						defaultFn: instance._addRow
-					});
-
-					instance.publish('deleteRow', {
-						defaultFn: instance._deleteRow
-					});
-				},
-
-				syncUI: function() {
+				syncUI() {
 					var instance = this;
 
 					var dataStore = instance._dataStore;
@@ -134,136 +291,7 @@ AUI.add(
 					}
 				},
 
-				addRow: function(arr, id) {
-					var instance = this;
-
-					var row;
-
-					if (id) {
-						var template = instance._table.one('.' + CSS_TEMPLATE);
-
-						if (template) {
-							row = template.clone();
-
-							var cells = row.all('> td');
-
-							cells.empty();
-
-							arr.forEach(function(item, index) {
-								var cell = cells.item(index);
-
-								if (cell) {
-									cell.html(item);
-								}
-							});
-
-							template.placeBefore(row);
-
-							row.removeClass(CSS_TEMPLATE);
-
-							instance._ids.push(id);
-						}
-
-						instance.updateDataStore();
-
-						instance.fire('addRow', {
-							id: id,
-							ids: instance._ids,
-							row: row,
-							rowData: arr
-						});
-					}
-
-					return row;
-				},
-
-				deleteRow: function(obj, id) {
-					var instance = this;
-
-					if (Lang.isNumber(obj) || Lang.isString(obj)) {
-						var row = null;
-
-						instance._table.all('tr').some(function(item, index) {
-							if (!item.hasClass(CSS_TEMPLATE) && index == obj) {
-								row = item;
-							}
-
-							return row;
-						});
-
-						obj = row;
-					} else {
-						obj = A.one(obj);
-					}
-
-					if (id) {
-						var index = instance._ids.indexOf(id.toString());
-
-						if (index > -1) {
-							instance._ids.splice(index, 1);
-
-							instance.updateDataStore();
-						}
-					}
-
-					instance.fire('deleteRow', {
-						id: id,
-						ids: instance._ids,
-						row: obj
-					});
-
-					if (obj) {
-						if (obj.get('nodeName').toLowerCase() !== 'tr') {
-							obj = obj.ancestor('tr');
-						}
-
-						// LPS-83031
-
-						setTimeout(function() {
-							obj.remove(true);
-						}, 0);
-					}
-				},
-
-				executeAction: function(name, params) {
-					var instance = this;
-
-					if (instance._actions[name]) {
-						instance._actions[name](params);
-					}
-				},
-
-				getData: function(toArray) {
-					var instance = this;
-
-					var ids = instance._ids;
-
-					if (!toArray) {
-						ids = ids.join(',');
-					}
-
-					return ids;
-				},
-
-				getForm: function() {
-					var instance = this;
-
-					return instance.get(STR_BOUNDING_BOX).ancestor('form');
-				},
-
-				getSize: function() {
-					var instance = this;
-
-					return instance._ids.length;
-				},
-
-				registerAction: function(name, fn) {
-					var instance = this;
-
-					instance._actions[name] = fn;
-				},
-
-				updateDataStore: function(ids) {
+				updateDataStore(ids) {
 					var instance = this;
 
 					if (ids) {
@@ -279,36 +307,10 @@ AUI.add(
 					if (dataStore) {
 						dataStore.val(instance._ids.join(','));
 					}
-				},
-
-				_addRow: function(event) {
-					var instance = this;
-
-					instance._parentContainer.show();
-
-					if (instance._emptyResultsMessage) {
-						instance._emptyResultsMessage.hide();
-					}
-				},
-
-				_deleteRow: function(event) {
-					var instance = this;
-
-					var action = 'show';
-
-					if (instance._ids.length == 0) {
-						action = 'hide';
-
-						if (instance._emptyResultsMessage) {
-							instance._emptyResultsMessage.show();
-						}
-					}
-
-					instance._parentContainer[action]();
 				}
 			},
 
-			register: function(obj) {
+			register(obj) {
 				var instance = this;
 
 				var id = obj.get('id');
@@ -322,9 +324,7 @@ AUI.add(
 				Liferay.fire('search-container:registered', {
 					searchContainer: obj
 				});
-			},
-
-			_cache: {}
+			}
 		});
 
 		Liferay.SearchContainer = SearchContainer;

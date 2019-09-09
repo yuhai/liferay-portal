@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMFormInstanceRecordVersion}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMFormInstanceRecordVersion
  * @generated
  */
-@ProviderType
 public class DDMFormInstanceRecordVersionWrapper
 	extends BaseModelWrapper<DDMFormInstanceRecordVersion>
 	implements DDMFormInstanceRecordVersion,
@@ -60,11 +57,11 @@ public class DDMFormInstanceRecordVersionWrapper
 		attributes.put("formInstanceVersion", getFormInstanceVersion());
 		attributes.put("formInstanceRecordId", getFormInstanceRecordId());
 		attributes.put("version", getVersion());
+		attributes.put("storageId", getStorageId());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
 		attributes.put("statusDate", getStatusDate());
-		attributes.put("storageId", getStorageId());
 
 		return attributes;
 	}
@@ -140,6 +137,12 @@ public class DDMFormInstanceRecordVersionWrapper
 			setVersion(version);
 		}
 
+		Long storageId = (Long)attributes.get("storageId");
+
+		if (storageId != null) {
+			setStorageId(storageId);
+		}
+
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
@@ -162,12 +165,6 @@ public class DDMFormInstanceRecordVersionWrapper
 
 		if (statusDate != null) {
 			setStatusDate(statusDate);
-		}
-
-		Long storageId = (Long)attributes.get("storageId");
-
-		if (storageId != null) {
-			setStorageId(storageId);
 		}
 	}
 
@@ -470,6 +467,11 @@ public class DDMFormInstanceRecordVersionWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm form instance record version model instance should use the <code>DDMFormInstanceRecordVersion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

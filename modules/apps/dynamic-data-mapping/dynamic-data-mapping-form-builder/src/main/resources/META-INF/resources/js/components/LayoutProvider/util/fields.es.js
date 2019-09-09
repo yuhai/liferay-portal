@@ -87,8 +87,12 @@ export const updateFieldValidationProperty = (
 		if (field.fieldName === 'validation' && field.value) {
 			let expression = field.value.expression;
 
-			if (propertyName === 'fieldName' && expression) {
-				expression = expression.replace(fieldName, propertyValue);
+			if (
+				propertyName === 'fieldName' &&
+				expression &&
+				expression.value
+			) {
+				expression = expression.value.replace(fieldName, propertyValue);
 			}
 
 			field = {

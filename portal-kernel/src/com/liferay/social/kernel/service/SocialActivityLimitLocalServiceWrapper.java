@@ -16,8 +16,6 @@ package com.liferay.social.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SocialActivityLimitLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivityLimitLocalService
  * @generated
  */
-@ProviderType
 public class SocialActivityLimitLocalServiceWrapper
 	implements SocialActivityLimitLocalService,
 			   ServiceWrapper<SocialActivityLimitLocalService> {
@@ -36,6 +33,11 @@ public class SocialActivityLimitLocalServiceWrapper
 		_socialActivityLimitLocalService = socialActivityLimitLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SocialActivityLimitLocalServiceUtil} to access the social activity limit local service. Add custom service methods to <code>com.liferay.portlet.social.service.impl.SocialActivityLimitLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.social.kernel.model.SocialActivityLimit addActivityLimit(
 			long userId, long groupId, long classNameId, long classPK,

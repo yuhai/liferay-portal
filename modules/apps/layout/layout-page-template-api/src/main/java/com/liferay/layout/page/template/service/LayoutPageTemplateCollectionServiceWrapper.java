@@ -16,8 +16,6 @@ package com.liferay.layout.page.template.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link LayoutPageTemplateCollectionService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutPageTemplateCollectionService
  * @generated
  */
-@ProviderType
 public class LayoutPageTemplateCollectionServiceWrapper
 	implements LayoutPageTemplateCollectionService,
 			   ServiceWrapper<LayoutPageTemplateCollectionService> {
@@ -38,6 +35,11 @@ public class LayoutPageTemplateCollectionServiceWrapper
 			layoutPageTemplateCollectionService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link LayoutPageTemplateCollectionServiceUtil} to access the layout page template collection remote service. Add custom service methods to <code>com.liferay.layout.page.template.service.impl.LayoutPageTemplateCollectionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.layout.page.template.model.LayoutPageTemplateCollection
 			addLayoutPageTemplateCollection(

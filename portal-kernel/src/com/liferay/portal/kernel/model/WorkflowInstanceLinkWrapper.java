@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link WorkflowInstanceLink}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WorkflowInstanceLink
  * @generated
  */
-@ProviderType
 public class WorkflowInstanceLinkWrapper
 	extends BaseModelWrapper<WorkflowInstanceLink>
 	implements WorkflowInstanceLink, ModelWrapper<WorkflowInstanceLink> {
@@ -271,6 +268,11 @@ public class WorkflowInstanceLinkWrapper
 		return model.getWorkflowInstanceLinkId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a workflow instance link model instance should use the <code>WorkflowInstanceLink</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

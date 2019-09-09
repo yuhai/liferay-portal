@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface RatingsStatsLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link RatingsStatsLocalServiceUtil} to access the ratings stats local service. Add custom service methods to <code>com.liferay.portlet.ratings.service.impl.RatingsStatsLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

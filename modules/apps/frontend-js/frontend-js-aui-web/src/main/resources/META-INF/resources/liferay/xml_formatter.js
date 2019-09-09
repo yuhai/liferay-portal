@@ -35,7 +35,7 @@ AUI.add(
 			NAME: 'liferayxmlformatter',
 
 			prototype: {
-				format: function(content) {
+				format(content) {
 					var instance = this;
 
 					var tagIndent = instance.get('tagIndent');
@@ -43,8 +43,8 @@ AUI.add(
 					var lineIndent = instance.get('lineIndent');
 
 					return Liferay.Util.formatXML(content, {
-						lineIndent: lineIndent,
-						tagIndent: tagIndent
+						lineIndent,
+						tagIndent
 					});
 				}
 			}

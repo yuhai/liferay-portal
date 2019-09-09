@@ -14,6 +14,7 @@
 
 package com.liferay.segments.service.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
@@ -31,6 +32,7 @@ import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.BigDecimalUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.constants.SegmentsExperimentConstants;
@@ -40,14 +42,23 @@ import com.liferay.segments.exception.NoSuchExperimentException;
 import com.liferay.segments.exception.SegmentsExperimentConfidenceLevelException;
 import com.liferay.segments.exception.SegmentsExperimentGoalException;
 import com.liferay.segments.exception.SegmentsExperimentNameException;
+import com.liferay.segments.exception.SegmentsExperimentRelSplitException;
 import com.liferay.segments.exception.SegmentsExperimentStatusException;
+import com.liferay.segments.exception.WinnerSegmentsExperienceException;
+import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
+import com.liferay.segments.model.SegmentsExperimentRel;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.segments.service.SegmentsExperimentRelLocalService;
 import com.liferay.segments.service.base.SegmentsExperimentLocalServiceBaseImpl;
 
+import java.math.RoundingMode;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -272,27 +283,41 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	@Override
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, double confidenceLevel, int status)
+	public SegmentsExperiment runSegmentsExperiment(
+			long segmentsExperimentId, double confidenceLevel,
+			Map<Long, Double> segmentsExperienceIdSplitMap)
 		throws PortalException {
+
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentPersistence.findByPrimaryKey(
+				segmentsExperimentId);
+
+		_validateEditableStatus(segmentsExperiment.getStatus());
 
 		_validateConfidenceLevel(confidenceLevel);
+		_validateSplit(segmentsExperienceIdSplitMap);
+
+		UnicodeProperties typeSettingsProperties =
+			segmentsExperiment.getTypeSettingsProperties();
+
+		typeSettingsProperties.setProperty(
+			"confidenceLevel", String.valueOf(confidenceLevel));
+
+		segmentsExperiment.setTypeSettings(typeSettingsProperties.toString());
+
+		for (Map.Entry<Long, Double> segmentsExperienceIdSplit :
+				segmentsExperienceIdSplitMap.entrySet()) {
+
+			_segmentsExperimentRelLocalService.updateSegmentsExperimentRel(
+				segmentsExperimentId, segmentsExperienceIdSplit.getKey(),
+				BigDecimalUtil.scale(
+					segmentsExperienceIdSplit.getValue(), 2,
+					RoundingMode.HALF_DOWN));
+		}
 
 		return _updateSegmentsExperimentStatus(
-			segmentsExperimentPersistence.findByPrimaryKey(
-				segmentsExperimentId),
-			confidenceLevel, status);
-	}
-
-	@Override
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, int status)
-		throws PortalException {
-
-		return _updateSegmentsExperimentStatus(
-			segmentsExperimentPersistence.findByPrimaryKey(
-				segmentsExperimentId),
-			0, status);
+			segmentsExperiment, -1,
+			SegmentsExperimentConstants.Status.RUNNING.getValue());
 	}
 
 	@Override
@@ -326,14 +351,26 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	@Override
-	public SegmentsExperiment updateSegmentsExperiment(
-			String segmentsExperimentKey, int status)
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, int status)
 		throws PortalException {
 
 		return _updateSegmentsExperimentStatus(
-			segmentsExperimentPersistence.findBySegmentsExperimentKey_First(
-				segmentsExperimentKey, null),
-			0, status);
+			segmentsExperimentPersistence.findByPrimaryKey(
+				segmentsExperimentId),
+			-1, status);
+	}
+
+	@Override
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, long winnerSegmentsExperienceId,
+			int status)
+		throws PortalException {
+
+		return _updateSegmentsExperimentStatus(
+			segmentsExperimentPersistence.findByPrimaryKey(
+				segmentsExperimentId),
+			winnerSegmentsExperienceId, status);
 	}
 
 	protected void sendNotificationEvent(SegmentsExperiment segmentsExperiment)
@@ -393,8 +430,8 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	private SegmentsExperiment _updateSegmentsExperimentStatus(
-			SegmentsExperiment segmentsExperiment, double confidenceLevel,
-			int status)
+			SegmentsExperiment segmentsExperiment,
+			long winnerSegmentsExperienceId, int status)
 		throws PortalException {
 
 		_validateStatus(
@@ -402,26 +439,70 @@ public class SegmentsExperimentLocalServiceImpl
 			segmentsExperiment.getSegmentsExperienceId(),
 			segmentsExperiment.getClassNameId(),
 			segmentsExperiment.getClassPK(), segmentsExperiment.getStatus(),
-			status);
+			status, winnerSegmentsExperienceId);
 
-		segmentsExperiment.setModifiedDate(new Date());
-
-		if (confidenceLevel != 0) {
-			UnicodeProperties typeSettingsProperties =
-				segmentsExperiment.getTypeSettingsProperties();
-
-			typeSettingsProperties.setProperty(
-				"confidenceLevel", String.valueOf(confidenceLevel));
-
-			segmentsExperiment.setTypeSettings(
-				typeSettingsProperties.toString());
+		if (winnerSegmentsExperienceId != -1) {
+			_updateWinnerSegmentsExperienceId(
+				segmentsExperiment, winnerSegmentsExperienceId, status);
 		}
 
+		segmentsExperiment.setModifiedDate(new Date());
 		segmentsExperiment.setStatus(status);
 
 		segmentsExperimentPersistence.update(segmentsExperiment);
 
 		sendNotificationEvent(segmentsExperiment);
+
+		return segmentsExperiment;
+	}
+
+	private SegmentsExperiment _updateWinnerSegmentsExperienceId(
+			SegmentsExperiment segmentsExperiment,
+			long winnerSegmentsExperienceId, int status)
+		throws PortalException {
+
+		SegmentsExperimentRel segmentsExperimentRel =
+			_segmentsExperimentRelLocalService.fetchSegmentsExperimentRel(
+				segmentsExperiment.getSegmentsExperimentId(),
+				winnerSegmentsExperienceId);
+
+		if (segmentsExperimentRel == null) {
+			throw new WinnerSegmentsExperienceException(
+				"Winner segments experience " + winnerSegmentsExperienceId +
+					" no found");
+		}
+
+		UnicodeProperties typeSettingsProperties =
+			segmentsExperiment.getTypeSettingsProperties();
+
+		typeSettingsProperties.setProperty(
+			"winnerSegmentsExperienceId",
+			String.valueOf(winnerSegmentsExperienceId));
+
+		segmentsExperiment.setTypeSettings(typeSettingsProperties.toString());
+
+		SegmentsExperimentConstants.Status statusObject =
+			SegmentsExperimentConstants.Status.valueOf(status);
+
+		if ((winnerSegmentsExperienceId !=
+				segmentsExperiment.getSegmentsExperienceId()) &&
+			(statusObject == SegmentsExperimentConstants.Status.COMPLETED)) {
+
+			List<SegmentsExperience> segmentsExperiences =
+				_segmentsExperienceLocalService.getSegmentsExperiences(
+					segmentsExperiment.getGroupId(),
+					segmentsExperiment.getClassNameId(),
+					segmentsExperiment.getClassPK());
+
+			for (SegmentsExperience segmentsExperience : segmentsExperiences) {
+				segmentsExperience.setActive(
+					segmentsExperience.getSegmentsExperienceId() ==
+						winnerSegmentsExperienceId);
+
+				_segmentsExperienceLocalService.updateSegmentsExperience(
+					segmentsExperience);
+			}
+		}
 
 		return segmentsExperiment;
 	}
@@ -436,29 +517,27 @@ public class SegmentsExperimentLocalServiceImpl
 		_validateName(name);
 		_validateStatus(
 			segmentsExperimentId, segmentsExperienceId, classNameId, classPK,
-			currentStatus, newStatus);
+			currentStatus, newStatus, -1);
 	}
 
 	private void _validateConfidenceLevel(double confidenceLevel)
 		throws PortalException {
 
-		if ((confidenceLevel > 1) || (confidenceLevel < 0)) {
+		if ((confidenceLevel < 0.8) || (confidenceLevel > 0.99)) {
 			throw new SegmentsExperimentConfidenceLevelException(
 				"Confidence level " + confidenceLevel +
-					" is not a value between 0 and 1");
+					" is not a value between 0.8 and 0.99");
 		}
 	}
 
-	private void _validateEditableStatus(int statusValue)
-		throws PortalException {
+	private void _validateEditableStatus(int status) throws PortalException {
+		SegmentsExperimentConstants.Status statusObject =
+			SegmentsExperimentConstants.Status.valueOf(status);
 
-		SegmentsExperimentConstants.Status status =
-			SegmentsExperimentConstants.Status.valueOf(statusValue);
-
-		if (!status.isEditable()) {
+		if (!statusObject.isEditable()) {
 			throw new LockedSegmentsExperimentException(
 				"Segments experiment is not editable in status " +
-					SegmentsExperimentConstants.Status.parse(statusValue));
+					statusObject);
 		}
 	}
 
@@ -474,22 +553,45 @@ public class SegmentsExperimentLocalServiceImpl
 		}
 	}
 
+	private void _validateSplit(Map<Long, Double> segmentsExperienceIdSplitMap)
+		throws PortalException {
+
+		Collection<Double> segmentsExperienceIdSplitsValues =
+			segmentsExperienceIdSplitMap.values();
+
+		Stream<Double> segmentsExperienceIdSplitsStream =
+			segmentsExperienceIdSplitsValues.stream();
+
+		double segmentsExperienceIdSplitsSum =
+			segmentsExperienceIdSplitsStream.mapToDouble(
+				segmentsExperienceIdSplit -> BigDecimalUtil.scale(
+					segmentsExperienceIdSplit, 2, RoundingMode.HALF_DOWN)
+			).sum();
+
+		if (segmentsExperienceIdSplitsSum != 1) {
+			throw new SegmentsExperimentRelSplitException(
+				"Segments experiment rel splits must add up to " + 1);
+		}
+	}
+
 	private void _validateStatus(
 			long segmentsExperimentId, long segmentsExperienceId,
-			long classNameId, long classPK, int statusValue, int newStatusValue)
+			long classNameId, long classPK, int status, int newStatus,
+			long winnerSegmentsExperienceId)
 		throws SegmentsExperimentStatusException {
 
 		SegmentsExperimentConstants.Status.validateTransition(
-			statusValue, newStatusValue);
+			status, newStatus);
 
-		SegmentsExperimentConstants.Status newStatus =
-			SegmentsExperimentConstants.Status.valueOf(newStatusValue);
+		SegmentsExperimentConstants.Status newStatusObject =
+			SegmentsExperimentConstants.Status.valueOf(newStatus);
 
-		if (newStatus.isExclusive()) {
+		if (newStatusObject.isExclusive()) {
 			List<SegmentsExperiment> segmentsExperiments =
 				segmentsExperimentPersistence.findByS_C_C_S(
 					new long[] {segmentsExperienceId}, classNameId, classPK,
-					SegmentsExperimentConstants.Status.exclusiveStates());
+					SegmentsExperimentConstants.Status.
+						getExclusiveStatusValues());
 
 			if (segmentsExperiments.isEmpty()) {
 				return;
@@ -509,9 +611,18 @@ public class SegmentsExperimentLocalServiceImpl
 					segmentsExperimentId) {
 
 				throw new SegmentsExperimentStatusException(
-					"A segments experiment with status " + newStatus.name() +
-						" already exists");
+					"A segments experiment with status " +
+						newStatusObject.name() + " already exists");
 			}
+		}
+
+		if (newStatusObject.requiresWinnerExperience() &&
+			(winnerSegmentsExperienceId < 0)) {
+
+			throw new SegmentsExperimentStatusException(
+				StringBundler.concat(
+					"Status ", newStatusObject.name(),
+					" requires a winner segments experience"));
 		}
 	}
 

@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface RecentLayoutRevisionPersistence
 	extends BasePersistence<RecentLayoutRevision> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link RecentLayoutRevisionUtil} to access the recent layout revision persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

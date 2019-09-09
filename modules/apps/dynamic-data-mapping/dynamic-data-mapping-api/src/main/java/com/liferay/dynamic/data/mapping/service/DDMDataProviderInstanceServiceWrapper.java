@@ -16,8 +16,6 @@ package com.liferay.dynamic.data.mapping.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DDMDataProviderInstanceService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMDataProviderInstanceService
  * @generated
  */
-@ProviderType
 public class DDMDataProviderInstanceServiceWrapper
 	implements DDMDataProviderInstanceService,
 			   ServiceWrapper<DDMDataProviderInstanceService> {
@@ -36,6 +33,11 @@ public class DDMDataProviderInstanceServiceWrapper
 		_ddmDataProviderInstanceService = ddmDataProviderInstanceService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DDMDataProviderInstanceServiceUtil} to access the ddm data provider instance remote service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMDataProviderInstanceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance
 			addDataProviderInstance(

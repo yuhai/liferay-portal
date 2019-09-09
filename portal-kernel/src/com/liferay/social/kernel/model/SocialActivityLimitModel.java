@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialActivityLimitModel
 	extends AttachedModel, BaseModel<SocialActivityLimit>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a social activity limit model instance should use the {@link SocialActivityLimit} interface instead.

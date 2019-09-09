@@ -55,8 +55,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the membership request local service.
  *
@@ -68,12 +66,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portal.service.impl.MembershipRequestLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class MembershipRequestLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements MembershipRequestLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MembershipRequestLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.MembershipRequestLocalServiceUtil</code>.

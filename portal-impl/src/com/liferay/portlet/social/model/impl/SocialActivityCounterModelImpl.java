@@ -43,8 +43,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the SocialActivityCounter service. Represents a row in the &quot;SocialActivityCounter&quot; database table, with each column mapped to a property of this class.
  *
@@ -56,12 +54,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivityCounterImpl
  * @generated
  */
-@ProviderType
 public class SocialActivityCounterModelImpl
 	extends BaseModelImpl<SocialActivityCounter>
 	implements SocialActivityCounterModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a social activity counter model instance should use the <code>SocialActivityCounter</code> interface instead.

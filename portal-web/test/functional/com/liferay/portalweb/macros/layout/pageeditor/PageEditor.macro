@@ -1,0 +1,543 @@
+definition {
+
+	macro addComment {
+		PageEditor.gotoTab(tabName = "Comments");
+
+		Click(
+			key_content = "${content}",
+			key_fragmentClass = "${fragmentClass}",
+			key_position = "${position}",
+			locator1 = "Fragment#FRAGMENT");
+
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_SECTION_NAME");
+
+		Click.clickAt(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS");
+
+		Type(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS",
+			value1 = "${fragmentComment}");
+
+		Button.clickComment();
+	}
+
+	macro addCommentViaFragment {
+		PageEditor.gotoCommentViaFragment(
+			key_content = "${content}",
+			key_fragmentClass = "${fragmentClass}",
+			key_position = "${position}");
+
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_SECTION_NAME");
+
+		Click.clickAt(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS");
+
+		Type(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS",
+			value1 = "${fragmentComment}");
+
+		Button.clickComment();
+	}
+
+	macro addExperience {
+		var key_experienceName = "${experienceName}";
+
+		AssertTextEquals(
+			locator1 = "PageEditor#EXPERIENCE_LABEL",
+			value1 = "Experience");
+
+		Click(locator1 = "PageEditor#EXPERIENCE_DEFAULT_BUTTON_NAME");
+
+		Click(
+			key_text = "New Experience",
+			locator1 = "Button#ANY");
+
+		Type(
+			locator1 = "PageEditor#EXPERIENCE_NAME",
+			value1 = "${experienceName}");
+
+		Button.clickSave();
+
+		AssertClick(
+			locator1 = "PageEditor#EXPERIENCE_BUTTON_NAME",
+			value1 = "${experienceName}");
+
+		AssertElementPresent(
+			key_experienceName = "${experienceName}",
+			locator1 = "PageEditor#EXPERIENCE_SELECT_ITEM");
+	}
+
+	macro addFragment {
+		PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
+
+		Click.clickNoMouseOverNoWaitForVisible(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_ADD_FRAGMENT_BUTTON");
+
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "Fragment#FRAGMENT_HEADER");
+
+		PageEditor.waitForAutoSave();
+	}
+
+	macro addLayoutSection {
+		PageEditor.gotoTab(tabName = "Section Builder");
+
+		PageEditor.expandFragmentCollection(collectionName = "Layouts");
+
+		DragAndDrop(
+			locator1 = "PageEditor#SECTION_BUILDER_LAYOUTS_${columnCount}_COLUMN",
+			locator2 = "PageEditor#FRAGMENT_DROP_TARGET",
+			value1 = "");
+
+		AssertVisible(
+			key_position = "1",
+			locator1 = "PageEditor#SECTION");
+	}
+
+	macro addWidget {
+		PageEditor.gotoTab(tabName = "Widgets");
+
+		Type.sendKeysApplicationSearch(
+			locator1 = "PageEditor#WIDGETS_APPLICATION_SEARCH_FIELD",
+			value1 = "${portletName}");
+
+		var key_portletName = "${portletName}";
+
+		DragAndDrop(
+			locator1 = "PageEditor#WIDGETS_ADD_PORTLET_DRAG_LINK",
+			locator2 = "PageEditor#FRAGMENT_DROP_TARGET",
+			value1 = "${portletName}");
+
+		Pause(locator1 = "5000");
+
+		AssertElementPresent(
+			key_fragmentName = "${portletName}",
+			locator1 = "Fragment#FRAGMENT_HEADER");
+
+		PageEditor.closeSidebar(tabName = "Widgets");
+	}
+
+	macro assertFragmentSidebarLoaded {
+		AssertVisible(locator1 = "PageEditor#FRAGMENT_SIDEBAR_LOADED");
+	}
+
+	macro changeExperience {
+		var key_experienceName = "${newExperience}";
+
+		Click(locator1 = "PageEditor#EXPERIENCE_LABEL");
+
+		Click(locator1 = "PageEditor#EXPERIENCE_SELECT_ITEM");
+
+		Click(locator1 = "PageEditor#FRAGMENT_SIDEBAR");
+
+		AssertElementPresent(locator1 = "PageEditor#EXPERIENCE_BUTTON_NAME");
+	}
+
+	macro clickBack {
+		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
+	}
+
+	macro clickDiscardDraft {
+		Button.clickNoError(button = "Discard Draft");
+
+		Confirm();
+	}
+
+	macro clickEditableField {
+		Click(
+			key_fragmentName = "${fragmentName}",
+			key_id = "${id}",
+			locator1 = "Fragment#EDITABLE_FIELD");
+	}
+
+	macro clickPublish {
+		Button.click(button = "Publish");
+	}
+
+	macro closeSidebar {
+		Click(
+			key_tabName = "${tabName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON");
+
+		AssertElementPresent(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLAPSED");
+	}
+
+	macro deleteComment {
+		MouseOver(locator1 = "PageEditor#FRAGMENT_SIDEBAR_ELLIPSIS");
+
+		Click(locator1 = "PageEditor#FRAGMENT_SIDEBAR_ELLIPSIS");
+
+		AssertClickNoError(
+			key_menuItem = "Delete",
+			locator1 = "MenuItem#ANY_MENU_ITEM",
+			value1 = "Delete");
+
+		Click(locator1 = "Button#DELETE_FRAGMENT_COMMENT");
+
+		AssertTextNotPresent(value1 = "${fragmentComment}");
+	}
+
+	macro editComment {
+		MouseOver(locator1 = "PageEditor#FRAGMENT_SIDEBAR_ELLIPSIS");
+
+		Click(locator1 = "PageEditor#FRAGMENT_SIDEBAR_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Edit");
+
+		Click.clickAt(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS_EDITOR");
+
+		Type(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENTS_EDITOR",
+			value1 = "${fragmentCommentEdit}");
+
+		Click(locator1 = "Button#UPDATE");
+	}
+
+	macro editFragmentImage {
+		PageEditor.gotoEditableFieldImageProperties(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
+
+		Button.clickSelect();
+
+		SelectFrame(locator1 = "IFrame#DIALOG");
+
+		AssertElementPresent(locator1 = "Button#SELECT_FILE");
+
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
+			value1 = "${fileName}");
+
+		Pause(locator1 = "3000");
+
+		SelectFrameTop();
+
+		Click(locator1 = "Button#ADD");
+
+		PageEditor.waitForAutoSave();
+	}
+
+	macro editFragmentText {
+		PageEditor.gotoEditableFieldEdit(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
+
+		Type(
+			key_fragmentName = "${fragmentName}",
+			key_id = "${id}",
+			locator1 = "Fragment#EDITABLE_FIELD_CK_EDITOR",
+			value1 = "${text}");
+
+		PageEditor.waitForAutoSave();
+	}
+
+	macro editLayoutSectionSpacing {
+		Click(
+			key_position = "1",
+			locator1 = "PageEditor#SECTION");
+
+		Click(
+			key_button = "Spacing",
+			locator1 = "PageEditor#SECTION_PROPERTIES_BUTTON");
+
+		if (isSet(numberOfColumns)) {
+			Select(
+				key_fieldLabel = "Number of Columns",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${numberOfColumns}");
+		}
+
+		if (isSet(container)) {
+			Select(
+				key_fieldLabel = "Container",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${container}");
+		}
+
+		if (isSet(paddingV)) {
+			Select(
+				key_fieldLabel = "Padding V",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${paddingV}");
+		}
+
+		if (isSet(paddingH)) {
+			Select(
+				key_fieldLabel = "Padding H",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${paddingH}");
+		}
+
+		if ("${spaceBetweenColumns}" == "true") {
+			Check.checkToggleSwitch(
+				checkboxName = "Space Between Columns",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		if ("${spaceBetweenColumns}" == "false") {
+			Uncheck.uncheckToggleSwitch(
+				checkboxName = "Space Between Columns",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		PageEditor.waitForAutoSave();
+	}
+
+	macro expandFragmentCollection {
+		AssertVisible(
+			key_collectionName = "${collectionName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL");
+
+		if (IsElementPresent(locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED", key_collectionName = "${collectionName}")) {
+			AssertClick(
+				key_collectionName = "${collectionName}",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED",
+				value1 = "${collectionName}");
+		}
+
+		AssertElementPresent(
+			key_collectionName = "${collectionName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_EXPANDED");
+	}
+
+	macro gotoCommentList {
+		Click(locator1 = "PageEditor#FRAGMENT_SIDEBAR_BACK");
+
+		AssertTextEquals(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_LIST_TITLE",
+			value1 = "Comments");
+	}
+
+	macro gotoCommentViaFragment {
+		Click(
+			key_content = "${content}",
+			key_fragmentClass = "${fragmentClass}",
+			key_position = "${position}",
+			locator1 = "Fragment#FRAGMENT");
+
+		Click(locator1 = "Fragment#FRAGMENT_COMMENT_ICON");
+	}
+
+	macro gotoEditableFieldEdit {
+		PageEditor.clickEditableField(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
+
+		Click(locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_EDIT_BUTTON");
+	}
+
+	macro gotoEditableFieldImageProperties {
+		PageEditor.clickEditableField(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
+
+		Click(locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_IMAGE_PROPERTIES_BUTTON");
+	}
+
+	macro gotoTab {
+		Click(
+			key_tabName = "${tabName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON");
+	}
+
+	macro removeFragment {
+		Click(
+			fragment_name = "${fragmentName}",
+			locator1 = "PageEditor#SECTION_NAME");
+
+		Click(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "FragmentEditor#FRAGMENTS_EDITOR_FLOATING_TOOLBAR_DELETE");
+
+		AssertElementNotPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "Fragment#FRAGMENT_HEADER");
+
+		PageEditor.waitForAutoSave();
+	}
+
+	macro removeSection {
+		MouseOver.mouseOverNotVisible(
+			key_position = "${position}",
+			locator1 = "PageEditor#SECTION");
+
+		Click(
+			key_position = "${position}",
+			locator1 = "PageEditor#SECTION_HEADER_DELETE_BUTTON");
+
+		PageEditor.waitForAutoSave();
+	}
+
+	macro reopenResolvedComment {
+		AssertElementPresent(locator1 = "PageEditor#FRAGMENT_SIDEBAR_SHOW_RESOLVED_COMMENTS_CHECKBOX_UNCHECKED");
+
+		MouseOver(locator1 = "PageEditor#FRAGMENT_SIDEBAR_SHOW_RESOLVED_COMMENTS_LABEL");
+
+		Click(locator1 = "PageEditor#FRAGMENT_SIDEBAR_SHOW_RESOLVED_COMMENTS_LABEL");
+
+		AssertTextEquals(
+			key_fragmentComment = "${fragmentComment}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_RESOLVED_COMMENTS_ENTRY",
+			value1 = "${fragmentComment}");
+
+		AssertTextEquals(
+			key_commentReply = "${commentReply}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_REPLY_RESOLVED_COMMENTS_ENTRY",
+			value1 = "${commentReply}");
+
+		AssertElementPresent(locator1 = "Button#REPLY_DISABLED");
+
+		Click.clickNoMouseOver(locator1 = "Button#REOPEN");
+
+		AssertElementPresent(locator1 = "PageEditor#FRAGMENT_SIDEBAR_SHOW_RESOLVED_COMMENTS_CHECKBOX_DISABLED");
+	}
+
+	macro replyToComment {
+		AssertClick(
+			locator1 = "Button#REPLY",
+			value1 = "Reply");
+
+		Type(
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_REPLY_COMMENTS_EDITOR",
+			value1 = "${commentReply}");
+
+		AssertClick(
+			locator1 = "Button#REPLY",
+			value1 = "Reply");
+	}
+
+	macro resolveComment {
+		AssertElementPresent(locator1 = "PageEditor#FRAGMENT_SIDEBAR_SHOW_RESOLVED_COMMENTS_CHECKBOX_DISABLED");
+
+		Click.clickNoMouseOver(locator1 = "Button#RESOLVE");
+
+		AssertTextNotPresent(value1 = "${fragmentComment}");
+	}
+
+	macro viewAutoSaveMessage {
+		AssertTextEquals.assertPartialText(
+			locator1 = "PageEditor#AUTOSAVE_MESSAGE",
+			value1 = "Draft saved at");
+	}
+
+	macro viewCollectionNotPresent {
+		AssertElementNotPresent(
+			key_collectionName = "${collectionName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL");
+	}
+
+	macro viewComment {
+		if (isSet(fragmentComment)) {
+			if (isSet(fromNotifications)) {
+				AssertTextEquals(
+					key_fragmentComment = "${fragmentComment}",
+					locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_ENTRY_HIGHLIGHTED",
+					value1 = "${fragmentComment}");
+			}
+
+			else {
+				AssertTextEquals(
+					key_fragmentComment = "${fragmentComment}",
+					locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_ENTRY",
+					value1 = "${fragmentComment}");
+			}
+		}
+
+		else {
+			AssertTextEquals(
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_SECTION_TITLE",
+				value1 = "Comments");
+
+			AssertTextEquals(
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_CENTER_TEXT",
+				value1 = "There are no comments yet.");
+
+			AssertTextEquals(
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_SECONDARY_TEXT",
+				value1 = "Select a fragment to add a comment.");
+		}
+
+		if (isSet(key_fragmentName)) {
+			AssertElementPresent(
+				key_fragmentName = "Rich Text",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_SECTION_NAME");
+		}
+	}
+
+	macro viewCommentList {
+		AssertTextEquals(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_LIST_HEADING",
+			value1 = "${fragmentName}");
+
+		AssertTextEquals(
+			key_commentCount = "${commentCount}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_LIST_SECONDARY_TEXT",
+			value1 = "${commentCount}");
+
+		if (isSet(openComment)) {
+			Click(
+				key_fragmentName = "${fragmentName}",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_LIST_HEADING");
+		}
+	}
+
+	macro viewCommentReply {
+		if (isSet(fromNotifications)) {
+			AssertTextEquals(
+				key_commentReply = "${commentReply}",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_REPLY_COMMENTS_ENTRY_HIGHLIGHTED",
+				value1 = "${commentReply}");
+		}
+
+		else {
+			AssertTextEquals(
+				key_commentReply = "${commentReply}",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_REPLY_COMMENTS_ENTRY",
+				value1 = "${commentReply}");
+		}
+
+		AssertTextEquals(
+			key_commentReply = "${commentReply}",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_REPLY_COMMENTS_ENTRY_AUTHOR",
+			value1 = "${user}");
+	}
+
+	macro viewEditorEmpty {
+		AssertElementPresent(locator1 = "PageEditor#EMPTY_MESSAGE");
+	}
+
+	macro viewFragment {
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			locator1 = "Fragment#FRAGMENT_HEADER");
+	}
+
+	macro viewFragmentEditableText {
+		AssertTextEquals(
+			key_fragmentName = "${fragmentName}",
+			key_id = "${id}",
+			locator1 = "Fragment#EDITABLE_FIELD",
+			value1 = "${editableText}");
+	}
+
+	macro viewFragmentOrder {
+		AssertElementPresent(
+			key_fragmentName = "${fragmentName}",
+			key_position = "${position}",
+			locator1 = "Fragment#FRAGMENT_HEADER_POSITION");
+	}
+
+	macro waitForAutoSave {
+		Pause(locator1 = "1000");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "PageEditor#AUTOSAVE_MESSAGE",
+			value1 = "Draft saved at");
+	}
+
+}

@@ -12,92 +12,76 @@
  * details.
  */
 
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import ClaySelect from '@clayui/select';
-import Variants from './Variants/Variants.es';
-import {
-	SegmentsExperienceType,
-	SegmentsExperimentType,
-	SegmentsVariantType
-} from '../types.es';
+import ClickGoalPicker from './ClickGoalPicker/ClickGoalPicker.es';
+import {SegmentsExperienceType} from '../types.es';
 import SegmentsExperimentsActions from './SegmentsExperimentsActions.es';
 import SegmentsExperimentsDetails from './SegmentsExperimentsDetails.es';
-
-const _statusToType = status => STATUS_TO_TYPE[status];
-
-const STATUS_TO_TYPE = {
-	0: 'secondary',
-	1: 'primary',
-	2: 'success',
-	3: 'success',
-	4: 'primary',
-	5: 'warning',
-	6: 'danger',
-	7: 'warning'
-};
+import Variants from './Variants/Variants.es';
+import {statusToLabelDisplayType, STATUS_DRAFT} from '../util/statuses.es';
+import {StateContext} from '../state/context.es';
 
 function SegmentsExperiments({
 	onCreateSegmentsExperiment,
 	onDeleteSegmentsExperiment,
 	onEditSegmentsExperiment,
 	onEditSegmentsExperimentStatus,
-	onRunExperiment,
 	onSelectSegmentsExperienceChange,
-	onVariantCreation,
-	onVariantDeletion,
-	onVariantEdition,
-	segmentsExperiences = [],
-	segmentsExperiment,
-	selectedSegmentsExperienceId,
-	variants
+	onTargetChange,
+	segmentsExperiences = []
 }) {
 	const [dropdown, setDropdown] = useState(false);
+	const {experiment, selectedExperienceId} = useContext(StateContext);
 
-	const _selectedSegmentsExperienceId = segmentsExperiment
-		? segmentsExperiment.segmentsExperienceId
-		: selectedSegmentsExperienceId;
+	const _selectedExperienceId = experiment
+		? experiment.segmentsExperienceId
+		: selectedExperienceId;
 
 	return (
 		<>
 			{segmentsExperiences.length > 1 && (
-				<div className="form-group">
-					<label>{Liferay.Language.get('select-experience')}</label>
-					<ClaySelect
-						defaultValue={_selectedSegmentsExperienceId}
-						onChange={_handleExperienceSelection}
-					>
-						{segmentsExperiences.map(segmentsExperience => {
-							return (
-								<ClaySelect.Option
-									key={
-										segmentsExperience.segmentsExperienceId
-									}
-									label={segmentsExperience.name}
-									value={
-										segmentsExperience.segmentsExperienceId
-									}
-								/>
-							);
-						})}
-					</ClaySelect>
-				</div>
+				<>
+					<div className="form-group">
+						<label>
+							{Liferay.Language.get('select-experience')}
+						</label>
+						<ClaySelect
+							defaultValue={_selectedExperienceId}
+							onChange={_handleExperienceSelection}
+						>
+							{segmentsExperiences.map(segmentsExperience => {
+								return (
+									<ClaySelect.Option
+										key={
+											segmentsExperience.segmentsExperienceId
+										}
+										label={segmentsExperience.name}
+										value={
+											segmentsExperience.segmentsExperienceId
+										}
+									/>
+								);
+							})}
+						</ClaySelect>
+					</div>
+					<hr />
+				</>
 			)}
 
-			<hr />
-
-			{segmentsExperiment && (
+			{experiment && (
 				<>
 					<div className="d-flex justify-content-between align-items-center">
 						<h3 className="mb-0 text-dark text-truncate">
-							{segmentsExperiment.name}
+							{experiment.name}
 						</h3>
 
-						{segmentsExperiment.editable && (
+						{experiment.editable && (
 							<ClayDropDown
 								active={dropdown}
 								data-testid="segments-experiments-drop-down"
@@ -132,40 +116,40 @@ function SegmentsExperiments({
 					</div>
 
 					<ClayLabel
-						displayType={_statusToType(
-							segmentsExperiment.status.value
+						displayType={statusToLabelDisplayType(
+							experiment.status.value
 						)}
 					>
-						{segmentsExperiment.status.label}
+						{experiment.status.label}
 					</ClayLabel>
 
 					<SegmentsExperimentsDetails
-						segmentsExperiment={segmentsExperiment}
+						segmentsExperiment={experiment}
 					/>
 
+					{experiment.goal.value === 'click' && (
+						<ClickGoalPicker
+							allowEdit={experiment.status.value === STATUS_DRAFT}
+							onSelectClickGoalTarget={selector => {
+								onTargetChange(selector);
+							}}
+							target={experiment.goal.target}
+						/>
+					)}
+
 					<Variants
-						editable={segmentsExperiment.editable}
-						onVariantCreation={onVariantCreation}
-						onVariantDeletion={onVariantDeletion}
-						onVariantEdition={onVariantEdition}
-						selectedSegmentsExperienceId={
-							selectedSegmentsExperienceId
-						}
-						variants={variants}
+						selectedSegmentsExperienceId={selectedExperienceId}
 					/>
 
 					<SegmentsExperimentsActions
 						onEditSegmentsExperimentStatus={
 							onEditSegmentsExperimentStatus
 						}
-						onRunExperiment={onRunExperiment}
-						segmentsExperiment={segmentsExperiment}
-						variants={variants}
 					/>
 				</>
 			)}
 
-			{!segmentsExperiment && (
+			{!experiment && (
 				<div className="text-center">
 					<h4 className="text-dark">
 						{Liferay.Language.get(
@@ -178,9 +162,7 @@ function SegmentsExperiments({
 					<ClayButton
 						displayType="secondary"
 						onClick={() =>
-							onCreateSegmentsExperiment(
-								selectedSegmentsExperienceId
-							)
+							onCreateSegmentsExperiment(selectedExperienceId)
 						}
 					>
 						{Liferay.Language.get('create-test')}
@@ -214,15 +196,9 @@ SegmentsExperiments.propTypes = {
 	onDeleteSegmentsExperiment: PropTypes.func.isRequired,
 	onEditSegmentsExperiment: PropTypes.func.isRequired,
 	onEditSegmentsExperimentStatus: PropTypes.func.isRequired,
-	onRunExperiment: PropTypes.func.isRequired,
 	onSelectSegmentsExperienceChange: PropTypes.func.isRequired,
-	onVariantCreation: PropTypes.func.isRequired,
-	onVariantDeletion: PropTypes.func.isRequired,
-	onVariantEdition: PropTypes.func.isRequired,
-	segmentsExperiences: PropTypes.arrayOf(SegmentsExperienceType),
-	segmentsExperiment: SegmentsExperimentType,
-	selectedSegmentsExperienceId: PropTypes.string.isRequired,
-	variants: PropTypes.arrayOf(SegmentsVariantType)
+	onTargetChange: PropTypes.func.isRequired,
+	segmentsExperiences: PropTypes.arrayOf(SegmentsExperienceType)
 };
 
 export default SegmentsExperiments;

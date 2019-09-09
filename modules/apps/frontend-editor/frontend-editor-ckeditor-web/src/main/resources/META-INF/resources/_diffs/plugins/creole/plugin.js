@@ -14,7 +14,7 @@
 
 (function() {
 	CKEDITOR.plugins.add('creole', {
-		init: function(editor) {
+		init(editor) {
 			var instance = this;
 
 			var path = instance.path;

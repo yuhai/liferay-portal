@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link RatingsEntry}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see RatingsEntry
  * @generated
  */
-@ProviderType
 public class RatingsEntryWrapper
 	extends BaseModelWrapper<RatingsEntry>
 	implements RatingsEntry, ModelWrapper<RatingsEntry> {
@@ -253,6 +250,11 @@ public class RatingsEntryWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ratings entry model instance should use the <code>RatingsEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

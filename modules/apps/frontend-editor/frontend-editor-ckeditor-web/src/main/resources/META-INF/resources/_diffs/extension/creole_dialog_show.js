@@ -54,7 +54,7 @@ ckEditor.on('dialogShow', function(event) {
 
 			cellTypeWrapper.setStyle('width', '100%');
 
-			cellTypeWrapper.all('tr').each(function(item, index, collection) {
+			cellTypeWrapper.all('tr').each(function(item, index) {
 				if (index > 0) {
 					item.hide();
 				}

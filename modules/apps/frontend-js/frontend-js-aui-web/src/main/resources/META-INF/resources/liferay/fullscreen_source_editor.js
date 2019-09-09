@@ -112,61 +112,76 @@ AUI.add(
 			NS: 'liferayfullscreensourceeditor',
 
 			prototype: {
+				_getHtml(val) {
+					var instance = this;
+
+					var dataProcessor = instance.get('dataProcessor');
+
+					if (dataProcessor && dataProcessor.toHtml) {
+						val = dataProcessor.toHtml(val);
+					}
+
+					return val;
+				},
+
+				_getValue(val) {
+					var instance = this;
+
+					return instance._editor
+						? instance._editor.get(STR_VALUE)
+						: val;
+				},
+
+				_onEditorChange(event) {
+					var instance = this;
+
+					instance._previewPanel.html(
+						instance._getHtml(event.newVal)
+					);
+				},
+
+				_onLayoutChange(event) {
+					var instance = this;
+
+					instance
+						.get(STR_BOUNDING_BOX)
+						.one(STR_DOT + instance.getClassName('content'))
+						.replaceClass(event.prevVal, event.newVal);
+
+					instance.resizeEditor();
+				},
+
+				_onLayoutClick(event) {
+					var instance = this;
+
+					instance.set(
+						STR_LAYOUT,
+						event.currentTarget.attr('data-layout')
+					);
+				},
+
+				_onPreviewLink(event) {
+					event.currentTarget.attr('target', '_blank');
+				},
+
+				_onValueChange(event) {
+					var instance = this;
+
+					instance._editor.set(STR_VALUE, event.newVal);
+				},
+
+				_switchTheme() {
+					var instance = this;
+
+					instance._editor.switchTheme();
+				},
+
 				CONTENT_TEMPLATE: Lang.sub(CONTENT_TEMPLATE, {
 					iconMoonTooltip: Liferay.Language.get('dark-theme'),
 					pathThemeImages: themeDisplay.getPathThemeImages()
 				}),
 
-				renderUI: function() {
-					var instance = this;
-
-					var boundingBox = instance.get(STR_BOUNDING_BOX);
-
-					boundingBox
-						.one(STR_DOT + instance.getClassName('content'))
-						.addClass(instance.get(STR_LAYOUT));
-
-					instance._editorSwitchTheme = boundingBox.one(
-						'#switchTheme'
-					);
-
-					instance._editor = new A.LiferaySourceEditor({
-						aceOptions: instance.get('aceOptions'),
-						boundingBox: boundingBox.one('.source-html'),
-						height: '100%',
-						mode: 'html',
-						on: {
-							themeSwitched: function(event) {
-								var editorSwitchTheme =
-									instance._editorSwitchTheme;
-
-								var nextTheme =
-									event.themes[event.nextThemeIndex];
-
-								editorSwitchTheme
-									.one('.lexicon-icon')
-									.replace(nextTheme.icon);
-
-								editorSwitchTheme.setAttribute(
-									'data-title',
-									nextTheme.tooltip
-								);
-							}
-						},
-						value: instance.get(STR_VALUE)
-					}).render();
-
-					instance._previewPanel = boundingBox.one(CSS_PREVIEW_PANEL);
-
-					instance._previewPanel.html(
-						instance._getHtml(instance.get(STR_VALUE))
-					);
-					instance._previewPanel.addClass(
-						instance.get('previewCssClass')
-					);
-				},
-
-				bindUI: function() {
+				bindUI() {
 					var instance = this;
 
 					var boundingBox = instance.get(STR_BOUNDING_BOX);
@@ -205,7 +220,7 @@ AUI.add(
 					];
 				},
 
-				destructor: function() {
+				destructor() {
 					var instance = this;
 
 					var sourceEditor = instance._editor;
@@ -217,74 +232,59 @@ AUI.add(
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
-				resizeEditor: function() {
+				renderUI() {
+					var instance = this;
+
+					var boundingBox = instance.get(STR_BOUNDING_BOX);
+
+					boundingBox
+						.one(STR_DOT + instance.getClassName('content'))
+						.addClass(instance.get(STR_LAYOUT));
+
+					instance._editorSwitchTheme = boundingBox.one(
+						'#switchTheme'
+					);
+
+					instance._editor = new A.LiferaySourceEditor({
+						aceOptions: instance.get('aceOptions'),
+						boundingBox: boundingBox.one('.source-html'),
+						height: '100%',
+						mode: 'html',
+						on: {
+							themeSwitched(event) {
+								var editorSwitchTheme =
+									instance._editorSwitchTheme;
+
+								var nextTheme =
+									event.themes[event.nextThemeIndex];
+
+								editorSwitchTheme
+									.one('.lexicon-icon')
+									.replace(nextTheme.icon);
+
+								editorSwitchTheme.setAttribute(
+									'data-title',
+									nextTheme.tooltip
+								);
+							}
+						},
+						value: instance.get(STR_VALUE)
+					}).render();
+
+					instance._previewPanel = boundingBox.one(CSS_PREVIEW_PANEL);
+
+					instance._previewPanel.html(
+						instance._getHtml(instance.get(STR_VALUE))
+					);
+					instance._previewPanel.addClass(
+						instance.get('previewCssClass')
+					);
+				},
+
+				resizeEditor() {
 					var instance = this;
 
 					instance._editor.getEditor().resize();
-				},
-
-				_getHtml: function(val) {
-					var instance = this;
-
-					var dataProcessor = instance.get('dataProcessor');
-
-					if (dataProcessor && dataProcessor.toHtml) {
-						val = dataProcessor.toHtml(val);
-					}
-
-					return val;
-				},
-
-				_getValue: function(val) {
-					var instance = this;
-
-					return instance._editor
-						? instance._editor.get(STR_VALUE)
-						: val;
-				},
-
-				_onEditorChange: function(event) {
-					var instance = this;
-
-					instance._previewPanel.html(
-						instance._getHtml(event.newVal)
-					);
-				},
-
-				_onLayoutChange: function(event) {
-					var instance = this;
-
-					instance
-						.get(STR_BOUNDING_BOX)
-						.one(STR_DOT + instance.getClassName('content'))
-						.replaceClass(event.prevVal, event.newVal);
-
-					instance.resizeEditor();
-				},
-
-				_onLayoutClick: function(event) {
-					var instance = this;
-
-					instance.set(
-						STR_LAYOUT,
-						event.currentTarget.attr('data-layout')
-					);
-				},
-
-				_onPreviewLink: function(event) {
-					event.currentTarget.attr('target', '_blank');
-				},
-
-				_onValueChange: function(event) {
-					var instance = this;
-
-					instance._editor.set(STR_VALUE, event.newVal);
-				},
-
-				_switchTheme: function(event) {
-					var instance = this;
-
-					instance._editor.switchTheme();
 				}
 			}
 		});

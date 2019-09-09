@@ -39,7 +39,7 @@ public interface AssetListEntrySegmentsEntryRelModel
 	extends BaseModel<AssetListEntrySegmentsEntryRel>, ShardedModel,
 			StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset list entry segments entry rel model instance should use the {@link AssetListEntrySegmentsEntryRel} interface instead.

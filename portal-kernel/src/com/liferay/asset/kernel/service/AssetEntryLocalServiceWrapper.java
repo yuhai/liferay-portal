@@ -16,8 +16,6 @@ package com.liferay.asset.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link AssetEntryLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetEntryLocalService
  * @generated
  */
-@ProviderType
 public class AssetEntryLocalServiceWrapper
 	implements AssetEntryLocalService, ServiceWrapper<AssetEntryLocalService> {
 
@@ -35,6 +32,11 @@ public class AssetEntryLocalServiceWrapper
 		_assetEntryLocalService = assetEntryLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link AssetEntryLocalServiceUtil} to access the asset entry local service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void addAssetCategoryAssetEntries(
 		long categoryId,

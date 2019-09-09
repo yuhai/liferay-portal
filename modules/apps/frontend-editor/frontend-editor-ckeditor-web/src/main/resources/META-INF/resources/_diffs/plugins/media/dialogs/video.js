@@ -91,11 +91,11 @@ CKEDITOR.dialog.add('video', function(editor) {
 				scriptTPL = new CKEDITOR.template(TPL_SCRIPT);
 
 				textScript = scriptTPL.output({
-					height: height,
+					height,
 					ogvUrl: videoOgvUrl,
 					poster: videoPoster,
 					url: videoUrl,
-					width: width
+					width
 				});
 
 				editor.plugins.media.applyMediaScript(
@@ -130,9 +130,6 @@ CKEDITOR.dialog.add('video', function(editor) {
 	}
 
 	return {
-		minHeight: 200,
-		minWidth: 400,
-
 		contents: [
 			{
 				elements: [
@@ -198,18 +195,21 @@ CKEDITOR.dialog.add('video', function(editor) {
 			}
 		],
 
-		title: Liferay.Language.get('video-properties'),
+		minHeight: 200,
+		minWidth: 400,
 
-		onOk: function() {
+		onOk() {
 			var instance = this;
 
 			editor.plugins.media.onOkCallback(instance, editor, 'video');
 		},
 
-		onShow: function() {
+		onShow() {
 			var instance = this;
 
 			editor.plugins.media.onShowCallback(instance, editor, 'video');
-		}
+		},
+
+		title: Liferay.Language.get('video-properties')
 	};
 });

@@ -52,7 +52,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -66,13 +65,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.asset.list.service.impl.AssetListEntrySegmentsEntryRelLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class AssetListEntrySegmentsEntryRelLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AssetListEntrySegmentsEntryRelLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetListEntrySegmentsEntryRelLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalServiceUtil</code>.

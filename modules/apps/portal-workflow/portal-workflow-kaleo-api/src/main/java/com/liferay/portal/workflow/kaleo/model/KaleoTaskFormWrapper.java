@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KaleoTaskForm}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoTaskForm
  * @generated
  */
-@ProviderType
 public class KaleoTaskFormWrapper
 	extends BaseModelWrapper<KaleoTaskForm>
 	implements KaleoTaskForm, ModelWrapper<KaleoTaskForm> {
@@ -431,6 +428,11 @@ public class KaleoTaskFormWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kaleo task form model instance should use the <code>KaleoTaskForm</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

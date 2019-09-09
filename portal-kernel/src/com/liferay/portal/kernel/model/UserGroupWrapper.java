@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link UserGroup}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see UserGroup
  * @generated
  */
-@ProviderType
 public class UserGroupWrapper
 	extends BaseModelWrapper<UserGroup>
 	implements UserGroup, ModelWrapper<UserGroup> {
@@ -347,6 +344,11 @@ public class UserGroupWrapper
 		return model.isAddedByLDAPImport();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a user group model instance should use the <code>UserGroup</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -23,6 +23,8 @@
 		<weight>2</weight>
 		<permissions>
 			<supports>
+				<action-key>DELETE</action-key>
+				<action-key>UPDATE</action-key>
 				<action-key>VIEW</action-key>
 			</supports>
 		</permissions>

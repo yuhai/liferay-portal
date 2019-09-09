@@ -17,8 +17,6 @@ package com.liferay.portal.model.impl;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the Role service. Represents a row in the &quot;Role_&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,10 +29,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Role
  * @generated
  */
-@ProviderType
 public abstract class RoleBaseImpl extends RoleModelImpl implements Role {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a role model instance should use the <code>Role</code> interface instead.

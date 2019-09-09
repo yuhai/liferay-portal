@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLOpenerFileEntryReference
 	extends DLOpenerFileEntryReferenceModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.document.library.opener.model.impl.DLOpenerFileEntryReferenceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

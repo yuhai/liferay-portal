@@ -16,8 +16,6 @@ package com.liferay.wiki.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link WikiNodeLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WikiNodeLocalService
  * @generated
  */
-@ProviderType
 public class WikiNodeLocalServiceWrapper
 	implements WikiNodeLocalService, ServiceWrapper<WikiNodeLocalService> {
 
@@ -35,6 +32,11 @@ public class WikiNodeLocalServiceWrapper
 		_wikiNodeLocalService = wikiNodeLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link WikiNodeLocalServiceUtil} to access the wiki node local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiNodeLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.wiki.model.WikiNode addDefaultNode(
 			long userId,

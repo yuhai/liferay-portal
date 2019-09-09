@@ -14,26 +14,30 @@
 
 (function(Liferay) {
 	var DOMTaskRunner = {
-		addTask: function(task) {
+		_scheduledTasks: [],
+
+		_taskStates: [],
+
+		addTask(task) {
 			var instance = this;
 
 			instance._scheduledTasks.push(task);
 		},
 
-		addTaskState: function(state) {
+		addTaskState(state) {
 			var instance = this;
 
 			instance._taskStates.push(state);
 		},
 
-		reset: function() {
+		reset() {
 			var instance = this;
 
 			instance._taskStates.length = 0;
 			instance._scheduledTasks.length = 0;
 		},
 
-		runTasks: function(node) {
+		runTasks(node) {
 			var instance = this;
 
 			var scheduledTasks = instance._scheduledTasks;
@@ -55,10 +59,7 @@
 					}
 				}
 			}
-		},
-
-		_scheduledTasks: [],
-		_taskStates: []
+		}
 	};
 
 	Liferay.DOMTaskRunner = DOMTaskRunner;

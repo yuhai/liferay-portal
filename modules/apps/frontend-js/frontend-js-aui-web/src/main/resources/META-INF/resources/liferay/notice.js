@@ -114,39 +114,7 @@ AUI.add(
 		};
 
 		Notice.prototype = {
-			close: function() {
-				var instance = this;
-
-				var notice = instance._notice;
-
-				notice.hide();
-
-				instance._body.removeClass(CSS_ALERTS);
-
-				if (instance._onClose) {
-					instance._onClose();
-				}
-			},
-
-			setClosing: function() {
-				var instance = this;
-
-				var alerts = A.all('.popup-alert-notice, .popup-alert-warning');
-
-				if (alerts.size()) {
-					instance._useCloseButton = true;
-
-					if (!instance._body) {
-						instance._body = A.getBody();
-					}
-
-					instance._body.addClass(CSS_ALERTS);
-
-					alerts.each(instance._addCloseButton, instance);
-				}
-			},
-
-			_addCloseButton: function(notice) {
+			_addCloseButton(notice) {
 				var instance = this;
 
 				var closeButton;
@@ -175,7 +143,7 @@ AUI.add(
 				}
 			},
 
-			_addToggleButton: function(notice) {
+			_addToggleButton(notice) {
 				var instance = this;
 
 				if (instance._useToggleButton) {
@@ -198,7 +166,7 @@ AUI.add(
 					var hideText = instance._hideText;
 					var showText = instance._showText;
 
-					toggleButton.on(STR_CLICK, function(event) {
+					toggleButton.on(STR_CLICK, function() {
 						var text = showText;
 
 						if (visible === 0) {
@@ -217,7 +185,7 @@ AUI.add(
 				}
 			},
 
-			_afterNoticeShow: function(event) {
+			_afterNoticeShow() {
 				var instance = this;
 
 				instance._preventHide();
@@ -265,7 +233,7 @@ AUI.add(
 				});
 			},
 
-			_beforeNoticeHide: function(event) {
+			_beforeNoticeHide() {
 				var instance = this;
 
 				var returnVal;
@@ -290,13 +258,13 @@ AUI.add(
 				return returnVal;
 			},
 
-			_beforeNoticeShow: function(event) {
+			_beforeNoticeShow() {
 				var instance = this;
 
 				instance._notice.toggle(true);
 			},
 
-			_createHTML: function() {
+			_createHTML() {
 				var instance = this;
 
 				var content = instance._content;
@@ -312,7 +280,7 @@ AUI.add(
 					notice.html(content);
 				}
 
-				instance._noticeClass.split(' ').forEach(function(item, index) {
+				instance._noticeClass.split(' ').forEach(function(item) {
 					notice.addClass(item);
 				});
 
@@ -344,13 +312,45 @@ AUI.add(
 				instance._notice = notice;
 			},
 
-			_preventHide: function() {
+			_preventHide() {
 				var instance = this;
 
 				if (instance._hideHandle) {
 					instance._hideHandle.cancel();
 
 					instance._hideHandle = null;
+				}
+			},
+
+			close() {
+				var instance = this;
+
+				var notice = instance._notice;
+
+				notice.hide();
+
+				instance._body.removeClass(CSS_ALERTS);
+
+				if (instance._onClose) {
+					instance._onClose();
+				}
+			},
+
+			setClosing() {
+				var instance = this;
+
+				var alerts = A.all('.popup-alert-notice, .popup-alert-warning');
+
+				if (alerts.size()) {
+					instance._useCloseButton = true;
+
+					if (!instance._body) {
+						instance._body = A.getBody();
+					}
+
+					instance._body.addClass(CSS_ALERTS);
+
+					alerts.each(instance._addCloseButton, instance);
 				}
 			}
 		};

@@ -16,8 +16,6 @@ package com.liferay.expando.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for ExpandoValue. This utility wraps
  * <code>com.liferay.portlet.expando.service.impl.ExpandoValueLocalServiceImpl</code> and
@@ -30,10 +28,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ExpandoValueLocalService
  * @generated
  */
-@ProviderType
 public class ExpandoValueLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.expando.service.impl.ExpandoValueLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

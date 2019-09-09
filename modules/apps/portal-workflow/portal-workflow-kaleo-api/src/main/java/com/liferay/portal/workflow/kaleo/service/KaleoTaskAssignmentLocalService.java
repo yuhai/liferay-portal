@@ -57,7 +57,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTaskAssignmentLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoTaskAssignmentLocalServiceUtil} to access the kaleo task assignment local service. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoTaskAssignmentLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

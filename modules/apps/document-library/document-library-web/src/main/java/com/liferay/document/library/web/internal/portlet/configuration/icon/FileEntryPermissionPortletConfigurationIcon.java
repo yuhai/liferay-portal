@@ -17,7 +17,8 @@ package com.liferay.document.library.web.internal.portlet.configuration.icon;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.web.internal.portlet.action.ActionUtil;
-import com.liferay.petra.string.StringPool;
+import com.liferay.document.library.web.internal.util.DLPortletConfigurationIconUtil;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
@@ -58,15 +59,14 @@ public class FileEntryPermissionPortletConfigurationIcon
 	public String getURL(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		String url = StringPool.BLANK;
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)portletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
 			FileEntry fileEntry = ActionUtil.getFileEntry(portletRequest);
 
-			url = PermissionsURLTag.doTag(
+			return PermissionsURLTag.doTag(
 				null, DLFileEntryConstants.getClassName(),
 				HtmlUtil.unescape(fileEntry.getTitle()), null,
 				String.valueOf(fileEntry.getFileEntryId()),
@@ -74,9 +74,8 @@ public class FileEntryPermissionPortletConfigurationIcon
 				themeDisplay.getRequest());
 		}
 		catch (Exception e) {
+			return ReflectionUtil.throwException(e);
 		}
-
-		return url;
 	}
 
 	@Override
@@ -86,23 +85,23 @@ public class FileEntryPermissionPortletConfigurationIcon
 
 	@Override
 	public boolean isShow(PortletRequest portletRequest) {
-		try {
-			FileEntry fileEntry = ActionUtil.getFileEntry(portletRequest);
+		return DLPortletConfigurationIconUtil.runWithDefaultValueOnError(
+			false,
+			() -> {
+				FileEntry fileEntry = ActionUtil.getFileEntry(portletRequest);
 
-			if (fileEntry == null) {
+				if (fileEntry == null) {
+					return false;
+				}
+
+				if (!RepositoryUtil.isExternalRepository(
+						fileEntry.getRepositoryId())) {
+
+					return true;
+				}
+
 				return false;
-			}
-
-			if (!RepositoryUtil.isExternalRepository(
-					fileEntry.getRepositoryId())) {
-
-				return true;
-			}
-		}
-		catch (Exception e) {
-		}
-
-		return false;
+			});
 	}
 
 	@Override

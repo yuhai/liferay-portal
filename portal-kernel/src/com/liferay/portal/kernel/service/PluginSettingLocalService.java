@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PluginSettingLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PluginSettingLocalServiceUtil} to access the plugin setting local service. Add custom service methods to <code>com.liferay.portal.service.impl.PluginSettingLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

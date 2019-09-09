@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -35,7 +33,6 @@ import java.util.Objects;
  * @see NestedSetsTreeEntry
  * @generated
  */
-@ProviderType
 public class NestedSetsTreeEntryWrapper
 	implements NestedSetsTreeEntry, ModelWrapper<NestedSetsTreeEntry> {
 
@@ -207,6 +204,11 @@ public class NestedSetsTreeEntryWrapper
 		return _nestedSetsTreeEntry.isNew();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a nested sets tree entry model instance should use the <code>NestedSetsTreeEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		_nestedSetsTreeEntry.persist();

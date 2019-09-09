@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ResourceActionLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link ResourceActionLocalServiceUtil} to access the resource action local service. Add custom service methods to <code>com.liferay.portal.service.impl.ResourceActionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

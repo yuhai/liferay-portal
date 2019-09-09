@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
@@ -55,11 +53,10 @@ import java.util.function.Function;
  * @see LVEntryVersionImpl
  * @generated
  */
-@ProviderType
 public class LVEntryVersionModelImpl
 	extends BaseModelImpl<LVEntryVersion> implements LVEntryVersionModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a lv entry version model instance should use the <code>LVEntryVersion</code> interface instead.

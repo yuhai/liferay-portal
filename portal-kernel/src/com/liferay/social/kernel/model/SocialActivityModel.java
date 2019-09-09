@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialActivityModel
 	extends AttachedModel, BaseModel<SocialActivity>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a social activity model instance should use the {@link SocialActivity} interface instead.

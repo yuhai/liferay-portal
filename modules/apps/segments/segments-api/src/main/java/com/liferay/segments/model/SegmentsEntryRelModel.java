@@ -40,7 +40,7 @@ public interface SegmentsEntryRelModel
 	extends AttachedModel, BaseModel<SegmentsEntryRel>, GroupedModel,
 			ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a segments entry rel model instance should use the {@link SegmentsEntryRel} interface instead.

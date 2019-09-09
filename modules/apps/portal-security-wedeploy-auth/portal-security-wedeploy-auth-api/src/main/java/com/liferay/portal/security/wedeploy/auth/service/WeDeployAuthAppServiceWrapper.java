@@ -16,8 +16,6 @@ package com.liferay.portal.security.wedeploy.auth.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link WeDeployAuthAppService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WeDeployAuthAppService
  * @generated
  */
-@ProviderType
 public class WeDeployAuthAppServiceWrapper
 	implements WeDeployAuthAppService, ServiceWrapper<WeDeployAuthAppService> {
 
@@ -35,6 +32,11 @@ public class WeDeployAuthAppServiceWrapper
 		_weDeployAuthAppService = weDeployAuthAppService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link WeDeployAuthAppServiceUtil} to access the we deploy auth app remote service. Add custom service methods to <code>com.liferay.portal.security.wedeploy.auth.service.impl.WeDeployAuthAppServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp
 			addWeDeployAuthApp(

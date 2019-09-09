@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileVersionPreviewPersistence
 	extends BasePersistence<DLFileVersionPreview> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileVersionPreviewUtil} to access the dl file version preview persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

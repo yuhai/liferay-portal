@@ -54,7 +54,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -71,12 +70,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = WikiPageResourcePersistence.class)
-@ProviderType
 public class WikiPageResourcePersistenceImpl
 	extends BasePersistenceImpl<WikiPageResource>
 	implements WikiPageResourcePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>WikiPageResourceUtil</code> to access the wiki page resource persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

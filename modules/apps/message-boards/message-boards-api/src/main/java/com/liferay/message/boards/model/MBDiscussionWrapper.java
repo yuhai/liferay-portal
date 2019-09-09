@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MBDiscussion}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBDiscussion
  * @generated
  */
-@ProviderType
 public class MBDiscussionWrapper
 	extends BaseModelWrapper<MBDiscussion>
 	implements MBDiscussion, ModelWrapper<MBDiscussion> {
@@ -287,6 +284,11 @@ public class MBDiscussionWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a message boards discussion model instance should use the <code>MBDiscussion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

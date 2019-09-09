@@ -16,8 +16,6 @@ package com.liferay.social.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SocialActivitySettingService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivitySettingService
  * @generated
  */
-@ProviderType
 public class SocialActivitySettingServiceWrapper
 	implements SocialActivitySettingService,
 			   ServiceWrapper<SocialActivitySettingService> {
@@ -36,6 +33,11 @@ public class SocialActivitySettingServiceWrapper
 		_socialActivitySettingService = socialActivitySettingService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SocialActivitySettingServiceUtil} to access the social activity setting remote service. Add custom service methods to <code>com.liferay.portlet.social.service.impl.SocialActivitySettingServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.social.kernel.model.SocialActivityDefinition
 			getActivityDefinition(

@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.util.Accessor;
 public interface NestedSetsTreeEntry
 	extends NestedSetsTreeEntryModel, NestedSetsTreeNodeModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.tools.service.builder.test.model.impl.NestedSetsTreeEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

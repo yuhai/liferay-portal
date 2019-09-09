@@ -16,8 +16,6 @@ package com.liferay.dynamic.data.mapping.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DDMDataProviderInstanceLinkLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMDataProviderInstanceLinkLocalService
  * @generated
  */
-@ProviderType
 public class DDMDataProviderInstanceLinkLocalServiceWrapper
 	implements DDMDataProviderInstanceLinkLocalService,
 			   ServiceWrapper<DDMDataProviderInstanceLinkLocalService> {
@@ -38,6 +35,11 @@ public class DDMDataProviderInstanceLinkLocalServiceWrapper
 			ddmDataProviderInstanceLinkLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DDMDataProviderInstanceLinkLocalServiceUtil} to access the ddm data provider instance link local service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMDataProviderInstanceLinkLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink
 		addDataProviderInstanceLink(

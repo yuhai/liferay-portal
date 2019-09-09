@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ReadingTimeEntry
 	extends PersistedModel, ReadingTimeEntryModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.reading.time.model.impl.ReadingTimeEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

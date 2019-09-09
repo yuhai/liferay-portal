@@ -16,8 +16,6 @@ package com.liferay.push.notifications.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link PushNotificationsDeviceLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PushNotificationsDeviceLocalService
  * @generated
  */
-@ProviderType
 public class PushNotificationsDeviceLocalServiceWrapper
 	implements PushNotificationsDeviceLocalService,
 			   ServiceWrapper<PushNotificationsDeviceLocalService> {
@@ -38,6 +35,11 @@ public class PushNotificationsDeviceLocalServiceWrapper
 			pushNotificationsDeviceLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PushNotificationsDeviceLocalServiceUtil} to access the push notifications device local service. Add custom service methods to <code>com.liferay.push.notifications.service.impl.PushNotificationsDeviceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.push.notifications.model.PushNotificationsDevice
 			addPushNotificationsDevice(

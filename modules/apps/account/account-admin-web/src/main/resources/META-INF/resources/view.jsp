@@ -47,20 +47,35 @@ ViewAccountsManagementToolbarDisplayContext viewAccountsManagementToolbarDisplay
 				row.setData(rowData);
 				%>
 
+				<portlet:renderURL var="rowURL">
+					<portlet:param name="mvcRenderCommandName" value="/account_admin/edit_account" />
+					<portlet:param name="redirect" value="<%= accountDisplaySearchContainer.getIteratorURL().toString() %>" />
+					<portlet:param name="accountEntryId" value="<%= String.valueOf(accountDisplay.getAccountId()) %>" />
+				</portlet:renderURL>
+
+				<%
+				if (!AccountEntryPermission.contains(permissionChecker, accountDisplay.getAccountId(), ActionKeys.UPDATE)) {
+					rowURL = null;
+				}
+				%>
+
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand table-title"
+					href="<%= rowURL %>"
 					name="name"
 					property="name"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand"
+					href="<%= rowURL %>"
 					name="parent-account"
 					property="parentAccountName"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand"
+					href="<%= rowURL %>"
 					name="account-owner"
 					value=""
 				/>

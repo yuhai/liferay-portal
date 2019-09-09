@@ -31,9 +31,12 @@ public class DDMFormFieldValidation implements Serializable {
 	public DDMFormFieldValidation(
 		DDMFormFieldValidation ddmFormFieldValidation) {
 
-		_expression = ddmFormFieldValidation._expression;
+		_ddmFormFieldValidationExpression =
+			ddmFormFieldValidation._ddmFormFieldValidationExpression;
 		_errorMessageLocalizedValue =
 			ddmFormFieldValidation._errorMessageLocalizedValue;
+		_parameterLocalizedValue =
+			ddmFormFieldValidation._parameterLocalizedValue;
 	}
 
 	@Override
@@ -50,14 +53,25 @@ public class DDMFormFieldValidation implements Serializable {
 			(DDMFormFieldValidation)obj;
 
 		if (Objects.equals(
+				_ddmFormFieldValidationExpression,
+				ddmFormFieldValidation._ddmFormFieldValidationExpression) &&
+			Objects.equals(
 				_errorMessageLocalizedValue,
 				ddmFormFieldValidation._errorMessageLocalizedValue) &&
-			Objects.equals(_expression, ddmFormFieldValidation._expression)) {
+			Objects.equals(
+				_parameterLocalizedValue,
+				ddmFormFieldValidation._parameterLocalizedValue)) {
 
 			return true;
 		}
 
 		return false;
+	}
+
+	public DDMFormFieldValidationExpression
+		getDDMFormFieldValidationExpression() {
+
+		return _ddmFormFieldValidationExpression;
 	}
 
 	/**
@@ -74,15 +88,32 @@ public class DDMFormFieldValidation implements Serializable {
 		return _errorMessageLocalizedValue;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 * 	 #getDDMFormFieldValidationExpression()}
+	 */
+	@Deprecated
 	public String getExpression() {
 		return _expression;
 	}
 
+	public LocalizedValue getParameterLocalizedValue() {
+		return _parameterLocalizedValue;
+	}
+
 	@Override
 	public int hashCode() {
-		int hash = HashUtil.hash(0, _errorMessageLocalizedValue);
+		int hash = HashUtil.hash(0, _ddmFormFieldValidationExpression);
 
-		return HashUtil.hash(hash, _expression);
+		hash = hash + HashUtil.hash(hash, _errorMessageLocalizedValue);
+
+		return HashUtil.hash(hash, _parameterLocalizedValue);
+	}
+
+	public void setDDMFormFieldValidationExpression(
+		DDMFormFieldValidationExpression ddmFormFieldValidationExpression) {
+
+		_ddmFormFieldValidationExpression = ddmFormFieldValidationExpression;
 	}
 
 	/**
@@ -105,11 +136,25 @@ public class DDMFormFieldValidation implements Serializable {
 		_errorMessageLocalizedValue = errorMessageLocalizedValue;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 * 	 #setDDMFormFieldValidationExpression(DDMFormFieldValidationExpression)}
+	 */
+	@Deprecated
 	public void setExpression(String expression) {
 		_expression = expression;
 	}
 
+	public void setParameterLocalizedValue(
+		LocalizedValue parameterLocalizedValue) {
+
+		_parameterLocalizedValue = parameterLocalizedValue;
+	}
+
+	private DDMFormFieldValidationExpression _ddmFormFieldValidationExpression =
+		new DDMFormFieldValidationExpression();
 	private LocalizedValue _errorMessageLocalizedValue;
 	private String _expression;
+	private LocalizedValue _parameterLocalizedValue;
 
 }

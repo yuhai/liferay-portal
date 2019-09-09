@@ -18,24 +18,24 @@ import {openImageSelector} from '../../utils/FragmentsEditorDialogUtils';
 /**
  * Handle item selector image changes and propagate them with an
  * "editableChanged" event.
- * @param {string} url
+ * @param {object} image
  * @param {HTMLElement} editableElement
  * @param {string} fragmentEntryLinkId
  * @param {function} changedCallback
  * @private
  */
 function _handleImageEditorChange(
-	url,
+	image,
 	editableElement,
 	fragmentEntryLinkId,
 	changedCallback
 ) {
 	const imageElement = editableElement.querySelector('img');
 
-	if (imageElement && url) {
-		imageElement.src = url;
+	if (imageElement && image.url) {
+		imageElement.src = image.url;
 
-		changedCallback(url);
+		changedCallback(image);
 	}
 }
 
@@ -104,9 +104,9 @@ function init(
 	const {imageSelectorURL} = options;
 
 	openImageSelector({
-		callback: url => {
+		callback: image => {
 			_handleImageEditorChange(
-				url,
+				image,
 				editableElement,
 				fragmentEntryLinkId,
 				changedCallback
@@ -120,7 +120,7 @@ function init(
 
 /**
  * @param {string} content editableField's original HTML
- * @param {string} value Translated/segmented value
+ * @param {object} value Translated/segmented value
  * @param {object} editableValues values of the element
  * @return {string} Transformed content
  */
@@ -134,7 +134,7 @@ function render(content, value, editableValues) {
 	const image = wrapper.querySelector('img');
 
 	if (image) {
-		image.src = value;
+		image.src = value.url || value;
 
 		if (config.alt) {
 			image.alt = config.alt;

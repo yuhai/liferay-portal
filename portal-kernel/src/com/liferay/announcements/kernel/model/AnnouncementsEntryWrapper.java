@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AnnouncementsEntry}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AnnouncementsEntry
  * @generated
  */
-@ProviderType
 public class AnnouncementsEntryWrapper
 	extends BaseModelWrapper<AnnouncementsEntry>
 	implements AnnouncementsEntry, ModelWrapper<AnnouncementsEntry> {
@@ -389,6 +386,11 @@ public class AnnouncementsEntryWrapper
 		return model.isAlert();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a announcements entry model instance should use the <code>AnnouncementsEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -66,45 +66,7 @@ AUI.add(
 			NAME: 'admin',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._eventHandles = [];
-
-					instance.bindUI();
-
-					instance._laterTimeout = A.later(
-						INTERVAL_RENDER_IN_PROGRESS,
-						instance,
-						'_updateIndexActions'
-					);
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					instance._eventHandles.push(
-						instance
-							.get(STR_FORM)
-							.delegate(
-								STR_CLICK,
-								A.bind('_onSubmit', instance),
-								instance.get('submitButton')
-							)
-					);
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					A.Array.invoke(instance._eventHandles, 'detach');
-
-					instance._eventHandles = null;
-
-					A.clearTimeout(instance._laterTimeout);
-				},
-
-				_addInputsFromData: function(data) {
+				_addInputsFromData(data) {
 					var instance = this;
 
 					var form = instance.get(STR_FORM);
@@ -128,7 +90,7 @@ AUI.add(
 					form.append(inputsArray.join(''));
 				},
 
-				_isBackgroundTaskInProgress: function() {
+				_isBackgroundTaskInProgress() {
 					var instance = this;
 
 					var indexActionsNode = A.one(
@@ -143,7 +105,7 @@ AUI.add(
 					);
 				},
 
-				_onSubmit: function(event) {
+				_onSubmit(event) {
 					var instance = this;
 
 					var data = event.currentTarget.getData();
@@ -160,7 +122,7 @@ AUI.add(
 					submitForm(form, instance.get(STR_URL));
 				},
 
-				_updateIndexActions: function() {
+				_updateIndexActions() {
 					var instance = this;
 
 					var renderInterval = INTERVAL_RENDER_IDLE;
@@ -174,74 +136,105 @@ AUI.add(
 					);
 
 					if (currentAdminIndexPanel) {
-						A.io.request(instance.get(STR_URL), {
-							on: {
-								success: function(event, id, obj) {
-									var responseDataNode = A.Node.create(
-										this.get('responseData')
-									);
+						Liferay.Util.fetch(instance.get(STR_URL), {
+							method: 'POST'
+						})
+							.then(response => {
+								return response.text();
+							})
+							.then(response => {
+								var responseDataNode = A.Node.create(response);
 
-									var responseAdminIndexPanel = responseDataNode.one(
-										instance.get(STR_INDEX_ACTIONS_PANEL)
-									);
+								var responseAdminIndexPanel = responseDataNode.one(
+									instance.get(STR_INDEX_ACTIONS_PANEL)
+								);
 
-									var responseAdminIndexNodeList = responseAdminIndexPanel.all(
-										'.index-action-wrapper'
-									);
+								var responseAdminIndexNodeList = responseAdminIndexPanel.all(
+									'.index-action-wrapper'
+								);
 
-									var currentAdminIndexNodeList = currentAdminIndexPanel.all(
-										'.index-action-wrapper'
-									);
+								var currentAdminIndexNodeList = currentAdminIndexPanel.all(
+									'.index-action-wrapper'
+								);
 
-									currentAdminIndexNodeList.each(function(
-										item,
+								currentAdminIndexNodeList.each(function(
+									item,
+									index
+								) {
+									var inProgress = item.one('.progress');
+
+									var responseAdminIndexNode = responseAdminIndexNodeList.item(
 										index
-									) {
-										var inProgress = item.one('.progress');
-
-										var responseAdminIndexNode = responseAdminIndexNodeList.item(
-											index
-										);
-
-										if (!inProgress) {
-											inProgress = responseAdminIndexNode.one(
-												'.progress'
-											);
-										}
-
-										if (inProgress) {
-											item.replace(
-												responseAdminIndexNode
-											);
-										}
-									});
-
-									var controlMenuId =
-										'#' + instance.ns('controlMenu');
-
-									var currentControlMenu = A.one(
-										controlMenuId
 									);
 
-									var responseControlMenu = responseDataNode.one(
-										controlMenuId
-									);
-
-									if (
-										currentControlMenu &&
-										responseControlMenu
-									) {
-										currentControlMenu.replace(
-											responseControlMenu
+									if (!inProgress) {
+										inProgress = responseAdminIndexNode.one(
+											'.progress'
 										);
 									}
+
+									if (inProgress) {
+										item.replace(responseAdminIndexNode);
+									}
+								});
+
+								var controlMenuId =
+									'#' + instance.ns('controlMenu');
+
+								var currentControlMenu = A.one(controlMenuId);
+
+								var responseControlMenu = responseDataNode.one(
+									controlMenuId
+								);
+
+								if (currentControlMenu && responseControlMenu) {
+									currentControlMenu.replace(
+										responseControlMenu
+									);
 								}
-							}
-						});
+							});
 					}
 
 					instance._laterTimeout = A.later(
 						renderInterval,
+						instance,
+						'_updateIndexActions'
+					);
+				},
+
+				bindUI() {
+					var instance = this;
+
+					instance._eventHandles.push(
+						instance
+							.get(STR_FORM)
+							.delegate(
+								STR_CLICK,
+								A.bind('_onSubmit', instance),
+								instance.get('submitButton')
+							)
+					);
+				},
+
+				destructor() {
+					var instance = this;
+
+					A.Array.invoke(instance._eventHandles, 'detach');
+
+					instance._eventHandles = null;
+
+					A.clearTimeout(instance._laterTimeout);
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._eventHandles = [];
+
+					instance.bindUI();
+
+					instance._laterTimeout = A.later(
+						INTERVAL_RENDER_IN_PROGRESS,
 						instance,
 						'_updateIndexActions'
 					);
@@ -255,7 +248,6 @@ AUI.add(
 	{
 		requires: [
 			'aui-io-plugin-deprecated',
-			'aui-io-request',
 			'liferay-portlet-base',
 			'querystring-parse'
 		]

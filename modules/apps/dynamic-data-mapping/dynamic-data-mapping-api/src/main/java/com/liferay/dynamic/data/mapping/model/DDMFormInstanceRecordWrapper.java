@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMFormInstanceRecord}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMFormInstanceRecord
  * @generated
  */
-@ProviderType
 public class DDMFormInstanceRecordWrapper
 	extends BaseModelWrapper<DDMFormInstanceRecord>
 	implements DDMFormInstanceRecord, ModelWrapper<DDMFormInstanceRecord> {
@@ -403,6 +400,11 @@ public class DDMFormInstanceRecordWrapper
 		return model.getVersionUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm form instance record model instance should use the <code>DDMFormInstanceRecord</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

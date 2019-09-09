@@ -58,7 +58,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTaskFormLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoTaskFormLocalServiceUtil} to access the kaleo task form local service. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoTaskFormLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

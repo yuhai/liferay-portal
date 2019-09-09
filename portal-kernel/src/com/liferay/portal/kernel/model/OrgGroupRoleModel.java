@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OrgGroupRoleModel
 	extends BaseModel<OrgGroupRole>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a org group role model instance should use the {@link OrgGroupRole} interface instead.

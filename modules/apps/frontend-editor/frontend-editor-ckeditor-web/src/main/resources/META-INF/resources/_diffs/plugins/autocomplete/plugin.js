@@ -14,7 +14,7 @@
 
 (function() {
 	CKEDITOR.plugins.add('autocomplete', {
-		init: function(editor) {
+		init(editor) {
 			var instance = this;
 
 			AUI().use('aui-debounce', 'liferay-autocomplete-input', function(
@@ -27,7 +27,7 @@
 				CKEDITOR.scriptLoader.load(dependencies, function() {
 					var liferayAutoCompleteCKEditor = new Liferay.AutoCompleteCKEditor(
 						A.merge(editor.config.autocomplete, {
-							editor: editor,
+							editor,
 							width: 300
 						})
 					);

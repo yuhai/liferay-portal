@@ -62,7 +62,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CalendarLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link CalendarLocalServiceUtil} to access the calendar local service. Add custom service methods to <code>com.liferay.calendar.service.impl.CalendarLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

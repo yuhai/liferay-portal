@@ -38,7 +38,7 @@ import java.io.Serializable;
 @ProviderType
 public interface UADPartialEntryModel extends BaseModel<UADPartialEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a uad partial entry model instance should use the {@link UADPartialEntry} interface instead.

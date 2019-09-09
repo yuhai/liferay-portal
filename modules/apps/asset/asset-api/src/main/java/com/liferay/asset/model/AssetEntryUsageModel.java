@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AssetEntryUsageModel extends BaseModel<AssetEntryUsage> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset entry usage model instance should use the {@link AssetEntryUsage} interface instead.

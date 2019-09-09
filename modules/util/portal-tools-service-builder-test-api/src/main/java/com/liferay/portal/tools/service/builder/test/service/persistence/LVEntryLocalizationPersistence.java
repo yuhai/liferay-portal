@@ -40,7 +40,7 @@ import java.util.Set;
 public interface LVEntryLocalizationPersistence
 	extends BasePersistence<LVEntryLocalization> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LVEntryLocalizationUtil} to access the lv entry localization persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -26,8 +26,6 @@ AUI.add(
 
 		var isString = Lang.isString;
 
-		var RESPONSE_DATA = 'responseData';
-
 		var STR_CHECK_ENTRY_URL = 'checkEntryURL';
 
 		var RestoreEntry = A.Component.create({
@@ -52,37 +50,13 @@ AUI.add(
 			NAME: 'restoreentry',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._eventCheckEntry = instance.ns('checkEntry');
-
-					instance._hrefFm = A.one('#hrefFm');
-
-					var eventHandles = [
-						Liferay.on(
-							instance._eventCheckEntry,
-							instance._checkEntry,
-							instance
-						)
-					];
-
-					instance._eventHandles = eventHandles;
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					A.Array.invoke(instance._eventHandles, 'detach');
-				},
-
-				_afterCheckEntryFailure: function(uri) {
+				_afterCheckEntryFailure(uri) {
 					var instance = this;
 
 					submitForm(instance._hrefFm, uri);
 				},
 
-				_afterCheckEntrySuccess: function(response, uri) {
+				_afterCheckEntrySuccess(response, uri) {
 					var instance = this;
 
 					if (response.success) {
@@ -102,13 +76,11 @@ AUI.add(
 					}
 				},
 
-				_afterPopupCheckEntryFailure: function(form) {
-					var instance = this;
-
+				_afterPopupCheckEntryFailure(form) {
 					submitForm(form);
 				},
 
-				_afterPopupCheckEntrySuccess: function(response, form) {
+				_afterPopupCheckEntrySuccess(response, form) {
 					var instance = this;
 
 					if (response.success) {
@@ -146,7 +118,7 @@ AUI.add(
 					}
 				},
 
-				_checkEntry: function(event) {
+				_checkEntry(event) {
 					var instance = this;
 
 					var uri = event.uri;
@@ -168,7 +140,7 @@ AUI.add(
 						});
 				},
 
-				_getPopup: function() {
+				_getPopup() {
 					var instance = this;
 
 					var popup = instance._popup;
@@ -197,7 +169,7 @@ AUI.add(
 					return popup;
 				},
 
-				_initializeRestorePopup: function() {
+				_initializeRestorePopup() {
 					var instance = this;
 
 					var restoreTrashEntryFm = instance.byId(
@@ -229,12 +201,12 @@ AUI.add(
 						A.fn('focusFormField', Liferay.Util, newName)
 					);
 
-					newName.on('focus', function(event) {
+					newName.on('focus', function() {
 						rename.attr('checked', true);
 					});
 				},
 
-				_onRestoreTrashEntryFmSubmit: function(event, form) {
+				_onRestoreTrashEntryFmSubmit(_event, form) {
 					var instance = this;
 
 					var newName = instance.byId('newName');
@@ -271,7 +243,7 @@ AUI.add(
 					}
 				},
 
-				_showPopup: function(data, uri) {
+				_showPopup(data, uri) {
 					var instance = this;
 
 					var popup = instance._getPopup();
@@ -284,6 +256,30 @@ AUI.add(
 					popupIO.set('uri', uri);
 
 					popupIO.start();
+				},
+
+				destructor() {
+					var instance = this;
+
+					A.Array.invoke(instance._eventHandles, 'detach');
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._eventCheckEntry = instance.ns('checkEntry');
+
+					instance._hrefFm = A.one('#hrefFm');
+
+					var eventHandles = [
+						Liferay.on(
+							instance._eventCheckEntry,
+							instance._checkEntry,
+							instance
+						)
+					];
+
+					instance._eventHandles = eventHandles;
 				}
 			}
 		});

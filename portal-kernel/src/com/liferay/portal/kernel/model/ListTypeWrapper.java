@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ListType}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ListType
  * @generated
  */
-@ProviderType
 public class ListTypeWrapper
 	extends BaseModelWrapper<ListType>
 	implements ListType, ModelWrapper<ListType> {
@@ -128,6 +125,11 @@ public class ListTypeWrapper
 		return model.getType();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a list type model instance should use the <code>ListType</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

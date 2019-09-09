@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialActivitySettingPersistence
 	extends BasePersistence<SocialActivitySetting> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SocialActivitySettingUtil} to access the social activity setting persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

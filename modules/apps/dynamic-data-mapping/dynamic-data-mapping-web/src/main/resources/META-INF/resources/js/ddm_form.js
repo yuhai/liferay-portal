@@ -136,7 +136,134 @@ AUI.add(
 		};
 
 		FieldsSupport.prototype = {
-			eachParent: function(fn) {
+			_getField(fieldNode) {
+				var instance = this;
+
+				var displayLocale = instance.get('displayLocale');
+
+				var fieldInstanceId = instance.extractInstanceId(fieldNode);
+
+				var fieldName = fieldNode.getData('fieldName');
+
+				var definition = instance.get('definition');
+
+				var fieldDefinition = instance.getFieldInfo(
+					definition,
+					'name',
+					fieldName
+				);
+
+				var FieldClass = getFieldClass(fieldDefinition.type);
+
+				var field = new FieldClass(
+					A.merge(
+						instance.getAttrs(
+							AObject.keys(DDMPortletSupport.ATTRS)
+						),
+						{
+							container: fieldNode,
+							dataType: fieldDefinition.dataType,
+							definition,
+							displayLocale,
+							instanceId: fieldInstanceId,
+							name: fieldName,
+							parent: instance,
+							values: instance.get('values')
+						}
+					)
+				);
+
+				var form = instance.getForm();
+
+				field.addTarget(form);
+
+				return field;
+			},
+
+			_getTemplate(callback) {
+				var instance = this;
+
+				var key =
+					Liferay.Util.getPortletNamespace(
+						Liferay.PortletKeys.DYNAMIC_DATA_MAPPING
+					) + 'definition';
+
+				const data = new URLSearchParams();
+				data.append(key, JSON.stringify(instance.get('definition')));
+
+				Liferay.Util.fetch(instance._getTemplateResourceURL(), {
+					body: data,
+					method: 'POST'
+				})
+					.then(response => {
+						return response.text();
+					})
+					.then(response => {
+						if (callback) {
+							callback.call(instance, response);
+						}
+					});
+			},
+
+			_getTemplateResourceURL() {
+				var instance = this;
+
+				var container = instance.get('container');
+
+				var templateResourceParameters = {
+					doAsGroupId: instance.get('doAsGroupId'),
+					fieldName: instance.get('name'),
+					mode: instance.get('mode'),
+					namespace: instance.get('fieldsNamespace'),
+					p_l_id: instance.get('p_l_id'),
+					p_p_auth: container.getData('ddmAuthToken'),
+					p_p_id: Liferay.PortletKeys.DYNAMIC_DATA_MAPPING,
+					p_p_isolated: true,
+					p_p_resource_id: 'renderStructureField',
+					p_p_state: 'pop_up',
+					portletNamespace: instance.get('portletNamespace'),
+					readOnly: instance.get('readOnly')
+				};
+
+				var templateResourceURL = Liferay.Util.PortletURL.createResourceURL(
+					themeDisplay.getURLControlPanel(),
+					templateResourceParameters
+				);
+
+				return templateResourceURL.toString();
+			},
+
+			_valueDisplayLocale() {
+				var instance = this;
+
+				var displayLocale = instance.get('displayLocale');
+
+				if (!displayLocale) {
+					displayLocale = instance.getDefaultLocale();
+				}
+
+				var defaultEditLocale = instance.get('defaultEditLocale');
+
+				if (defaultEditLocale) {
+					displayLocale = defaultEditLocale;
+				}
+
+				return displayLocale;
+			},
+
+			_valueFields() {
+				var instance = this;
+
+				var fields = [];
+
+				instance.getFieldNodes().each(function(item) {
+					fields.push(instance._getField(item));
+				});
+
+				return fields;
+			},
+
+			eachParent(fn) {
 				var instance = this;
 
 				var parent = instance.get('parent');
@@ -148,15 +275,13 @@ AUI.add(
 				}
 			},
 
-			extractInstanceId: function(fieldNode) {
-				var instance = this;
-
+			extractInstanceId(fieldNode) {
 				var fieldInstanceId = fieldNode.getData('fieldNamespace');
 
 				return fieldInstanceId.replace(INSTANCE_ID_PREFIX, '');
 			},
 
-			getDefaultLocale: function() {
+			getDefaultLocale() {
 				var instance = this;
 
 				var defaultLocale = themeDisplay.getDefaultLanguageId();
@@ -170,7 +295,7 @@ AUI.add(
 				return defaultLocale;
 			},
 
-			getFieldInfo: function(tree, key, value) {
+			getFieldInfo(tree, key, value) {
 				var queue = new A.Queue(tree);
 
 				var addToQueue = function(item) {
@@ -202,13 +327,13 @@ AUI.add(
 				return fieldInfo;
 			},
 
-			getFieldNodes: function() {
+			getFieldNodes() {
 				var instance = this;
 
 				return instance.get('container').all('> .field-wrapper');
 			},
 
-			getForm: function() {
+			getForm() {
 				var instance = this;
 
 				var root;
@@ -220,7 +345,7 @@ AUI.add(
 				return root || instance;
 			},
 
-			getReadOnly: function() {
+			getReadOnly() {
 				var instance = this;
 
 				var retVal = false;
@@ -239,132 +364,6 @@ AUI.add(
 				}
 
 				return retVal;
-			},
-
-			_getField: function(fieldNode) {
-				var instance = this;
-
-				var displayLocale = instance.get('displayLocale');
-
-				var fieldInstanceId = instance.extractInstanceId(fieldNode);
-
-				var fieldName = fieldNode.getData('fieldName');
-
-				var definition = instance.get('definition');
-
-				var fieldDefinition = instance.getFieldInfo(
-					definition,
-					'name',
-					fieldName
-				);
-
-				var FieldClass = getFieldClass(fieldDefinition.type);
-
-				var field = new FieldClass(
-					A.merge(
-						instance.getAttrs(
-							AObject.keys(DDMPortletSupport.ATTRS)
-						),
-						{
-							container: fieldNode,
-							dataType: fieldDefinition.dataType,
-							definition: definition,
-							displayLocale: displayLocale,
-							instanceId: fieldInstanceId,
-							name: fieldName,
-							parent: instance,
-							values: instance.get('values')
-						}
-					)
-				);
-
-				var form = instance.getForm();
-
-				field.addTarget(form);
-
-				return field;
-			},
-
-			_getTemplate: function(callback) {
-				var instance = this;
-
-				var config = {
-					data: {},
-					on: {
-						success: function(event, id, xhr) {
-							if (callback) {
-								callback.call(instance, xhr.responseText);
-							}
-						}
-					}
-				};
-
-				var key =
-					Liferay.Util.getPortletNamespace(
-						Liferay.PortletKeys.DYNAMIC_DATA_MAPPING
-					) + 'definition';
-
-				config.data[key] = JSON.stringify(instance.get('definition'));
-
-				A.io.request(instance._getTemplateResourceURL(), config);
-			},
-
-			_getTemplateResourceURL: function() {
-				var instance = this;
-
-				var container = instance.get('container');
-
-				var templateResourceParameters = {
-					doAsGroupId: instance.get('doAsGroupId'),
-					fieldName: instance.get('name'),
-					mode: instance.get('mode'),
-					namespace: instance.get('fieldsNamespace'),
-					portletNamespace: instance.get('portletNamespace'),
-					readOnly: instance.get('readOnly'),
-					p_p_auth: container.getData('ddmAuthToken'),
-					p_p_isolated: true,
-					p_l_id: instance.get('p_l_id'),
-					p_p_id: Liferay.PortletKeys.DYNAMIC_DATA_MAPPING,
-					p_p_resource_id: 'renderStructureField',
-					p_p_state: 'pop_up'
-				};
-
-				var templateResourceURL = Liferay.Util.PortletURL.createResourceURL(
-					themeDisplay.getURLControlPanel(),
-					templateResourceParameters
-				);
-
-				return templateResourceURL.toString();
-			},
-
-			_valueDisplayLocale: function() {
-				var instance = this;
-
-				var displayLocale = instance.get('displayLocale');
-
-				if (!displayLocale) {
-					displayLocale = instance.getDefaultLocale();
-				}
-
-				var defaultEditLocale = instance.get('defaultEditLocale');
-
-				if (defaultEditLocale) {
-					displayLocale = defaultEditLocale;
-				}
-
-				return displayLocale;
-			},
-
-			_valueFields: function() {
-				var instance = this;
-
-				var fields = [];
-
-				instance.getFieldNodes().each(function(item) {
-					fields.push(instance._getField(item));
-				});
-
-				return fields;
 			}
 		};
 
@@ -422,33 +421,169 @@ AUI.add(
 			NAME: 'liferay-ddm-field',
 
 			prototype: {
-				initializer: function() {
+				_addFieldValidation(newField, originalField) {
 					var instance = this;
 
-					instance.eventHandlers = [];
+					instance.fire('liferay-ddm-field:repeat', {
+						field: newField,
+						originalField
+					});
 
-					instance.bindUI();
-				},
+					newField.get('fields').forEach(function(item) {
+						var name = item.get('name');
 
-				renderUI: function() {
-					var instance = this;
+						var originalChildField = originalField.getFirstFieldByName(
+							name
+						);
 
-					if (instance.get('repeatable')) {
-						instance.renderRepeatableUI();
-						instance.syncLabel(instance.get('displayLocale'));
-						instance.syncRepeatablelUI();
-					}
-
-					instance.syncValueUI();
-
-					AArray.invoke(instance.get('fields'), 'renderUI');
-
-					instance.fire('liferay-ddm-field:render', {
-						field: instance
+						if (originalChildField) {
+							instance._addFieldValidation(
+								item,
+								originalChildField
+							);
+						}
 					});
 				},
 
-				bindUI: function() {
+				_addTip(labelNode, tipNode) {
+					if (tipNode) {
+						var instance = this;
+
+						var defaultLocale = instance.getDefaultLocale();
+						var fieldDefinition = instance.getFieldDefinition();
+
+						var tipsMap = fieldDefinition.tip;
+
+						if (Lang.isObject(tipsMap)) {
+							var tip =
+								tipsMap[instance.get('displayLocale')] ||
+								tipsMap[defaultLocale];
+
+							tipNode.attr('title', tip);
+						}
+
+						labelNode.append(tipNode);
+					}
+				},
+
+				_afterFormRegistered(event) {
+					var instance = this;
+
+					var formNode = instance.get('formNode');
+
+					if (event.formName === formNode.attr('name')) {
+						instance.set('liferayForm', event.form);
+					}
+				},
+
+				_getLocalizable() {
+					var instance = this;
+
+					return instance.getFieldDefinition().localizable === true;
+				},
+
+				_getRepeatable() {
+					var instance = this;
+
+					return instance.getFieldDefinition().repeatable === true;
+				},
+
+				_handleToolbarClick(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					instance.ddmRepeatableButton = currentTarget;
+
+					if (
+						currentTarget.hasClass('lfr-ddm-repeatable-add-button')
+					) {
+						instance.repeat();
+					} else if (
+						currentTarget.hasClass(
+							'lfr-ddm-repeatable-delete-button'
+						)
+					) {
+						instance.remove();
+
+						instance.syncRepeatablelUI();
+					}
+
+					event.stopPropagation();
+				},
+
+				_onLocaleChanged(event) {
+					var instance = this;
+
+					var currentLocale = instance.get('displayLocale');
+					var displayLocale = event.item.getAttribute('data-value');
+
+					instance.updateLocalizationMap(currentLocale);
+
+					instance.set('displayLocale', displayLocale);
+
+					instance.syncLabel(displayLocale);
+					instance.syncValueUI();
+					instance.syncReadOnlyUI();
+				},
+
+				_removeFieldValidation(field) {
+					var instance = this;
+
+					field.get('fields').forEach(function(item) {
+						instance._removeFieldValidation(item);
+					});
+
+					instance.fire('liferay-ddm-field:remove', {
+						field
+					});
+				},
+
+				_valueFormNode() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					return container.ancestor('form', true);
+				},
+
+				_valueLiferayForm() {
+					var instance = this;
+
+					var formNode = instance.get('formNode');
+
+					var formName = null;
+
+					if (formNode) {
+						formName = formNode.attr('name');
+					}
+
+					return Liferay.Form.get(formName);
+				},
+
+				_valueLocalizationMap() {
+					var instance = this;
+
+					var instanceId = instance.get('instanceId');
+
+					var values = instance.get('values');
+
+					var fieldValue = instance.getFieldInfo(
+						values,
+						'instanceId',
+						instanceId
+					);
+
+					var localizationMap = {};
+
+					if (fieldValue && fieldValue.value) {
+						localizationMap = fieldValue.value;
+					}
+
+					return localizationMap;
+				},
+
+				bindUI() {
 					var instance = this;
 
 					instance.eventHandlers.push(
@@ -472,19 +607,7 @@ AUI.add(
 					}
 				},
 
-				destructor: function() {
-					var instance = this;
-
-					AArray.invoke(instance.eventHandlers, 'detach');
-
-					AArray.invoke(instance.get('fields'), 'destroy');
-
-					instance.eventHandlers = null;
-
-					instance.get('container').remove();
-				},
-
-				createField: function(fieldTemplate) {
+				createField(fieldTemplate) {
 					var instance = this;
 
 					var fieldNode = A.Node.create(fieldTemplate);
@@ -508,7 +631,19 @@ AUI.add(
 					return field;
 				},
 
-				getDefaultLocalization: function(locale) {
+				destructor() {
+					var instance = this;
+
+					AArray.invoke(instance.eventHandlers, 'detach');
+
+					AArray.invoke(instance.get('fields'), 'destroy');
+
+					instance.eventHandlers = null;
+
+					instance.get('container').remove();
+				},
+
+				getDefaultLocalization(locale) {
 					var instance = this;
 
 					var localizationMap = instance.get('localizationMap');
@@ -534,7 +669,7 @@ AUI.add(
 					return localizationMap[locale];
 				},
 
-				getFieldByNameInFieldDefinition: function(name) {
+				getFieldByNameInFieldDefinition(name) {
 					var instance = this;
 
 					var definition = instance.get('definition');
@@ -550,7 +685,7 @@ AUI.add(
 					});
 				},
 
-				getFieldDefinition: function() {
+				getFieldDefinition() {
 					var instance = this;
 
 					var definition = instance.get('definition');
@@ -560,7 +695,7 @@ AUI.add(
 					return instance.getFieldInfo(definition, 'name', name);
 				},
 
-				getFirstFieldByName: function(name) {
+				getFirstFieldByName(name) {
 					var instance = this;
 
 					return AArray.find(instance.get('fields'), function(item) {
@@ -568,7 +703,7 @@ AUI.add(
 					});
 				},
 
-				getInputName: function() {
+				getInputName() {
 					var instance = this;
 
 					var fieldsNamespace = instance.get('fieldsNamespace');
@@ -589,7 +724,7 @@ AUI.add(
 						.join('');
 				},
 
-				getInputNode: function() {
+				getInputNode() {
 					var instance = this;
 
 					return instance
@@ -597,13 +732,13 @@ AUI.add(
 						.one('[name=' + instance.getInputName() + ']');
 				},
 
-				getLabelNode: function() {
+				getLabelNode() {
 					var instance = this;
 
 					return instance.get('container').one('.control-label');
 				},
 
-				getPredefinedValueByLocale: function(locale) {
+				getPredefinedValueByLocale(locale) {
 					var instance = this;
 
 					var name = instance.get('name');
@@ -630,7 +765,7 @@ AUI.add(
 					return predefinedValue;
 				},
 
-				getRepeatedSiblings: function() {
+				getRepeatedSiblings() {
 					var instance = this;
 
 					return instance.getSiblings().filter(function(item) {
@@ -638,7 +773,7 @@ AUI.add(
 					});
 				},
 
-				getRuleInputName: function() {
+				getRuleInputName() {
 					var instance = this;
 
 					var inputName = instance.getInputName();
@@ -646,13 +781,13 @@ AUI.add(
 					return inputName;
 				},
 
-				getSiblings: function() {
+				getSiblings() {
 					var instance = this;
 
 					return instance.get('parent').get('fields');
 				},
 
-				getValue: function() {
+				getValue() {
 					var instance = this;
 
 					var inputNode = instance.getInputNode();
@@ -660,7 +795,15 @@ AUI.add(
 					return Lang.String.unescapeHTML(inputNode.val());
 				},
 
-				parseContent: function(content) {
+				initializer() {
+					var instance = this;
+
+					instance.eventHandlers = [];
+
+					instance.bindUI();
+				},
+
+				parseContent(content) {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -672,7 +815,7 @@ AUI.add(
 					parser.parseContent(content);
 				},
 
-				populateRepeatedSiblings: function(locale) {
+				populateRepeatedSiblings(locale) {
 					var instance = this;
 
 					var siblings = instance.getRepeatedSiblings();
@@ -686,7 +829,7 @@ AUI.add(
 					});
 				},
 
-				remove: function() {
+				remove() {
 					var instance = this;
 
 					var siblings = instance.getSiblings();
@@ -702,7 +845,7 @@ AUI.add(
 					instance.get('container').remove(true);
 				},
 
-				renderRepeatableUI: function() {
+				renderRepeatableUI() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -725,7 +868,25 @@ AUI.add(
 					);
 				},
 
-				repeat: function() {
+				renderUI() {
+					var instance = this;
+
+					if (instance.get('repeatable')) {
+						instance.renderRepeatableUI();
+						instance.syncLabel(instance.get('displayLocale'));
+						instance.syncRepeatablelUI();
+					}
+
+					instance.syncValueUI();
+
+					AArray.invoke(instance.get('fields'), 'renderUI');
+
+					instance.fire('liferay-ddm-field:render', {
+						field: instance
+					});
+				},
+
+				repeat() {
 					var instance = this;
 
 					instance._getTemplate(function(fieldTemplate) {
@@ -751,7 +912,7 @@ AUI.add(
 					});
 				},
 
-				setLabel: function(label) {
+				setLabel(label) {
 					var instance = this;
 
 					var labelNode = instance.getLabelNode();
@@ -777,7 +938,7 @@ AUI.add(
 					}
 				},
 
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					var inputNode = instance.getInputNode();
@@ -787,7 +948,7 @@ AUI.add(
 					}
 				},
 
-				syncLabel: function(locale) {
+				syncLabel(locale) {
 					var instance = this;
 
 					var fieldDefinition = instance.getFieldDefinition();
@@ -801,7 +962,7 @@ AUI.add(
 					}
 				},
 
-				syncReadOnlyUI: function() {
+				syncReadOnlyUI() {
 					var instance = this;
 
 					var readOnly = instance.getReadOnly();
@@ -843,7 +1004,7 @@ AUI.add(
 					}
 				},
 
-				syncRepeatablelUI: function() {
+				syncRepeatablelUI() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -855,7 +1016,7 @@ AUI.add(
 						.toggle(siblings.length > 1);
 				},
 
-				syncValueUI: function() {
+				syncValueUI() {
 					var instance = this;
 
 					var dataType = instance.get('dataType');
@@ -886,7 +1047,7 @@ AUI.add(
 					}
 				},
 
-				toJSON: function() {
+				toJSON() {
 					var instance = this;
 
 					var fieldJSON = {
@@ -924,7 +1085,7 @@ AUI.add(
 					return fieldJSON;
 				},
 
-				updateLocalizationMap: function(locale) {
+				updateLocalizationMap(locale) {
 					var instance = this;
 
 					var localizationMap = instance.get('localizationMap');
@@ -947,168 +1108,6 @@ AUI.add(
 					}
 
 					instance.set('localizationMap', localizationMap);
-				},
-
-				_addFieldValidation: function(newField, originalField) {
-					var instance = this;
-
-					instance.fire('liferay-ddm-field:repeat', {
-						field: newField,
-						originalField: originalField
-					});
-
-					newField.get('fields').forEach(function(item, index) {
-						var name = item.get('name');
-
-						var originalChildField = originalField.getFirstFieldByName(
-							name
-						);
-
-						if (originalChildField) {
-							instance._addFieldValidation(
-								item,
-								originalChildField
-							);
-						}
-					});
-				},
-
-				_addTip: function(labelNode, tipNode) {
-					if (tipNode) {
-						var instance = this;
-
-						var defaultLocale = instance.getDefaultLocale();
-						var fieldDefinition = instance.getFieldDefinition();
-
-						var tipsMap = fieldDefinition.tip;
-
-						if (Lang.isObject(tipsMap)) {
-							var tip =
-								tipsMap[instance.get('displayLocale')] ||
-								tipsMap[defaultLocale];
-
-							tipNode.attr('title', tip);
-						}
-
-						labelNode.append(tipNode);
-					}
-				},
-
-				_afterFormRegistered: function(event) {
-					var instance = this;
-
-					var formNode = instance.get('formNode');
-
-					if (event.formName === formNode.attr('name')) {
-						instance.set('liferayForm', event.form);
-					}
-				},
-
-				_getLocalizable: function() {
-					var instance = this;
-
-					return instance.getFieldDefinition().localizable === true;
-				},
-
-				_getRepeatable: function() {
-					var instance = this;
-
-					return instance.getFieldDefinition().repeatable === true;
-				},
-
-				_handleToolbarClick: function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					instance.ddmRepeatableButton = currentTarget;
-
-					if (
-						currentTarget.hasClass('lfr-ddm-repeatable-add-button')
-					) {
-						instance.repeat();
-					} else if (
-						currentTarget.hasClass(
-							'lfr-ddm-repeatable-delete-button'
-						)
-					) {
-						instance.remove();
-
-						instance.syncRepeatablelUI();
-					}
-
-					event.stopPropagation();
-				},
-
-				_onLocaleChanged: function(event) {
-					var instance = this;
-
-					var currentLocale = instance.get('displayLocale');
-					var displayLocale = event.item.getAttribute('data-value');
-
-					instance.updateLocalizationMap(currentLocale);
-
-					instance.set('displayLocale', displayLocale);
-
-					instance.syncLabel(displayLocale);
-					instance.syncValueUI();
-					instance.syncReadOnlyUI();
-				},
-
-				_removeFieldValidation: function(field) {
-					var instance = this;
-
-					field.get('fields').forEach(function(item, index) {
-						instance._removeFieldValidation(item);
-					});
-
-					instance.fire('liferay-ddm-field:remove', {
-						field: field
-					});
-				},
-
-				_valueFormNode: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					return container.ancestor('form', true);
-				},
-
-				_valueLiferayForm: function() {
-					var instance = this;
-
-					var formNode = instance.get('formNode');
-
-					var formName = null;
-
-					if (formNode) {
-						formName = formNode.attr('name');
-					}
-
-					return Liferay.Form.get(formName);
-				},
-
-				_valueLocalizationMap: function() {
-					var instance = this;
-
-					var instanceId = instance.get('instanceId');
-
-					var values = instance.get('values');
-
-					var fieldValue = instance.getFieldInfo(
-						values,
-						'instanceId',
-						instanceId
-					);
-
-					var localizationMap = {};
-
-					if (fieldValue && fieldValue.value) {
-						localizationMap = fieldValue.value;
-					}
-
-					return localizationMap;
 				}
 			}
 		});
@@ -1117,19 +1116,19 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				getLabelNode: function() {
+				getLabelNode() {
 					var instance = this;
 
 					return instance.get('container').one('label');
 				},
 
-				getValue: function() {
+				getValue() {
 					var instance = this;
 
 					return instance.getInputNode().test(':checked') + '';
 				},
 
-				setLabel: function(label) {
+				setLabel(label) {
 					var instance = this;
 
 					var labelNode = instance.getLabelNode();
@@ -1153,7 +1152,7 @@ AUI.add(
 					instance._addTip(labelNode, tipNode);
 				},
 
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					instance.getInputNode().attr('checked', value === 'true');
@@ -1167,7 +1166,16 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				initializer: function() {
+				getValue() {
+					var instance = this;
+
+					var container = instance.get('container');
+					var valueField = container.one('.color-value');
+
+					return valueField.val();
+				},
+
+				initializer() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -1202,16 +1210,7 @@ AUI.add(
 					instance.set('colorPicker', colorPicker);
 				},
 
-				getValue: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-					var valueField = container.one('.color-value');
-
-					return valueField.val();
-				},
-
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -1230,7 +1229,7 @@ AUI.add(
 					colorPicker.set('color', value);
 				},
 
-				validateField: function(valueField) {
+				validateField(valueField) {
 					var instance = this;
 
 					var liferayForm = instance.get('liferayForm');
@@ -1252,7 +1251,7 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				getDatePicker: function() {
+				getDatePicker() {
 					var instance = this;
 
 					var inputNode = instance.getInputNode();
@@ -1262,7 +1261,7 @@ AUI.add(
 					);
 				},
 
-				getValue: function() {
+				getValue() {
 					var instance = this;
 
 					var datePicker = instance.getDatePicker();
@@ -1284,7 +1283,7 @@ AUI.add(
 					return value;
 				},
 
-				repeat: function() {
+				repeat() {
 					var instance = this;
 
 					instance._getTemplate(function(fieldTemplate) {
@@ -1303,7 +1302,7 @@ AUI.add(
 					});
 				},
 
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					var datePicker = instance.getDatePicker();
@@ -1351,42 +1350,73 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				initializer: function() {
+				_handleButtonsClick(event) {
 					var instance = this;
 
-					var container = instance.get('container');
+					if (!instance.get('readOnly')) {
+						var currentTarget = event.currentTarget;
 
-					container.delegate(
-						'click',
-						instance._handleButtonsClick,
-						'> .form-group .btn',
-						instance
-					);
+						if (currentTarget.test('.select-button')) {
+							instance._handleSelectButtonClick(event);
+						} else if (currentTarget.test('.clear-button')) {
+							instance._handleClearButtonClick(event);
+						}
+					}
 				},
 
-				syncUI: function() {
+				_handleClearButtonClick() {
 					var instance = this;
 
-					var parsedValue = instance.getParsedValue(
-						instance.getValue()
-					);
-
-					var titleNode = A.one(
-						'#' + instance.getInputName() + 'Title'
-					);
-
-					titleNode.val(parsedValue.title || '');
-
-					instance._validateField(titleNode);
-
-					var clearButtonNode = A.one(
-						'#' + instance.getInputName() + 'ClearButton'
-					);
-
-					clearButtonNode.toggle(!!parsedValue.uuid);
+					instance.setValue('');
 				},
 
-				getDocumentLibrarySelectorURL: function() {
+				_handleSelectButtonClick() {
+					var instance = this;
+
+					var portletNamespace = instance.get('portletNamespace');
+
+					var itemSelectorDialog = new A.LiferayItemSelectorDialog({
+						eventName: portletNamespace + 'selectDocumentLibrary',
+						on: {
+							selectedItemChange(event) {
+								var selectedItem = event.newVal;
+
+								if (selectedItem) {
+									var itemValue = JSON.parse(
+										selectedItem.value
+									);
+
+									instance.setValue({
+										classPK: itemValue.fileEntryId,
+										groupId: itemValue.groupId,
+										title: itemValue.title,
+										type: itemValue.type,
+										uuid: itemValue.uuid
+									});
+								}
+							}
+						},
+						url: instance.getDocumentLibrarySelectorURL()
+					});
+
+					itemSelectorDialog.open();
+				},
+
+				_validateField(fieldNode) {
+					var instance = this;
+
+					var liferayForm = instance.get('liferayForm');
+
+					if (liferayForm) {
+						var formValidator = liferayForm.formValidator;
+
+						if (formValidator) {
+							formValidator.validateField(fieldNode);
+						}
+					}
+				},
+
+				getDocumentLibrarySelectorURL() {
 					var instance = this;
 
 					var form = instance.getForm();
@@ -1406,7 +1436,7 @@ AUI.add(
 					return retVal;
 				},
 
-				getDocumentLibraryURL: function(criteria) {
+				getDocumentLibraryURL(criteria) {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -1419,18 +1449,18 @@ AUI.add(
 					};
 
 					var uploadCriterionJSON = {
+						URL: instance.getUploadURL(),
 						desiredItemSelectorReturnTypes:
-							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
-						URL: instance.getUploadURL()
+							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType'
 					};
 
 					var documentLibraryParameters = {
-						criteria: criteria,
-						itemSelectedEventName:
-							portletNamespace + 'selectDocumentLibrary',
 						'0_json': JSON.stringify(criterionJSON),
 						'1_json': JSON.stringify(criterionJSON),
 						'2_json': JSON.stringify(uploadCriterionJSON),
+						criteria,
+						itemSelectedEventName:
+							portletNamespace + 'selectDocumentLibrary',
 						p_p_auth: container.getData('itemSelectorAuthToken'),
 						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
 						p_p_mode: 'view',
@@ -1445,9 +1475,7 @@ AUI.add(
 					return documentLibraryURL.toString();
 				},
 
-				getParsedValue: function(value) {
-					var instance = this;
-
+				getParsedValue(value) {
 					if (Lang.isString(value)) {
 						if (value !== '') {
 							value = JSON.parse(value);
@@ -1459,7 +1487,7 @@ AUI.add(
 					return value;
 				},
 
-				getRuleInputName: function() {
+				getRuleInputName() {
 					var instance = this;
 
 					var inputName = instance.getInputName();
@@ -1467,7 +1495,7 @@ AUI.add(
 					return inputName + 'Title';
 				},
 
-				getUploadURL: function() {
+				getUploadURL() {
 					var uploadParameters = {
 						cmd: 'add_temp',
 						'javax.portlet.action':
@@ -1484,7 +1512,20 @@ AUI.add(
 					return uploadURL.toString();
 				},
 
-				setValue: function(value) {
+				initializer() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					container.delegate(
+						'click',
+						instance._handleButtonsClick,
+						'> .form-group .btn',
+						instance
+					);
+				},
+
+				setValue(value) {
 					var instance = this;
 
 					var parsedValue = instance.getParsedValue(value);
@@ -1503,7 +1544,7 @@ AUI.add(
 					instance.syncUI();
 				},
 
-				syncReadOnlyUI: function() {
+				syncReadOnlyUI() {
 					var instance = this;
 
 					var readOnly = instance.getReadOnly();
@@ -1531,94 +1572,7 @@ AUI.add(
 					}
 				},
 
-				_handleButtonsClick: function(event) {
-					var instance = this;
-
-					if (!instance.get('readOnly')) {
-						var currentTarget = event.currentTarget;
-
-						if (currentTarget.test('.select-button')) {
-							instance._handleSelectButtonClick(event);
-						} else if (currentTarget.test('.clear-button')) {
-							instance._handleClearButtonClick(event);
-						}
-					}
-				},
-
-				_handleClearButtonClick: function(event) {
-					var instance = this;
-
-					instance.setValue('');
-				},
-
-				_handleSelectButtonClick: function(event) {
-					var instance = this;
-
-					var portletNamespace = instance.get('portletNamespace');
-
-					var itemSelectorDialog = new A.LiferayItemSelectorDialog({
-						eventName: portletNamespace + 'selectDocumentLibrary',
-						on: {
-							selectedItemChange: function(event) {
-								var selectedItem = event.newVal;
-
-								if (selectedItem) {
-									var itemValue = JSON.parse(
-										selectedItem.value
-									);
-
-									instance.setValue({
-										classPK: itemValue.fileEntryId,
-										groupId: itemValue.groupId,
-										title: itemValue.title,
-										type: itemValue.type,
-										uuid: itemValue.uuid
-									});
-								}
-							}
-						},
-						url: instance.getDocumentLibrarySelectorURL()
-					});
-
-					itemSelectorDialog.open();
-				},
-
-				_validateField: function(fieldNode) {
-					var instance = this;
-
-					var liferayForm = instance.get('liferayForm');
-
-					if (liferayForm) {
-						var formValidator = liferayForm.formValidator;
-
-						if (formValidator) {
-							formValidator.validateField(fieldNode);
-						}
-					}
-				}
-			}
-		});
-
-		FieldTypes['ddm-documentlibrary'] = DocumentLibraryField;
-
-		var JournalArticleField = A.Component.create({
-			EXTENDS: Field,
-
-			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					container.delegate(
-						'click',
-						instance._handleButtonsClick,
-						'> .form-group .btn',
-						instance
-					);
-				},
-
-				syncUI: function() {
+				syncUI() {
 					var instance = this;
 
 					var parsedValue = instance.getParsedValue(
@@ -1637,118 +1591,18 @@ AUI.add(
 						'#' + instance.getInputName() + 'ClearButton'
 					);
 
-					clearButtonNode.toggle(!!parsedValue.classPK);
-				},
+					clearButtonNode.toggle(!!parsedValue.uuid);
+				}
+			}
+		});
 
-				getParsedValue: function(value) {
-					if (Lang.isString(value)) {
-						if (value !== '') {
-							value = JSON.parse(value);
-						} else {
-							value = {};
-						}
-					}
+		FieldTypes['ddm-documentlibrary'] = DocumentLibraryField;
 
-					return value;
-				},
+		var JournalArticleField = A.Component.create({
+			EXTENDS: Field,
 
-				getRuleInputName: function() {
-					var instance = this;
-
-					var inputName = instance.getInputName();
-
-					return inputName + 'Title';
-				},
-
-				getWebContentSelectorURL: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					var groupIdNode = A.one(
-						'#' + this.get('portletNamespace') + 'groupId'
-					);
-
-					var groupId =
-						(groupIdNode && groupIdNode.getAttribute('value')) ||
-						themeDisplay.getScopeGroupId();
-
-					var webContentSelectorParameters = {
-						eventName: 'selectContent',
-						groupId: groupId,
-						p_p_auth: container.getData('assetBrowserAuthToken'),
-						selectedGroupId: groupId,
-						showNonindexable: true,
-						showScheduled: true,
-						typeSelection:
-							'com.liferay.journal.model.JournalArticle',
-						p_p_id:
-							'com_liferay_asset_browser_web_portlet_AssetBrowserPortlet',
-						p_p_state: 'pop_up'
-					};
-
-					var webContentSelectorURL = Liferay.Util.PortletURL.createRenderURL(
-						themeDisplay.getURLControlPanel(),
-						webContentSelectorParameters
-					);
-
-					return webContentSelectorURL.toString();
-				},
-
-				setValue: function(value) {
-					var instance = this;
-
-					var parsedValue = instance.getParsedValue(value);
-
-					if (!parsedValue.className && !parsedValue.classPK) {
-						value = '';
-					} else {
-						value = JSON.stringify(parsedValue);
-					}
-
-					JournalArticleField.superclass.setValue.call(
-						instance,
-						value
-					);
-
-					instance.syncUI();
-				},
-
-				showNotice: function(message) {
-					var instance = this;
-
-					if (!instance.notice) {
-						instance.notice = new Liferay.Notice({
-							toggleText: false,
-							type: 'warning'
-						}).hide();
-					}
-
-					instance.notice.html(message);
-					instance.notice.show();
-				},
-
-				syncReadOnlyUI: function() {
-					var instance = this;
-
-					var readOnly = instance.getReadOnly();
-
-					var container = instance.get('container');
-
-					var selectButtonNode = container.one(
-						'#' + instance.getInputName() + 'SelectButton'
-					);
-
-					selectButtonNode.attr('disabled', readOnly);
-
-					var clearButtonNode = container.one(
-						'#' + instance.getInputName() + 'ClearButton'
-					);
-
-					clearButtonNode.attr('disabled', readOnly);
-				},
-
-				_handleButtonsClick: function(event) {
+			prototype: {
+				_handleButtonsClick(event) {
 					var instance = this;
 
 					if (!instance.get('readOnly')) {
@@ -1762,7 +1616,7 @@ AUI.add(
 					}
 				},
 
-				_handleClearButtonClick: function() {
+				_handleClearButtonClick() {
 					var instance = this;
 
 					instance.setValue('');
@@ -1770,7 +1624,7 @@ AUI.add(
 					instance._hideMessage();
 				},
 
-				_handleSelectButtonClick: function(event) {
+				_handleSelectButtonClick() {
 					var instance = this;
 
 					Liferay.Util.selectEntity(
@@ -1793,7 +1647,8 @@ AUI.add(
 									className:
 										selectedWebContent.assetclassname,
 									classPK: selectedWebContent.assetclasspk,
-									title: selectedWebContent.assettitle || ''
+									title: selectedWebContent.assettitle || '',
+									titleMap: selectedWebContent.assettitlemap
 								});
 
 								instance._hideMessage();
@@ -1802,7 +1657,7 @@ AUI.add(
 					);
 				},
 
-				_hideMessage: function() {
+				_hideMessage() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -1822,7 +1677,7 @@ AUI.add(
 					formGroup.removeClass('has-warning');
 				},
 
-				_validateField: function(fieldNode) {
+				_validateField(fieldNode) {
 					var instance = this;
 
 					var liferayForm = instance.get('liferayForm');
@@ -1834,6 +1689,162 @@ AUI.add(
 							formValidator.validateField(fieldNode);
 						}
 					}
+				},
+
+				getParsedValue(value) {
+					if (Lang.isString(value)) {
+						if (value !== '') {
+							value = JSON.parse(value);
+						} else {
+							value = {};
+						}
+					}
+
+					return value;
+				},
+
+				getRuleInputName() {
+					var instance = this;
+
+					var inputName = instance.getInputName();
+
+					return inputName + 'Title';
+				},
+
+				getWebContentSelectorURL() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					var groupIdNode = A.one(
+						'#' + this.get('portletNamespace') + 'groupId'
+					);
+
+					var groupId =
+						(groupIdNode && groupIdNode.getAttribute('value')) ||
+						themeDisplay.getScopeGroupId();
+
+					var webContentSelectorParameters = {
+						eventName: 'selectContent',
+						groupId,
+						p_p_auth: container.getData('assetBrowserAuthToken'),
+						p_p_id:
+							'com_liferay_asset_browser_web_portlet_AssetBrowserPortlet',
+						p_p_state: 'pop_up',
+						selectedGroupId: groupId,
+						showNonindexable: true,
+						showScheduled: true,
+						typeSelection:
+							'com.liferay.journal.model.JournalArticle'
+					};
+
+					var webContentSelectorURL = Liferay.Util.PortletURL.createRenderURL(
+						themeDisplay.getURLControlPanel(),
+						webContentSelectorParameters
+					);
+
+					return webContentSelectorURL.toString();
+				},
+
+				initializer() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					container.delegate(
+						'click',
+						instance._handleButtonsClick,
+						'> .form-group .btn',
+						instance
+					);
+				},
+
+				setValue(value) {
+					var instance = this;
+
+					var parsedValue = instance.getParsedValue(value);
+
+					if (!parsedValue.className && !parsedValue.classPK) {
+						value = '';
+					} else {
+						value = JSON.stringify(parsedValue);
+					}
+
+					JournalArticleField.superclass.setValue.call(
+						instance,
+						value
+					);
+
+					instance.syncUI();
+				},
+
+				showNotice(message) {
+					var instance = this;
+
+					if (!instance.notice) {
+						instance.notice = new Liferay.Notice({
+							toggleText: false,
+							type: 'warning'
+						}).hide();
+					}
+
+					instance.notice.html(message);
+					instance.notice.show();
+				},
+
+				syncReadOnlyUI() {
+					var instance = this;
+
+					var readOnly = instance.getReadOnly();
+
+					var container = instance.get('container');
+
+					var selectButtonNode = container.one(
+						'#' + instance.getInputName() + 'SelectButton'
+					);
+
+					selectButtonNode.attr('disabled', readOnly);
+
+					var clearButtonNode = container.one(
+						'#' + instance.getInputName() + 'ClearButton'
+					);
+
+					clearButtonNode.attr('disabled', readOnly);
+				},
+
+				syncUI() {
+					var instance = this;
+
+					var parsedValue = instance.getParsedValue(
+						instance.getValue()
+					);
+
+					var titleNode = A.one(
+						'#' + instance.getInputName() + 'Title'
+					);
+
+					var parsedTitleMap = instance.getParsedValue(
+						parsedValue.titleMap
+					);
+
+					if (parsedTitleMap) {
+						var journalTitle =
+							parsedTitleMap[instance.get('displayLocale')];
+
+						if (journalTitle) {
+							parsedValue.title = journalTitle;
+						}
+					}
+
+					titleNode.val(parsedValue.title || '');
+
+					instance._validateField(titleNode);
+
+					var clearButtonNode = A.one(
+						'#' + instance.getInputName() + 'ClearButton'
+					);
+
+					clearButtonNode.toggle(!!parsedValue.classPK);
 				}
 			}
 		});
@@ -1847,7 +1858,7 @@ AUI.add(
 				},
 
 				selectedLayout: {
-					valueFn: function() {
+					valueFn() {
 						var instance = this;
 
 						var layoutValue = instance.getParsedValue(
@@ -1865,7 +1876,7 @@ AUI.add(
 				},
 
 				selectedLayoutPath: {
-					valueFn: function() {
+					valueFn() {
 						var instance = this;
 
 						var layoutValue = instance.getParsedValue(
@@ -1886,10 +1897,10 @@ AUI.add(
 							themeDisplay.getScopeGroupId();
 
 						var layoutsRoot = {
-							groupId: groupId,
+							groupId,
 							label: Liferay.Language.get('all'),
 							layoutId: 0,
-							privateLayout: privateLayout
+							privateLayout
 						};
 
 						return [layoutsRoot];
@@ -1900,119 +1911,7 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					instance._currentParentLayoutId = 0;
-					instance._loadingAnimationNode = A.Node.create(TPL_LOADER);
-
-					instance._cache = {};
-
-					instance._clearedModal = false;
-
-					instance.after(
-						'selectedLayoutChange',
-						instance._afterSelectedLayoutChange
-					);
-					instance.after(
-						'selectedLayoutPathChange',
-						instance._afterSelectedLayoutPathChange
-					);
-
-					container.delegate(
-						'click',
-						instance._handleControlButtonsClick,
-						'> .form-group .btn',
-						instance
-					);
-				},
-
-				getParsedValue: function(value) {
-					var instance = this;
-
-					if (Lang.isString(value)) {
-						if (value) {
-							value = JSON.parse(value);
-						} else {
-							value = {};
-						}
-					}
-
-					return value;
-				},
-
-				getRuleInputName: function() {
-					var instance = this;
-
-					var inputName = instance.getInputName();
-
-					return inputName + 'LayoutName';
-				},
-
-				setValue: function(value) {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					var inputName = instance.getInputName();
-
-					var layoutNameNode = container.one(
-						'#' + inputName + 'LayoutName'
-					);
-
-					var parsedValue = instance.getParsedValue(value);
-
-					if (parsedValue && parsedValue.layoutId) {
-						if (parsedValue.label) {
-							layoutNameNode.val(parsedValue.label);
-						}
-
-						value = JSON.stringify(parsedValue);
-					} else {
-						layoutNameNode.val('');
-
-						value = '';
-					}
-
-					instance._validateField(layoutNameNode);
-
-					var clearButtonNode = container.one(
-						'#' + inputName + 'ClearButton'
-					);
-
-					clearButtonNode.toggle(!!value);
-
-					LinkToPageField.superclass.setValue.call(instance, value);
-				},
-
-				syncReadOnlyUI: function() {
-					var instance = this;
-
-					var readOnly = instance.getReadOnly();
-
-					var container = instance.get('container');
-
-					var selectButtonNode = container.one(
-						'#' + instance.getInputName() + 'SelectButton'
-					);
-
-					selectButtonNode.attr('disabled', readOnly);
-
-					var clearButtonNode = container.one(
-						'#' + instance.getInputName() + 'ClearButton'
-					);
-
-					clearButtonNode.attr('disabled', readOnly);
-				},
-
-				_addBreadcrumbElement: function(
-					label,
-					layoutId,
-					groupId,
-					privateLayout
-				) {
+				_addBreadcrumbElement(label, layoutId, groupId, privateLayout) {
 					var instance = this;
 
 					var breadcrumbNode = instance._modal.bodyNode.one(
@@ -2021,24 +1920,17 @@ AUI.add(
 
 					var breadcrumbElementNode = A.Node.create(
 						Lang.sub(TPL_PAGES_BREADCRUMB_ELEMENT, {
-							groupId: groupId,
-							label: label,
-							layoutId: layoutId,
-							privateLayout: privateLayout
+							groupId,
+							label,
+							layoutId,
+							privateLayout
 						})
 					);
 
 					breadcrumbNode.append(breadcrumbElementNode);
 				},
 
-				_addListElement: function(
-					layout,
-					container,
-					selected,
-					prepend
-				) {
-					var instance = this;
-
+				_addListElement(layout, container, selected, prepend) {
 					var entryNode = A.Node.create(
 						Lang.sub(TPL_PAGE, {
 							checked: selected ? 'checked="checked"' : '',
@@ -2062,7 +1954,7 @@ AUI.add(
 					}
 				},
 
-				_afterSelectedLayoutChange: function(event) {
+				_afterSelectedLayoutChange(event) {
 					var instance = this;
 
 					var modal = instance._modal;
@@ -2079,13 +1971,13 @@ AUI.add(
 					}
 				},
 
-				_afterSelectedLayoutPathChange: function(event) {
+				_afterSelectedLayoutPathChange(event) {
 					var instance = this;
 
 					instance._renderBreadcrumb(event.newVal);
 				},
 
-				_canLoadMore: function(key, start, end) {
+				_canLoadMore(key, start, end) {
 					var instance = this;
 
 					var cache = instance._getCache(key);
@@ -2093,7 +1985,7 @@ AUI.add(
 					return !cache || start < cache.start || end > cache.end;
 				},
 
-				_cleanSelectedLayout: function() {
+				_cleanSelectedLayout() {
 					var instance = this;
 
 					var checkedElement = instance._modal.bodyNode.one(
@@ -2107,7 +1999,7 @@ AUI.add(
 					}
 				},
 
-				_getCache: function(key) {
+				_getCache(key) {
 					var instance = this;
 
 					var cache;
@@ -2119,7 +2011,7 @@ AUI.add(
 					return cache;
 				},
 
-				_getModalConfig: function() {
+				_getModalConfig() {
 					var instance = this;
 
 					return {
@@ -2128,7 +2020,7 @@ AUI.add(
 							height: 600,
 							modal: true,
 							on: {
-								destroy: function() {
+								destroy() {
 									instance.set('selectedLayout', null);
 								}
 							},
@@ -2181,7 +2073,7 @@ AUI.add(
 					};
 				},
 
-				_handleBreadcrumbElementClick: function(event) {
+				_handleBreadcrumbElementClick(event) {
 					var instance = this;
 
 					var currentTargetLayoutId = Number(
@@ -2247,13 +2139,13 @@ AUI.add(
 					}
 				},
 
-				_handleCancelButtonClick: function() {
+				_handleCancelButtonClick() {
 					var instance = this;
 
 					instance._modal.hide();
 				},
 
-				_handleChooseButtonClick: function() {
+				_handleChooseButtonClick() {
 					var instance = this;
 
 					var selectedLayout = instance.get('selectedLayout');
@@ -2263,7 +2155,7 @@ AUI.add(
 					instance._modal.hide();
 				},
 
-				_handleClearButtonClick: function() {
+				_handleClearButtonClick() {
 					var instance = this;
 
 					instance._clearedModal = true;
@@ -2276,7 +2168,7 @@ AUI.add(
 					);
 				},
 
-				_handleControlButtonsClick: function(event) {
+				_handleControlButtonsClick(event) {
 					var instance = this;
 
 					if (!instance.get('readOnly')) {
@@ -2290,7 +2182,7 @@ AUI.add(
 					}
 				},
 
-				_handleListEntryClick: function(event) {
+				_handleListEntryClick(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -2320,10 +2212,10 @@ AUI.add(
 							);
 
 							selectedLayoutPath.push({
-								groupId: groupId,
-								label: label,
-								layoutId: layoutId,
-								privateLayout: privateLayout
+								groupId,
+								label,
+								layoutId,
+								privateLayout
 							});
 
 							instance.set(
@@ -2353,25 +2245,25 @@ AUI.add(
 							inputRadioNode.attr('checked', 'true');
 
 							instance.set('selectedLayout', {
-								groupId: groupId,
-								label: label,
-								layoutId: layoutId,
+								groupId,
+								label,
+								layoutId,
 								path: instance.get('selectedLayoutPath'),
-								privateLayout: privateLayout
+								privateLayout
 							});
 						}
 					} else if (event.target.hasClass('lfr-ddm-page-radio')) {
 						instance.set('selectedLayout', {
-							groupId: groupId,
-							label: label,
-							layoutId: layoutId,
+							groupId,
+							label,
+							layoutId,
 							path: instance.get('selectedLayoutPath'),
-							privateLayout: privateLayout
+							privateLayout
 						});
 					}
 				},
 
-				_handleModalScroll: function(event) {
+				_handleModalScroll(event) {
 					var instance = this;
 
 					var listNode = event.currentTarget;
@@ -2466,7 +2358,7 @@ AUI.add(
 					}
 				},
 
-				_handleNavbarClick: function(event) {
+				_handleNavbarClick(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -2485,19 +2377,19 @@ AUI.add(
 					instance._renderLayoutsList(privateLayout);
 				},
 
-				_handleSelectButtonClick: function() {
+				_handleSelectButtonClick() {
 					var instance = this;
 
 					instance._openLinkToPageModal();
 				},
 
-				_hideLoader: function() {
+				_hideLoader() {
 					var instance = this;
 
 					instance._loadingAnimationNode.remove();
 				},
 
-				_initBreadcrumb: function() {
+				_initBreadcrumb() {
 					var instance = this;
 
 					var breadcrumbNode = A.Node.create(TPL_PAGES_BREADCRUMB);
@@ -2512,7 +2404,7 @@ AUI.add(
 					);
 				},
 
-				_initLayoutsList: function() {
+				_initLayoutsList() {
 					var instance = this;
 
 					var bodyNode = instance._modal.bodyNode;
@@ -2531,7 +2423,7 @@ AUI.add(
 					}
 				},
 
-				_isListNodeEmpty: function(key) {
+				_isListNodeEmpty(key) {
 					var instance = this;
 
 					var cache = instance._getCache(key);
@@ -2539,7 +2431,7 @@ AUI.add(
 					return !(cache && cache.layouts);
 				},
 
-				_openLinkToPageModal: function() {
+				_openLinkToPageModal() {
 					var instance = this;
 
 					var value = instance.getParsedValue(instance.getValue());
@@ -2593,7 +2485,7 @@ AUI.add(
 					instance._syncModalHeight();
 				},
 
-				_renderBreadcrumb: function(layoutsPath) {
+				_renderBreadcrumb(layoutsPath) {
 					var instance = this;
 
 					var bodyNode = instance._modal.bodyNode;
@@ -2618,7 +2510,7 @@ AUI.add(
 					}
 				},
 
-				_renderLayouts: function(layouts) {
+				_renderLayouts(layouts) {
 					var instance = this;
 
 					var bodyNode = instance._modal.bodyNode;
@@ -2640,7 +2532,7 @@ AUI.add(
 					instance._syncModalHeight();
 				},
 
-				_renderLayoutsFragment: function(layouts, key, direction) {
+				_renderLayoutsFragment(layouts, key, direction) {
 					var instance = this;
 
 					var bodyNode = instance._modal.bodyNode;
@@ -2686,7 +2578,7 @@ AUI.add(
 					instance._syncModalHeight();
 				},
 
-				_renderLayoutsList: function(privateLayout) {
+				_renderLayoutsList(privateLayout) {
 					var instance = this;
 
 					var bodyNode = instance._modal.bodyNode;
@@ -2749,7 +2641,7 @@ AUI.add(
 					}
 				},
 
-				_renderNavbar: function(privateLayout) {
+				_renderNavbar(privateLayout) {
 					var instance = this;
 
 					var navbar = instance._navbar;
@@ -2777,7 +2669,7 @@ AUI.add(
 					}
 				},
 
-				_requestInitialLayouts: function(
+				_requestInitialLayouts(
 					parentLayoutId,
 					groupId,
 					privateLayout,
@@ -2799,7 +2691,7 @@ AUI.add(
 					);
 				},
 
-				_requestLayouts: function(
+				_requestLayouts(
 					parentLayoutId,
 					groupId,
 					privateLayout,
@@ -2817,59 +2709,51 @@ AUI.add(
 
 					if (!cache || start <= cache.total) {
 						if (instance._canLoadMore(key, start, end)) {
-							A.io.request(
+							const data = new URLSearchParams({
+								cmd: 'get',
+								end,
+								expandParentLayouts: false,
+								groupId,
+								p_auth: Liferay.authToken,
+								paginate: true,
+								parentLayoutId,
+								privateLayout,
+								start
+							});
+
+							Liferay.Util.fetch(
 								themeDisplay.getPathMain() +
 									'/portal/get_layouts',
 								{
-									after: {
-										success: function() {
-											var response = JSON.parse(
-												this.get('responseData')
-											);
-
-											var layouts =
-												response && response.layouts;
-
-											if (layouts) {
-												instance._updateCache(
-													key,
-													layouts,
-													start,
-													end,
-													response.total
-												);
-
-												callback.call(
-													instance,
-													layouts
-												);
-											}
-										}
-									},
-									data: {
-										cmd: 'get',
-										end: end,
-										expandParentLayouts: false,
-										groupId: groupId,
-										p_auth: Liferay.authToken,
-										paginate: true,
-										parentLayoutId: parentLayoutId,
-										privateLayout: privateLayout,
-										start: start
-									}
+									body: data,
+									method: 'POST'
 								}
-							);
+							)
+								.then(response => {
+									return response.json();
+								})
+								.then(response => {
+									var layouts = response && response.layouts;
+
+									if (layouts) {
+										instance._updateCache(
+											key,
+											layouts,
+											start,
+											end,
+											response.total
+										);
+
+										callback.call(instance, layouts);
+									}
+								});
 						} else if (cache) {
 							callback.call(instance, cache.layouts);
 						}
 					}
 				},
 
-				_requestSiblingLayouts: function(
-					groupId,
-					privateLayout,
-					callback
-				) {
+				_requestSiblingLayouts(groupId, privateLayout, callback) {
 					var instance = this;
 
 					var cache;
@@ -2895,84 +2779,83 @@ AUI.add(
 					} else {
 						var selectedLayout = instance.get('selectedLayout');
 
-						A.io.request(
+						const data = new URLSearchParams({
+							cmd: 'getSiblingLayoutsJSON',
+							expandParentLayouts: false,
+							groupId,
+							layoutId: selectedLayout.layoutId,
+							max: instance.get('delta'),
+							p_auth: Liferay.authToken,
+							paginate: true,
+							privateLayout
+						});
+
+						Liferay.Util.fetch(
 							themeDisplay.getPathMain() + '/portal/get_layouts',
 							{
-								after: {
-									failure: function() {
-										var bodyNode = instance._modal.bodyNode;
-
-										var listNode = bodyNode.one(
-											'.lfr-ddm-pages-container'
-										);
-
-										listNode.addClass('top-ended');
-
-										instance._requestInitialLayouts(
-											0,
-											groupId,
-											privateLayout,
-											instance._renderLayouts
-										);
-									},
-									success: function() {
-										var response = JSON.parse(
-											this.get('responseData')
-										);
-
-										var layouts =
-											response && response.layouts;
-
-										if (layouts) {
-											var parentLayoutId =
-												response.ancestorLayoutIds[0];
-
-											var key = [
-												parentLayoutId,
-												groupId,
-												privateLayout
-											].join('-');
-
-											var start = response.start;
-
-											var end = start + layouts.length;
-
-											instance._currentParentLayoutId = parentLayoutId;
-
-											instance._setSelectedLayoutPath(
-												groupId,
-												privateLayout,
-												response
-											);
-
-											instance._updateCache(
-												key,
-												layouts,
-												start,
-												end,
-												response.total
-											);
-
-											callback.call(instance, layouts);
-										}
-									}
-								},
-								data: {
-									cmd: 'getSiblingLayoutsJSON',
-									expandParentLayouts: false,
-									groupId: groupId,
-									layoutId: selectedLayout.layoutId,
-									max: instance.get('delta'),
-									p_auth: Liferay.authToken,
-									paginate: true,
-									privateLayout: privateLayout
-								}
+								body: data,
+								method: 'POST'
 							}
-						);
+						)
+							.then(response => {
+								return response.json();
+							})
+							.then(response => {
+								var layouts = response && response.layouts;
+
+								if (layouts) {
+									var parentLayoutId =
+										response.ancestorLayoutIds[0];
+
+									var key = [
+										parentLayoutId,
+										groupId,
+										privateLayout
+									].join('-');
+
+									var start = response.start;
+
+									var end = start + layouts.length;
+
+									instance._currentParentLayoutId = parentLayoutId;
+
+									instance._setSelectedLayoutPath(
+										groupId,
+										privateLayout,
+										response
+									);
+
+									instance._updateCache(
+										key,
+										layouts,
+										start,
+										end,
+										response.total
+									);
+
+									callback.call(instance, layouts);
+								}
+							})
+							.catch(() => {
+								var bodyNode = instance._modal.bodyNode;
+
+								var listNode = bodyNode.one(
+									'.lfr-ddm-pages-container'
+								);
+
+								listNode.addClass('top-ended');
+
+								instance._requestInitialLayouts(
+									0,
+									groupId,
+									privateLayout,
+									instance._renderLayouts
+								);
+							});
 					}
 				},
 
-				_resetBreadcrumb: function(privateLayout) {
+				_resetBreadcrumb(privateLayout) {
 					var instance = this;
 
 					var selectedLayoutRoot = instance.get(
@@ -2984,11 +2867,7 @@ AUI.add(
 					instance.set('selectedLayoutPath', [selectedLayoutRoot]);
 				},
 
-				_setSelectedLayoutPath: function(
-					groupId,
-					privateLayout,
-					response
-				) {
+				_setSelectedLayoutPath(groupId, privateLayout, response) {
 					var instance = this;
 
 					var ancestorLayoutIds = response.ancestorLayoutIds;
@@ -3006,10 +2885,10 @@ AUI.add(
 							index--
 						) {
 							selectedLayoutPath.push({
-								groupId: groupId,
+								groupId,
 								label: ancestorLayoutNames[index],
 								layoutId: ancestorLayoutIds[index],
-								privateLayout: privateLayout
+								privateLayout
 							});
 						}
 
@@ -3017,13 +2896,13 @@ AUI.add(
 					}
 				},
 
-				_showLoader: function(node) {
+				_showLoader(node) {
 					var instance = this;
 
 					instance._loadingAnimationNode.appendTo(node);
 				},
 
-				_syncModalHeight: function() {
+				_syncModalHeight() {
 					var instance = this;
 
 					var modal = instance._modal;
@@ -3039,7 +2918,7 @@ AUI.add(
 					);
 				},
 
-				_updateCache: function(key, layouts, start, end, total) {
+				_updateCache(key, layouts, start, end, total) {
 					var instance = this;
 
 					var cache = instance._cache[key];
@@ -3048,12 +2927,12 @@ AUI.add(
 						var path = instance.get('selectedLayoutPath');
 
 						cache = {
-							end: end,
-							layouts: layouts,
+							end,
+							layouts,
 							oldStart: 0,
 							path: path.slice(),
-							start: start,
-							total: total
+							start,
+							total
 						};
 
 						instance._cache[key] = cache;
@@ -3076,7 +2955,7 @@ AUI.add(
 					}
 				},
 
-				_validateField: function(fieldNode) {
+				_validateField(fieldNode) {
 					var instance = this;
 
 					var liferayForm = instance.get('liferayForm');
@@ -3088,6 +2967,111 @@ AUI.add(
 							formValidator.validateField(fieldNode);
 						}
 					}
+				},
+
+				getParsedValue(value) {
+					if (Lang.isString(value)) {
+						if (value) {
+							value = JSON.parse(value);
+						} else {
+							value = {};
+						}
+					}
+
+					return value;
+				},
+
+				getRuleInputName() {
+					var instance = this;
+
+					var inputName = instance.getInputName();
+
+					return inputName + 'LayoutName';
+				},
+
+				initializer() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					instance._currentParentLayoutId = 0;
+					instance._loadingAnimationNode = A.Node.create(TPL_LOADER);
+
+					instance._cache = {};
+
+					instance._clearedModal = false;
+
+					instance.after(
+						'selectedLayoutChange',
+						instance._afterSelectedLayoutChange
+					);
+					instance.after(
+						'selectedLayoutPathChange',
+						instance._afterSelectedLayoutPathChange
+					);
+
+					container.delegate(
+						'click',
+						instance._handleControlButtonsClick,
+						'> .form-group .btn',
+						instance
+					);
+				},
+
+				setValue(value) {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					var inputName = instance.getInputName();
+
+					var layoutNameNode = container.one(
+						'#' + inputName + 'LayoutName'
+					);
+
+					var parsedValue = instance.getParsedValue(value);
+
+					if (parsedValue && parsedValue.layoutId) {
+						if (parsedValue.label) {
+							layoutNameNode.val(parsedValue.label);
+						}
+
+						value = JSON.stringify(parsedValue);
+					} else {
+						layoutNameNode.val('');
+
+						value = '';
+					}
+
+					instance._validateField(layoutNameNode);
+
+					var clearButtonNode = container.one(
+						'#' + inputName + 'ClearButton'
+					);
+
+					clearButtonNode.toggle(!!value);
+
+					LinkToPageField.superclass.setValue.call(instance, value);
+				},
+
+				syncReadOnlyUI() {
+					var instance = this;
+
+					var readOnly = instance.getReadOnly();
+
+					var container = instance.get('container');
+
+					var selectButtonNode = container.one(
+						'#' + instance.getInputName() + 'SelectButton'
+					);
+
+					selectButtonNode.attr('disabled', readOnly);
+
+					var clearButtonNode = container.one(
+						'#' + instance.getInputName() + 'ClearButton'
+					);
+
+					clearButtonNode.attr('disabled', readOnly);
 				}
 			}
 		});
@@ -3100,7 +3084,7 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				getFieldNodes: function() {
+				getFieldNodes() {
 					var instance = this;
 
 					return instance
@@ -3122,7 +3106,228 @@ AUI.add(
 			EXTENDS: DocumentLibraryField,
 
 			prototype: {
-				syncUI: function() {
+				_getImagePreviewURL() {
+					var instance = this;
+
+					var imagePreviewURL;
+
+					var value = instance.getParsedValue(instance.getValue());
+
+					if (value.data) {
+						imagePreviewURL =
+							themeDisplay.getPathContext() + value.data;
+					} else if (value.uuid) {
+						imagePreviewURL = [
+							themeDisplay.getPathContext(),
+							'documents',
+							value.groupId,
+							value.uuid
+						].join('/');
+					}
+
+					return imagePreviewURL;
+				},
+
+				_handleButtonsClick(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					if (currentTarget.test('.preview-button')) {
+						instance._handlePreviewButtonClick(event);
+					}
+
+					ImageField.superclass._handleButtonsClick.apply(
+						instance,
+						arguments
+					);
+				},
+
+				_handlePreviewButtonClick() {
+					var instance = this;
+
+					if (!instance.viewer) {
+						instance.viewer = new A.ImageViewer({
+							caption: 'alt',
+							links:
+								'#' +
+								instance.getInputName() +
+								'PreviewContainer a',
+							preloadAllImages: false,
+							zIndex: Liferay.zIndex.OVERLAY
+						}).render();
+					}
+
+					var imagePreviewURL = instance._getImagePreviewURL();
+
+					var previewImageNode = A.one(
+						'#' + instance.getInputName() + 'PreviewContainer img'
+					);
+					var previewLinkNode = A.one(
+						'#' + instance.getInputName() + 'PreviewContainer a'
+					);
+
+					previewLinkNode.attr('href', imagePreviewURL);
+					previewImageNode.attr('src', imagePreviewURL);
+
+					instance.viewer.set('currentIndex', 0);
+					instance.viewer.set('links', previewLinkNode);
+
+					instance.viewer.show();
+				},
+
+				_validateField(fieldNode) {
+					var instance = this;
+
+					var liferayForm = instance.get('liferayForm');
+
+					if (liferayForm) {
+						var formValidator = liferayForm.formValidator;
+
+						if (formValidator) {
+							formValidator.validateField(fieldNode);
+						}
+					}
+				},
+
+				getDocumentLibrarySelectorURL() {
+					var instance = this;
+
+					var form = instance.getForm();
+
+					var imageSelectorURL = form.get('imageSelectorURL');
+
+					var retVal = instance.getDocumentLibraryURL(
+						'com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion,com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion'
+					);
+
+					if (imageSelectorURL) {
+						retVal = imageSelectorURL;
+					}
+
+					return retVal;
+				},
+
+				getDocumentLibraryURL(criteria) {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					var parsedValue = instance.getParsedValue(
+						ImageField.superclass.getValue.apply(
+							instance,
+							arguments
+						)
+					);
+
+					var portletNamespace = instance.get('portletNamespace');
+
+					var journalCriterionJSON = {
+						desiredItemSelectorReturnTypes:
+							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
+						resourcePrimKey: parsedValue.resourcePrimKey
+					};
+
+					var imageCriterionJSON = {
+						desiredItemSelectorReturnTypes:
+							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType'
+					};
+
+					var documentLibraryParameters = {
+						'0_json': JSON.stringify(journalCriterionJSON),
+						'1_json': JSON.stringify(imageCriterionJSON),
+						criteria,
+						itemSelectedEventName:
+							portletNamespace + 'selectDocumentLibrary',
+						p_p_auth: container.getData('itemSelectorAuthToken'),
+						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
+						p_p_mode: 'view',
+						p_p_state: 'pop_up'
+					};
+
+					var documentLibraryURL = Liferay.Util.PortletURL.createPortletURL(
+						themeDisplay.getLayoutRelativeControlPanelURL(),
+						documentLibraryParameters
+					);
+
+					return documentLibraryURL.toString();
+				},
+
+				getValue() {
+					var instance = this;
+
+					var value;
+
+					var parsedValue = instance.getParsedValue(
+						ImageField.superclass.getValue.apply(
+							instance,
+							arguments
+						)
+					);
+
+					if (instance.isNotEmpty(parsedValue)) {
+						var altNode = A.one(
+							'#' + instance.getInputName() + 'Alt'
+						);
+
+						parsedValue.alt = altNode.val();
+
+						value = JSON.stringify(parsedValue);
+					} else {
+						value = '';
+					}
+
+					return value;
+				},
+
+				isNotEmpty(value) {
+					var instance = this;
+
+					var parsedValue = instance.getParsedValue(value);
+
+					return (
+						(Object.prototype.hasOwnProperty.call(
+							parsedValue,
+							'data'
+						) &&
+							parsedValue.data !== '') ||
+						Object.prototype.hasOwnProperty.call(
+							parsedValue,
+							'uuid'
+						)
+					);
+				},
+
+				setValue(value) {
+					var instance = this;
+
+					var parsedValue = instance.getParsedValue(value);
+
+					if (instance.isNotEmpty(parsedValue)) {
+						if (!parsedValue.name && parsedValue.title) {
+							parsedValue.name = parsedValue.title;
+						}
+
+						var altNode = A.one(
+							'#' + instance.getInputName() + 'Alt'
+						);
+
+						altNode.val(parsedValue.alt);
+
+						value = JSON.stringify(parsedValue);
+					} else {
+						value = '';
+					}
+
+					DocumentLibraryField.superclass.setValue.call(
+						instance,
+						value
+					);
+
+					instance.syncUI();
+				},
+
+				syncUI() {
 					var instance = this;
 
 					var parsedValue = instance.getParsedValue(
@@ -3161,221 +3366,6 @@ AUI.add(
 					);
 
 					previewButtonNode.toggle(notEmpty);
-				},
-
-				getDocumentLibrarySelectorURL: function() {
-					var instance = this;
-
-					var form = instance.getForm();
-
-					var imageSelectorURL = form.get('imageSelectorURL');
-
-					var retVal = instance.getDocumentLibraryURL(
-						'com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion,com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion'
-					);
-
-					if (imageSelectorURL) {
-						retVal = imageSelectorURL;
-					}
-
-					return retVal;
-				},
-
-				getDocumentLibraryURL: function(criteria) {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					var parsedValue = instance.getParsedValue(
-						ImageField.superclass.getValue.apply(
-							instance,
-							arguments
-						)
-					);
-
-					var portletNamespace = instance.get('portletNamespace');
-
-					var journalCriterionJSON = {
-						desiredItemSelectorReturnTypes:
-							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
-						resourcePrimKey: parsedValue.resourcePrimKey
-					};
-
-					var imageCriterionJSON = {
-						desiredItemSelectorReturnTypes:
-							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType'
-					};
-
-					var documentLibraryParameters = {
-						criteria: criteria,
-						itemSelectedEventName:
-							portletNamespace + 'selectDocumentLibrary',
-						'0_json': JSON.stringify(journalCriterionJSON),
-						'1_json': JSON.stringify(imageCriterionJSON),
-						p_p_auth: container.getData('itemSelectorAuthToken'),
-						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
-						p_p_mode: 'view',
-						p_p_state: 'pop_up'
-					};
-
-					var documentLibraryURL = Liferay.Util.PortletURL.createPortletURL(
-						themeDisplay.getLayoutRelativeControlPanelURL(),
-						documentLibraryParameters
-					);
-
-					return documentLibraryURL.toString();
-				},
-
-				getValue: function() {
-					var instance = this;
-
-					var value;
-
-					var parsedValue = instance.getParsedValue(
-						ImageField.superclass.getValue.apply(
-							instance,
-							arguments
-						)
-					);
-
-					if (instance.isNotEmpty(parsedValue)) {
-						var altNode = A.one(
-							'#' + instance.getInputName() + 'Alt'
-						);
-
-						parsedValue.alt = altNode.val();
-
-						value = JSON.stringify(parsedValue);
-					} else {
-						value = '';
-					}
-
-					return value;
-				},
-
-				isNotEmpty: function(value) {
-					var instance = this;
-
-					var parsedValue = instance.getParsedValue(value);
-
-					return (
-						(parsedValue.hasOwnProperty('data') &&
-							parsedValue.data !== '') ||
-						parsedValue.hasOwnProperty('uuid')
-					);
-				},
-
-				setValue: function(value) {
-					var instance = this;
-
-					var parsedValue = instance.getParsedValue(value);
-
-					if (instance.isNotEmpty(parsedValue)) {
-						if (!parsedValue.name && parsedValue.title) {
-							parsedValue.name = parsedValue.title;
-						}
-
-						var altNode = A.one(
-							'#' + instance.getInputName() + 'Alt'
-						);
-
-						altNode.val(parsedValue.alt);
-
-						value = JSON.stringify(parsedValue);
-					} else {
-						value = '';
-					}
-
-					DocumentLibraryField.superclass.setValue.call(
-						instance,
-						value
-					);
-
-					instance.syncUI();
-				},
-
-				_getImagePreviewURL: function() {
-					var instance = this;
-
-					var imagePreviewURL;
-
-					var value = instance.getParsedValue(instance.getValue());
-
-					if (value.data) {
-						imagePreviewURL =
-							themeDisplay.getPathContext() + value.data;
-					} else if (value.uuid) {
-						imagePreviewURL = [
-							themeDisplay.getPathContext(),
-							'documents',
-							value.groupId,
-							value.uuid
-						].join('/');
-					}
-
-					return imagePreviewURL;
-				},
-
-				_handleButtonsClick: function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					if (currentTarget.test('.preview-button')) {
-						instance._handlePreviewButtonClick(event);
-					}
-
-					ImageField.superclass._handleButtonsClick.apply(
-						instance,
-						arguments
-					);
-				},
-
-				_handlePreviewButtonClick: function(event) {
-					var instance = this;
-
-					if (!instance.viewer) {
-						instance.viewer = new A.ImageViewer({
-							caption: 'alt',
-							links:
-								'#' +
-								instance.getInputName() +
-								'PreviewContainer a',
-							preloadAllImages: false,
-							zIndex: Liferay.zIndex.OVERLAY
-						}).render();
-					}
-
-					var imagePreviewURL = instance._getImagePreviewURL();
-
-					var previewImageNode = A.one(
-						'#' + instance.getInputName() + 'PreviewContainer img'
-					);
-					var previewLinkNode = A.one(
-						'#' + instance.getInputName() + 'PreviewContainer a'
-					);
-
-					previewLinkNode.attr('href', imagePreviewURL);
-					previewImageNode.attr('src', imagePreviewURL);
-
-					instance.viewer.set('currentIndex', 0);
-					instance.viewer.set('links', previewLinkNode);
-
-					instance.viewer.show();
-				},
-
-				_validateField: function(fieldNode) {
-					var instance = this;
-
-					var liferayForm = instance.get('liferayForm');
-
-					if (liferayForm) {
-						var formValidator = liferayForm.formValidator;
-
-						if (formValidator) {
-							formValidator.validateField(fieldNode);
-						}
-					}
 				}
 			}
 		});
@@ -3386,7 +3376,7 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				initializer: function() {
+				initializer() {
 					var instance = this;
 
 					Liferay.componentReady(instance.getInputName()).then(
@@ -3400,7 +3390,7 @@ AUI.add(
 					);
 				},
 
-				onPositionChange: function(event) {
+				onPositionChange(event) {
 					var instance = this;
 
 					var inputName = instance.getInputName();
@@ -3427,7 +3417,32 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				initializer: function() {
+				_afterRenderTextHTMLField() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					container.placeAfter(instance.readOnlyText);
+					container.placeAfter(instance.readOnlyLabel);
+				},
+
+				getEditor() {
+					var instance = this;
+
+					return window[instance.getInputName() + 'Editor'];
+				},
+
+				getValue() {
+					var instance = this;
+
+					var editor = instance.getEditor();
+
+					return isNode(editor)
+						? A.one(editor).val()
+						: editor.getHTML();
+				},
+
+				initializer() {
 					var instance = this;
 
 					instance.readOnlyLabel = A.Node.create(
@@ -3442,23 +3457,7 @@ AUI.add(
 					});
 				},
 
-				getEditor: function() {
-					var instance = this;
-
-					return window[instance.getInputName() + 'Editor'];
-				},
-
-				getValue: function() {
-					var instance = this;
-
-					var editor = instance.getEditor();
-
-					return isNode(editor)
-						? A.one(editor).val()
-						: editor.getHTML();
-				},
-
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					var editorComponentName =
@@ -3487,7 +3486,7 @@ AUI.add(
 					});
 				},
 
-				syncReadOnlyUI: function() {
+				syncReadOnlyUI() {
 					var instance = this;
 
 					instance.readOnlyLabel.html(
@@ -3503,15 +3502,6 @@ AUI.add(
 					instance.readOnlyText.toggle(readOnly);
 
 					instance.get('container').toggle(!readOnly);
-				},
-
-				_afterRenderTextHTMLField: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					container.placeAfter(instance.readOnlyText);
-					container.placeAfter(instance.readOnlyLabel);
 				}
 			}
 		});
@@ -3522,7 +3512,7 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				getInputNode: function() {
+				getInputNode() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -3532,7 +3522,7 @@ AUI.add(
 					);
 				},
 
-				getRadioNodes: function() {
+				getRadioNodes() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -3542,7 +3532,7 @@ AUI.add(
 					);
 				},
 
-				getValue: function() {
+				getValue() {
 					var instance = this;
 
 					var value = '';
@@ -3557,7 +3547,7 @@ AUI.add(
 					return value;
 				},
 
-				setLabel: function() {
+				setLabel() {
 					var instance = this;
 
 					var container = instance.get('container');
@@ -3584,7 +3574,7 @@ AUI.add(
 					RadioField.superclass.setLabel.apply(instance, arguments);
 				},
 
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					var radioNodes = instance.getRadioNodes();
@@ -3596,7 +3586,7 @@ AUI.add(
 						.set('checked', true);
 				},
 
-				syncReadOnlyUI: function() {
+				syncReadOnlyUI() {
 					var instance = this;
 
 					var readOnly = instance.getReadOnly();
@@ -3614,7 +3604,31 @@ AUI.add(
 			EXTENDS: RadioField,
 
 			prototype: {
-				getInputNode: function() {
+				_getOptions() {
+					var instance = this;
+
+					var fieldDefinition = instance.getFieldDefinition();
+
+					var fieldOptions = fieldDefinition.options;
+
+					fieldOptions.unshift(instance._getPlaceholderOption());
+
+					return fieldOptions;
+				},
+
+				_getPlaceholderOption() {
+					var instance = this;
+					var label = {};
+
+					label[instance.get('displayLocale')] = '';
+
+					return {
+						label,
+						value: ''
+					};
+				},
+
+				getInputNode() {
 					var instance = this;
 
 					return Field.prototype.getInputNode.apply(
@@ -3623,7 +3637,7 @@ AUI.add(
 					);
 				},
 
-				getValue: function() {
+				getValue() {
 					var instance = this;
 
 					var selectedItems = instance
@@ -3644,7 +3658,7 @@ AUI.add(
 					return value;
 				},
 
-				setLabel: function() {
+				setLabel() {
 					var instance = this;
 
 					var options = instance._getOptions();
@@ -3668,46 +3682,26 @@ AUI.add(
 					Field.prototype.setLabel.apply(instance, arguments);
 				},
 
-				setValue: function(value) {
+				setValue(value) {
 					var instance = this;
 
 					if (Lang.isString(value)) {
-						value = JSON.parse(value);
+						if (value !== '') {
+							value = JSON.parse(value);
+						} else {
+							value = [''];
+						}
 					}
 
 					instance
 						.getInputNode()
 						.all('option')
-						.each(function(item, index) {
+						.each(function(item) {
 							item.set(
 								'selected',
 								value.indexOf(item.val()) > -1
 							);
 						});
-				},
-
-				_getOptions: function() {
-					var instance = this;
-
-					var fieldDefinition = instance.getFieldDefinition();
-
-					var fieldOptions = fieldDefinition.options;
-
-					fieldOptions.unshift(instance._getPlaceholderOption());
-
-					return fieldOptions;
-				},
-
-				_getPlaceholderOption: function() {
-					var instance = this;
-					var label = {};
-
-					label[instance.get('displayLocale')] = '';
-
-					return {
-						label: label,
-						value: ''
-					};
 				}
 			}
 		});
@@ -3718,7 +3712,7 @@ AUI.add(
 			EXTENDS: Field,
 
 			prototype: {
-				getValue: function() {
+				getValue() {
 					return '';
 				}
 			}
@@ -3772,24 +3766,167 @@ AUI.add(
 			NAME: 'liferay-ddm-form',
 
 			prototype: {
-				initializer: function() {
+				_afterFormRegistered(event) {
 					var instance = this;
 
-					instance.eventHandlers = [];
-					instance.newRepeatableInstances = [];
-					instance.repeatableInstances = {};
+					var formNode = instance.get('formNode');
 
-					instance.bindUI();
-					instance.renderUI();
+					if (event.formName === formNode.attr('name')) {
+						instance.set('liferayForm', event.form);
+					}
 				},
 
-				renderUI: function() {
+				_afterRenderField(event) {
 					var instance = this;
 
-					AArray.invoke(instance.get('fields'), 'renderUI');
+					var field = event.field;
+
+					if (field.get('repeatable')) {
+						instance.registerRepeatable(field);
+					}
 				},
 
-				bindUI: function() {
+				_afterRepeatableDragAlign() {
+					var DDM = A.DD.DDM;
+
+					DDM.syncActiveShims();
+					DDM._dropMove();
+				},
+
+				_afterRepeatableDragEnd(event, parentField) {
+					var instance = this;
+
+					var node = event.target.get('node');
+
+					var oldIndex = -1;
+
+					parentField.get('fields').some(function(item, index) {
+						oldIndex = index;
+
+						return (
+							item.get('instanceId') ===
+							instance.extractInstanceId(node)
+						);
+					});
+
+					var newIndex = node
+						.ancestor()
+						.all('> .field-wrapper')
+						.indexOf(node);
+
+					instance.moveField(parentField, oldIndex, newIndex);
+				},
+
+				_afterUpdateRepeatableFields(event) {
+					var instance = this;
+
+					var field = event.field;
+
+					var liferayForm = instance.get('liferayForm');
+
+					if (liferayForm) {
+						var validatorRules = liferayForm.formValidator.get(
+							'rules'
+						);
+
+						if (event.type === 'liferay-ddm-field:repeat') {
+							var originalField = event.originalField;
+
+							var originalFieldRuleInputName = originalField.getRuleInputName();
+
+							var originalFieldRules =
+								validatorRules[originalFieldRuleInputName];
+
+							if (originalFieldRules) {
+								validatorRules[
+									field.getRuleInputName()
+								] = originalFieldRules;
+							}
+						} else if (event.type === 'liferay-ddm-field:remove') {
+							delete validatorRules[field.getRuleInputName()];
+
+							var inputNode = field.getInputNode();
+
+							if (inputNode) {
+								liferayForm.formValidator.resetField(inputNode);
+							}
+
+							if (field.get('repeatable')) {
+								instance.unregisterRepeatable(field);
+							}
+						}
+
+						liferayForm.formValidator.set('rules', validatorRules);
+					}
+				},
+
+				_onDefaultLocaleChanged(event) {
+					var instance = this;
+
+					var definition = instance.get('definition');
+
+					definition.defaultLanguageId = event.item.getAttribute(
+						'data-value'
+					);
+
+					instance.set('definition', definition);
+				},
+
+				_onLiferaySubmitForm(event) {
+					var instance = this;
+
+					var formNode = instance.get('formNode');
+
+					if (event.form.attr('name') === formNode.attr('name')) {
+						instance.updateDDMFormInputValue();
+					}
+				},
+
+				_onSubmitForm() {
+					var instance = this;
+
+					instance.finalizeRepeatableFieldLocalizations();
+
+					instance.updateDDMFormInputValue();
+				},
+
+				_valueFormNode() {
+					var instance = this;
+
+					var container = instance.get('container');
+
+					return container.ancestor('form', true);
+				},
+
+				_valueLiferayForm() {
+					var instance = this;
+
+					var formNode = instance.get('formNode');
+
+					var formName = null;
+
+					if (formNode) {
+						formName = formNode.attr('name');
+					}
+
+					return Liferay.Form.get(formName);
+				},
+
+				addAvailableLanguageIds(availableLanguageIds) {
+					var instance = this;
+
+					var currentAvailableLanguageIds = instance.get(
+						'availableLanguageIds'
+					);
+
+					availableLanguageIds.forEach(function(item) {
+						if (currentAvailableLanguageIds.indexOf(item) == -1) {
+							currentAvailableLanguageIds.push(item);
+						}
+					});
+				},
+
+				bindUI() {
 					var instance = this;
 
 					var formNode = instance.get('formNode');
@@ -3837,7 +3974,7 @@ AUI.add(
 					}
 				},
 
-				destructor: function() {
+				destructor() {
 					var instance = this;
 
 					AArray.invoke(instance.eventHandlers, 'detach');
@@ -3854,21 +3991,7 @@ AUI.add(
 					instance.repeatableInstances = null;
 				},
 
-				addAvailableLanguageIds: function(availableLanguageIds) {
-					var instance = this;
-
-					var currentAvailableLanguageIds = instance.get(
-						'availableLanguageIds'
-					);
-
-					availableLanguageIds.forEach(function(item) {
-						if (currentAvailableLanguageIds.indexOf(item) == -1) {
-							currentAvailableLanguageIds.push(item);
-						}
-					});
-				},
-
-				finalizeRepeatableFieldLocalizations: function() {
+				finalizeRepeatableFieldLocalizations() {
 					var instance = this;
 
 					var defaultLocale = instance.getDefaultLocale();
@@ -3890,15 +4013,24 @@ AUI.add(
 					);
 				},
 
-				moveField: function(parentField, oldIndex, newIndex) {
+				initializer() {
 					var instance = this;
 
+					instance.eventHandlers = [];
+					instance.newRepeatableInstances = [];
+					instance.repeatableInstances = {};
+
+					instance.bindUI();
+					instance.renderUI();
+				},
+
+				moveField(parentField, oldIndex, newIndex) {
 					var fields = parentField.get('fields');
 
 					fields.splice(newIndex, 0, fields.splice(oldIndex, 1)[0]);
 				},
 
-				populateBlankLocalizationMap: function(
+				populateBlankLocalizationMap(
 					defaultLocale,
 					originalField,
 					repeatedField
@@ -3953,7 +4085,7 @@ AUI.add(
 					}
 				},
 
-				registerRepeatable: function(field) {
+				registerRepeatable(field) {
 					var instance = this;
 
 					var fieldName = field.get('name');
@@ -4011,7 +4143,7 @@ AUI.add(
 								placeholder: A.Node.create(
 									'<div class="form-builder-placeholder"></div>'
 								),
-								sortCondition: function(event) {
+								sortCondition(event) {
 									var dropNode = event.drop.get('node');
 
 									var dropNodeAncestor = dropNode.ancestor();
@@ -4068,7 +4200,13 @@ AUI.add(
 					drag.addInvalid('.lfr-source-editor');
 				},
 
-				toJSON: function() {
+				renderUI() {
+					var instance = this;
+
+					AArray.invoke(instance.get('fields'), 'renderUI');
+				},
+
+				toJSON() {
 					var instance = this;
 
 					var definition = instance.get('definition');
@@ -4085,168 +4223,20 @@ AUI.add(
 						defaultLanguageId:
 							definition.defaultLanguageId ||
 							themeDisplay.getDefaultLanguageId(),
-						fieldValues: fieldValues
+						fieldValues
 					};
 				},
 
-				unregisterRepeatable: function(field) {
-					var instance = this;
-
+				unregisterRepeatable(field) {
 					field.get('container').dd.destroy();
 				},
 
-				updateDDMFormInputValue: function() {
+				updateDDMFormInputValue() {
 					var instance = this;
 
 					var ddmFormValuesInput = instance.get('ddmFormValuesInput');
 
 					ddmFormValuesInput.val(JSON.stringify(instance.toJSON()));
-				},
-
-				_afterFormRegistered: function(event) {
-					var instance = this;
-
-					var formNode = instance.get('formNode');
-
-					if (event.formName === formNode.attr('name')) {
-						instance.set('liferayForm', event.form);
-					}
-				},
-
-				_afterRenderField: function(event) {
-					var instance = this;
-
-					var field = event.field;
-
-					if (field.get('repeatable')) {
-						instance.registerRepeatable(field);
-					}
-				},
-
-				_afterRepeatableDragAlign: function() {
-					var DDM = A.DD.DDM;
-
-					DDM.syncActiveShims();
-					DDM._dropMove();
-				},
-
-				_afterRepeatableDragEnd: function(event, parentField) {
-					var instance = this;
-
-					var node = event.target.get('node');
-
-					var oldIndex = -1;
-
-					parentField.get('fields').some(function(item, index) {
-						oldIndex = index;
-
-						return (
-							item.get('instanceId') ===
-							instance.extractInstanceId(node)
-						);
-					});
-
-					var newIndex = node
-						.ancestor()
-						.all('> .field-wrapper')
-						.indexOf(node);
-
-					instance.moveField(parentField, oldIndex, newIndex);
-				},
-
-				_afterUpdateRepeatableFields: function(event) {
-					var instance = this;
-
-					var field = event.field;
-
-					var liferayForm = instance.get('liferayForm');
-
-					if (liferayForm) {
-						var validatorRules = liferayForm.formValidator.get(
-							'rules'
-						);
-
-						if (event.type === 'liferay-ddm-field:repeat') {
-							var originalField = event.originalField;
-
-							var originalFieldRuleInputName = originalField.getRuleInputName();
-
-							var originalFieldRules =
-								validatorRules[originalFieldRuleInputName];
-
-							if (originalFieldRules) {
-								validatorRules[
-									field.getRuleInputName()
-								] = originalFieldRules;
-							}
-						} else if (event.type === 'liferay-ddm-field:remove') {
-							delete validatorRules[field.getRuleInputName()];
-
-							var inputNode = field.getInputNode();
-
-							if (inputNode) {
-								liferayForm.formValidator.resetField(inputNode);
-							}
-
-							if (field.get('repeatable')) {
-								instance.unregisterRepeatable(field);
-							}
-						}
-
-						liferayForm.formValidator.set('rules', validatorRules);
-					}
-				},
-
-				_onDefaultLocaleChanged: function(event) {
-					var instance = this;
-
-					var definition = instance.get('definition');
-
-					definition.defaultLanguageId = event.item.getAttribute(
-						'data-value'
-					);
-
-					instance.set('definition', definition);
-				},
-
-				_onLiferaySubmitForm: function(event) {
-					var instance = this;
-
-					var formNode = instance.get('formNode');
-
-					if (event.form.attr('name') === formNode.attr('name')) {
-						instance.updateDDMFormInputValue();
-					}
-				},
-
-				_onSubmitForm: function(event) {
-					var instance = this;
-
-					instance.finalizeRepeatableFieldLocalizations();
-
-					instance.updateDDMFormInputValue();
-				},
-
-				_valueFormNode: function() {
-					var instance = this;
-
-					var container = instance.get('container');
-
-					return container.ancestor('form', true);
-				},
-
-				_valueLiferayForm: function() {
-					var instance = this;
-
-					var formNode = instance.get('formNode');
-
-					var formName = null;
-
-					if (formNode) {
-						formName = formNode.attr('name');
-					}
-
-					return Liferay.Form.get(formName);
 				}
 			}
 		});
@@ -4255,7 +4245,7 @@ AUI.add(
 			EXTENDS: A.SortableList,
 
 			prototype: {
-				_createDrag: function(node) {
+				_createDrag(node) {
 					var instance = this;
 
 					var helper = instance.get('helper');
@@ -4263,7 +4253,7 @@ AUI.add(
 					if (!A.DD.DDM.getDrag(node)) {
 						var dragOptions = {
 							bubbleTargets: instance,
-							node: node,
+							node,
 							target: true
 						};
 
@@ -4291,7 +4281,6 @@ AUI.add(
 			'aui-datatable',
 			'aui-datatype',
 			'aui-image-viewer',
-			'aui-io-request',
 			'aui-parse-content',
 			'aui-set',
 			'aui-sortable-list',

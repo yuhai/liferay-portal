@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AnnouncementsFlagModel
 	extends BaseModel<AnnouncementsFlag>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a announcements flag model instance should use the {@link AnnouncementsFlag} interface instead.

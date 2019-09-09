@@ -5,7 +5,9 @@
  */
 {template .render}
 	{@param item: [
-		backgroundImage: string
+		backgroundImage: [
+			title: string
+		]
 	]}
 	{@param? _handleClearButtonClick: any}
 	{@param? _handleSelectButtonClick: any}
@@ -22,7 +24,11 @@
 
 			{let $inputValue kind="text"}
 				{if $item.backgroundImage}
-					{$item.backgroundImage}
+					{if $item.backgroundImage.title}
+						{$item.backgroundImage.title}
+					{else}
+						{$item.backgroundImage}
+					{/if}
 				{/if}
 			{/let}
 

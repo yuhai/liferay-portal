@@ -14,8 +14,11 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,22 +27,13 @@ import java.util.TreeSet;
  */
 public abstract class BaseResourceMonitor implements ResourceMonitor {
 
-	public BaseResourceMonitor(
-		String etcdServerURL, String monitorName,
-		Integer allowedResourceConnection) {
-
+	public BaseResourceMonitor(String etcdServerURL, String name) {
 		_etcdServerURL = etcdServerURL;
-		_monitorName = monitorName;
-		_allowedResourceConnections = allowedResourceConnection;
+		_name = name;
 
 		if (!EtcdUtil.has(_etcdServerURL, getKey())) {
 			EtcdUtil.put(_etcdServerURL, getKey());
 		}
-	}
-
-	@Override
-	public Integer getAllowedResourceConnections() {
-		return _allowedResourceConnections;
 	}
 
 	@Override
@@ -53,20 +47,49 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 
 		sb.append("/monitor");
 
-		String monitorName = getName();
+		String name = getName();
 
-		if (!monitorName.startsWith("/")) {
+		if (!name.startsWith("/")) {
 			sb.append("/");
 		}
 
-		sb.append(monitorName);
+		sb.append(name);
 
 		return sb.toString();
 	}
 
 	@Override
+	public Integer getMaxResourceConnections() {
+		if (_maxResourceConnections != null) {
+			return _maxResourceConnections;
+		}
+
+		try {
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
+
+			String key = JenkinsResultsParserUtil.combine(
+				"resource.monitor.max.resource.connections[", getType(), "]");
+
+			if (!buildProperties.containsKey(key)) {
+				_maxResourceConnections = _MAX_RESOURCE_CONNECTIONS_DEFAULT;
+
+				return _maxResourceConnections;
+			}
+
+			_maxResourceConnections = Integer.valueOf(
+				buildProperties.getProperty(key));
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+
+		return _maxResourceConnections;
+	}
+
+	@Override
 	public String getName() {
-		return _monitorName;
+		return _name;
 	}
 
 	@Override
@@ -82,10 +105,17 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 		EtcdUtil.Node node = EtcdUtil.get(getEtcdServerURL(), getKey());
 
 		for (EtcdUtil.Node childNode : node.getNodes()) {
-			resourceConnections.add(new ResourceConnection(this, childNode));
+			resourceConnections.add(
+				ResourceConnectionFactory.newResourceConnection(
+					childNode, this));
 		}
 
 		return new ArrayList<>(resourceConnections);
+	}
+
+	@Override
+	public String getType() {
+		return getName();
 	}
 
 	@Override
@@ -93,16 +123,22 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 		List<ResourceConnection> resourceConnectionQueue =
 			getResourceConnectionQueue();
 
-		String[][] table = new String[resourceConnectionQueue.size()][4];
+		String[][] table = new String[resourceConnectionQueue.size()][6];
 
 		for (int i = 0; i < resourceConnectionQueue.size(); i++) {
 			ResourceConnection resourceConnection = resourceConnectionQueue.get(
 				i);
 
-			table[i][0] = String.valueOf(i);
-			table[i][1] = String.valueOf(resourceConnection.getState());
-			table[i][2] = String.valueOf(resourceConnection.getCreatedIndex());
-			table[i][3] = resourceConnection.getKey();
+			table[i] = new String[] {
+				String.valueOf(i),
+				String.valueOf(resourceConnection.getState()),
+				String.valueOf(resourceConnection.getCreatedIndex()),
+				resourceConnection.getKey(),
+				JenkinsResultsParserUtil.toDurationString(
+					resourceConnection.getInQueueAge()),
+				JenkinsResultsParserUtil.toDurationString(
+					resourceConnection.getInUseAge())
+			};
 		}
 
 		JenkinsResultsParserUtil.printTable(table);
@@ -110,8 +146,9 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 
 	@Override
 	public void signal(String connectionName) {
-		ResourceConnection resourceConnection = new ResourceConnection(
-			this, connectionName);
+		ResourceConnection resourceConnection =
+			ResourceConnectionFactory.newResourceConnection(
+				connectionName, this);
 
 		resourceConnection.setState(ResourceConnection.State.RETIRE);
 	}
@@ -125,17 +162,18 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 		String connectionName, ResourceMonitor resourceMonitor,
 		String competingResourceMonitorName) {
 
-		ResourceConnection resourceConnection = new ResourceConnection(
-			resourceMonitor, connectionName);
+		ResourceConnection resourceConnection =
+			ResourceConnectionFactory.newResourceConnection(
+				connectionName, resourceMonitor);
 
-		Integer allowedResourceConnections =
-			resourceMonitor.getAllowedResourceConnections();
+		Integer maxResourceConnections =
+			resourceMonitor.getMaxResourceConnections();
 
 		while (true) {
 			List<ResourceConnection> resourceConnectionQueue =
 				getResourceConnectionQueue();
 
-			for (int i = 0; i < allowedResourceConnections; i++) {
+			for (int i = 0; i < maxResourceConnections; i++) {
 				if (i >= resourceConnectionQueue.size()) {
 					break;
 				}
@@ -144,10 +182,12 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 					resourceConnectionQueue.get(i);
 
 				if (competingResourceMonitorName != null) {
-					String monitorName =
-						queuedResourceConnection.getMonitorName();
+					ResourceMonitor queuedResourceMonitor =
+						queuedResourceConnection.getResourceMonitor();
 
-					if (monitorName.equals(competingResourceMonitorName)) {
+					if (competingResourceMonitorName.equals(
+							queuedResourceMonitor.getName())) {
+
 						break;
 					}
 				}
@@ -166,12 +206,102 @@ public abstract class BaseResourceMonitor implements ResourceMonitor {
 				break;
 			}
 
+			ResourceConnection firstResourceConnection =
+				resourceConnectionQueue.get(0);
+
+			long inQueueAge = firstResourceConnection.getInQueueAge();
+			long inUseAge = firstResourceConnection.getInUseAge();
+			String key = firstResourceConnection.getKey();
+
+			if (inUseAge == 0) {
+				if (inQueueAge > _getMaxInQueueAge()) {
+					System.out.println(
+						JenkinsResultsParserUtil.combine(
+							"Retiring ", key, " due to duration 'In Queue'"));
+
+					firstResourceConnection.setState(
+						ResourceConnection.State.RETIRE);
+				}
+			}
+			else if (inUseAge > _getMaxInUseAge()) {
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Retiring ", key, " due to duration 'In Use'"));
+
+				firstResourceConnection.setState(
+					ResourceConnection.State.RETIRE);
+
+				continue;
+			}
+
 			JenkinsResultsParserUtil.sleep(5000);
 		}
 	}
 
-	private final Integer _allowedResourceConnections;
+	private Long _getMaxInQueueAge() {
+		if (_maxInQueueAge != null) {
+			return _maxInQueueAge;
+		}
+
+		try {
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
+
+			String key = JenkinsResultsParserUtil.combine(
+				"resource.monitor.max.in.queue.age[", getType(), "]");
+
+			if (!buildProperties.containsKey(key)) {
+				_maxInQueueAge = _MAX_IN_QUEUE_AGE_DEFAULT;
+
+				return _maxInQueueAge;
+			}
+
+			_maxInQueueAge = Long.valueOf(buildProperties.getProperty(key));
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+
+		return _maxInQueueAge;
+	}
+
+	private Long _getMaxInUseAge() {
+		if (_maxInUseAge != null) {
+			return _maxInUseAge;
+		}
+
+		try {
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
+
+			String key = JenkinsResultsParserUtil.combine(
+				"resource.monitor.max.in.use.age[", getType(), "]");
+
+			if (!buildProperties.containsKey(key)) {
+				_maxInUseAge = _MAX_IN_USE_AGE_DEFAULT;
+
+				return _maxInUseAge;
+			}
+
+			_maxInUseAge = Long.valueOf(buildProperties.getProperty(key));
+		}
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+
+		return _maxInUseAge;
+	}
+
+	private static final long _MAX_IN_QUEUE_AGE_DEFAULT = 2 * 60 * 60 * 1000;
+
+	private static final long _MAX_IN_USE_AGE_DEFAULT = 60 * 60 * 1000;
+
+	private static final Integer _MAX_RESOURCE_CONNECTIONS_DEFAULT = 1;
+
 	private final String _etcdServerURL;
-	private final String _monitorName;
+	private Long _maxInQueueAge;
+	private Long _maxInUseAge;
+	private Integer _maxResourceConnections;
+	private final String _name;
 
 }

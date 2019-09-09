@@ -19,7 +19,7 @@ const {Divider, Item} = ClayDropDown;
 
 export default ({action, item, setActive}) => {
 	const {callback, link, name} = action;
-	const href = link ? link(item) : 'javascript:;';
+	const href = link ? link(item) : '';
 
 	if (name === 'divider') {
 		return <Divider />;
@@ -28,7 +28,9 @@ export default ({action, item, setActive}) => {
 	return (
 		<Item
 			href={href}
-			onClick={() => {
+			onClick={event => {
+				event.preventDefault();
+
 				setActive(false);
 
 				if (callback) {

@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link EmailAddressService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see EmailAddressService
  * @generated
  */
-@ProviderType
 public class EmailAddressServiceWrapper
 	implements EmailAddressService, ServiceWrapper<EmailAddressService> {
 
@@ -31,10 +29,15 @@ public class EmailAddressServiceWrapper
 		_emailAddressService = emailAddressService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link EmailAddressServiceUtil} to access the email address remote service. Add custom service methods to <code>com.liferay.portal.service.impl.EmailAddressServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.EmailAddress addEmailAddress(
-			String className, long classPK, String address, long typeId,
-			boolean primary, ServiceContext serviceContext)
+			java.lang.String className, long classPK, java.lang.String address,
+			long typeId, boolean primary, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _emailAddressService.addEmailAddress(
@@ -74,7 +77,7 @@ public class EmailAddressServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.EmailAddress>
-			getEmailAddresses(String className, long classPK)
+			getEmailAddresses(java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _emailAddressService.getEmailAddresses(className, classPK);
@@ -86,13 +89,14 @@ public class EmailAddressServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _emailAddressService.getOSGiServiceIdentifier();
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.EmailAddress updateEmailAddress(
-			long emailAddressId, String address, long typeId, boolean primary)
+			long emailAddressId, java.lang.String address, long typeId,
+			boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _emailAddressService.updateEmailAddress(

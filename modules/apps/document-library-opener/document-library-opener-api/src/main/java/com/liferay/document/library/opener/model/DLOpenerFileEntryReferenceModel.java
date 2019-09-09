@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLOpenerFileEntryReferenceModel
 	extends BaseModel<DLOpenerFileEntryReference>, GroupedModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a dl opener file entry reference model instance should use the {@link DLOpenerFileEntryReference} interface instead.

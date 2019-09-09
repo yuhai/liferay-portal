@@ -16,8 +16,6 @@ package com.liferay.document.library.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DLFileEntryService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileEntryService
  * @generated
  */
-@ProviderType
 public class DLFileEntryServiceWrapper
 	implements DLFileEntryService, ServiceWrapper<DLFileEntryService> {
 
@@ -33,6 +30,11 @@ public class DLFileEntryServiceWrapper
 		_dlFileEntryService = dlFileEntryService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DLFileEntryServiceUtil} to access the document library file entry remote service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.document.library.kernel.model.DLFileEntry addFileEntry(
 			long groupId, long repositoryId, long folderId,

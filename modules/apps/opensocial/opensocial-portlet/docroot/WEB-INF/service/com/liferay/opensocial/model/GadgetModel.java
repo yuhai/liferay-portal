@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface GadgetModel
 	extends BaseModel<Gadget>, ShardedModel, StagedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a gadget model instance should use the {@link Gadget} interface instead.

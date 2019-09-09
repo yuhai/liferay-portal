@@ -22,8 +22,6 @@ import java.sql.Blob;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLContent}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLContent
  * @generated
  */
-@ProviderType
 public class DLContentWrapper
 	extends BaseModelWrapper<DLContent>
 	implements DLContent, ModelWrapper<DLContent> {
@@ -199,6 +196,11 @@ public class DLContentWrapper
 		return model.getVersion();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a document library content model instance should use the <code>DLContent</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

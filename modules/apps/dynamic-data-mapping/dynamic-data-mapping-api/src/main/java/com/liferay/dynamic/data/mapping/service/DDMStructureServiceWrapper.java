@@ -16,8 +16,6 @@ package com.liferay.dynamic.data.mapping.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DDMStructureService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMStructureService
  * @generated
  */
-@ProviderType
 public class DDMStructureServiceWrapper
 	implements DDMStructureService, ServiceWrapper<DDMStructureService> {
 
@@ -33,6 +30,11 @@ public class DDMStructureServiceWrapper
 		_ddmStructureService = ddmStructureService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DDMStructureServiceUtil} to access the ddm structure remote service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMStructureServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructure addStructure(
 			long groupId, long parentStructureId, long classNameId,

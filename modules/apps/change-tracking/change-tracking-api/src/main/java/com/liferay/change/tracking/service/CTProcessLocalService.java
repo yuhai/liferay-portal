@@ -57,7 +57,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CTProcessLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link CTProcessLocalServiceUtil} to access the ct process local service. Add custom service methods to <code>com.liferay.change.tracking.service.impl.CTProcessLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

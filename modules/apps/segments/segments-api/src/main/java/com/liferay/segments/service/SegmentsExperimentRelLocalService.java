@@ -58,7 +58,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsExperimentRelLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentRelLocalServiceUtil} to access the segments experiment rel local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperimentRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -198,6 +198,11 @@ public interface SegmentsExperimentRelLocalService
 		long segmentsExperimentRelId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public SegmentsExperimentRel fetchSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -261,6 +266,10 @@ public interface SegmentsExperimentRelLocalService
 
 	public SegmentsExperimentRel updateSegmentsExperimentRel(
 			long segmentsExperimentRelId, double split)
+		throws PortalException;
+
+	public SegmentsExperimentRel updateSegmentsExperimentRel(
+			long segmentsExperimentId, long segmentsExperienceId, double split)
 		throws PortalException;
 
 	public SegmentsExperimentRel updateSegmentsExperimentRel(

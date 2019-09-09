@@ -16,8 +16,6 @@ package com.liferay.document.library.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for DLFileShortcut. This utility wraps
  * <code>com.liferay.portlet.documentlibrary.service.impl.DLFileShortcutLocalServiceImpl</code> and
@@ -30,10 +28,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileShortcutLocalService
  * @generated
  */
-@ProviderType
 public class DLFileShortcutLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileShortcutLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

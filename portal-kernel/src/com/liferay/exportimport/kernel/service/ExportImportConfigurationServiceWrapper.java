@@ -16,8 +16,6 @@ package com.liferay.exportimport.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ExportImportConfigurationService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ExportImportConfigurationService
  * @generated
  */
-@ProviderType
 public class ExportImportConfigurationServiceWrapper
 	implements ExportImportConfigurationService,
 			   ServiceWrapper<ExportImportConfigurationService> {
@@ -36,6 +33,11 @@ public class ExportImportConfigurationServiceWrapper
 		_exportImportConfigurationService = exportImportConfigurationService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ExportImportConfigurationServiceUtil} to access the export import configuration remote service. Add custom service methods to <code>com.liferay.portlet.exportimport.service.impl.ExportImportConfigurationServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void deleteExportImportConfiguration(
 			long exportImportConfigurationId)

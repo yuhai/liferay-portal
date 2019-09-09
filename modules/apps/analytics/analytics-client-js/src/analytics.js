@@ -43,7 +43,7 @@ let instance;
 
 const getItem = key => {
 	let data;
-	let item = localStorage.getItem(key);
+	const item = localStorage.getItem(key);
 	try {
 		data = JSON.parse(item);
 	} catch (e) {
@@ -333,7 +333,11 @@ class Analytics {
 					this.reset(events);
 				})
 				.catch()
-				.then(() => (this.isFlushInProgress = false));
+				.then(() => {
+					this.isFlushInProgress = false;
+
+					return this.isFlushInProgress;
+				});
 		} else {
 			result = Promise.resolve();
 		}

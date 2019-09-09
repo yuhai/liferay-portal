@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoDefinitionVersionPersistence
 	extends BasePersistence<KaleoDefinitionVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoDefinitionVersionUtil} to access the kaleo definition version persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

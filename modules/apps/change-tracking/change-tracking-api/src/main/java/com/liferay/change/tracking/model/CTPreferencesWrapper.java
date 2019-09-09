@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link CTPreferences}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CTPreferences
  * @generated
  */
-@ProviderType
 public class CTPreferencesWrapper
 	extends BaseModelWrapper<CTPreferences>
 	implements CTPreferences, ModelWrapper<CTPreferences> {
@@ -184,6 +181,11 @@ public class CTPreferencesWrapper
 		return model.isConfirmationEnabled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ct preferences model instance should use the <code>CTPreferences</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -14,16 +14,22 @@
 
 package com.liferay.layout.page.template.service.impl;
 
+import com.liferay.asset.kernel.NoSuchClassTypeException;
+import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLink;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.exception.LayoutPageTemplateEntryNameException;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateEntryLocalServiceBaseImpl;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.exception.NoSuchClassNameException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -32,6 +38,7 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -189,6 +196,31 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	@Override
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
+			long classNameId, long classTypeId, String name, int type,
+			int status, ServiceContext serviceContext)
+		throws PortalException {
+
+		validate(classNameId, classTypeId, groupId, serviceContext.getLocale());
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			addLayoutPageTemplateEntry(
+				userId, groupId, layoutPageTemplateCollectionId, classNameId,
+				classTypeId, name, type, false, 0, 0, 0, status,
+				serviceContext);
+
+		// Dynamic data mapping structure link
+
+		_ddmStructureLinkLocalService.addStructureLink(
+			classNameLocalService.getClassNameId(LayoutPageTemplateEntry.class),
+			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+			classTypeId);
+
+		return layoutPageTemplateEntry;
+	}
+
+	@Override
+	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
+			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, int type, int status, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -306,15 +338,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 					LayoutPageTemplateEntry.class),
 				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 		}
-
-		// Fragment entry instance links
-
-		_fragmentEntryLinkLocalService.
-			deleteLayoutPageTemplateEntryFragmentEntryLinks(
-				layoutPageTemplateEntry.getGroupId(),
-				classNameLocalService.getClassNameId(
-					LayoutPageTemplateEntry.class.getName()),
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 
 		return layoutPageTemplateEntry;
 	}
@@ -547,6 +570,10 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			updateLayoutPageTemplateEntry(layoutPageTemplateEntry);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public LayoutPageTemplateEntry updateLayoutPageTemplateEntry(
 			long layoutPageTemplateEntryId, long classNameId, long classTypeId)
@@ -763,6 +790,34 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			new ServiceContext());
 	}
 
+	protected void validate(
+			long classNameId, long classTypeId, long groupId, Locale locale)
+		throws PortalException {
+
+		ClassName className = _classNameLocalService.getClassName(classNameId);
+
+		InfoDisplayContributor<?> infoDisplayContributor =
+			_infoDisplayContributorTracker.getInfoDisplayContributor(
+				className.getClassName());
+
+		if (infoDisplayContributor == null) {
+			throw new NoSuchClassNameException(
+				"Class name does not exist for class name ID " + classNameId);
+		}
+
+		List<ClassType> classTypes = infoDisplayContributor.getClassTypes(
+			groupId, locale);
+
+		if (!classTypes.isEmpty() &&
+			!ListUtil.exists(
+				classTypes,
+				classType -> classTypeId == classType.getClassTypeId())) {
+
+			throw new NoSuchClassTypeException(
+				"Class type does not exist for class name ID " + classNameId);
+		}
+	}
+
 	protected void validate(long groupId, String name) throws PortalException {
 		if (Validator.isNull(name)) {
 			throw new LayoutPageTemplateEntryNameException.MustNotBeNull(
@@ -836,6 +891,9 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	};
 
 	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
 	private CompanyLocalService _companyLocalService;
 
 	@Reference
@@ -843,6 +901,9 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;

@@ -49,7 +49,7 @@ public abstract class PermissionServiceBaseImpl
 	extends BaseServiceImpl
 	implements PermissionService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PermissionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.PermissionServiceUtil</code>.

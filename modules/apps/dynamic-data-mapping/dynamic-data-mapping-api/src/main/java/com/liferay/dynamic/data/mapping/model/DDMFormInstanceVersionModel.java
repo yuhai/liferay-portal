@@ -44,7 +44,7 @@ public interface DDMFormInstanceVersionModel
 	extends BaseModel<DDMFormInstanceVersion>, LocalizedModel, MVCCModel,
 			ShardedModel, WorkflowedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddm form instance version model instance should use the {@link DDMFormInstanceVersion} interface instead.

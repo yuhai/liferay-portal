@@ -38,7 +38,7 @@ public interface GroupModel
 	extends AttachedModel, BaseModel<Group>, LocalizedModel, MVCCModel,
 			ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a group model instance should use the {@link Group} interface instead.

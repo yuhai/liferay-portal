@@ -76,9 +76,6 @@ CKEDITOR.dialog.add('audio', function(editor) {
 	}
 
 	return {
-		minHeight: 200,
-		minWidth: 400,
-
 		contents: [
 			{
 				elements: [
@@ -112,18 +109,21 @@ CKEDITOR.dialog.add('audio', function(editor) {
 			}
 		],
 
-		title: Liferay.Language.get('audio-properties'),
+		minHeight: 200,
+		minWidth: 400,
 
-		onOk: function() {
+		onOk() {
 			var instance = this;
 
 			editor.plugins.media.onOkCallback(instance, editor, 'audio');
 		},
 
-		onShow: function() {
+		onShow() {
 			var instance = this;
 
 			editor.plugins.media.onShowCallback(instance, editor, 'audio');
-		}
+		},
+
+		title: Liferay.Language.get('audio-properties')
 	};
 });

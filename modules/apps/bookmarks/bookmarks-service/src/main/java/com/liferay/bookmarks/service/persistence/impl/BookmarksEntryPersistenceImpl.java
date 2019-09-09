@@ -61,7 +61,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -78,12 +77,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = BookmarksEntryPersistence.class)
-@ProviderType
 public class BookmarksEntryPersistenceImpl
 	extends BasePersistenceImpl<BookmarksEntry>
 	implements BookmarksEntryPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>BookmarksEntryUtil</code> to access the bookmarks entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

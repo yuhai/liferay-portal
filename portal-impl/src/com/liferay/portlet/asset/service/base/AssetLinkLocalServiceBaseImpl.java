@@ -52,8 +52,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the asset link local service.
  *
@@ -65,12 +63,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portlet.asset.service.impl.AssetLinkLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class AssetLinkLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AssetLinkLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetLinkLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil</code>.

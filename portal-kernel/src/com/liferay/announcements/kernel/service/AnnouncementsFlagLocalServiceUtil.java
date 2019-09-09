@@ -16,8 +16,6 @@ package com.liferay.announcements.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for AnnouncementsFlag. This utility wraps
  * <code>com.liferay.portlet.announcements.service.impl.AnnouncementsFlagLocalServiceImpl</code> and
@@ -30,10 +28,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AnnouncementsFlagLocalService
  * @generated
  */
-@ProviderType
 public class AnnouncementsFlagLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.announcements.service.impl.AnnouncementsFlagLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

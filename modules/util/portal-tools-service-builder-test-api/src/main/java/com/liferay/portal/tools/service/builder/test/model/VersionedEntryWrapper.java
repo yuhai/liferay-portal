@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -35,7 +33,6 @@ import java.util.Objects;
  * @see VersionedEntry
  * @generated
  */
-@ProviderType
 public class VersionedEntryWrapper
 	implements VersionedEntry, ModelWrapper<VersionedEntry> {
 
@@ -183,6 +180,11 @@ public class VersionedEntryWrapper
 		return _versionedEntry.isNew();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a versioned entry model instance should use the <code>VersionedEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		_versionedEntry.persist();

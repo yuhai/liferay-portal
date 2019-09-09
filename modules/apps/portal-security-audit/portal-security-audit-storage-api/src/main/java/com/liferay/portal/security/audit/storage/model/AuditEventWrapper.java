@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AuditEvent}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AuditEvent
  * @generated
  */
-@ProviderType
 public class AuditEventWrapper
 	extends BaseModelWrapper<AuditEvent>
 	implements AuditEvent, ModelWrapper<AuditEvent> {
@@ -327,6 +324,11 @@ public class AuditEventWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a audit event model instance should use the <code>AuditEvent</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -32,15 +32,13 @@ AUI.add(
 
 		var EDITOR_PREFIX = 'editorPrefix';
 
-		var RESPONSE_DATA = 'responseData';
-
 		var TPL_NOTICE =
 			'<div class="alert alert-success lfr-editable-notice">' +
 			'<span class="lfr-editable-notice-text yui3-widget-bd"></span>' +
 			'<a class="lfr-editable-notice-close yui3-widget-ft" href="javascript:;" tabindex="0"></a>' +
 			'</div>';
 
-		function InlineEditorBase(config) {
+		function InlineEditorBase() {
 			var instance = this;
 
 			instance.publish('saveFailure', {
@@ -98,132 +96,7 @@ AUI.add(
 		};
 
 		InlineEditorBase.prototype = {
-			destructor: function() {
-				var instance = this;
-
-				instance.getEditNotice().destroy();
-
-				if (instance._closeNoticeTask) {
-					instance._closeNoticeTask.cancel();
-				}
-
-				if (instance._saveTask) {
-					instance._saveTask.cancel();
-				}
-			},
-
-			closeNotice: function(delay) {
-				var instance = this;
-
-				var closeNoticeTask = instance._closeNoticeTask;
-
-				if (!closeNoticeTask) {
-					closeNoticeTask = A.debounce(
-						instance._closeNoticeFn,
-						instance.get('closeNoticeTimeout'),
-						instance
-					);
-
-					instance._closeNoticeTask = closeNoticeTask;
-				}
-
-				if (Lang.isNumber(delay)) {
-					closeNoticeTask.delay(delay);
-				} else {
-					closeNoticeTask();
-				}
-			},
-
-			getEditNotice: function() {
-				var instance = this;
-
-				var editNotice = instance._editNotice;
-
-				if (!editNotice) {
-					var triggerNode = A.one(
-						instance.get(EDITOR_PREFIX) + instance.get(EDITOR_NAME)
-					);
-
-					var editNoticeNode = A.Node.create(TPL_NOTICE);
-
-					editNotice = new A.OverlayBase({
-						contentBox: editNoticeNode,
-						footerContent: Liferay.Language.get('close'),
-						visible: false,
-						zIndex: triggerNode.getStyle('zIndex') + 2
-					}).render();
-
-					instance._editNoticeNode = editNoticeNode;
-					instance._editNotice = editNotice;
-
-					instance._attachCloseListener();
-				}
-
-				return editNotice;
-			},
-
-			save: function(autosaved) {
-				var instance = this;
-
-				var data = {
-					content: instance.get(EDITOR).getData()
-				};
-
-				var namespacedData = Liferay.Util.ns(
-					instance.get('namespace'),
-					data
-				);
-
-				Liferay.Util.fetch(instance.get('saveURL'), {
-					body: Liferay.Util.objectToFormData(namespacedData),
-					method: 'POST'
-				})
-					.then(response => response.json())
-					.then(response => {
-						if (response) {
-							instance.fire('saveSuccess', autosaved);
-						} else {
-							instance.fire('saveFailure');
-						}
-					})
-					.catch(() => instance.fire('saveFailure'));
-			},
-
-			startSaveTask: function() {
-				var instance = this;
-
-				var saveTask = instance._saveTask;
-
-				if (saveTask) {
-					saveTask.cancel();
-				}
-
-				saveTask = A.later(
-					instance.get('autoSaveTimeout'),
-					instance,
-					instance._saveFn,
-					[true],
-					true
-				);
-
-				instance._saveTask = saveTask;
-
-				return saveTask;
-			},
-
-			stopSaveTask: function() {
-				var instance = this;
-
-				var saveTask = instance._saveTask;
-
-				if (saveTask) {
-					saveTask.cancel();
-				}
-
-				return saveTask;
-			},
-
-			_attachCloseListener: function() {
+			_attachCloseListener() {
 				var instance = this;
 
 				var notice = instance.getEditNotice();
@@ -231,13 +104,13 @@ AUI.add(
 				notice.footerNode.on('click', A.bind('hide', notice));
 			},
 
-			_closeNoticeFn: function() {
+			_closeNoticeFn() {
 				var instance = this;
 
 				instance.getEditNotice().hide();
 			},
 
-			_defSaveFailureFn: function() {
+			_defSaveFailureFn() {
 				var instance = this;
 
 				instance.resetDirty();
@@ -256,7 +129,7 @@ AUI.add(
 				instance.closeNotice();
 			},
 
-			_defSaveSuccessFn: function(autosaved) {
+			_defSaveSuccessFn(autosaved) {
 				var instance = this;
 
 				instance.resetDirty();
@@ -284,12 +157,137 @@ AUI.add(
 				instance.closeNotice();
 			},
 
-			_saveFn: function(autosaved) {
+			_saveFn(autosaved) {
 				var instance = this;
 
 				if (instance.isContentDirty()) {
 					instance.save(autosaved);
 				}
+			},
+
+			closeNotice(delay) {
+				var instance = this;
+
+				var closeNoticeTask = instance._closeNoticeTask;
+
+				if (!closeNoticeTask) {
+					closeNoticeTask = A.debounce(
+						instance._closeNoticeFn,
+						instance.get('closeNoticeTimeout'),
+						instance
+					);
+
+					instance._closeNoticeTask = closeNoticeTask;
+				}
+
+				if (Lang.isNumber(delay)) {
+					closeNoticeTask.delay(delay);
+				} else {
+					closeNoticeTask();
+				}
+			},
+
+			destructor() {
+				var instance = this;
+
+				instance.getEditNotice().destroy();
+
+				if (instance._closeNoticeTask) {
+					instance._closeNoticeTask.cancel();
+				}
+
+				if (instance._saveTask) {
+					instance._saveTask.cancel();
+				}
+			},
+
+			getEditNotice() {
+				var instance = this;
+
+				var editNotice = instance._editNotice;
+
+				if (!editNotice) {
+					var triggerNode = A.one(
+						instance.get(EDITOR_PREFIX) + instance.get(EDITOR_NAME)
+					);
+
+					var editNoticeNode = A.Node.create(TPL_NOTICE);
+
+					editNotice = new A.OverlayBase({
+						contentBox: editNoticeNode,
+						footerContent: Liferay.Language.get('close'),
+						visible: false,
+						zIndex: triggerNode.getStyle('zIndex') + 2
+					}).render();
+
+					instance._editNoticeNode = editNoticeNode;
+					instance._editNotice = editNotice;
+
+					instance._attachCloseListener();
+				}
+
+				return editNotice;
+			},
+
+			save(autosaved) {
+				var instance = this;
+
+				var data = {
+					content: instance.get(EDITOR).getData()
+				};
+
+				var namespacedData = Liferay.Util.ns(
+					instance.get('namespace'),
+					data
+				);
+
+				Liferay.Util.fetch(instance.get('saveURL'), {
+					body: Liferay.Util.objectToFormData(namespacedData),
+					method: 'POST'
+				})
+					.then(response => response.json())
+					.then(response => {
+						if (response) {
+							instance.fire('saveSuccess', autosaved);
+						} else {
+							instance.fire('saveFailure');
+						}
+					})
+					.catch(() => instance.fire('saveFailure'));
+			},
+
+			startSaveTask() {
+				var instance = this;
+
+				var saveTask = instance._saveTask;
+
+				if (saveTask) {
+					saveTask.cancel();
+				}
+
+				saveTask = A.later(
+					instance.get('autoSaveTimeout'),
+					instance,
+					instance._saveFn,
+					[true],
+					true
+				);
+
+				instance._saveTask = saveTask;
+
+				return saveTask;
+			},
+
+			stopSaveTask() {
+				var instance = this;
+
+				var saveTask = instance._saveTask;
+
+				if (saveTask) {
+					saveTask.cancel();
+				}
+
+				return saveTask;
 			}
 		};
 

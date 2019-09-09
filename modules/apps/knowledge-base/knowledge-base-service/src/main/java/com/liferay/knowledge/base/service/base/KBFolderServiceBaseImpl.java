@@ -51,7 +51,7 @@ public abstract class KBFolderServiceBaseImpl
 	extends BaseServiceImpl
 	implements KBFolderService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KBFolderService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.knowledge.base.service.KBFolderServiceUtil</code>.

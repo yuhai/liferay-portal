@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WebDAVPropsModel
 	extends AttachedModel, BaseModel<WebDAVProps>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a web dav props model instance should use the {@link WebDAVProps} interface instead.

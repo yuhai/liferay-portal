@@ -36,7 +36,7 @@ AUI.add(
 		};
 
 		A.mix(ModifiedFacetFilter.prototype, {
-			filter: function() {
+			filter() {
 				var instance = this;
 
 				var fromDate = instance.fromInputDatePicker.getDate();
@@ -93,7 +93,7 @@ AUI.add(
 		Liferay.namespace('Search').ModifiedFacetFilter = ModifiedFacetFilter;
 
 		var ModifiedFacetFilterUtil = {
-			clearSelections: function(event) {
+			clearSelections() {
 				var param = this.getParameterName();
 				var paramFrom = param + 'From';
 				var paramTo = param + 'To';
@@ -120,11 +120,11 @@ AUI.add(
 				this.submitSearch(parameterArray.join('&'));
 			},
 
-			getParameterName: function() {
+			getParameterName() {
 				return 'modified';
 			},
 
-			submitSearch: function(parameterString) {
+			submitSearch(parameterString) {
 				document.location.search = parameterString;
 			},
 
@@ -133,7 +133,7 @@ AUI.add(
 			 * @param {Date} date The date to format.
 			 * @returns {String} The date string.
 			 */
-			toLocaleDateStringFormatted: function(date) {
+			toLocaleDateStringFormatted(date) {
 				var localDate = new Date(date);
 
 				localDate.setMinutes(

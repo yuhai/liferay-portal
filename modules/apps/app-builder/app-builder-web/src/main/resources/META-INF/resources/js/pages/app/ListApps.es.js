@@ -17,6 +17,7 @@ import moment from 'moment';
 import React from 'react';
 import ListView from '../../components/list-view/ListView.es';
 import {confirmDelete} from '../../utils/client.es';
+import Button from '../../components/button/Button.es';
 
 const DEPLOYMENT_STATUS = {
 	deployed: Liferay.Language.get('deployed'),
@@ -79,21 +80,35 @@ const COLUMNS = [
 	}
 ];
 
-const EMPTY_STATE = {
-	description: Liferay.Language.get(
-		'select-the-form-and-table-view-you-want-and-deploy-your-app-as-a-widget-standalone-or-place-it-in-the-product-menu'
-	),
-	title: Liferay.Language.get('there-are-no-deployments-yet')
-};
-
 export default ({
 	match: {
-		params: {dataDefinitionId}
+		params: {dataDefinitionId},
+		url
 	}
 }) => {
+	const EMPTY_STATE = {
+		button: () => (
+			<Button displayType="secondary" href={`${url}/add`}>
+				{Liferay.Language.get('new-app')}
+			</Button>
+		),
+		description: Liferay.Language.get(
+			'select-the-form-and-table-view-you-want-and-deploy-your-app-as-a-widget-standalone-or-place-it-in-the-product-menu'
+		),
+		title: Liferay.Language.get('there-are-no-apps-yet')
+	};
+
 	return (
 		<ListView
 			actions={ACTIONS}
+			addButton={() => (
+				<Button
+					className="nav-btn nav-btn-monospaced navbar-breakpoint-down-d-none"
+					href={`${url}/add`}
+					symbol="plus"
+					tooltip={Liferay.Language.get('new-app')}
+				/>
+			)}
 			columns={COLUMNS}
 			emptyState={EMPTY_STATE}
 			endpoint={`/o/app-builder/v1.0/data-definitions/${dataDefinitionId}/apps`}

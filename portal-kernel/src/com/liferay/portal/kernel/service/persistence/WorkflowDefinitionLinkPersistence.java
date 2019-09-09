@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WorkflowDefinitionLinkPersistence
 	extends BasePersistence<WorkflowDefinitionLink> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link WorkflowDefinitionLinkUtil} to access the workflow definition link persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

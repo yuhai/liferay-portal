@@ -66,7 +66,7 @@ AUI.add(
 				},
 
 				strings: {
-					setter: function(value) {
+					setter(value) {
 						return A.merge(value, {
 							items: Liferay.Language.get('items'),
 							next: Liferay.Language.get('next'),
@@ -89,9 +89,177 @@ AUI.add(
 
 			EXTENDS: A.Pagination,
 
-			NAME: NAME,
+			NAME,
 
 			prototype: {
+				_afterResultsChange() {
+					var instance = this;
+
+					instance._syncResults();
+				},
+
+				_dispatchRequest(state) {
+					var instance = this;
+
+					if (
+						!Object.prototype.hasOwnProperty.call(
+							state,
+							ITEMS_PER_PAGE
+						)
+					) {
+						state.itemsPerPage = instance.get(ITEMS_PER_PAGE);
+					}
+
+					Pagination.superclass._dispatchRequest.call(
+						instance,
+						state
+					);
+				},
+
+				_getLabelContent(itemsPerPage) {
+					var instance = this;
+
+					var results = {};
+
+					if (!itemsPerPage) {
+						itemsPerPage = instance.get(ITEMS_PER_PAGE);
+					}
+
+					results.amount = itemsPerPage;
+
+					results.title = instance._itemsPerPageMessage;
+
+					return results;
+				},
+
+				_getResultsContent(page, itemsPerPage) {
+					var instance = this;
+
+					var results = instance.get(RESULTS);
+
+					if (!Lang.isValue(page)) {
+						page = instance.get(PAGE);
+					}
+
+					if (!Lang.isValue(itemsPerPage)) {
+						itemsPerPage = instance.get(ITEMS_PER_PAGE);
+					}
+
+					var resultsContent;
+
+					if (results > itemsPerPage) {
+						var tmp = page * itemsPerPage;
+
+						resultsContent = Lang.sub(instance._resultsMessage, [
+							(page - 1) * itemsPerPage + 1,
+							tmp < results ? tmp : results,
+							results
+						]);
+					} else {
+						resultsContent = Lang.sub(
+							instance._resultsMessageShort,
+							[results]
+						);
+					}
+
+					return resultsContent;
+				},
+
+				_onChangeRequest(event) {
+					var instance = this;
+
+					var state = event.state;
+
+					var page = state.page;
+
+					var itemsPerPage = state.itemsPerPage;
+
+					instance._syncLabel(itemsPerPage);
+					instance._syncResults(page, itemsPerPage);
+				},
+
+				_onItemClick(event) {
+					var instance = this;
+
+					var itemsPerPage = Lang.toInt(
+						event.currentTarget
+							.one('.taglib-text-icon')
+							.attr('data-value')
+					);
+
+					instance.set(ITEMS_PER_PAGE, itemsPerPage);
+				},
+
+				_onItemsPerPageChange(event) {
+					var instance = this;
+
+					var page = instance.get(PAGE);
+
+					var itemsPerPage = event.newVal;
+
+					instance._dispatchRequest({
+						itemsPerPage,
+						page
+					});
+
+					var results = instance.get(RESULTS);
+
+					instance.set(
+						'visible',
+						!!(results && results > itemsPerPage)
+					);
+				},
+
+				_syncLabel(itemsPerPage) {
+					var instance = this;
+
+					var results = instance._getLabelContent(itemsPerPage);
+
+					instance._deltaSelector
+						.one('.lfr-pagination-delta-selector-amount')
+						.html(results.amount);
+					instance._deltaSelector
+						.one('.lfr-icon-menu-text')
+						.html(results.title);
+				},
+
+				_syncResults(page, itemsPerPage) {
+					var instance = this;
+
+					var result = instance._getResultsContent(
+						page,
+						itemsPerPage
+					);
+
+					instance._searchResults.html(result);
+				},
+
+				_uiSetVisible(val) {
+					var instance = this;
+
+					var hideClass = instance.get('hideClass');
+
+					var hiddenClass = instance.getClassName('hidden');
+
+					if (hideClass !== false) {
+						hiddenClass += STR_SPACE + (hideClass || 'hide');
+					}
+
+					var results = instance.get(RESULTS);
+
+					var itemsPerPageList = instance.get(ITEMS_PER_PAGE_LIST);
+
+					instance._paginationControls.toggleClass(
+						hiddenClass,
+						results <= itemsPerPageList[0]
+					);
+
+					instance._paginationContentNode.toggleClass(
+						hiddenClass,
+						!val
+					);
+				},
+
 				TPL_CONTAINER:
 					'<div class="lfr-pagination-controls" id="{id}"></div>',
 
@@ -119,7 +287,44 @@ AUI.add(
 				TPL_RESULTS:
 					'<small class="search-results" id="{id}">{value}</small>',
 
-				renderUI: function() {
+				bindUI() {
+					var instance = this;
+
+					Pagination.superclass.bindUI.apply(instance, arguments);
+
+					instance._eventHandles = [
+						instance._itemContainer.delegate(
+							'click',
+							instance._onItemClick,
+							'.lfr-pagination-link',
+							instance
+						)
+					];
+
+					instance.after(
+						'resultsChange',
+						instance._afterResultsChange,
+						instance
+					);
+					instance.on(
+						'changeRequest',
+						instance._onChangeRequest,
+						instance
+					);
+					instance.on(
+						'itemsPerPageChange',
+						instance._onItemsPerPageChange,
+						instance
+					);
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				renderUI() {
 					var instance = this;
 
 					Pagination.superclass.renderUI.apply(instance, arguments);
@@ -177,7 +382,7 @@ AUI.add(
 							return Lang.sub(instance.TPL_ITEM, {
 								idLi: namespace + 'itemLiId' + index,
 								idLink: namespace + 'itemLinkId' + index,
-								index: index,
+								index,
 								value: item
 							});
 						});
@@ -206,206 +411,6 @@ AUI.add(
 					instance._searchResults = searchResults;
 
 					Liferay.Menu.register(deltaSelectorId);
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					Pagination.superclass.bindUI.apply(instance, arguments);
-
-					instance._eventHandles = [
-						instance._itemContainer.delegate(
-							'click',
-							instance._onItemClick,
-							'.lfr-pagination-link',
-							instance
-						)
-					];
-
-					instance.after(
-						'resultsChange',
-						instance._afterResultsChange,
-						instance
-					);
-					instance.on(
-						'changeRequest',
-						instance._onChangeRequest,
-						instance
-					);
-					instance.on(
-						'itemsPerPageChange',
-						instance._onItemsPerPageChange,
-						instance
-					);
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_afterResultsChange: function(event) {
-					var instance = this;
-
-					instance._syncResults();
-				},
-
-				_dispatchRequest: function(state) {
-					var instance = this;
-
-					if (!state.hasOwnProperty(ITEMS_PER_PAGE)) {
-						state.itemsPerPage = instance.get(ITEMS_PER_PAGE);
-					}
-
-					Pagination.superclass._dispatchRequest.call(
-						instance,
-						state
-					);
-				},
-
-				_getLabelContent: function(itemsPerPage) {
-					var instance = this;
-
-					var results = {};
-
-					if (!itemsPerPage) {
-						itemsPerPage = instance.get(ITEMS_PER_PAGE);
-					}
-
-					results.amount = itemsPerPage;
-
-					results.title = instance._itemsPerPageMessage;
-
-					return results;
-				},
-
-				_getResultsContent: function(page, itemsPerPage) {
-					var instance = this;
-
-					var results = instance.get(RESULTS);
-
-					if (!Lang.isValue(page)) {
-						page = instance.get(PAGE);
-					}
-
-					if (!Lang.isValue(itemsPerPage)) {
-						itemsPerPage = instance.get(ITEMS_PER_PAGE);
-					}
-
-					var resultsContent;
-
-					if (results > itemsPerPage) {
-						var tmp = page * itemsPerPage;
-
-						resultsContent = Lang.sub(instance._resultsMessage, [
-							(page - 1) * itemsPerPage + 1,
-							tmp < results ? tmp : results,
-							results
-						]);
-					} else {
-						resultsContent = Lang.sub(
-							instance._resultsMessageShort,
-							[results]
-						);
-					}
-
-					return resultsContent;
-				},
-
-				_onChangeRequest: function(event) {
-					var instance = this;
-
-					var state = event.state;
-
-					var page = state.page;
-
-					var itemsPerPage = state.itemsPerPage;
-
-					instance._syncLabel(itemsPerPage);
-					instance._syncResults(page, itemsPerPage);
-				},
-
-				_onItemClick: function(event) {
-					var instance = this;
-
-					var itemsPerPage = Lang.toInt(
-						event.currentTarget
-							.one('.taglib-text-icon')
-							.attr('data-value')
-					);
-
-					instance.set(ITEMS_PER_PAGE, itemsPerPage);
-				},
-
-				_onItemsPerPageChange: function(event) {
-					var instance = this;
-
-					var page = instance.get(PAGE);
-
-					var itemsPerPage = event.newVal;
-
-					instance._dispatchRequest({
-						itemsPerPage: itemsPerPage,
-						page: page
-					});
-
-					var results = instance.get(RESULTS);
-
-					instance.set(
-						'visible',
-						!!(results && results > itemsPerPage)
-					);
-				},
-
-				_syncLabel: function(itemsPerPage) {
-					var instance = this;
-
-					var results = instance._getLabelContent(itemsPerPage);
-
-					instance._deltaSelector
-						.one('.lfr-pagination-delta-selector-amount')
-						.html(results.amount);
-					instance._deltaSelector
-						.one('.lfr-icon-menu-text')
-						.html(results.title);
-				},
-
-				_syncResults: function(page, itemsPerPage) {
-					var instance = this;
-
-					var result = instance._getResultsContent(
-						page,
-						itemsPerPage
-					);
-
-					instance._searchResults.html(result);
-				},
-
-				_uiSetVisible: function(val) {
-					var instance = this;
-
-					var hideClass = instance.get('hideClass');
-
-					var hiddenClass = instance.getClassName('hidden');
-
-					if (hideClass !== false) {
-						hiddenClass += STR_SPACE + (hideClass || 'hide');
-					}
-
-					var results = instance.get(RESULTS);
-
-					var itemsPerPageList = instance.get(ITEMS_PER_PAGE_LIST);
-
-					instance._paginationControls.toggleClass(
-						hiddenClass,
-						results <= itemsPerPageList[0]
-					);
-
-					instance._paginationContentNode.toggleClass(
-						hiddenClass,
-						!val
-					);
 				}
 			}
 		});

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface UserTrackerPathModel
 	extends BaseModel<UserTrackerPath>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a user tracker path model instance should use the {@link UserTrackerPath} interface instead.

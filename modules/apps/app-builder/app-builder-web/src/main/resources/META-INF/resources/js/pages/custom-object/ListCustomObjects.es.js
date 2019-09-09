@@ -35,8 +35,8 @@ const ACTIONS = [
 		name: Liferay.Language.get('table-views')
 	},
 	{
-		link: item => `#/custom-object/${item.id}/deployments`,
-		name: Liferay.Language.get('deployments')
+		link: item => `#/custom-object/${item.id}/apps`,
+		name: Liferay.Language.get('apps')
 	},
 	{
 		name: 'divider'

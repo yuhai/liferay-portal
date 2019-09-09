@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the Group service. Represents a row in the &quot;Group_&quot; database table, with each column mapped to a property of this class.
  *
@@ -36,10 +34,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Group
  * @generated
  */
-@ProviderType
 public abstract class GroupBaseImpl extends GroupModelImpl implements Group {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a group model instance should use the <code>Group</code> interface instead.

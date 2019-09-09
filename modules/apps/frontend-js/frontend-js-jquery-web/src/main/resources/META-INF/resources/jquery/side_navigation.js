@@ -24,7 +24,7 @@
 		if (!listenerAdded) {
 			$(window).on(
 				'resize',
-				debounce(function(event) {
+				debounce(function() {
 					doc.trigger('screenChange.lexicon.sidenav');
 				}, 150)
 			);
@@ -104,541 +104,7 @@
 	SideNavigation.TRANSITION_DURATION = 500;
 
 	SideNavigation.prototype = {
-		init: function(toggler, options) {
-			var instance = this;
-
-			var useDataAttribute = toggler.data('toggle') === 'sidenav';
-
-			options = $.extend({}, $.fn.sideNavigation.defaults, options);
-
-			options.breakpoint = toInt(options.breakpoint);
-			options.container =
-				options.container ||
-				toggler.data('target') ||
-				toggler.attr('href');
-			options.gutter = toInt(options.gutter);
-			options.heightType =
-				options.heightType ||
-				(options.equalHeight ? 'equalHeight' : false);
-			options.rtl = doc.attr('dir') === 'rtl';
-			options.width = toInt(options.width);
-			options.widthOriginal = options.width;
-
-			// instantiate using data attribute
-
-			if (useDataAttribute) {
-				options.closedClass = toggler.data('closed-class') || 'closed';
-				options.content = toggler.data('content');
-				options.equalHeight = false; // equalHeight option is deprecated
-				options.loadingIndicatorTPL =
-					toggler.data('loading-indicator-tpl') ||
-					options.loadingIndicatorTPL;
-				options.openClass = toggler.data('open-class') || 'open';
-				options.toggler = toggler;
-				options.type = toggler.data('type');
-				options.typeMobile = toggler.data('type-mobile');
-				options.url = toggler.data('url');
-				options.useDelegate = toggler.data('use-delegate');
-				options.width = '';
-
-				if (options.useDelegate === undefined) {
-					options.useDelegate = true;
-				}
-			}
-
-			instance.toggler = toggler;
-			instance.options = options;
-			instance.useDataAttribute = useDataAttribute;
-
-			instance._bindUI();
-			instance._renderUI();
-		},
-
-		clearStyle: function(attribute) {
-			var instance = this;
-
-			var options = instance.options;
-
-			var container = $(options.container);
-			var content = container.find(options.content).first();
-			var navigation = container.find(options.navigation).first();
-
-			var menu = container.find('.sidenav-menu').first();
-
-			var els = content.add(navigation).add(menu);
-
-			if (Array.isArray(attribute)) {
-				for (var i = 0; i < attribute.length; i++) {
-					els.css(attribute[i], '');
-				}
-			} else {
-				els.css(attribute, '');
-			}
-		},
-
-		destroy: function() {
-			var instance = this;
-
-			var options = instance.options;
-
-			var container = $(instance.options.container);
-
-			// Detach sidenav close
-
-			doc.off(
-				'click.close.lexicon.sidenav',
-				instance.closeButtonSelector
-			);
-			doc.data(instance.dataCloseButtonSelector, null);
-
-			// Detach toggler
-
-			if (options.useDelegate) {
-				doc.off('click.lexicon.sidenav', instance.togglerSelector);
-				doc.data(instance.dataTogglerSelector, null);
-			} else {
-				container.off('click.lexicon.sidenav');
-			}
-
-			// Remove Side Navigation
-
-			container.data('lexicon.sidenav', null);
-		},
-
-		hide: function() {
-			var instance = this;
-
-			if (instance.useDataAttribute) {
-				instance.hideSimpleSidenav();
-			} else {
-				instance.toggleNavigation(false);
-			}
-		},
-
-		hideSidenav: function() {
-			var instance = this;
-			var options = instance.options;
-
-			var container = $(options.container);
-			var content = container.find(options.content).first();
-			var navigation = container.find(options.navigation).first();
-			var menu = navigation.find('.sidenav-menu').first();
-
-			var sidenavRight = instance._isSidenavRight();
-
-			var positionDirection = options.rtl ? 'right' : 'left';
-
-			if (sidenavRight) {
-				positionDirection = options.rtl ? 'left' : 'right';
-			}
-
-			var paddingDirection = 'padding-' + positionDirection;
-
-			content.css(paddingDirection, '').css(positionDirection, '');
-
-			navigation.css('width', '');
-
-			if (sidenavRight) {
-				menu.css(positionDirection, instance._getSidenavWidth());
-			}
-		},
-
-		hideSimpleSidenav: function() {
-			var instance = this;
-
-			var options = instance.options;
-
-			var simpleSidenavClosed = instance._isSimpleSidenavClosed();
-
-			if (!simpleSidenavClosed) {
-				var content = $(options.content).first();
-				var sidenav = $(options.container);
-
-				var closedClass = options.closedClass;
-				var openClass = options.openClass;
-
-				var toggler = instance.toggler;
-
-				var target =
-					toggler.attr('href') || toggler.attr('data-target');
-
-				sidenav.trigger({
-					toggler: $(instance.togglerSelector),
-					type: 'closedStart.lexicon.sidenav'
-				});
-
-				instance._onSidenavTransitionEnd(content, function() {
-					sidenav.removeClass('sidenav-transition');
-					toggler.removeClass('sidenav-transition');
-
-					sidenav.trigger({
-						toggler: $(instance.togglerSelector),
-						type: 'closed.lexicon.sidenav'
-					});
-				});
-
-				if (content.hasClass(openClass)) {
-					content
-						.addClass('sidenav-transition')
-						.addClass(closedClass)
-						.removeClass(openClass);
-				}
-
-				sidenav.addClass('sidenav-transition');
-				toggler.addClass('sidenav-transition');
-
-				sidenav.addClass(closedClass).removeClass(openClass);
-
-				$('[data-target="' + target + '"]')
-					.removeClass(openClass)
-					.removeClass('active');
-				$('[href="' + target + '"]')
-					.removeClass(openClass)
-					.removeClass('active');
-			}
-		},
-
-		setEqualHeight: function() {
-			var instance = this;
-
-			var options = instance.options;
-
-			var container = $(options.container);
-			var content = options.content;
-			var navigation = options.navigation;
-
-			var type = instance.mobile ? options.typeMobile : options.type;
-
-			if (type !== 'fixed' && type !== 'fixed-push') {
-				var contentNode = container.find(content).first();
-				var navNode = container.find(navigation).first();
-				var sideNavMenuNode = container.find('.sidenav-menu').first();
-
-				var tallest = Math.max(
-					contentNode.outerHeight(),
-					navNode.outerHeight()
-				);
-
-				contentNode.css('min-height', tallest);
-
-				navNode.css({
-					'min-height': tallest,
-					height: '100%'
-				});
-
-				sideNavMenuNode.css({
-					'min-height': tallest,
-					height: '100%'
-				});
-			}
-		},
-
-		setFullHeight: function() {
-			var instance = this;
-
-			var options = instance.options;
-
-			var container = $(options.container);
-			var navigation = options.navigation;
-
-			var type = instance.mobile ? options.typeMobile : options.type;
-
-			if (type === 'relative') {
-				var navNode = container.find(navigation).first();
-				var sidenavMenuNode = container.find('.sidenav-menu').first();
-
-				var minHeight = doc.innerHeight() - navNode.offset().top;
-
-				if (
-					sidenavMenuNode.innerHeight() + navNode.offset().top >
-					doc.innerHeight()
-				) {
-					minHeight = sidenavMenuNode.innerHeight();
-				}
-
-				navNode.css({
-					'min-height': minHeight,
-					height: '100%'
-				});
-
-				sidenavMenuNode.css({
-					'min-height': minHeight,
-					height: '100%'
-				});
-			}
-		},
-
-		setHeight: function() {
-			var instance = this;
-
-			var options = instance.options;
-
-			if (options.heightType === 'equalHeight') {
-				instance.setEqualHeight();
-			} else if (options.heightType === 'fullHeight') {
-				instance.setFullHeight();
-			}
-		},
-
-		show: function() {
-			var instance = this;
-
-			if (instance.useDataAttribute) {
-				instance.showSimpleSidenav();
-			} else {
-				instance.toggleNavigation(true);
-			}
-		},
-
-		showSidenav: function() {
-			var instance = this;
-			var mobile = instance.mobile;
-			var options = instance.options;
-
-			var container = $(options.container);
-			var content = container.find(options.content).first();
-			var navigation = container.find(options.navigation).first();
-			var menu = navigation.find('.sidenav-menu').first();
-
-			var sidenavRight = instance._isSidenavRight();
-			var width = instance._getSidenavWidth();
-
-			var offset = width + options.gutter;
-
-			var url = options.url;
-
-			if (url) {
-				container.one('urlLoaded.lexicon.sidenav', function(event) {
-					instance.setHeight();
-				});
-
-				instance._loadUrl(menu, url, container);
-			}
-
-			navigation.css('width', width);
-			menu.css('width', width);
-
-			var positionDirection = options.rtl ? 'right' : 'left';
-
-			if (sidenavRight) {
-				positionDirection = options.rtl ? 'left' : 'right';
-			}
-
-			var paddingDirection = 'padding-' + positionDirection;
-
-			var pushContentCssProperty = mobile
-				? positionDirection
-				: paddingDirection;
-			var type = mobile ? options.typeMobile : options.type;
-
-			if (type !== 'fixed') {
-				var navigationStartX = container.hasClass('open')
-					? navigation.offset().left - options.gutter
-					: navigation.offset().left - offset;
-
-				var contentStartX = content.offset().left;
-				var contentWidth = content.innerWidth();
-
-				var padding = '';
-
-				if (
-					(options.rtl && sidenavRight) ||
-					(!options.rtl && options.position === 'left')
-				) {
-					navigationStartX = navigation.offset().left + offset;
-
-					if (navigationStartX > contentStartX) {
-						padding = navigationStartX - contentStartX;
-					}
-				} else if (
-					(options.rtl && options.position === 'left') ||
-					(!options.rtl && sidenavRight)
-				) {
-					if (navigationStartX < contentStartX + contentWidth) {
-						padding =
-							contentStartX + contentWidth - navigationStartX;
-
-						if (padding >= offset) {
-							padding = offset;
-						}
-					}
-				}
-
-				content.css(pushContentCssProperty, padding);
-			}
-		},
-
-		showSimpleSidenav: function() {
-			var instance = this;
-
-			var options = instance.options;
-
-			var simpleSidenavClosed = instance._isSimpleSidenavClosed();
-
-			if (simpleSidenavClosed) {
-				var content = $(options.content).first();
-				var sidenav = $(options.container);
-
-				var closedClass = options.closedClass;
-				var openClass = options.openClass;
-
-				var toggler = options.toggler;
-
-				var url = toggler.data('url');
-
-				if (url) {
-					instance._loadUrl(sidenav, url);
-				}
-
-				sidenav.trigger({
-					toggler: $(instance.togglerSelector),
-					type: 'openStart.lexicon.sidenav'
-				});
-
-				instance._onSidenavTransitionEnd(content, function() {
-					sidenav.removeClass('sidenav-transition');
-					toggler.removeClass('sidenav-transition');
-
-					sidenav.trigger({
-						toggler: $(instance.togglerSelector),
-						type: 'open.lexicon.sidenav'
-					});
-				});
-
-				content
-					.addClass('sidenav-transition')
-					.addClass(openClass)
-					.removeClass(closedClass);
-				sidenav.addClass('sidenav-transition');
-				toggler.addClass('sidenav-transition');
-
-				sidenav.addClass(openClass).removeClass(closedClass);
-				toggler.addClass('active').addClass(openClass);
-			}
-		},
-
-		toggle: function() {
-			var instance = this;
-
-			if (instance.useDataAttribute) {
-				instance.toggleSimpleSidenav();
-			} else {
-				instance.toggleNavigation();
-			}
-		},
-
-		toggleNavigation: function(force) {
-			var instance = this;
-			var options = instance.options;
-
-			var container = $(options.container);
-			var menu = container.find('.sidenav-menu').first();
-			var toggler = instance.toggler;
-
-			var width = options.width;
-
-			var closed =
-				$.type(force) === 'boolean'
-					? force
-					: container.hasClass('closed');
-			var sidenavRight = instance._isSidenavRight();
-
-			var widthMethod = closed ? 'showSidenav' : 'hideSidenav';
-
-			if (closed) {
-				container.trigger({
-					toggler: toggler,
-					type: 'openStart.lexicon.sidenav'
-				});
-			} else {
-				container.trigger({
-					toggler: toggler,
-					type: 'closedStart.lexicon.sidenav'
-				});
-			}
-
-			instance._onSidenavTransitionEnd(container, function() {
-				var menu = container.find('.sidenav-menu').first();
-
-				if (container.hasClass('closed')) {
-					instance.clearStyle(['min-height', 'height']);
-
-					toggler
-						.removeClass('open')
-						.removeClass('sidenav-transition');
-
-					container.trigger({
-						toggler: toggler,
-						type: 'closed.lexicon.sidenav'
-					});
-				} else {
-					toggler.addClass('open').removeClass('sidenav-transition');
-
-					container.trigger({
-						toggler: toggler,
-						type: 'open.lexicon.sidenav'
-					});
-				}
-
-				if (instance.mobile) {
-					instance._focusElement(menu);
-				}
-			});
-
-			if (closed) {
-				instance.setHeight();
-
-				menu.css('width', width);
-
-				var positionDirection = options.rtl ? 'left' : 'right';
-
-				if (sidenavRight) {
-					menu.css(positionDirection, '');
-				}
-			}
-
-			container.addClass('sidenav-transition');
-			toggler.addClass('sidenav-transition');
-
-			instance[widthMethod](container);
-
-			container
-				.toggleClass('closed', !closed)
-				.toggleClass('open', closed);
-			toggler.toggleClass('active', closed).toggleClass('open', closed);
-		},
-
-		toggleSimpleSidenav: function() {
-			var instance = this;
-
-			var simpleSidenavClosed = instance._isSimpleSidenavClosed();
-
-			if (simpleSidenavClosed) {
-				instance.showSimpleSidenav();
-			} else {
-				instance.hideSimpleSidenav();
-			}
-		},
-
-		visible: function() {
-			var instance = this;
-
-			var closed;
-
-			if (instance.useDataAttribute) {
-				closed = instance._isSimpleSidenavClosed();
-			} else {
-				var container = $(instance.options.container);
-
-				closed = container.hasClass('sidenav-transition')
-					? !container.hasClass('closed')
-					: container.hasClass('closed');
-			}
-
-			return !closed;
-		},
-
-		_bindUI: function() {
+		_bindUI() {
 			var instance = this;
 
 			if (!instance.useDataAttribute) {
@@ -655,13 +121,13 @@
 			instance._onClickSidenavClose();
 		},
 
-		_focusElement: function(el) {
+		_focusElement(el) {
 			// ios 8 fixed element disappears when trying to scroll
 
 			el.focus();
 		},
 
-		_getSidenavWidth: function() {
+		_getSidenavWidth() {
 			var instance = this;
 
 			var options = instance.options;
@@ -678,7 +144,7 @@
 			return width;
 		},
 
-		_getSimpleSidenavType: function() {
+		_getSimpleSidenavType() {
 			var instance = this;
 
 			var options = instance.options;
@@ -696,11 +162,11 @@
 			return 'fixed';
 		},
 
-		_isDesktop: function() {
+		_isDesktop() {
 			return window.innerWidth >= this.options.breakpoint;
 		},
 
-		_isSidenavRight: function() {
+		_isSidenavRight() {
 			var instance = this;
 			var options = instance.options;
 
@@ -710,7 +176,7 @@
 			return isSidenavRight;
 		},
 
-		_isSimpleSidenavClosed: function() {
+		_isSimpleSidenavClosed() {
 			var instance = this;
 			var options = instance.options;
 
@@ -721,7 +187,7 @@
 			return !container.hasClass(openClass);
 		},
 
-		_loadUrl: function(sidenav, url, eventTarget) {
+		_loadUrl(sidenav, url, eventTarget) {
 			var instance = this;
 
 			var urlLoaded = sidenav.data('url-loaded');
@@ -757,12 +223,11 @@
 			return urlLoaded;
 		},
 
-		_onClickSidenavClose: function() {
+		_onClickSidenavClose() {
 			var instance = this;
 
 			var options = instance.options;
 
-			var container = $(options.container);
 			var containerSelector = options.container;
 
 			var closeButton = $(containerSelector)
@@ -790,17 +255,17 @@
 			instance.dataCloseButtonSelector = dataCloseButtonSelector;
 		},
 
-		_onClickTrigger: function() {
+		_onClickTrigger() {
 			var instance = this;
 
 			var el = instance.toggler;
 
-			el.on('click.lexicon.sidenav', function(event) {
+			el.on('click.lexicon.sidenav', function() {
 				instance.toggle();
 			});
 		},
 
-		_onDelegateClickTrigger: function() {
+		_onDelegateClickTrigger() {
 			var instance = this;
 
 			var toggler = instance.toggler;
@@ -826,7 +291,7 @@
 			instance.dataTogglerSelector = dataTogglerSelector;
 		},
 
-		_onScreenChange: function() {
+		_onScreenChange() {
 			var instance = this;
 			var options = instance.options;
 
@@ -835,7 +300,7 @@
 
 			var screenStartDesktop = instance._setScreenSize();
 
-			doc.on('screenChange.lexicon.sidenav', function(event) {
+			doc.on('screenChange.lexicon.sidenav', function() {
 				var desktop = instance._setScreenSize();
 				var sidenavRight = instance._isSidenavRight();
 				var type = desktop ? options.type : options.typeMobile;
@@ -843,7 +308,6 @@
 				var fixedMenu = type === 'fixed' || type === 'fixed-push';
 
 				var menu = container.find('.sidenav-menu').first();
-				var navigation = container.find(options.navigation).first();
 
 				var menuWidth;
 
@@ -907,7 +371,7 @@
 			});
 		},
 
-		_onSidenavTransitionEnd: function(el, fn) {
+		_onSidenavTransitionEnd(el, fn) {
 			var instance = this;
 
 			var transitionEnd = 'bsTransitionEnd';
@@ -923,13 +387,13 @@
 			if (!bootstrap.Util.supportsTransitionEnd()) {
 				complete.call(instance);
 			} else {
-				el.one(transitionEnd, function(event) {
+				el.one(transitionEnd, function() {
 					complete();
 				}).emulateTransitionEnd(SideNavigation.TRANSITION_DURATION);
 			}
 		},
 
-		_renderNav: function() {
+		_renderNav() {
 			var instance = this;
 			var options = instance.options;
 
@@ -957,7 +421,7 @@
 			container.removeClass('sidenav-js-fouc');
 		},
 
-		_renderUI: function() {
+		_renderUI() {
 			var instance = this;
 			var options = instance.options;
 
@@ -987,7 +451,7 @@
 			container.css('display', ''); // Force Reflow for IE11 Browser Bug
 		},
 
-		_setScreenSize: function() {
+		_setScreenSize() {
 			var instance = this;
 
 			var screenSize = getBreakpointRegion();
@@ -1001,6 +465,540 @@
 			instance.desktop = desktop;
 
 			return desktop;
+		},
+
+		clearStyle(attribute) {
+			var instance = this;
+
+			var options = instance.options;
+
+			var container = $(options.container);
+			var content = container.find(options.content).first();
+			var navigation = container.find(options.navigation).first();
+
+			var menu = container.find('.sidenav-menu').first();
+
+			var els = content.add(navigation).add(menu);
+
+			if (Array.isArray(attribute)) {
+				for (var i = 0; i < attribute.length; i++) {
+					els.css(attribute[i], '');
+				}
+			} else {
+				els.css(attribute, '');
+			}
+		},
+
+		destroy() {
+			var instance = this;
+
+			var options = instance.options;
+
+			var container = $(instance.options.container);
+
+			// Detach sidenav close
+
+			doc.off(
+				'click.close.lexicon.sidenav',
+				instance.closeButtonSelector
+			);
+			doc.data(instance.dataCloseButtonSelector, null);
+
+			// Detach toggler
+
+			if (options.useDelegate) {
+				doc.off('click.lexicon.sidenav', instance.togglerSelector);
+				doc.data(instance.dataTogglerSelector, null);
+			} else {
+				container.off('click.lexicon.sidenav');
+			}
+
+			// Remove Side Navigation
+
+			container.data('lexicon.sidenav', null);
+		},
+
+		hide() {
+			var instance = this;
+
+			if (instance.useDataAttribute) {
+				instance.hideSimpleSidenav();
+			} else {
+				instance.toggleNavigation(false);
+			}
+		},
+
+		hideSidenav() {
+			var instance = this;
+			var options = instance.options;
+
+			var container = $(options.container);
+			var content = container.find(options.content).first();
+			var navigation = container.find(options.navigation).first();
+			var menu = navigation.find('.sidenav-menu').first();
+
+			var sidenavRight = instance._isSidenavRight();
+
+			var positionDirection = options.rtl ? 'right' : 'left';
+
+			if (sidenavRight) {
+				positionDirection = options.rtl ? 'left' : 'right';
+			}
+
+			var paddingDirection = 'padding-' + positionDirection;
+
+			content.css(paddingDirection, '').css(positionDirection, '');
+
+			navigation.css('width', '');
+
+			if (sidenavRight) {
+				menu.css(positionDirection, instance._getSidenavWidth());
+			}
+		},
+
+		hideSimpleSidenav() {
+			var instance = this;
+
+			var options = instance.options;
+
+			var simpleSidenavClosed = instance._isSimpleSidenavClosed();
+
+			if (!simpleSidenavClosed) {
+				var content = $(options.content).first();
+				var sidenav = $(options.container);
+
+				var closedClass = options.closedClass;
+				var openClass = options.openClass;
+
+				var toggler = instance.toggler;
+
+				var target =
+					toggler.attr('href') || toggler.attr('data-target');
+
+				sidenav.trigger({
+					toggler: $(instance.togglerSelector),
+					type: 'closedStart.lexicon.sidenav'
+				});
+
+				instance._onSidenavTransitionEnd(content, function() {
+					sidenav.removeClass('sidenav-transition');
+					toggler.removeClass('sidenav-transition');
+
+					sidenav.trigger({
+						toggler: $(instance.togglerSelector),
+						type: 'closed.lexicon.sidenav'
+					});
+				});
+
+				if (content.hasClass(openClass)) {
+					content
+						.addClass('sidenav-transition')
+						.addClass(closedClass)
+						.removeClass(openClass);
+				}
+
+				sidenav.addClass('sidenav-transition');
+				toggler.addClass('sidenav-transition');
+
+				sidenav.addClass(closedClass).removeClass(openClass);
+
+				$('[data-target="' + target + '"]')
+					.removeClass(openClass)
+					.removeClass('active');
+				$('[href="' + target + '"]')
+					.removeClass(openClass)
+					.removeClass('active');
+			}
+		},
+
+		init(toggler, options) {
+			var instance = this;
+
+			var useDataAttribute = toggler.data('toggle') === 'sidenav';
+
+			options = $.extend({}, $.fn.sideNavigation.defaults, options);
+
+			options.breakpoint = toInt(options.breakpoint);
+			options.container =
+				options.container ||
+				toggler.data('target') ||
+				toggler.attr('href');
+			options.gutter = toInt(options.gutter);
+			options.heightType =
+				options.heightType ||
+				(options.equalHeight ? 'equalHeight' : false);
+			options.rtl = doc.attr('dir') === 'rtl';
+			options.width = toInt(options.width);
+			options.widthOriginal = options.width;
+
+			// instantiate using data attribute
+
+			if (useDataAttribute) {
+				options.closedClass = toggler.data('closed-class') || 'closed';
+				options.content = toggler.data('content');
+				options.equalHeight = false; // equalHeight option is deprecated
+				options.loadingIndicatorTPL =
+					toggler.data('loading-indicator-tpl') ||
+					options.loadingIndicatorTPL;
+				options.openClass = toggler.data('open-class') || 'open';
+				options.toggler = toggler;
+				options.type = toggler.data('type');
+				options.typeMobile = toggler.data('type-mobile');
+				options.url = toggler.data('url');
+				options.useDelegate = toggler.data('use-delegate');
+				options.width = '';
+
+				if (options.useDelegate === undefined) {
+					options.useDelegate = true;
+				}
+			}
+
+			instance.toggler = toggler;
+			instance.options = options;
+			instance.useDataAttribute = useDataAttribute;
+
+			instance._bindUI();
+			instance._renderUI();
+		},
+
+		setEqualHeight() {
+			var instance = this;
+
+			var options = instance.options;
+
+			var container = $(options.container);
+			var content = options.content;
+			var navigation = options.navigation;
+
+			var type = instance.mobile ? options.typeMobile : options.type;
+
+			if (type !== 'fixed' && type !== 'fixed-push') {
+				var contentNode = container.find(content).first();
+				var navNode = container.find(navigation).first();
+				var sideNavMenuNode = container.find('.sidenav-menu').first();
+
+				var tallest = Math.max(
+					contentNode.outerHeight(),
+					navNode.outerHeight()
+				);
+
+				contentNode.css('min-height', tallest);
+
+				navNode.css({
+					height: '100%',
+					'min-height': tallest
+				});
+
+				sideNavMenuNode.css({
+					height: '100%',
+					'min-height': tallest
+				});
+			}
+		},
+
+		setFullHeight() {
+			var instance = this;
+
+			var options = instance.options;
+
+			var container = $(options.container);
+			var navigation = options.navigation;
+
+			var type = instance.mobile ? options.typeMobile : options.type;
+
+			if (type === 'relative') {
+				var navNode = container.find(navigation).first();
+				var sidenavMenuNode = container.find('.sidenav-menu').first();
+
+				var minHeight = doc.innerHeight() - navNode.offset().top;
+
+				if (
+					sidenavMenuNode.innerHeight() + navNode.offset().top >
+					doc.innerHeight()
+				) {
+					minHeight = sidenavMenuNode.innerHeight();
+				}
+
+				navNode.css({
+					height: '100%',
+					'min-height': minHeight
+				});
+
+				sidenavMenuNode.css({
+					height: '100%',
+					'min-height': minHeight
+				});
+			}
+		},
+
+		setHeight() {
+			var instance = this;
+
+			var options = instance.options;
+
+			if (options.heightType === 'equalHeight') {
+				instance.setEqualHeight();
+			} else if (options.heightType === 'fullHeight') {
+				instance.setFullHeight();
+			}
+		},
+
+		show() {
+			var instance = this;
+
+			if (instance.useDataAttribute) {
+				instance.showSimpleSidenav();
+			} else {
+				instance.toggleNavigation(true);
+			}
+		},
+
+		showSidenav() {
+			var instance = this;
+			var mobile = instance.mobile;
+			var options = instance.options;
+
+			var container = $(options.container);
+			var content = container.find(options.content).first();
+			var navigation = container.find(options.navigation).first();
+			var menu = navigation.find('.sidenav-menu').first();
+
+			var sidenavRight = instance._isSidenavRight();
+			var width = instance._getSidenavWidth();
+
+			var offset = width + options.gutter;
+
+			var url = options.url;
+
+			if (url) {
+				container.one('urlLoaded.lexicon.sidenav', function() {
+					instance.setHeight();
+				});
+
+				instance._loadUrl(menu, url, container);
+			}
+
+			navigation.css('width', width);
+			menu.css('width', width);
+
+			var positionDirection = options.rtl ? 'right' : 'left';
+
+			if (sidenavRight) {
+				positionDirection = options.rtl ? 'left' : 'right';
+			}
+
+			var paddingDirection = 'padding-' + positionDirection;
+
+			var pushContentCssProperty = mobile
+				? positionDirection
+				: paddingDirection;
+			var type = mobile ? options.typeMobile : options.type;
+
+			if (type !== 'fixed') {
+				var navigationStartX = container.hasClass('open')
+					? navigation.offset().left - options.gutter
+					: navigation.offset().left - offset;
+
+				var contentStartX = content.offset().left;
+				var contentWidth = content.innerWidth();
+
+				var padding = '';
+
+				if (
+					(options.rtl && sidenavRight) ||
+					(!options.rtl && options.position === 'left')
+				) {
+					navigationStartX = navigation.offset().left + offset;
+
+					if (navigationStartX > contentStartX) {
+						padding = navigationStartX - contentStartX;
+					}
+				} else if (
+					(options.rtl && options.position === 'left') ||
+					(!options.rtl && sidenavRight)
+				) {
+					if (navigationStartX < contentStartX + contentWidth) {
+						padding =
+							contentStartX + contentWidth - navigationStartX;
+
+						if (padding >= offset) {
+							padding = offset;
+						}
+					}
+				}
+
+				content.css(pushContentCssProperty, padding);
+			}
+		},
+
+		showSimpleSidenav() {
+			var instance = this;
+
+			var options = instance.options;
+
+			var simpleSidenavClosed = instance._isSimpleSidenavClosed();
+
+			if (simpleSidenavClosed) {
+				var content = $(options.content).first();
+				var sidenav = $(options.container);
+
+				var closedClass = options.closedClass;
+				var openClass = options.openClass;
+
+				var toggler = options.toggler;
+
+				var url = toggler.data('url');
+
+				if (url) {
+					instance._loadUrl(sidenav, url);
+				}
+
+				sidenav.trigger({
+					toggler: $(instance.togglerSelector),
+					type: 'openStart.lexicon.sidenav'
+				});
+
+				instance._onSidenavTransitionEnd(content, function() {
+					sidenav.removeClass('sidenav-transition');
+					toggler.removeClass('sidenav-transition');
+
+					sidenav.trigger({
+						toggler: $(instance.togglerSelector),
+						type: 'open.lexicon.sidenav'
+					});
+				});
+
+				content
+					.addClass('sidenav-transition')
+					.addClass(openClass)
+					.removeClass(closedClass);
+				sidenav.addClass('sidenav-transition');
+				toggler.addClass('sidenav-transition');
+
+				sidenav.addClass(openClass).removeClass(closedClass);
+				toggler.addClass('active').addClass(openClass);
+			}
+		},
+
+		toggle() {
+			var instance = this;
+
+			if (instance.useDataAttribute) {
+				instance.toggleSimpleSidenav();
+			} else {
+				instance.toggleNavigation();
+			}
+		},
+
+		toggleNavigation(force) {
+			var instance = this;
+			var options = instance.options;
+
+			var container = $(options.container);
+			var menu = container.find('.sidenav-menu').first();
+			var toggler = instance.toggler;
+
+			var width = options.width;
+
+			var closed =
+				$.type(force) === 'boolean'
+					? force
+					: container.hasClass('closed');
+			var sidenavRight = instance._isSidenavRight();
+
+			var widthMethod = closed ? 'showSidenav' : 'hideSidenav';
+
+			if (closed) {
+				container.trigger({
+					toggler,
+					type: 'openStart.lexicon.sidenav'
+				});
+			} else {
+				container.trigger({
+					toggler,
+					type: 'closedStart.lexicon.sidenav'
+				});
+			}
+
+			instance._onSidenavTransitionEnd(container, function() {
+				var menu = container.find('.sidenav-menu').first();
+
+				if (container.hasClass('closed')) {
+					instance.clearStyle(['min-height', 'height']);
+
+					toggler
+						.removeClass('open')
+						.removeClass('sidenav-transition');
+
+					container.trigger({
+						toggler,
+						type: 'closed.lexicon.sidenav'
+					});
+				} else {
+					toggler.addClass('open').removeClass('sidenav-transition');
+
+					container.trigger({
+						toggler,
+						type: 'open.lexicon.sidenav'
+					});
+				}
+
+				if (instance.mobile) {
+					instance._focusElement(menu);
+				}
+			});
+
+			if (closed) {
+				instance.setHeight();
+
+				menu.css('width', width);
+
+				var positionDirection = options.rtl ? 'left' : 'right';
+
+				if (sidenavRight) {
+					menu.css(positionDirection, '');
+				}
+			}
+
+			container.addClass('sidenav-transition');
+			toggler.addClass('sidenav-transition');
+
+			instance[widthMethod](container);
+
+			container
+				.toggleClass('closed', !closed)
+				.toggleClass('open', closed);
+			toggler.toggleClass('active', closed).toggleClass('open', closed);
+		},
+
+		toggleSimpleSidenav() {
+			var instance = this;
+
+			var simpleSidenavClosed = instance._isSimpleSidenavClosed();
+
+			if (simpleSidenavClosed) {
+				instance.showSimpleSidenav();
+			} else {
+				instance.hideSimpleSidenav();
+			}
+		},
+
+		visible() {
+			var instance = this;
+
+			var closed;
+
+			if (instance.useDataAttribute) {
+				closed = instance._isSimpleSidenavClosed();
+			} else {
+				var container = $(instance.options.container);
+
+				closed = container.hasClass('sidenav-transition')
+					? !container.hasClass('closed')
+					: container.hasClass('closed');
+			}
+
+			return !closed;
 		}
 	};
 

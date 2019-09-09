@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WeDeployAuthTokenPersistence
 	extends BasePersistence<WeDeployAuthToken> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link WeDeployAuthTokenUtil} to access the we deploy auth token persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

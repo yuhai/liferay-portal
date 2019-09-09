@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MDRRuleGroupInstance
 	extends MDRRuleGroupInstanceModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.mobile.device.rules.model.impl.MDRRuleGroupInstanceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

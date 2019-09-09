@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetAutoTaggerEntryModel
 	extends BaseModel<AssetAutoTaggerEntry>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset auto tagger entry model instance should use the {@link AssetAutoTaggerEntry} interface instead.

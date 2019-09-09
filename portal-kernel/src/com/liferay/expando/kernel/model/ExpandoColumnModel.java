@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ExpandoColumnModel
 	extends BaseModel<ExpandoColumn>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a expando column model instance should use the {@link ExpandoColumn} interface instead.

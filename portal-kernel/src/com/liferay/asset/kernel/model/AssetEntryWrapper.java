@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetEntry}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetEntry
  * @generated
  */
-@ProviderType
 public class AssetEntryWrapper
 	extends BaseModelWrapper<AssetEntry>
 	implements AssetEntry, ModelWrapper<AssetEntry> {
@@ -799,6 +796,11 @@ public class AssetEntryWrapper
 		return model.isVisible();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset entry model instance should use the <code>AssetEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link OAuth2Authorization}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OAuth2Authorization
  * @generated
  */
-@ProviderType
 public class OAuth2AuthorizationWrapper
 	extends BaseModelWrapper<OAuth2Authorization>
 	implements OAuth2Authorization, ModelWrapper<OAuth2Authorization> {
@@ -375,6 +372,11 @@ public class OAuth2AuthorizationWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a o auth2 authorization model instance should use the <code>OAuth2Authorization</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

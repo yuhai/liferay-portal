@@ -67,9 +67,132 @@
 	};
 
 	Parser.prototype = {
+		_handleData(token, data) {
+			var instance = this;
+
+			var length = data.length;
+
+			var lastIndex = length;
+
+			if (token) {
+				lastIndex = instance._lexer.getLastIndex();
+
+				length = lastIndex;
+
+				var tokenItem = token[1] || token[3];
+
+				if (instance._isValidTag(tokenItem)) {
+					length = token.index;
+				}
+			}
+
+			if (length > instance._dataPointer) {
+				instance._result.push({
+					type: Parser.TOKEN_DATA,
+					value: data.substring(instance._dataPointer, length)
+				});
+			}
+
+			instance._dataPointer = lastIndex;
+		},
+
+		_handleTagEnd(token) {
+			var instance = this;
+
+			var pos = 0;
+
+			var stack = instance._stack;
+
+			var tagName;
+
+			if (token) {
+				if (isString(token)) {
+					tagName = token;
+				} else {
+					tagName = token[3];
+				}
+
+				tagName = tagName.toLowerCase();
+
+				for (pos = stack.length - 1; pos >= 0; pos--) {
+					if (stack[pos] == tagName) {
+						break;
+					}
+				}
+			}
+
+			if (pos >= 0) {
+				var tokenTagEnd = Parser.TOKEN_TAG_END;
+
+				for (var i = stack.length - 1; i >= pos; i--) {
+					instance._result.push({
+						type: tokenTagEnd,
+						value: stack[i]
+					});
+				}
+
+				stack.length = pos;
+			}
+		},
+
+		_handleTagStart(token) {
+			var instance = this;
+
+			var tagName = token[1].toLowerCase();
+
+			if (instance._isValidTag(tagName)) {
+				var stack = instance._stack;
+
+				if (hasOwnProperty.call(ELEMENTS_BLOCK, tagName)) {
+					var lastTag;
+
+					while (
+						(lastTag = stack.last()) &&
+						hasOwnProperty.call(ELEMENTS_INLINE, lastTag)
+					) {
+						instance._handleTagEnd(lastTag);
+					}
+				}
+
+				if (
+					hasOwnProperty.call(ELEMENTS_CLOSE_SELF, tagName) &&
+					stack.last() == tagName
+				) {
+					instance._handleTagEnd(tagName);
+				}
+
+				stack.push(tagName);
+
+				instance._result.push({
+					attribute: token[2],
+					type: Parser.TOKEN_TAG_START,
+					value: tagName
+				});
+			}
+		},
+
+		_isValidTag(tagName) {
+			var valid = false;
+
+			if (tagName && tagName.length) {
+				valid = REGEX_TAG_NAME.test(tagName);
+			}
+
+			return valid;
+		},
+
+		_reset() {
+			var instance = this;
+
+			instance._stack.length = 0;
+			instance._result.length = 0;
+
+			instance._dataPointer = 0;
+		},
+
 		constructor: Parser,
 
-		init: function() {
+		init() {
 			var instance = this;
 
 			var stack = [];
@@ -89,7 +212,7 @@
 			instance._dataPointer = 0;
 		},
 
-		parse: function(data) {
+		parse(data) {
 			var instance = this;
 
 			var lexer = new Liferay.BBCodeLexer(data);
@@ -132,129 +255,6 @@
 			instance._reset();
 
 			return result;
-		},
-
-		_handleData: function(token, data) {
-			var instance = this;
-
-			var length = data.length;
-
-			var lastIndex = length;
-
-			if (token) {
-				lastIndex = instance._lexer.getLastIndex();
-
-				length = lastIndex;
-
-				var tokenItem = token[1] || token[3];
-
-				if (instance._isValidTag(tokenItem)) {
-					length = token.index;
-				}
-			}
-
-			if (length > instance._dataPointer) {
-				instance._result.push({
-					type: Parser.TOKEN_DATA,
-					value: data.substring(instance._dataPointer, length)
-				});
-			}
-
-			instance._dataPointer = lastIndex;
-		},
-
-		_handleTagEnd: function(token) {
-			var instance = this;
-
-			var pos = 0;
-
-			var stack = instance._stack;
-
-			var tagName;
-
-			if (token) {
-				if (isString(token)) {
-					tagName = token;
-				} else {
-					tagName = token[3];
-				}
-
-				tagName = tagName.toLowerCase();
-
-				for (pos = stack.length - 1; pos >= 0; pos--) {
-					if (stack[pos] == tagName) {
-						break;
-					}
-				}
-			}
-
-			if (pos >= 0) {
-				var tokenTagEnd = Parser.TOKEN_TAG_END;
-
-				for (var i = stack.length - 1; i >= pos; i--) {
-					instance._result.push({
-						type: tokenTagEnd,
-						value: stack[i]
-					});
-				}
-
-				stack.length = pos;
-			}
-		},
-
-		_handleTagStart: function(token) {
-			var instance = this;
-
-			var tagName = token[1].toLowerCase();
-
-			if (instance._isValidTag(tagName)) {
-				var stack = instance._stack;
-
-				if (hasOwnProperty.call(ELEMENTS_BLOCK, tagName)) {
-					var lastTag;
-
-					while (
-						(lastTag = stack.last()) &&
-						hasOwnProperty.call(ELEMENTS_INLINE, lastTag)
-					) {
-						instance._handleTagEnd(lastTag);
-					}
-				}
-
-				if (
-					hasOwnProperty.call(ELEMENTS_CLOSE_SELF, tagName) &&
-					stack.last() == tagName
-				) {
-					instance._handleTagEnd(tagName);
-				}
-
-				stack.push(tagName);
-
-				instance._result.push({
-					attribute: token[2],
-					type: Parser.TOKEN_TAG_START,
-					value: tagName
-				});
-			}
-		},
-
-		_isValidTag: function(tagName) {
-			var valid = false;
-
-			if (tagName && tagName.length) {
-				valid = REGEX_TAG_NAME.test(tagName);
-			}
-
-			return valid;
-		},
-
-		_reset: function() {
-			var instance = this;
-
-			instance._stack.length = 0;
-			instance._result.length = 0;
-
-			instance._dataPointer = 0;
 		}
 	};
 

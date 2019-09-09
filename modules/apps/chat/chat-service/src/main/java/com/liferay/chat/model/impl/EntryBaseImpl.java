@@ -17,8 +17,6 @@ package com.liferay.chat.model.impl;
 import com.liferay.chat.model.Entry;
 import com.liferay.chat.service.EntryLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the Entry service. Represents a row in the &quot;Chat_Entry&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,10 +29,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Entry
  * @generated
  */
-@ProviderType
 public abstract class EntryBaseImpl extends EntryModelImpl implements Entry {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a entry model instance should use the <code>Entry</code> interface instead.

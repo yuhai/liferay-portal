@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PasswordPolicyRelPersistence
 	extends BasePersistence<PasswordPolicyRel> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PasswordPolicyRelUtil} to access the password policy rel persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

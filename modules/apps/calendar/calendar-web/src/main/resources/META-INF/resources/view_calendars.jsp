@@ -121,7 +121,7 @@ portletURL.setParameter("calendarResourceId", String.valueOf(calendarResource.ge
 	</aui:form>
 </div>
 
-<aui:script>
+<aui:script use="io-upload-iframe">
 	var <portlet:namespace />importDialog;
 
 	Liferay.provide(
@@ -138,45 +138,39 @@ portletURL.setParameter("calendarResourceId", String.valueOf(calendarResource.ge
 						label: '<liferay-ui:message key="import" />',
 						on: {
 							click: function() {
-								A.io.request(
-									url,
-									{
-										dataType: 'JSON',
-										form: {
-											id: '<portlet:namespace />importFm',
-											upload: true
-										},
-										method: 'POST',
-										on: {
-											complete: function(event, id, xhr) {
-												var responseData = {};
+								var form = document.getElementById('<portlet:namespace />importFm');
 
-												try {
-													responseData = A.JSON.parse(xhr.responseText);
-												}
-												catch (e) {
-												}
+								Liferay.Util.fetch(url, {
+									body: new FormData(form),
+									method: 'POST'
+								}).then(function(response) {
+										return response.text();
+								}).then(function(data) {
+										var responseData = {};
 
-												var portletErrorMessage = A.one('#<portlet:namespace />portletErrorMessage');
-
-												var portletSuccessMessage = A.one('#<portlet:namespace />portletSuccessMessage');
-
-												var error = responseData && responseData.error;
-
-												if (error) {
-													portletErrorMessage.show();
-													portletSuccessMessage.hide();
-
-													portletErrorMessage.html(error);
-												}
-												else {
-													portletErrorMessage.hide();
-													portletSuccessMessage.show();
-												}
-											}
+										try {
+											responseData = JSON.parse(data);
 										}
-									}
-								);
+										catch (e) {
+										}
+
+										var portletErrorMessage = A.one('#<portlet:namespace />portletErrorMessage');
+
+										var portletSuccessMessage = A.one('#<portlet:namespace />portletSuccessMessage');
+
+										var error = responseData && responseData.error;
+
+										if (error) {
+											portletErrorMessage.show();
+											portletSuccessMessage.hide();
+
+											portletErrorMessage.html(error);
+										}
+										else {
+											portletErrorMessage.hide();
+											portletSuccessMessage.show();
+										}
+								});
 							}
 						}
 					}

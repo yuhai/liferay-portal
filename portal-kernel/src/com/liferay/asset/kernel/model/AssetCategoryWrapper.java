@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetCategory}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetCategory
  * @generated
  */
-@ProviderType
 public class AssetCategoryWrapper
 	extends BaseModelWrapper<AssetCategory>
 	implements AssetCategory, ModelWrapper<AssetCategory> {
@@ -536,6 +533,11 @@ public class AssetCategoryWrapper
 		return model.isRootCategory();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset category model instance should use the <code>AssetCategory</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

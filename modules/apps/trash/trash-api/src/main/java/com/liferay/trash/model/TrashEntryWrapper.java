@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link TrashEntry}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see TrashEntry
  * @generated
  */
-@ProviderType
 public class TrashEntryWrapper
 	extends BaseModelWrapper<TrashEntry>
 	implements TrashEntry, ModelWrapper<TrashEntry> {
@@ -301,6 +298,11 @@ public class TrashEntryWrapper
 		return model.isTrashEntry(className, classPK);
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a trash entry model instance should use the <code>TrashEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

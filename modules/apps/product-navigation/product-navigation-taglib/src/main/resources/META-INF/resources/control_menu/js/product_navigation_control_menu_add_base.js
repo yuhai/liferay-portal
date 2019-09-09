@@ -77,39 +77,121 @@ AUI.add(
 			NAME: 'addbase',
 
 			prototype: {
-				initializer: function(config) {
+				_bindUIDABase() {
 					var instance = this;
 
-					instance._focusItem = instance.get('focusItem');
-					instance._panelBody = instance.get('panelBody');
+					var panelBody = $(Util.getDOM(instance._panelBody));
 
-					var focusItem = instance._focusItem;
+					var listGroupPanel = panelBody.find('.list-group-panel');
 
-					if (focusItem && instance._isSelected()) {
-						focusItem.focus();
-					}
+					var eventType =
+						EVENT_SHOWN_BS_COLLAPSE + STR_DOT + instance._guid;
 
-					instance._guid = A.stamp(instance);
-
-					instance._eventHandles = [];
-					instance._jqueryEventHandles = [];
-
-					instance._bindUIDABase();
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-
-					A.Array.invoke(
-						instance._jqueryEventHandles,
-						'off',
-						STR_DOT + instance._guid
+					instance._jqueryEventHandles.push(
+						panelBody.on(
+							eventType,
+							$.proxy(instance._focusOnItem, instance)
+						),
+						listGroupPanel.on(eventType, function(event) {
+							event.stopPropagation();
+						})
 					);
 				},
 
-				addPortlet: function(portlet, options) {
+				_disablePortletEntry(portletId) {
+					var instance = this;
+
+					instance._eachPortletEntry(portletId, function(item) {
+						item.addClass(CSS_LFR_PORTLET_USED);
+					});
+				},
+
+				_eachPortletEntry(portletId, callback) {
+					var portlets = A.all('[data-portlet-id=' + portletId + ']');
+
+					portlets.each(callback);
+				},
+
+				_enablePortletEntry(portletId) {
+					var instance = this;
+
+					instance._eachPortletEntry(portletId, function(item) {
+						item.removeClass(CSS_LFR_PORTLET_USED);
+					});
+				},
+
+				_focusOnItem() {
+					var instance = this;
+
+					var focusItem = instance._focusItem;
+
+					if (focusItem) {
+						focusItem.focus();
+					}
+				},
+
+				_getPortletMetaData(portlet) {
+					var portletMetaData = portlet._LFR_portletMetaData;
+
+					if (!portletMetaData) {
+						var className = portlet.attr(DATA_CLASS_NAME);
+						var classPK = portlet.attr(DATA_CLASS_PK);
+
+						var instanceable =
+							portlet.attr('data-instanceable') == 'true';
+						var plid = portlet.attr('data-plid');
+
+						var portletData = STR_EMPTY;
+
+						if (className != STR_EMPTY && classPK != STR_EMPTY) {
+							portletData = classPK + ',' + className;
+						}
+
+						var portletId = portlet.attr(DATA_PORTLET_ID);
+						var portletItemId = portlet.attr(
+							'data-portlet-item-id'
+						);
+						var portletUsed = portlet.hasClass(
+							CSS_LFR_PORTLET_USED
+						);
+
+						portletMetaData = {
+							instanceable,
+							plid,
+							portletData,
+							portletId,
+							portletItemId,
+							portletUsed
+						};
+
+						portlet._LFR_portletMetaData = portletMetaData;
+					}
+
+					return portletMetaData;
+				},
+
+				_isSelected() {
+					var instance = this;
+
+					return instance._panelBody.hasClass('in');
+				},
+
+				_portletFeedback() {
+					new Liferay.Notification({
+						closeable: true,
+						delay: {
+							hide: 5000,
+							show: 0
+						},
+						duration: 500,
+						message: Liferay.Language.get(
+							'the-application-was-added-to-the-page'
+						),
+						type: 'success'
+					}).render('body');
+				},
+
+				addPortlet(portlet, options) {
 					var instance = this;
 
 					var portletMetaData = instance._getPortletMetaData(portlet);
@@ -159,140 +241,46 @@ AUI.add(
 						}
 
 						Portlet.add({
-							beforePortletLoaded: beforePortletLoaded,
-							placeHolder: placeHolder,
+							beforePortletLoaded,
+							placeHolder,
 							plid: portletMetaData.plid,
 							portletData: portletMetaData.portletData,
-							portletId: portletId,
+							portletId,
 							portletItemId: portletMetaData.portletItemId
 						});
 					}
 				},
 
-				_bindUIDABase: function() {
+				destructor() {
 					var instance = this;
 
-					var panelBody = $(Util.getDOM(instance._panelBody));
+					new A.EventHandle(instance._eventHandles).detach();
 
-					var listGroupPanel = panelBody.find('.list-group-panel');
-
-					var eventType =
-						EVENT_SHOWN_BS_COLLAPSE + STR_DOT + instance._guid;
-
-					instance._jqueryEventHandles.push(
-						panelBody.on(
-							eventType,
-							$.proxy(instance._focusOnItem, instance)
-						),
-						listGroupPanel.on(eventType, function(event) {
-							event.stopPropagation();
-						})
+					A.Array.invoke(
+						instance._jqueryEventHandles,
+						'off',
+						STR_DOT + instance._guid
 					);
 				},
 
-				_disablePortletEntry: function(portletId) {
+				initializer() {
 					var instance = this;
 
-					instance._eachPortletEntry(portletId, function(
-						item,
-						index
-					) {
-						item.addClass(CSS_LFR_PORTLET_USED);
-					});
-				},
-
-				_eachPortletEntry: function(portletId, callback) {
-					var instance = this;
-
-					var portlets = A.all('[data-portlet-id=' + portletId + ']');
-
-					portlets.each(callback);
-				},
-
-				_enablePortletEntry: function(portletId) {
-					var instance = this;
-
-					instance._eachPortletEntry(portletId, function(
-						item,
-						index
-					) {
-						item.removeClass(CSS_LFR_PORTLET_USED);
-					});
-				},
-
-				_focusOnItem: function(event) {
-					var instance = this;
+					instance._focusItem = instance.get('focusItem');
+					instance._panelBody = instance.get('panelBody');
 
 					var focusItem = instance._focusItem;
 
-					if (focusItem) {
+					if (focusItem && instance._isSelected()) {
 						focusItem.focus();
 					}
-				},
 
-				_getPortletMetaData: function(portlet) {
-					var instance = this;
+					instance._guid = A.stamp(instance);
 
-					var portletMetaData = portlet._LFR_portletMetaData;
+					instance._eventHandles = [];
+					instance._jqueryEventHandles = [];
 
-					if (!portletMetaData) {
-						var className = portlet.attr(DATA_CLASS_NAME);
-						var classPK = portlet.attr(DATA_CLASS_PK);
-
-						var instanceable =
-							portlet.attr('data-instanceable') == 'true';
-						var plid = portlet.attr('data-plid');
-
-						var portletData = STR_EMPTY;
-
-						if (className != STR_EMPTY && classPK != STR_EMPTY) {
-							portletData = classPK + ',' + className;
-						}
-
-						var portletId = portlet.attr(DATA_PORTLET_ID);
-						var portletItemId = portlet.attr(
-							'data-portlet-item-id'
-						);
-						var portletUsed = portlet.hasClass(
-							CSS_LFR_PORTLET_USED
-						);
-
-						portletMetaData = {
-							instanceable: instanceable,
-							plid: plid,
-							portletData: portletData,
-							portletId: portletId,
-							portletItemId: portletItemId,
-							portletUsed: portletUsed
-						};
-
-						portlet._LFR_portletMetaData = portletMetaData;
-					}
-
-					return portletMetaData;
-				},
-
-				_isSelected: function() {
-					var instance = this;
-
-					return instance._panelBody.hasClass('in');
-				},
-
-				_portletFeedback: function(portletId, portlet) {
-					var instance = this;
-
-					new Liferay.Notification({
-						closeable: true,
-						delay: {
-							hide: 5000,
-							show: 0
-						},
-						duration: 500,
-						message: Liferay.Language.get(
-							'the-application-was-added-to-the-page'
-						),
-						type: 'success'
-					}).render('body');
+					instance._bindUIDABase();
 				}
 			}
 		});
@@ -313,20 +301,7 @@ AUI.add(
 			NAME: 'PortletItem',
 
 			prototype: {
-				PROXY_TITLE: PROXY_NODE_ITEM.one('.portlet-title'),
-
-				bindUI: function() {
-					var instance = this;
-
-					PortletItem.superclass.bindUI.apply(this, arguments);
-
-					instance.on(
-						'placeholderAlign',
-						instance._onPlaceholderAlign
-					);
-				},
-
-				_getAppendNode: function() {
+				_getAppendNode() {
 					var instance = this;
 
 					instance.appendNode = DDM.activeDrag.get(STR_NODE).clone();
@@ -334,7 +309,7 @@ AUI.add(
 					return instance.appendNode;
 				},
 
-				_onDragStart: function() {
+				_onDragStart() {
 					var instance = this;
 
 					PortletItem.superclass._onDragStart.apply(this, arguments);
@@ -344,9 +319,7 @@ AUI.add(
 					instance.lazyEvents = false;
 				},
 
-				_onPlaceholderAlign: function(event) {
-					var instance = this;
-
+				_onPlaceholderAlign(event) {
 					var drop = event.drop;
 					var portletItem = event.currentTarget;
 
@@ -361,9 +334,7 @@ AUI.add(
 					}
 				},
 
-				_positionNode: function(event) {
-					var instance = this;
-
+				_positionNode(event) {
 					var portalLayout = event.currentTarget;
 
 					var activeDrop =
@@ -404,13 +375,26 @@ AUI.add(
 					}
 				},
 
-				_syncProxyTitle: function() {
+				_syncProxyTitle() {
 					var instance = this;
 
 					var node = DDM.activeDrag.get(STR_NODE);
 					var title = node.attr('data-title');
 
 					instance.PROXY_TITLE.html(title);
+				},
+
+				PROXY_TITLE: PROXY_NODE_ITEM.one('.portlet-title'),
+
+				bindUI() {
+					var instance = this;
+
+					PortletItem.superclass.bindUI.apply(this, arguments);
+
+					instance.on(
+						'placeholderAlign',
+						instance._onPlaceholderAlign
+					);
 				}
 			}
 		});

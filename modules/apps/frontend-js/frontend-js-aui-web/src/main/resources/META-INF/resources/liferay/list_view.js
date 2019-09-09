@@ -94,66 +94,10 @@ AUI.add(
 				}
 			},
 
-			NAME: NAME,
+			NAME,
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._transitionCompleteProxy = A.fn(
-						instance.fire,
-						instance,
-						'transitionComplete'
-					);
-				},
-
-				renderUI: function() {
-					var instance = this;
-
-					var boundingBox = instance.get('boundingBox');
-
-					var dataContainer = A.Node.create(TPL_DATA_CONTAINER);
-
-					boundingBox.append(dataContainer);
-
-					instance._dataContainer = dataContainer;
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					var contentBox = instance.get(CONTENT_BOX);
-
-					var itemChosenEvent = instance.get('itemChosenEvent');
-					var itemSelector = instance.get('itemSelector');
-
-					instance._itemChosenHandle = contentBox.delegate(
-						itemChosenEvent,
-						instance._onItemChosen,
-						itemSelector,
-						instance
-					);
-
-					instance.after('dataChange', instance._afterDataChange);
-
-					instance.publish('transitionComplete', {
-						defaultFn: instance._defTransitionCompletedFn
-					});
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					if (instance._itemChosenHandle) {
-						instance._itemChosenHandle.detach();
-					}
-
-					if (instance._dataContainer) {
-						instance._dataContainer.destroy(true);
-					}
-				},
-
-				_afterDataChange: function(event) {
+				_afterDataChange(event) {
 					var instance = this;
 
 					var useTransition = instance.get('useTransition');
@@ -177,7 +121,7 @@ AUI.add(
 					}
 				},
 
-				_defTransitionCompletedFn: function(event) {
+				_defTransitionCompletedFn() {
 					var instance = this;
 
 					var dataContainer = instance._dataContainer;
@@ -190,7 +134,7 @@ AUI.add(
 					dataContainer.empty();
 				},
 
-				_moveContainer: function() {
+				_moveContainer() {
 					var instance = this;
 
 					var contentBox = instance.get(CONTENT_BOX);
@@ -211,7 +155,7 @@ AUI.add(
 					);
 				},
 
-				_onItemChosen: function(event) {
+				_onItemChosen(event) {
 					var instance = this;
 
 					event.preventDefault();
@@ -221,7 +165,7 @@ AUI.add(
 					});
 				},
 
-				_setData: function(value) {
+				_setData(value) {
 					if (isString(value)) {
 						value = A.Node.create(value);
 					}
@@ -229,7 +173,7 @@ AUI.add(
 					return value;
 				},
 
-				_setDataContainerPosition: function(targetRegion) {
+				_setDataContainerPosition(targetRegion) {
 					var instance = this;
 
 					targetRegion =
@@ -258,17 +202,73 @@ AUI.add(
 					dataContainer.setStyles(styles);
 				},
 
-				_validateData: function(value) {
+				_validateData(value) {
 					return isString(value) || A.instanceOf(value, A.Node);
 				},
 
-				_validateDirection: function(value) {
+				_validateDirection(value) {
 					return (
 						value === STR_BOTTOM ||
 						value === STR_LEFT ||
 						value === STR_RIGHT ||
 						value === STR_TOP
 					);
+				},
+
+				bindUI() {
+					var instance = this;
+
+					var contentBox = instance.get(CONTENT_BOX);
+
+					var itemChosenEvent = instance.get('itemChosenEvent');
+					var itemSelector = instance.get('itemSelector');
+
+					instance._itemChosenHandle = contentBox.delegate(
+						itemChosenEvent,
+						instance._onItemChosen,
+						itemSelector,
+						instance
+					);
+
+					instance.after('dataChange', instance._afterDataChange);
+
+					instance.publish('transitionComplete', {
+						defaultFn: instance._defTransitionCompletedFn
+					});
+				},
+
+				destructor() {
+					var instance = this;
+
+					if (instance._itemChosenHandle) {
+						instance._itemChosenHandle.detach();
+					}
+
+					if (instance._dataContainer) {
+						instance._dataContainer.destroy(true);
+					}
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._transitionCompleteProxy = A.fn(
+						instance.fire,
+						instance,
+						'transitionComplete'
+					);
+				},
+
+				renderUI() {
+					var instance = this;
+
+					var boundingBox = instance.get('boundingBox');
+
+					var dataContainer = A.Node.create(TPL_DATA_CONTAINER);
+
+					boundingBox.append(dataContainer);
+
+					instance._dataContainer = dataContainer;
 				}
 			}
 		});

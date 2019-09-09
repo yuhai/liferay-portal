@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link PushNotificationsDevice}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PushNotificationsDevice
  * @generated
  */
-@ProviderType
 public class PushNotificationsDeviceWrapper
 	extends BaseModelWrapper<PushNotificationsDevice>
 	implements PushNotificationsDevice, ModelWrapper<PushNotificationsDevice> {
@@ -178,6 +175,11 @@ public class PushNotificationsDeviceWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a push notifications device model instance should use the <code>PushNotificationsDevice</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

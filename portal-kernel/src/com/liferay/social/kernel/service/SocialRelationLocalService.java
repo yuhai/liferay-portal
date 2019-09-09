@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialRelationLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SocialRelationLocalServiceUtil} to access the social relation local service. Add custom service methods to <code>com.liferay.portlet.social.service.impl.SocialRelationLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

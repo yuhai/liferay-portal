@@ -17,8 +17,6 @@ package com.liferay.portal.lock.model.impl;
 import com.liferay.portal.lock.model.Lock;
 import com.liferay.portal.lock.service.LockLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the Lock service. Represents a row in the &quot;Lock_&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,10 +29,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Lock
  * @generated
  */
-@ProviderType
 public abstract class LockBaseImpl extends LockModelImpl implements Lock {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a lock model instance should use the <code>Lock</code> interface instead.

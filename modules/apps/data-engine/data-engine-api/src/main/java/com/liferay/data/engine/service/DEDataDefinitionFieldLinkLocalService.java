@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataDefinitionFieldLinkLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DEDataDefinitionFieldLinkLocalServiceUtil} to access the de data definition field link local service. Add custom service methods to <code>com.liferay.data.engine.service.impl.DEDataDefinitionFieldLinkLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

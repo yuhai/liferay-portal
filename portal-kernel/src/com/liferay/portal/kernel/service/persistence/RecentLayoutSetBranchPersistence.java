@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface RecentLayoutSetBranchPersistence
 	extends BasePersistence<RecentLayoutSetBranch> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link RecentLayoutSetBranchUtil} to access the recent layout set branch persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -17,8 +17,6 @@ package com.liferay.data.engine.model.impl;
 import com.liferay.data.engine.model.DEDataListView;
 import com.liferay.data.engine.service.DEDataListViewLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the DEDataListView service. Represents a row in the &quot;DEDataListView&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,11 +29,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DEDataListView
  * @generated
  */
-@ProviderType
 public abstract class DEDataListViewBaseImpl
 	extends DEDataListViewModelImpl implements DEDataListView {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a de data list view model instance should use the <code>DEDataListView</code> interface instead.

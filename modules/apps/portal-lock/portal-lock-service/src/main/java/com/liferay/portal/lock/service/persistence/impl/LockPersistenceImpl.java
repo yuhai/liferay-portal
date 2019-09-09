@@ -57,7 +57,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -74,11 +73,10 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = LockPersistence.class)
-@ProviderType
 public class LockPersistenceImpl
 	extends BasePersistenceImpl<Lock> implements LockPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>LockUtil</code> to access the lock persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

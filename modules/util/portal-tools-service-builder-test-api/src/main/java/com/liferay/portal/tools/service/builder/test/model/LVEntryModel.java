@@ -45,7 +45,7 @@ public interface LVEntryModel
 	extends BaseModel<LVEntry>, MVCCModel, ShardedModel,
 			VersionedModel<LVEntryVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a lv entry model instance should use the {@link LVEntry} interface instead.

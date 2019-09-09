@@ -48,7 +48,7 @@ public abstract class PluginSettingServiceBaseImpl
 	extends BaseServiceImpl
 	implements PluginSettingService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PluginSettingService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.PluginSettingServiceUtil</code>.

@@ -12,15 +12,75 @@
  * details.
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import ClayIcon from '@clayui/icon';
 import ClaySticker from '@clayui/sticker';
+import {useDrag} from 'react-dnd';
+import classnames from 'classnames';
+import {getEmptyImage} from 'react-dnd-html5-backend';
+import FieldTypeDragPreview from './FieldTypeDragPreview.es';
 
-export default ({description, icon, label, name}) => {
+const ICONS = {
+	checkbox_multiple: 'select-from-list',
+	document_library: 'upload',
+	numeric: 'caret-double',
+	radio: 'radio-button',
+	select: 'list'
+};
+
+export default props => {
+	const {
+		description,
+		disabled,
+		icon,
+		label,
+		name,
+		onAddColumn = () => {}
+	} = props;
+
+	const [{dragging}, drag, preview] = useDrag({
+		canDrag: _ => !disabled,
+		collect: monitor => ({
+			dragging: monitor.isDragging()
+		}),
+		item: {
+			...props,
+			preview: () => <FieldTypeDragPreview {...props} />,
+			type: 'fieldType'
+		}
+	});
+
+	useEffect(() => {
+		preview(getEmptyImage(), {captureDraggingState: true});
+	}, [preview]);
+
+	const handleOnAddColumn = label => {
+		if (disabled) {
+			return;
+		}
+
+		onAddColumn(label);
+	};
+
+	const fieldIcon = ICONS[icon] ? ICONS[icon] : icon;
+
 	return (
 		<div
-			className="autofit-row autofit-row-center field-type p-0 pt-3 pb-3"
+			className={classnames(
+				'autofit-row',
+				'autofit-row-center',
+				'field-type',
+				'p-0',
+				'pb-3',
+				'pt-3',
+				{
+					disabled,
+					dragging
+				}
+			)}
 			data-field-type-name={name}
+			onDoubleClick={() => handleOnAddColumn(label)}
+			ref={drag}
 		>
 			<div className="autofit-col pl-2 pr-2">
 				<ClayIcon symbol="drag" />
@@ -31,7 +91,7 @@ export default ({description, icon, label, name}) => {
 					displayType="light"
 					size="md"
 				>
-					<ClayIcon symbol={icon} />
+					<ClayIcon symbol={fieldIcon} />
 				</ClaySticker>
 			</div>
 			<div className="autofit-col autofit-col-expand pr-2">

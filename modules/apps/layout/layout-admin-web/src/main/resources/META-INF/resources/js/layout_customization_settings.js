@@ -29,42 +29,7 @@ AUI.add(
 			NAME: 'layoutcustomizationsettings',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._controls = instance.byId(
-						'layoutCustomizableControls'
-					);
-					instance._manageCustomization = instance.byId(
-						'manageCustomization'
-					);
-
-					instance._bindUI();
-				},
-
-				destroy: function(event) {
-					var instance = this;
-
-					var columns = A.all('.portlet-column');
-
-					columns.each(function(item, index) {
-						var overlayMask = item.getData('customizationControls');
-
-						if (overlayMask) {
-							overlayMask.destroy();
-						}
-					});
-
-					var customizationsHandle = instance._customizationsHandle;
-
-					if (customizationsHandle) {
-						customizationsHandle.detach();
-
-						instance._customizationsHandle = null;
-					}
-				},
-
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					var manageCustomization = instance._manageCustomization;
@@ -82,8 +47,8 @@ AUI.add(
 						var columns = A.all('.portlet-column');
 
 						Liferay.publish('updatedLayout', {
-							defaultFn: function(event) {
-								columns.each(function(item, index) {
+							defaultFn() {
+								columns.each(function(item) {
 									var overlayMask = item.getData(
 										'customizationControls'
 									);
@@ -100,7 +65,7 @@ AUI.add(
 					}
 				},
 
-				_createCustomizationMask: function(column) {
+				_createCustomizationMask(column) {
 					var instance = this;
 
 					var columnId = column.attr('id');
@@ -116,7 +81,7 @@ AUI.add(
 					var cssClass = 'customizable-layout-column';
 
 					var overlayMask = new A.OverlayMask({
-						cssClass: cssClass,
+						cssClass,
 						target: column,
 						zIndex: 10
 					}).render();
@@ -173,9 +138,7 @@ AUI.add(
 					return overlayMask;
 				},
 
-				_onChangeCustomization: function(event) {
-					var instance = this;
-
+				_onChangeCustomization(event) {
 					var checkbox = event.currentTarget;
 
 					var overlayMask = checkbox.getData('customizationControls');
@@ -212,7 +175,7 @@ AUI.add(
 					);
 				},
 
-				_onManageCustomization: function(event) {
+				_onManageCustomization() {
 					var instance = this;
 
 					var customizationsHandle = instance._customizationsHandle;
@@ -234,7 +197,7 @@ AUI.add(
 
 					var columns = A.all('.portlet-column');
 
-					columns.each(function(item, index) {
+					columns.each(function(item) {
 						var overlayMask = item.getData('customizationControls');
 
 						if (!overlayMask) {
@@ -245,6 +208,41 @@ AUI.add(
 
 						overlayMask.toggle();
 					});
+				},
+
+				destroy() {
+					var instance = this;
+
+					var columns = A.all('.portlet-column');
+
+					columns.each(function(item) {
+						var overlayMask = item.getData('customizationControls');
+
+						if (overlayMask) {
+							overlayMask.destroy();
+						}
+					});
+
+					var customizationsHandle = instance._customizationsHandle;
+
+					if (customizationsHandle) {
+						customizationsHandle.detach();
+
+						instance._customizationsHandle = null;
+					}
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._controls = instance.byId(
+						'layoutCustomizableControls'
+					);
+					instance._manageCustomization = instance.byId(
+						'manageCustomization'
+					);
+
+					instance._bindUI();
 				}
 			}
 		});

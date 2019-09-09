@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link LayoutBranchService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutBranchService
  * @generated
  */
-@ProviderType
 public class LayoutBranchServiceWrapper
 	implements LayoutBranchService, ServiceWrapper<LayoutBranchService> {
 
@@ -31,10 +29,16 @@ public class LayoutBranchServiceWrapper
 		_layoutBranchService = layoutBranchService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link LayoutBranchServiceUtil} to access the layout branch remote service. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutBranchServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutBranch addLayoutBranch(
-			long layoutRevisionId, String name, String description,
-			boolean master, ServiceContext serviceContext)
+			long layoutRevisionId, java.lang.String name,
+			java.lang.String description, boolean master,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutBranchService.addLayoutBranch(
@@ -54,14 +58,14 @@ public class LayoutBranchServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _layoutBranchService.getOSGiServiceIdentifier();
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutBranch updateLayoutBranch(
-			long layoutBranchId, String name, String description,
-			ServiceContext serviceContext)
+			long layoutBranchId, java.lang.String name,
+			java.lang.String description, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutBranchService.updateLayoutBranch(

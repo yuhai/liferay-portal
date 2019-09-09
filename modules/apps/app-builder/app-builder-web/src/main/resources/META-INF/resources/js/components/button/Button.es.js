@@ -32,7 +32,7 @@ const Button = props => {
 
 	let button = (
 		<Button
-			className={classNames(className, {'lfr-portal-tooltip': tooltip})}
+			className={classNames(className)}
 			data-title={tooltip}
 			ref={forwardRef}
 			symbol={symbol}

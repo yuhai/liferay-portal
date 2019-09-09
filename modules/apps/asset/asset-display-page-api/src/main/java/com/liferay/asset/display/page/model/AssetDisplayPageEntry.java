@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetDisplayPageEntry
 	extends AssetDisplayPageEntryModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.asset.display.page.model.impl.AssetDisplayPageEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

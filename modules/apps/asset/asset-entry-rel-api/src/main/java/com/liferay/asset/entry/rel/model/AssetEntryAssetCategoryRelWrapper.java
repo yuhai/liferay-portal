@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetEntryAssetCategoryRel}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetEntryAssetCategoryRel
  * @generated
  */
-@ProviderType
 public class AssetEntryAssetCategoryRelWrapper
 	extends BaseModelWrapper<AssetEntryAssetCategoryRel>
 	implements AssetEntryAssetCategoryRel,
@@ -134,6 +131,11 @@ public class AssetEntryAssetCategoryRelWrapper
 		return model.getPriority();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset entry asset category rel model instance should use the <code>AssetEntryAssetCategoryRel</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

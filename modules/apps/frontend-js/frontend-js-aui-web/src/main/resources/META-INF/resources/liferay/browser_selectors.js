@@ -90,7 +90,7 @@ YUI.add(
 		UAX.win = OS == 'windows';
 
 		var BrowserSelectors = {
-			getSelectors: function() {
+			getSelectors() {
 				// The methods in this if block only run once across all instances
 
 				if (!UA.selectors) {
@@ -284,7 +284,7 @@ YUI.add(
 				return UA.selectors;
 			},
 
-			run: function() {
+			run() {
 				var documentElement = DOC.documentElement;
 
 				var selectors = this.getSelectors();

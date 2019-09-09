@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ChangesetCollectionPersistence
 	extends BasePersistence<ChangesetCollection> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link ChangesetCollectionUtil} to access the changeset collection persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

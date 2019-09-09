@@ -1,0 +1,158 @@
+definition {
+
+	macro addUser {
+		Variables.assertDefined(parameterList = "${userEmailAddress},${userFirstName},${userLastName},${userScreenName}");
+
+		JSONUserAPI._addUser(
+			userEmailAddress = "${userEmailAddress}",
+			userFirstName = "${userFirstName}",
+			userLastName = "${userLastName}",
+			userScreenName = "${userScreenName}");
+	}
+
+	macro addUserToSite {
+		Variables.assertDefined(parameterList = "${groupName},${userEmailAddress}");
+
+		var groupId = JSONGroupAPI._getGroupIdByName(groupName = "${groupName}");
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var userId = JSONUser.getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/add-group-users/group-id/${groupId}/user-ids/${userId} \
+				-u test@liferay.com:test
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro deleteUserByEmailAddress {
+		Variables.assertDefined(parameterList = "${userEmailAddress}");
+
+		var userId = JSONUser.getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		JSONUserAPI._deleteUser(userId = "${userId}");
+	}
+
+	macro deleteUserByUserId {
+		Variables.assertDefined(parameterList = "${userId}");
+
+		JSONUserAPI._deleteUser(userId = "${userId}");
+	}
+
+	macro getUserEmailAddress {
+		Variables.assertDefined(parameterList = "${userId}");
+
+		var companyId = JSONCompany.getCompanyId();
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/get-user-by-id/user-id/${userId} \
+				-u test@liferay.com:test
+		''';
+		var userEmailAddress = JSONCurlUtil.get("${curl}", "$['emailAddress']");
+
+		return "${userEmailAddress}";
+	}
+
+	macro getUserFirstName {
+		Variables.assertDefined(parameterList = "${userId}");
+
+		var companyId = JSONCompany.getCompanyId();
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/get-user-by-id/user-id/${userId} \
+				-u test@liferay.com:test
+		''';
+		var userFirstName = JSONCurlUtil.get("${curl}", "$['firstName']");
+
+		return "${userFirstName}";
+	}
+
+	macro getUserIdByEmailAddress {
+		Variables.assertDefined(parameterList = "${userEmailAddress}");
+
+		var companyId = JSONCompany.getCompanyId();
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/get-user-by-email-address/company-id/${companyId}/email-address/${userEmailAddress} \
+				-u test@liferay.com:test
+		''';
+		var userId = JSONCurlUtil.get("${curl}", "$['userId']");
+
+		return "${userId}";
+	}
+
+	macro setFirstPassword {
+		Variables.assertDefined(parameterList = "${userEmailAddress}");
+
+		if (!(isSet(newPassword))) {
+			var newPassword = "test";
+		}
+
+		if (!(isSet(requireReset))) {
+			var requireReset = "true";
+		}
+
+		var userId = JSONUser.getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/update-password \
+				-u test@liferay.com:test \
+				-d userId=${userId} \
+				-d password1='${newPassword}' \
+				-d password2='${newPassword}' \
+				-d passwordReset=${requireReset}
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+		if ("${requireReset}" == "false") {
+			JSONUserAPI._disablePasswordChangeRequired();
+		}
+
+		if ("${agreeToTermsAndAnswerReminderQuery}" == "true") {
+			JSONUserAPI._agreeToTermsAndAnswerReminderQuery(userId = "${userId}");
+		}
+	}
+
+	macro tearDownByFirstName {
+		Variables.assertDefined(parameterList = "${userFirstName}");
+
+		var companyId = JSONCompany.getCompanyId();
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/get-company-users-count/company-id/${companyId} \
+				-u test@liferay.com:test
+		''';
+		var userCount = JSONCurlUtil.get("${curl}", "$");
+
+		var curl = '''
+			${portalURL}/api/jsonws/user/get-company-users/company-id/${companyId}/start/0/end/${userCount} \
+				-u test@liferay.com:test
+		''';
+		var userIds = JSONCurlUtil.get("${curl}", "$..['userId']");
+		var userIds = StringUtil.replace("${userIds}", "[", "");
+		var userIds = StringUtil.replace("${userIds}", "]", "");
+		var userIds = StringUtil.replace("${userIds}", "&quot;", "");
+
+		for (var userId : list "${userIds}") {
+			var currentUserFirstName = JSONUser.getUserFirstName(userId = "${userId}");
+
+			if (contains("${currentUserFirstName}", "${userFirstName}")) {
+				JSONUser.deleteUserByUserId(userId = "${userId}");
+			}
+		}
+	}
+
+}

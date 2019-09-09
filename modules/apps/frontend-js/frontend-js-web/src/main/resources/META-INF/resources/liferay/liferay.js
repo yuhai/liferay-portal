@@ -126,8 +126,6 @@ Liferay = window.Liferay || {};
 	 */
 
 	var Service = function() {
-		var instance = this;
-
 		var args = Service.parseInvokeArgs(
 			Array.prototype.slice.call(arguments, 0)
 		);
@@ -170,8 +168,6 @@ Liferay = window.Liferay || {};
 	};
 
 	Service.parseIOConfig = function(args) {
-		var instance = this;
-
 		var payload = args[0];
 
 		var ioConfig = payload.io || {};
@@ -193,7 +189,7 @@ Liferay = window.Liferay || {};
 
 				if (
 					response !== null &&
-					!response.hasOwnProperty('exception')
+					!Object.prototype.hasOwnProperty.call(response, 'exception')
 				) {
 					if (callbackSuccess) {
 						callbackSuccess.call(this, response);
@@ -209,7 +205,7 @@ Liferay = window.Liferay || {};
 		}
 
 		if (
-			!ioConfig.hasOwnProperty('cache') &&
+			!Object.prototype.hasOwnProperty.call(ioConfig, 'cache') &&
 			REGEX_METHOD_GET.test(ioConfig.type)
 		) {
 			ioConfig.cache = false;
@@ -223,8 +219,6 @@ Liferay = window.Liferay || {};
 	};
 
 	Service.parseIOFormConfig = function(ioConfig, args) {
-		var instance = this;
-
 		var form = args[1];
 
 		if (isNode(form)) {
@@ -261,8 +255,8 @@ Liferay = window.Liferay || {};
 		ioConfig = Object.assign(
 			{
 				data: {
-					cmd: cmd,
-					p_auth: p_auth
+					cmd,
+					p_auth
 				},
 				dataType: 'JSON'
 			},
@@ -323,7 +317,7 @@ Liferay = window.Liferay || {};
 		A.namespace('config.io'),
 		{
 			method: 'POST',
-			uriFormatter: function(value) {
+			uriFormatter(value) {
 				return Liferay.Util.getURLWithSessionId(value);
 			}
 		},

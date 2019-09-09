@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Message}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Message
  * @generated
  */
-@ProviderType
 public class MessageWrapper
 	extends BaseModelWrapper<Message>
 	implements Message, ModelWrapper<Message> {
@@ -429,6 +426,11 @@ public class MessageWrapper
 		return model.hasFlag(flag);
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a message model instance should use the <code>Message</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

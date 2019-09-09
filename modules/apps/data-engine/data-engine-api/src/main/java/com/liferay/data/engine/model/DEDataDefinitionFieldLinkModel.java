@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataDefinitionFieldLinkModel
 	extends AttachedModel, BaseModel<DEDataDefinitionFieldLink> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a de data definition field link model instance should use the {@link DEDataDefinitionFieldLink} interface instead.

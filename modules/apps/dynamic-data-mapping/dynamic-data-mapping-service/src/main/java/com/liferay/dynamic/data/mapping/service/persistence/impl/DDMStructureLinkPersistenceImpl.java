@@ -48,7 +48,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -65,12 +64,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = DDMStructureLinkPersistence.class)
-@ProviderType
 public class DDMStructureLinkPersistenceImpl
 	extends BasePersistenceImpl<DDMStructureLink>
 	implements DDMStructureLinkPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>DDMStructureLinkUtil</code> to access the ddm structure link persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

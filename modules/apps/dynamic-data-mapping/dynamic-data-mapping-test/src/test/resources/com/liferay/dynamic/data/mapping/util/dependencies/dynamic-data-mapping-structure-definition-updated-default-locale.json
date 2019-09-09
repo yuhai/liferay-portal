@@ -43,7 +43,9 @@
 						"errorMessage": {
 							"en_US": "Integer must be equal to zero."
 						},
-						"expression": "Integer == 0"
+						"expression": {
+							"value": "Integer == 0"
+						}
 					},
 					"visibilityExpression": "FALSE"
 				}
@@ -65,7 +67,9 @@
 				"errorMessage": {
 					"en_US": "This field is never valid."
 				},
-				"expression": "FALSE"
+				"expression": {
+					"value": "FALSE"
+				}
 			},
 			"visibilityExpression": "TRUE"
 		},
@@ -108,7 +112,9 @@
 				"errorMessage": {
 					"en_US": "Field ChildField must not be empty."
 				},
-				"expression": "!ChildField.isEmpty()"
+				"expression": {
+					"value": "!ChildField.isEmpty()"
+				}
 			},
 			"visibilityExpression": "true"
 		}

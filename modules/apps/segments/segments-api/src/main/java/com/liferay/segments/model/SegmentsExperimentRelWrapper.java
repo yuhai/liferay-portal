@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SegmentsExperimentRel}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperimentRel
  * @generated
  */
-@ProviderType
 public class SegmentsExperimentRelWrapper
 	extends BaseModelWrapper<SegmentsExperimentRel>
 	implements SegmentsExperimentRel, ModelWrapper<SegmentsExperimentRel> {
@@ -267,12 +264,24 @@ public class SegmentsExperimentRelWrapper
 	}
 
 	@Override
+	public boolean isActive()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.isActive();
+	}
+
+	@Override
 	public boolean isControl()
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return model.isControl();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a segments experiment rel model instance should use the <code>SegmentsExperimentRel</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

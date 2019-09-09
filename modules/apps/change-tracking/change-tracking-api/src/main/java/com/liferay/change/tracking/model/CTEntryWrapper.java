@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link CTEntry}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CTEntry
  * @generated
  */
-@ProviderType
 public class CTEntryWrapper
 	extends BaseModelWrapper<CTEntry>
 	implements CTEntry, ModelWrapper<CTEntry> {
@@ -309,6 +306,11 @@ public class CTEntryWrapper
 		return model.isCollision();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ct entry model instance should use the <code>CTEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

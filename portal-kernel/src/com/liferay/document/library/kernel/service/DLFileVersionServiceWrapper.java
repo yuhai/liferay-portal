@@ -16,8 +16,6 @@ package com.liferay.document.library.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DLFileVersionService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileVersionService
  * @generated
  */
-@ProviderType
 public class DLFileVersionServiceWrapper
 	implements DLFileVersionService, ServiceWrapper<DLFileVersionService> {
 
@@ -35,6 +32,11 @@ public class DLFileVersionServiceWrapper
 		_dlFileVersionService = dlFileVersionService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DLFileVersionServiceUtil} to access the document library file version remote service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileVersionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.document.library.kernel.model.DLFileVersion
 			getFileVersion(long fileVersionId)

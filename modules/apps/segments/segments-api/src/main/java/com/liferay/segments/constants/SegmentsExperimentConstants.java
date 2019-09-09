@@ -82,8 +82,8 @@ public class SegmentsExperimentConstants {
 
 	public enum Status {
 
-		COMPLETED(STATUS_COMPLETED, "COMPLETED", "completed", true, true),
-		DRAFT(STATUS_DRAFT, "DRAFT", "draft", true, true) {
+		COMPLETED(STATUS_COMPLETED, "COMPLETED", "completed", true),
+		DRAFT(STATUS_DRAFT, "DRAFT", "draft", true) {
 
 			@Override
 			public Set<Status> validTransitions() {
@@ -94,7 +94,7 @@ public class SegmentsExperimentConstants {
 		},
 		FINISHED_NO_WINNER(
 			STATUS_FINISHED_NO_WINNER, "FINISHED_NO_WINNER", "no-winner", false,
-			true) {
+			true, false, true) {
 
 			@Override
 			public Set<Status> validTransitions() {
@@ -103,7 +103,8 @@ public class SegmentsExperimentConstants {
 
 		},
 		FINISHED_WINNER_DECLARED(
-			STATUS_FINISHED_WINNER, "FINISHED_WINNER", "winner", false, true) {
+			STATUS_FINISHED_WINNER, "FINISHED_WINNER", "winner", false, true,
+			true, true) {
 
 			@Override
 			public Set<Status> validTransitions() {
@@ -111,7 +112,7 @@ public class SegmentsExperimentConstants {
 			}
 
 		},
-		PAUSED(STATUS_PAUSED, "PAUSED", "paused", false, true) {
+		PAUSED(STATUS_PAUSED, "PAUSED", "paused", false) {
 
 			@Override
 			public Set<Status> validTransitions() {
@@ -119,7 +120,8 @@ public class SegmentsExperimentConstants {
 			}
 
 		},
-		RUNNING(STATUS_RUNNING, "RUNNING", "running", false, true) {
+		RUNNING(
+			STATUS_RUNNING, "RUNNING", "running", false, true, false, true) {
 
 			@Override
 			public Set<Status> validTransitions() {
@@ -131,7 +133,7 @@ public class SegmentsExperimentConstants {
 			}
 
 		},
-		SCHEDULED(STATUS_SCHEDULED, "SCHEDULED", "scheduled", false, true) {
+		SCHEDULED(STATUS_SCHEDULED, "SCHEDULED", "scheduled", false) {
 
 			@Override
 			public Set<Status> validTransitions() {
@@ -139,13 +141,23 @@ public class SegmentsExperimentConstants {
 			}
 
 		},
-		TERMINATED(STATUS_TERMINATED, "TERMINATED", "terminated", true, true);
+		TERMINATED(STATUS_TERMINATED, "TERMINATED", "terminated", true);
 
-		public static int[] exclusiveStates() {
+		public static int[] getExclusiveStatusValues() {
 			Stream<Status> stream = Arrays.stream(Status.values());
 
 			return stream.filter(
 				Status::isExclusive
+			).mapToInt(
+				Status::getValue
+			).toArray();
+		}
+
+		public static int[] getSplitStatusValues() {
+			Stream<Status> stream = Arrays.stream(Status.values());
+
+			return stream.filter(
+				Status::isSplit
 			).mapToInt(
 				Status::getValue
 			).toArray();
@@ -231,6 +243,14 @@ public class SegmentsExperimentConstants {
 			return _exclusive;
 		}
 
+		public boolean isSplit() {
+			return _split;
+		}
+
+		public boolean requiresWinnerExperience() {
+			return _requiresWinnerExperience;
+		}
+
 		@Override
 		public String toString() {
 			return _stringValue;
@@ -241,19 +261,36 @@ public class SegmentsExperimentConstants {
 		}
 
 		private Status(
+			int value, String stringValue, String label, boolean editable) {
+
+			_value = value;
+			_stringValue = stringValue;
+			_label = label;
+			_editable = editable;
+			_exclusive = true;
+			_requiresWinnerExperience = false;
+			_split = false;
+		}
+
+		private Status(
 			int value, String stringValue, String label, boolean editable,
-			boolean exclusive) {
+			boolean exclusive, boolean requiresWinnerExperience,
+			boolean split) {
 
 			_value = value;
 			_stringValue = stringValue;
 			_label = label;
 			_editable = editable;
 			_exclusive = exclusive;
+			_requiresWinnerExperience = requiresWinnerExperience;
+			_split = split;
 		}
 
 		private final boolean _editable;
 		private final boolean _exclusive;
 		private final String _label;
+		private final boolean _requiresWinnerExperience;
+		private final boolean _split;
 		private final String _stringValue;
 		private final int _value;
 

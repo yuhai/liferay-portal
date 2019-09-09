@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetListEntryUsage}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetListEntryUsage
  * @generated
  */
-@ProviderType
 public class AssetListEntryUsageWrapper
 	extends BaseModelWrapper<AssetListEntryUsage>
 	implements AssetListEntryUsage, ModelWrapper<AssetListEntryUsage> {
@@ -305,6 +302,11 @@ public class AssetListEntryUsageWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset list entry usage model instance should use the <code>AssetListEntryUsage</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

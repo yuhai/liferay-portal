@@ -16,7 +16,7 @@ import {getNumberOfWords} from '../../src/utils/assets';
 import {expect} from 'chai';
 
 describe('getNumberOfWords', () => {
-	it('should return the number of words', () => {
+	it('returns the number of words', () => {
 		const content = {
 			description:
 				'Build portals, intranets, websites and connected experiences on the most flexible platform around.',
@@ -36,7 +36,7 @@ describe('getNumberOfWords', () => {
 		expect(numberOfWords).to.equal(20);
 	});
 
-	it('should return 0 if the number of words is empty', () => {
+	it('returns 0 if the number of words is empty', () => {
 		const element = document.createElement('div');
 
 		element.innerText = '';

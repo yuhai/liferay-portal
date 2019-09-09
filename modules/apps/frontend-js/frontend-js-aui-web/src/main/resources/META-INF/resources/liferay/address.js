@@ -14,10 +14,10 @@
 
 AUI.add(
 	'liferay-address',
-	function(A) {
+	function() {
 		if (!Liferay.Address) {
 			Liferay.Address = {
-				getCountries: function(callback) {
+				getCountries(callback) {
 					Liferay.Service(
 						'/country/get-countries',
 						{
@@ -27,7 +27,7 @@ AUI.add(
 					);
 				},
 
-				getRegions: function(callback, selectKey) {
+				getRegions(callback, selectKey) {
 					Liferay.Service(
 						'/region/get-regions',
 						{

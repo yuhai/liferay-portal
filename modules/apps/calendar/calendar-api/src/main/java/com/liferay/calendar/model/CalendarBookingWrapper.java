@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link CalendarBooking}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CalendarBooking
  * @generated
  */
-@ProviderType
 public class CalendarBookingWrapper
 	extends BaseModelWrapper<CalendarBooking>
 	implements CalendarBooking, ModelWrapper<CalendarBooking> {
@@ -951,6 +948,11 @@ public class CalendarBookingWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a calendar booking model instance should use the <code>CalendarBooking</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

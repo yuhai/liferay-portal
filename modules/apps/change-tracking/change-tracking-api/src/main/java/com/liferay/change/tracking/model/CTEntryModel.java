@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CTEntryModel
 	extends BaseModel<CTEntry>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ct entry model instance should use the {@link CTEntry} interface instead.

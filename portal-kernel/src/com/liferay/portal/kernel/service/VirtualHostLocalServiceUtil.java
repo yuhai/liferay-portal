@@ -16,8 +16,6 @@ package com.liferay.portal.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for VirtualHost. This utility wraps
  * <code>com.liferay.portal.service.impl.VirtualHostLocalServiceImpl</code> and
@@ -30,10 +28,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see VirtualHostLocalService
  * @generated
  */
-@ProviderType
 public class VirtualHostLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.VirtualHostLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

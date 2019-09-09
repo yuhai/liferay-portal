@@ -98,10 +98,10 @@ public class DDLRecordModelSummaryContributor
 		if (ddlRecordSet.getScope() ==
 				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS) {
 
-			return "new-entry-for-list-x";
+			return "record-for-list-x";
 		}
 
-		return "new-entry-for-form-x";
+		return "form-record-for-form-x";
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

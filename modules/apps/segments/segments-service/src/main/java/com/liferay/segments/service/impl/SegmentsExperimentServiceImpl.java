@@ -16,15 +16,21 @@ package com.liferay.segments.service.impl;
 
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
+import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
+import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.segments.service.base.SegmentsExperimentServiceBaseImpl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -154,12 +160,13 @@ public class SegmentsExperimentServiceImpl
 		long groupId, long classNameId, long classPK) {
 
 		return segmentsExperimentPersistence.filterFindByG_C_C(
-			groupId, classNameId, _getPublishedLayoutClassPK(classPK));
+			groupId, classNameId, classPK);
 	}
 
 	@Override
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, double confidenceLevel, int status)
+	public SegmentsExperiment runSegmentsExperiment(
+			long segmentsExperimentId, double confidenceLevel,
+			Map<Long, Double> segmentsExperienceIdSplitMap)
 		throws PortalException {
 
 		_segmentsExperimentResourcePermission.check(
@@ -168,23 +175,40 @@ public class SegmentsExperimentServiceImpl
 				segmentsExperimentId),
 			ActionKeys.UPDATE);
 
-		return segmentsExperimentLocalService.updateSegmentsExperiment(
-			segmentsExperimentId, confidenceLevel, status);
+		return segmentsExperimentLocalService.runSegmentsExperiment(
+			segmentsExperimentId, confidenceLevel,
+			segmentsExperienceIdSplitMap);
 	}
 
 	@Override
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, int status)
+	public SegmentsExperiment runSegmentsExperiment(
+			String segmentsExperimentKey, double confidenceLevel,
+			Map<String, Double> segmentsExperienceKeySplitMap)
 		throws PortalException {
 
-		_segmentsExperimentResourcePermission.check(
-			getPermissionChecker(),
+		SegmentsExperiment segmentsExperiment =
 			segmentsExperimentLocalService.getSegmentsExperiment(
-				segmentsExperimentId),
-			ActionKeys.UPDATE);
+				segmentsExperimentKey);
 
-		return segmentsExperimentLocalService.updateSegmentsExperiment(
-			segmentsExperimentId, status);
+		_segmentsExperimentResourcePermission.check(
+			getPermissionChecker(), segmentsExperiment, ActionKeys.UPDATE);
+
+		Set<Map.Entry<String, Double>> segmentsExperienceKeySplits =
+			segmentsExperienceKeySplitMap.entrySet();
+
+		Stream<Map.Entry<String, Double>> segmentsExperienceKeySplitsStream =
+			segmentsExperienceKeySplits.stream();
+
+		Map<Long, Double> segmentsExperienceIdSplitMap =
+			segmentsExperienceKeySplitsStream.collect(
+				Collectors.toMap(
+					entry -> _getSegmentsExperienceId(
+						segmentsExperiment.getGroupId(), entry.getKey()),
+					Map.Entry::getValue));
+
+		return segmentsExperimentLocalService.runSegmentsExperiment(
+			segmentsExperiment.getSegmentsExperimentId(), confidenceLevel,
+			segmentsExperienceIdSplitMap);
 	}
 
 	@Override
@@ -204,33 +228,94 @@ public class SegmentsExperimentServiceImpl
 	}
 
 	@Override
-	public SegmentsExperiment updateSegmentsExperiment(
-			String segmentsExperimentKey, int status)
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, int status)
 		throws PortalException {
 
 		_segmentsExperimentResourcePermission.check(
 			getPermissionChecker(),
 			segmentsExperimentLocalService.getSegmentsExperiment(
-				segmentsExperimentKey),
+				segmentsExperimentId),
 			ActionKeys.UPDATE);
 
-		return segmentsExperimentLocalService.updateSegmentsExperiment(
-			segmentsExperimentKey, status);
+		return segmentsExperimentLocalService.updateSegmentsExperimentStatus(
+			segmentsExperimentId, status);
 	}
 
-	private long _getPublishedLayoutClassPK(long classPK) {
-		Layout layout = layoutLocalService.fetchLayout(classPK);
+	@Override
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, long winnerSegmentsExperienceId,
+			int status)
+		throws PortalException {
 
-		if ((layout != null) &&
-			(layout.getClassNameId() == classNameLocalService.getClassNameId(
-				Layout.class)) &&
-			(layout.getClassPK() != 0)) {
+		_segmentsExperimentResourcePermission.check(
+			getPermissionChecker(),
+			segmentsExperimentLocalService.getSegmentsExperiment(
+				segmentsExperimentId),
+			ActionKeys.UPDATE);
 
-			return layout.getClassPK();
+		return segmentsExperimentLocalService.updateSegmentsExperimentStatus(
+			segmentsExperimentId, winnerSegmentsExperienceId, status);
+	}
+
+	@Override
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			String segmentsExperimentKey, int status)
+		throws PortalException {
+
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentLocalService.getSegmentsExperiment(
+				segmentsExperimentKey);
+
+		_segmentsExperimentResourcePermission.check(
+			getPermissionChecker(), segmentsExperiment, ActionKeys.UPDATE);
+
+		return segmentsExperimentLocalService.updateSegmentsExperimentStatus(
+			segmentsExperiment.getSegmentsExperimentId(), status);
+	}
+
+	@Override
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			String segmentsExperimentKey, String winnerSegmentsExperienceKey,
+			int status)
+		throws PortalException {
+
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentLocalService.getSegmentsExperiment(
+				segmentsExperimentKey);
+
+		_segmentsExperimentResourcePermission.check(
+			getPermissionChecker(), segmentsExperiment, ActionKeys.UPDATE);
+
+		return segmentsExperimentLocalService.updateSegmentsExperimentStatus(
+			segmentsExperiment.getSegmentsExperimentId(),
+			_getSegmentsExperienceId(
+				segmentsExperiment.getGroupId(), winnerSegmentsExperienceKey),
+			status);
+	}
+
+	private long _getSegmentsExperienceId(
+		long groupId, String segmentsExperienceKey) {
+
+		if (segmentsExperienceKey.equals(
+				SegmentsExperienceConstants.KEY_DEFAULT)) {
+
+			return SegmentsExperienceConstants.ID_DEFAULT;
 		}
 
-		return classPK;
+		SegmentsExperience segmentsExperience =
+			_segmentsExperienceLocalService.fetchSegmentsExperience(
+				groupId, segmentsExperienceKey);
+
+		if (segmentsExperience != null) {
+			return segmentsExperience.getSegmentsExperienceId();
+		}
+
+		return -1;
 	}
+
+	@Reference
+	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.segments.model.SegmentsExperiment)"

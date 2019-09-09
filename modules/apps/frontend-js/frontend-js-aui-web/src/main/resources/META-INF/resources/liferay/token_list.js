@@ -31,7 +31,7 @@ AUI().add(
 			'</span>',
 			'</tpl>',
 			{
-				getTokenText: function(str, values) {
+				getTokenText(str, values) {
 					if ('html' in values) {
 						str = values.html;
 					} else {
@@ -57,24 +57,45 @@ AUI().add(
 			NAME: 'liferaytokenlist',
 
 			prototype: {
-				initializer: function() {
+				_addToken() {
 					var instance = this;
 
-					instance._buffer = [];
+					var buffer = instance._buffer;
 
-					instance._addTokenTask = A.debounce(
-						instance._addToken,
-						100
-					);
+					instance.get('contentBox').append(TPL_TOKEN.parse(buffer));
+
+					buffer.length = 0;
 				},
 
-				renderUI: function() {
+				_defCloseFn(event) {
+					event.item.remove();
+				},
+
+				_onClick(event) {
 					var instance = this;
 
-					instance.add(instance.get('children'));
+					instance.fire('close', {
+						item: event.currentTarget.ancestor('.lfr-token')
+					});
 				},
 
-				bindUI: function() {
+				add(token) {
+					var instance = this;
+
+					if (token) {
+						var buffer = instance._buffer;
+
+						if (Array.isArray(token)) {
+							instance._buffer = buffer.concat(token);
+						} else {
+							buffer.push(token);
+						}
+
+						instance._addTokenTask();
+					}
+				},
+
+				bindUI() {
 					var instance = this;
 
 					var boundingBox = instance.get('boundingBox');
@@ -91,44 +112,21 @@ AUI().add(
 					});
 				},
 
-				add: function(token) {
+				initializer() {
 					var instance = this;
 
-					if (token) {
-						var buffer = instance._buffer;
+					instance._buffer = [];
 
-						if (Array.isArray(token)) {
-							instance._buffer = buffer.concat(token);
-						} else {
-							buffer.push(token);
-						}
-
-						instance._addTokenTask();
-					}
+					instance._addTokenTask = A.debounce(
+						instance._addToken,
+						100
+					);
 				},
 
-				_addToken: function() {
+				renderUI() {
 					var instance = this;
 
-					var buffer = instance._buffer;
-
-					instance.get('contentBox').append(TPL_TOKEN.parse(buffer));
-
-					buffer.length = 0;
-				},
-
-				_defCloseFn: function(event) {
-					var instance = this;
-
-					event.item.remove();
-				},
-
-				_onClick: function(event) {
-					var instance = this;
-
-					instance.fire('close', {
-						item: event.currentTarget.ancestor('.lfr-token')
-					});
+					instance.add(instance.get('children'));
 				}
 			}
 		});

@@ -557,12 +557,12 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		ddmFormInstanceRecordVersion.setFormInstanceRecordId(
 			ddmFormInstanceRecord.getFormInstanceRecordId());
 		ddmFormInstanceRecordVersion.setVersion(version);
+		ddmFormInstanceRecordVersion.setStorageId(ddmStorageId);
 		ddmFormInstanceRecordVersion.setStatus(status);
 		ddmFormInstanceRecordVersion.setStatusByUserId(user.getUserId());
 		ddmFormInstanceRecordVersion.setStatusByUserName(user.getFullName());
 		ddmFormInstanceRecordVersion.setStatusDate(
 			ddmFormInstanceRecord.getModifiedDate());
-		ddmFormInstanceRecordVersion.setStorageId(ddmStorageId);
 
 		ddmFormInstanceRecordVersionPersistence.update(
 			ddmFormInstanceRecordVersion);
@@ -788,7 +788,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		DDMFormInstance formInstance = formInstanceRecord.getFormInstance();
 
 		String title = LanguageUtil.format(
-			getResourceBundle(locale), "new-entry-for-form-x",
+			getResourceBundle(locale), "form-record-for-form-x",
 			formInstance.getName(locale), false);
 
 		if (addDraftAssetEntry) {

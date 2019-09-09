@@ -16,8 +16,6 @@ package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link KBCommentService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KBCommentService
  * @generated
  */
-@ProviderType
 public class KBCommentServiceWrapper
 	implements KBCommentService, ServiceWrapper<KBCommentService> {
 
@@ -33,6 +30,11 @@ public class KBCommentServiceWrapper
 		_kbCommentService = kbCommentService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link KBCommentServiceUtil} to access the kb comment remote service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBCommentServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.knowledge.base.model.KBComment deleteKBComment(
 			com.liferay.knowledge.base.model.KBComment kbComment)

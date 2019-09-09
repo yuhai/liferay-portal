@@ -307,7 +307,7 @@ class FloatingToolbarLayoutBackgroundImagePanel extends Component {
 	 */
 	_handleSelectButtonClick() {
 		openImageSelector({
-			callback: url => this._updateRowBackgroundImage(url),
+			callback: image => this._updateRowBackgroundImage(image),
 			imageSelectorURL: this.imageSelectorURL,
 			portletNamespace: this.portletNamespace
 		});
@@ -319,7 +319,7 @@ class FloatingToolbarLayoutBackgroundImagePanel extends Component {
 	 * @review
 	 */
 	_handleClearButtonClick() {
-		this._updateRowBackgroundImage('');
+		this._updateRowBackgroundImage({});
 	}
 
 	/**
@@ -459,7 +459,7 @@ class FloatingToolbarLayoutBackgroundImagePanel extends Component {
 
 	/**
 	 * Updates row image
-	 * @param {string} backgroundImage Row image
+	 * @param {object} backgroundImage Row image
 	 * @private
 	 * @review
 	 */

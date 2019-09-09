@@ -16,8 +16,6 @@ package com.liferay.sync.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SyncDeviceLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SyncDeviceLocalService
  * @generated
  */
-@ProviderType
 public class SyncDeviceLocalServiceWrapper
 	implements SyncDeviceLocalService, ServiceWrapper<SyncDeviceLocalService> {
 
@@ -35,6 +32,11 @@ public class SyncDeviceLocalServiceWrapper
 		_syncDeviceLocalService = syncDeviceLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SyncDeviceLocalServiceUtil} to access the sync device local service. Add custom service methods to <code>com.liferay.sync.service.impl.SyncDeviceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.sync.model.SyncDevice addSyncDevice(
 			long userId, String type, long buildNumber, String hostname,

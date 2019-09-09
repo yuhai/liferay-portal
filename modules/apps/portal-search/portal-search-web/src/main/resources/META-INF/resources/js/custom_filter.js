@@ -34,7 +34,21 @@ AUI.add(
 		};
 
 		A.mix(CustomFilter.prototype, {
-			getFilterValue: function() {
+			_onClick() {
+				var instance = this;
+
+				instance.search();
+			},
+
+			_onSubmit(event) {
+				var instance = this;
+
+				event.stopPropagation();
+
+				instance.search();
+			},
+
+			getFilterValue() {
 				var instance = this;
 
 				var filterValue = instance.filterValueInput.val();
@@ -42,7 +56,7 @@ AUI.add(
 				return filterValue;
 			},
 
-			search: function() {
+			search() {
 				var instance = this;
 
 				var searchURL = instance.form.get('action');
@@ -54,7 +68,7 @@ AUI.add(
 				document.location.href = searchURL + queryString;
 			},
 
-			updateQueryString: function(queryString) {
+			updateQueryString(queryString) {
 				var instance = this;
 
 				var hasQuestionMark = false;
@@ -74,20 +88,6 @@ AUI.add(
 				}
 
 				return queryString;
-			},
-
-			_onClick: function(event) {
-				var instance = this;
-
-				instance.search();
-			},
-
-			_onSubmit: function(event) {
-				var instance = this;
-
-				event.stopPropagation();
-
-				instance.search();
 			}
 		});
 

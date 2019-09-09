@@ -40,7 +40,7 @@ public interface LayoutPageTemplateStructureRelModel
 	extends BaseModel<LayoutPageTemplateStructureRel>, GroupedModel,
 			ShardedModel, StagedAuditedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout page template structure rel model instance should use the {@link LayoutPageTemplateStructureRel} interface instead.

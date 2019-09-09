@@ -48,7 +48,7 @@ import javax.sql.DataSource;
 public abstract class GadgetServiceBaseImpl
 	extends BaseServiceImpl implements GadgetService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>GadgetService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.opensocial.service.GadgetServiceUtil</code>.

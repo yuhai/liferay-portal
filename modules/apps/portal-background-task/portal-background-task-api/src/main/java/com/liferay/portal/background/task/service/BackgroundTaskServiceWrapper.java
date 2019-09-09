@@ -16,8 +16,6 @@ package com.liferay.portal.background.task.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link BackgroundTaskService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see BackgroundTaskService
  * @generated
  */
-@ProviderType
 public class BackgroundTaskServiceWrapper
 	implements BackgroundTaskService, ServiceWrapper<BackgroundTaskService> {
 
@@ -35,6 +32,11 @@ public class BackgroundTaskServiceWrapper
 		_backgroundTaskService = backgroundTaskService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link BackgroundTaskServiceUtil} to access the background task remote service. Add custom service methods to <code>com.liferay.portal.background.task.service.impl.BackgroundTaskServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public int getBackgroundTasksCount(
 		long groupId, String taskExecutorClassName, boolean completed) {

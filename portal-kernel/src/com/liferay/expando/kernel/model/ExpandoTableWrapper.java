@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoTable}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ExpandoTable
  * @generated
  */
-@ProviderType
 public class ExpandoTableWrapper
 	extends BaseModelWrapper<ExpandoTable>
 	implements ExpandoTable, ModelWrapper<ExpandoTable> {
@@ -144,6 +141,11 @@ public class ExpandoTableWrapper
 		return model.isDefaultTable();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a expando table model instance should use the <code>ExpandoTable</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

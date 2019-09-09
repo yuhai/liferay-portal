@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileEntryMetadataPersistence
 	extends BasePersistence<DLFileEntryMetadata> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileEntryMetadataUtil} to access the document library file entry metadata persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -1,4 +1,3 @@
-let configuration = {};
 let handleProviderResize = () => {};
 
 let content = null;
@@ -29,13 +28,20 @@ const showVideo = () => {
 	videoContainer.removeAttribute('aria-hidden');
 	errorMessage.parentElement.removeChild(errorMessage);
 	loadingIndicator.parentElement.removeChild(loadingIndicator);
+
+	window.addEventListener('resize', resize);
+
 	resize();
 };
 
 const showError = () => {
-	errorMessage.removeAttribute('hidden');
-	videoContainer.parentElement.removeChild(videoContainer);
-	loadingIndicator.parentElement.removeChild(loadingIndicator);
+	if (document.body.classList.contains('has-edit-mode-menu')) {
+		errorMessage.removeAttribute('hidden');
+		videoContainer.parentElement.removeChild(videoContainer);
+		loadingIndicator.parentElement.removeChild(loadingIndicator);
+	} else {
+		fragmentElement.parentElement.removeChild(fragmentElement);
+	}
 };
 
 const rawProvider = {
@@ -139,18 +145,7 @@ const main = () => {
 	errorMessage = content.querySelector('.error-message');
 	loadingIndicator = content.querySelector('.loading-animation');
 
-	configuration = {
-		autoPlay: content.dataset.autoPlay === 'true',
-		hideControls: content.dataset.hideControls === 'true',
-		loop: content.dataset.loop === 'true',
-		mute: content.dataset.mute === 'true',
-		url: content.dataset.url,
-		width: parseInt(content.dataset.width || 0, 10),
-		height: parseInt(content.dataset.height || 0, 10)
-	};
-
 	window.removeEventListener('resize', resize);
-	window.addEventListener('resize', resize);
 
 	try {
 		let matched = false;

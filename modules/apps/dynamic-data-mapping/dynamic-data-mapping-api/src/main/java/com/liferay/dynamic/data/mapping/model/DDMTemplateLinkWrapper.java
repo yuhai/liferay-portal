@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMTemplateLink}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMTemplateLink
  * @generated
  */
-@ProviderType
 public class DDMTemplateLinkWrapper
 	extends BaseModelWrapper<DDMTemplateLink>
 	implements DDMTemplateLink, ModelWrapper<DDMTemplateLink> {
@@ -180,6 +177,11 @@ public class DDMTemplateLinkWrapper
 		return model.getTemplateLinkId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm template link model instance should use the <code>DDMTemplateLink</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

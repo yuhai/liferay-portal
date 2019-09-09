@@ -46,39 +46,7 @@ AUI.add(
 		};
 
 		A.mix(Store, {
-			get: function(key, callback) {
-				var instance = this;
-
-				instance._getValues('get', key, callback);
-			},
-
-			getAll: function(keys, callback) {
-				var instance = this;
-
-				instance._getValues('getAll', keys, callback);
-			},
-
-			set: function(key, value) {
-				var instance = this;
-
-				var obj = {};
-
-				if (isObject(value)) {
-					value = TOKEN_SERIALIZE + JSON.stringify(value);
-				}
-
-				obj[key] = value;
-
-				instance._setValues(obj);
-			},
-
-			setAll: function(obj) {
-				var instance = this;
-
-				instance._setValues(obj);
-			},
-
-			_getValues: function(cmd, key, callback) {
+			_getValues(cmd, key, callback) {
 				var instance = this;
 
 				var config = {
@@ -96,9 +64,7 @@ AUI.add(
 				instance._ioRequest(config);
 			},
 
-			_ioRequest: function(config) {
-				var instance = this;
-
+			_ioRequest(config) {
 				config.data.p_auth = Liferay.authToken;
 
 				var doAsUserIdEncoded = themeDisplay.getDoAsUserIdEncoded();
@@ -153,12 +119,44 @@ AUI.add(
 					});
 			},
 
-			_setValues: function(data) {
+			_setValues(data) {
 				var instance = this;
 
 				instance._ioRequest({
-					data: data
+					data
 				});
+			},
+
+			get(key, callback) {
+				var instance = this;
+
+				instance._getValues('get', key, callback);
+			},
+
+			getAll(keys, callback) {
+				var instance = this;
+
+				instance._getValues('getAll', keys, callback);
+			},
+
+			set(key, value) {
+				var instance = this;
+
+				var obj = {};
+
+				if (isObject(value)) {
+					value = TOKEN_SERIALIZE + JSON.stringify(value);
+				}
+
+				obj[key] = value;
+
+				instance._setValues(obj);
+			},
+
+			setAll(obj) {
+				var instance = this;
+
+				instance._setValues(obj);
 			}
 		});
 

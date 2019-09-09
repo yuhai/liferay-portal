@@ -17,8 +17,6 @@ package com.liferay.layout.page.template.model.impl;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the LayoutPageTemplateEntry service. Represents a row in the &quot;LayoutPageTemplateEntry&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,12 +29,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutPageTemplateEntry
  * @generated
  */
-@ProviderType
 public abstract class LayoutPageTemplateEntryBaseImpl
 	extends LayoutPageTemplateEntryModelImpl
 	implements LayoutPageTemplateEntry {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a layout page template entry model instance should use the <code>LayoutPageTemplateEntry</code> interface instead.

@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.tools.service.builder.test.model.LocalizedEntry;
 import com.liferay.portal.tools.service.builder.test.service.LocalizedEntryLocalServiceUtil;
 
@@ -31,11 +29,10 @@ import com.liferay.portal.tools.service.builder.test.service.LocalizedEntryLocal
  * @see LocalizedEntry
  * @generated
  */
-@ProviderType
 public abstract class LocalizedEntryBaseImpl
 	extends LocalizedEntryModelImpl implements LocalizedEntry {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a localized entry model instance should use the <code>LocalizedEntry</code> interface instead.

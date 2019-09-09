@@ -21,17 +21,19 @@ import java.util.List;
  */
 public interface ResourceMonitor {
 
-	public Integer getAllowedResourceConnections();
-
 	public String getEtcdServerURL();
 
 	public String getKey();
+
+	public Integer getMaxResourceConnections();
 
 	public String getName();
 
 	public String getNewConnectionName();
 
 	public List<ResourceConnection> getResourceConnectionQueue();
+
+	public String getType();
 
 	public void printResourceConnectionQueue();
 

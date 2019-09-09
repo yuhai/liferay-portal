@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PortletPreferencesPersistence
 	extends BasePersistence<PortletPreferences> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PortletPreferencesUtil} to access the portlet preferences persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

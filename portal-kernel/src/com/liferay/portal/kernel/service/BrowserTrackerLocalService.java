@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BrowserTrackerLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BrowserTrackerLocalServiceUtil} to access the browser tracker local service. Add custom service methods to <code>com.liferay.portal.service.impl.BrowserTrackerLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

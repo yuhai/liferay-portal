@@ -16,8 +16,6 @@ package com.liferay.message.boards.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link MBMessageService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBMessageService
  * @generated
  */
-@ProviderType
 public class MBMessageServiceWrapper
 	implements MBMessageService, ServiceWrapper<MBMessageService> {
 
@@ -33,6 +30,11 @@ public class MBMessageServiceWrapper
 		_mbMessageService = mbMessageService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MBMessageServiceUtil} to access the message-boards message remote service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBMessageServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.message.boards.model.MBMessage addDiscussionMessage(
 			long groupId, String className, long classPK, long threadId,

@@ -15,7 +15,7 @@
 import React from 'react';
 import FieldType from './FieldType.es';
 
-export default ({fieldTypes, keywords}) => {
+export default ({fieldTypes, keywords, onAddColumn}) => {
 	const regex = new RegExp(keywords, 'ig');
 
 	return fieldTypes
@@ -27,5 +27,11 @@ export default ({fieldTypes, keywords}) => {
 
 			return regex.test(description) || regex.test(label);
 		})
-		.map(fieldType => <FieldType {...fieldType} key={fieldType.name} />);
+		.map((fieldType, index) => (
+			<FieldType
+				{...fieldType}
+				key={`${fieldType.name}_${index}`}
+				onAddColumn={onAddColumn}
+			/>
+		));
 };

@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Image}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Image
  * @generated
  */
-@ProviderType
 public class ImageWrapper
 	extends BaseModelWrapper<Image> implements Image, ModelWrapper<Image> {
 
@@ -201,6 +198,11 @@ public class ImageWrapper
 		return model.getWidth();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a image model instance should use the <code>Image</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

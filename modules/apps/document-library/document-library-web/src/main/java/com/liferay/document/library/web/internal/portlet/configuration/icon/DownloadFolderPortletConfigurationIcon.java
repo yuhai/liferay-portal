@@ -16,6 +16,9 @@ package com.liferay.document.library.web.internal.portlet.configuration.icon;
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.web.internal.portlet.action.ActionUtil;
+import com.liferay.document.library.web.internal.util.DLPortletConfigurationIconUtil;
+import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
@@ -63,27 +66,26 @@ public class DownloadFolderPortletConfigurationIcon
 	public String getURL(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		ResourceURL portletURL = (ResourceURL)_portal.getControlPanelPortletURL(
-			portletRequest, DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
-			PortletRequest.RESOURCE_PHASE);
-
-		portletURL.setResourceID("/document_library/download_folder");
-
-		Folder folder = null;
-
 		try {
-			folder = ActionUtil.getFolder(portletRequest);
-		}
-		catch (Exception e) {
-			return null;
-		}
+			ResourceURL portletURL =
+				(ResourceURL)_portal.getControlPanelPortletURL(
+					portletRequest, DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+					PortletRequest.RESOURCE_PHASE);
 
-		portletURL.setParameter(
-			"folderId", String.valueOf(folder.getFolderId()));
-		portletURL.setParameter(
-			"repositoryId", String.valueOf(folder.getRepositoryId()));
+			portletURL.setResourceID("/document_library/download_folder");
 
-		return portletURL.toString();
+			Folder folder = ActionUtil.getFolder(portletRequest);
+
+			portletURL.setParameter(
+				"folderId", String.valueOf(folder.getFolderId()));
+			portletURL.setParameter(
+				"repositoryId", String.valueOf(folder.getRepositoryId()));
+
+			return portletURL.toString();
+		}
+		catch (PortalException pe) {
+			return ReflectionUtil.throwException(pe);
+		}
 	}
 
 	@Override
@@ -93,26 +95,25 @@ public class DownloadFolderPortletConfigurationIcon
 
 	@Override
 	public boolean isShow(PortletRequest portletRequest) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		return DLPortletConfigurationIconUtil.runWithDefaultValueOnError(
+			false,
+			() -> {
+				Folder folder = ActionUtil.getFolder(portletRequest);
 
-		try {
-			Folder folder = ActionUtil.getFolder(portletRequest);
+				if (folder.isMountPoint()) {
+					return false;
+				}
 
-			if (folder.isMountPoint()) {
-				return false;
-			}
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)portletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-			return ModelResourcePermissionHelper.contains(
-				_folderModelResourcePermission,
-				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(), folder.getFolderId(),
-				ActionKeys.VIEW);
-		}
-		catch (Exception e) {
-		}
-
-		return false;
+				return ModelResourcePermissionHelper.contains(
+					_folderModelResourcePermission,
+					themeDisplay.getPermissionChecker(),
+					themeDisplay.getScopeGroupId(), folder.getFolderId(),
+					ActionKeys.VIEW);
+			});
 	}
 
 	@Override

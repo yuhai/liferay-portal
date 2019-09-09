@@ -52,7 +52,7 @@ public abstract class CalendarServiceBaseImpl
 	extends BaseServiceImpl
 	implements CalendarService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CalendarService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.calendar.service.CalendarServiceUtil</code>.

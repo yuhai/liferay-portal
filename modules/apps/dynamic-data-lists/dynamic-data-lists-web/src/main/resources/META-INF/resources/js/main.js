@@ -84,315 +84,7 @@ AUI.add(
 				textarea: A.TextAreaCellEditor
 			},
 
-			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._setDataStableSort(instance.get('data'));
-
-					instance.set('scrollable', true);
-
-					instance.on('dataChange', instance._onDataChange);
-					instance.on('model:change', instance._onRecordUpdate);
-				},
-
-				addEmptyRows: function(num) {
-					var instance = this;
-
-					var columns = instance.get('columns');
-					var data = instance.get('data');
-
-					var keys = columns.map(function(item, index) {
-						return item.key;
-					});
-
-					data.add(SpreadSheet.buildEmptyRecords(num, keys));
-				},
-
-				updateMinDisplayRows: function(minDisplayRows, callback) {
-					var instance = this;
-
-					callback =
-						(callback && A.bind(callback, instance)) || EMPTY_FN;
-
-					var recordsetId = instance.get('recordsetId');
-
-					Liferay.Service(
-						'/ddl.ddlrecordset/update-min-display-rows',
-						{
-							minDisplayRows: minDisplayRows,
-							recordSetId: recordsetId,
-							serviceContext: JSON.stringify({
-								scopeGroupId: themeDisplay.getScopeGroupId(),
-								userId: themeDisplay.getUserId()
-							})
-						},
-						callback
-					);
-				},
-
-				_afterActiveCellIndexChange: function(event) {
-					var instance = this;
-
-					var activeCell = instance.get('activeCell');
-					var boundingBox = instance.get('boundingBox');
-
-					var scrollableElement = boundingBox.one(
-						'.table-x-scroller'
-					);
-
-					var tableHighlightBorder = instance.highlight.get(
-						'activeBorderWidth'
-					)[0];
-
-					var activeCellWidth =
-						activeCell.outerWidth() + tableHighlightBorder;
-					var scrollableWidth = scrollableElement.outerWidth();
-
-					var activeCellOffsetLeft = activeCell.get('offsetLeft');
-					var scrollLeft = scrollableElement.get('scrollLeft');
-
-					var activeCellOffsetRight =
-						activeCellOffsetLeft + activeCellWidth;
-
-					var scrollTo = scrollLeft;
-
-					if (scrollLeft + scrollableWidth < activeCellOffsetRight) {
-						scrollTo = activeCellOffsetRight - scrollableWidth;
-					} else if (activeCellOffsetLeft < scrollLeft) {
-						scrollTo = activeCellOffsetLeft;
-					}
-
-					scrollableElement.set('scrollLeft', scrollTo);
-				},
-
-				_afterSelectionKey: function(event) {
-					var instance = this;
-
-					var activeCell = instance.get('activeCell');
-
-					var alignNode = event.alignNode || activeCell;
-
-					var column = instance.getColumn(alignNode);
-
-					if (
-						activeCell &&
-						event.keyCode === 13 &&
-						column.type !== 'textarea'
-					) {
-						instance._onEditCell(activeCell);
-					}
-				},
-
-				_normalizeFieldData: function(
-					item,
-					record,
-					fieldsDisplayValues,
-					normalized
-				) {
-					var instance = this;
-
-					var type = item.type;
-					var value = record.get(item.name);
-
-					if (
-						!record.changed[item.id] &&
-						(value && value.length > 0)
-					) {
-						return;
-					}
-
-					if (type === 'ddm-link-to-page') {
-						value = FormBuilder.Util.parseJSON(value);
-
-						delete value.name;
-
-						value = JSON.stringify(value);
-					} else if (type === 'select') {
-						if (!isArray(value)) {
-							value = AArray(value);
-						}
-
-						value = JSON.stringify(value);
-					}
-
-					normalized[item.name] = instance._normalizeValue(value);
-
-					fieldsDisplayValues.push(
-						item.name +
-							FIELDS_DISPLAY_INSTANCE_SEPARATOR +
-							instance._randomString(8)
-					);
-
-					if (isArray(item.fields)) {
-						item.fields.forEach(function(item) {
-							instance._normalizeFieldData(
-								item,
-								record,
-								fieldsDisplayValues,
-								normalized
-							);
-						});
-					}
-				},
-
-				_normalizeRecordData: function(record) {
-					var instance = this;
-
-					var structure = instance.get('structure');
-
-					var fieldsDisplayValues = [];
-					var normalized = {};
-
-					structure.forEach(function(item) {
-						instance._normalizeFieldData(
-							item,
-							record,
-							fieldsDisplayValues,
-							normalized
-						);
-					});
-
-					normalized[FIELDS_DISPLAY_NAME] = fieldsDisplayValues.join(
-						','
-					);
-
-					delete normalized.displayIndex;
-					delete normalized.recordId;
-
-					return normalized;
-				},
-
-				_normalizeValue: function(value) {
-					var instance = this;
-
-					return String(value);
-				},
-
-				_onDataChange: function(event) {
-					var instance = this;
-
-					instance._setDataStableSort(event.newVal);
-				},
-
-				_onEditCell: function(event) {
-					var instance = this;
-
-					SpreadSheet.superclass._onEditCell.apply(
-						instance,
-						arguments
-					);
-
-					var activeCell = instance.get('activeCell');
-
-					var alignNode = event.alignNode || activeCell;
-
-					var column = instance.getColumn(alignNode);
-					var record = instance.getRecord(alignNode);
-
-					var data = instance.get('data');
-					var portletNamespace = instance.get('portletNamespace');
-					var recordsetId = instance.get('recordsetId');
-					var structure = instance.get('structure');
-
-					var editor = instance.getEditor(record, column);
-
-					if (editor) {
-						editor.setAttrs({
-							data: data,
-							portletNamespace: portletNamespace,
-							record: record,
-							recordsetId: recordsetId,
-							structure: structure,
-							zIndex: Liferay.zIndex.OVERLAY
-						});
-					}
-				},
-
-				_onRecordUpdate: function(event) {
-					var instance = this;
-
-					if (!event.changed.hasOwnProperty('recordId')) {
-						var data = instance.get('data');
-						var recordsetId = instance.get('recordsetId');
-
-						var record = event.target;
-
-						var recordId = record.get('recordId');
-
-						var fieldsMap = instance._normalizeRecordData(record);
-
-						var recordIndex = data.indexOf(record);
-
-						if (recordId > 0) {
-							SpreadSheet.updateRecord(
-								recordId,
-								recordIndex,
-								fieldsMap,
-								true
-							);
-						} else {
-							SpreadSheet.addRecord(
-								recordsetId,
-								recordIndex,
-								fieldsMap,
-								function(json) {
-									if (json.recordId > 0) {
-										record.set('recordId', json.recordId, {
-											silent: true
-										});
-									}
-								}
-							);
-						}
-					}
-				},
-
-				_randomString: function(length) {
-					var random = Math.random();
-
-					var randomString = random.toString(36);
-
-					return randomString.substring(length);
-				},
-
-				_setDataStableSort: function(data) {
-					var instance = this;
-
-					data.sort = function(options) {
-						if (this.comparator) {
-							options = options || {};
-
-							var models = this._items.concat();
-
-							A.ArraySort.stableSort(
-								models,
-								A.bind(this._sort, this)
-							);
-
-							var facade = A.merge(options, {
-								models: models,
-								src: 'sort'
-							});
-
-							if (options.silent) {
-								this._defResetFn(facade);
-							} else {
-								this.fire('reset', facade);
-							}
-						}
-
-						return this;
-					};
-				}
-			},
-
-			addRecord: function(
-				recordsetId,
-				displayIndex,
-				fieldsMap,
-				callback
-			) {
+			addRecord(recordsetId, displayIndex, fieldsMap, callback) {
 				var instance = this;
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
@@ -400,7 +92,7 @@ AUI.add(
 				Liferay.Service(
 					'/ddl.ddlrecord/add-record',
 					{
-						displayIndex: displayIndex,
+						displayIndex,
 						fieldsMap: JSON.stringify(fieldsMap),
 						groupId: themeDisplay.getScopeGroupId(),
 						recordSetId: recordsetId,
@@ -414,15 +106,10 @@ AUI.add(
 				);
 			},
 
-			buildDataTableColumns: function(
-				columns,
-				locale,
-				structure,
-				editable
-			) {
+			buildDataTableColumns(columns, locale, structure, editable) {
 				var instance = this;
 
-				columns.forEach(function(item, index) {
+				columns.forEach(function(item) {
 					var dataType = item.dataType;
 					var label = item.label;
 					var name = item.name;
@@ -491,13 +178,13 @@ AUI.add(
 						};
 					} else if (type === 'ddm-date') {
 						config.inputFormatter = function(val) {
-							return val.map(function(item, index) {
+							return val.map(function(item) {
 								return A.DataType.Date.format(item);
 							});
 						};
 
 						config.outputFormatter = function(val) {
-							return val.map(function(item, index) {
+							return val.map(function(item) {
 								var date;
 
 								if (item !== STR_EMPTY) {
@@ -627,7 +314,7 @@ AUI.add(
 							var value = data[name];
 
 							if (isArray(value)) {
-								value.forEach(function(item1, index1) {
+								value.forEach(function(item1) {
 									label.push(options[item1]);
 								});
 							}
@@ -661,7 +348,7 @@ AUI.add(
 
 					validatorRules[name] = A.mix(
 						{
-							required: required
+							required
 						},
 						validatorRules[name]
 					);
@@ -678,7 +365,7 @@ AUI.add(
 				return columns;
 			},
 
-			buildEmptyRecords: function(num, keys) {
+			buildEmptyRecords(num, keys) {
 				var instance = this;
 
 				var emptyRows = [];
@@ -690,7 +377,7 @@ AUI.add(
 				return emptyRows;
 			},
 
-			findStructureFieldByAttribute: function(
+			findStructureFieldByAttribute(
 				fieldsArray,
 				attributeName,
 				attributeValue
@@ -718,10 +405,10 @@ AUI.add(
 				return structureField;
 			},
 
-			getCellEditorOptions: function(options, locale) {
+			getCellEditorOptions(options, locale) {
 				var normalized = {};
 
-				options.forEach(function(item, index) {
+				options.forEach(function(item) {
 					normalized[item.value] = item.label;
 
 					var localizationMap = item.localizationMap;
@@ -734,25 +421,321 @@ AUI.add(
 				return normalized;
 			},
 
-			getRecordModel: function(keys) {
-				var instance = this;
-
+			getRecordModel(keys) {
 				var recordModel = {};
 
-				keys.forEach(function(item, index) {
+				keys.forEach(function(item) {
 					recordModel[item] = STR_EMPTY;
 				});
 
 				return recordModel;
 			},
 
-			updateRecord: function(
-				recordId,
-				displayIndex,
-				fieldsMap,
-				merge,
-				callback
-			) {
+			prototype: {
+				_afterActiveCellIndexChange() {
+					var instance = this;
+
+					var activeCell = instance.get('activeCell');
+					var boundingBox = instance.get('boundingBox');
+
+					var scrollableElement = boundingBox.one(
+						'.table-x-scroller'
+					);
+
+					var tableHighlightBorder = instance.highlight.get(
+						'activeBorderWidth'
+					)[0];
+
+					var activeCellWidth =
+						activeCell.outerWidth() + tableHighlightBorder;
+					var scrollableWidth = scrollableElement.outerWidth();
+
+					var activeCellOffsetLeft = activeCell.get('offsetLeft');
+					var scrollLeft = scrollableElement.get('scrollLeft');
+
+					var activeCellOffsetRight =
+						activeCellOffsetLeft + activeCellWidth;
+
+					var scrollTo = scrollLeft;
+
+					if (scrollLeft + scrollableWidth < activeCellOffsetRight) {
+						scrollTo = activeCellOffsetRight - scrollableWidth;
+					} else if (activeCellOffsetLeft < scrollLeft) {
+						scrollTo = activeCellOffsetLeft;
+					}
+
+					scrollableElement.set('scrollLeft', scrollTo);
+				},
+
+				_afterSelectionKey(event) {
+					var instance = this;
+
+					var activeCell = instance.get('activeCell');
+
+					var alignNode = event.alignNode || activeCell;
+
+					var column = instance.getColumn(alignNode);
+
+					if (
+						activeCell &&
+						event.keyCode === 13 &&
+						column.type !== 'textarea'
+					) {
+						instance._onEditCell(activeCell);
+					}
+				},
+
+				_normalizeFieldData(
+					item,
+					record,
+					fieldsDisplayValues,
+					normalized
+				) {
+					var instance = this;
+
+					var type = item.type;
+					var value = record.get(item.name);
+
+					if (
+						!record.changed[item.id] &&
+						(value && value.length > 0)
+					) {
+						return;
+					}
+
+					if (type === 'ddm-link-to-page') {
+						value = FormBuilder.Util.parseJSON(value);
+
+						delete value.name;
+
+						value = JSON.stringify(value);
+					} else if (type === 'select') {
+						if (!isArray(value)) {
+							value = AArray(value);
+						}
+
+						value = JSON.stringify(value);
+					}
+
+					normalized[item.name] = instance._normalizeValue(value);
+
+					fieldsDisplayValues.push(
+						item.name +
+							FIELDS_DISPLAY_INSTANCE_SEPARATOR +
+							instance._randomString(8)
+					);
+
+					if (isArray(item.fields)) {
+						item.fields.forEach(function(item) {
+							instance._normalizeFieldData(
+								item,
+								record,
+								fieldsDisplayValues,
+								normalized
+							);
+						});
+					}
+				},
+
+				_normalizeRecordData(record) {
+					var instance = this;
+
+					var structure = instance.get('structure');
+
+					var fieldsDisplayValues = [];
+					var normalized = {};
+
+					structure.forEach(function(item) {
+						instance._normalizeFieldData(
+							item,
+							record,
+							fieldsDisplayValues,
+							normalized
+						);
+					});
+
+					normalized[FIELDS_DISPLAY_NAME] = fieldsDisplayValues.join(
+						','
+					);
+
+					delete normalized.displayIndex;
+					delete normalized.recordId;
+
+					return normalized;
+				},
+
+				_normalizeValue(value) {
+					return String(value);
+				},
+
+				_onDataChange(event) {
+					var instance = this;
+
+					instance._setDataStableSort(event.newVal);
+				},
+
+				_onEditCell(event) {
+					var instance = this;
+
+					SpreadSheet.superclass._onEditCell.apply(
+						instance,
+						arguments
+					);
+
+					var activeCell = instance.get('activeCell');
+
+					var alignNode = event.alignNode || activeCell;
+
+					var column = instance.getColumn(alignNode);
+					var record = instance.getRecord(alignNode);
+
+					var data = instance.get('data');
+					var portletNamespace = instance.get('portletNamespace');
+					var recordsetId = instance.get('recordsetId');
+					var structure = instance.get('structure');
+
+					var editor = instance.getEditor(record, column);
+
+					if (editor) {
+						editor.setAttrs({
+							data,
+							portletNamespace,
+							record,
+							recordsetId,
+							structure,
+							zIndex: Liferay.zIndex.OVERLAY
+						});
+					}
+				},
+
+				_onRecordUpdate(event) {
+					var instance = this;
+
+					if (
+						!Object.prototype.hasOwnProperty.call(
+							event.changed,
+							'recordId'
+						)
+					) {
+						var data = instance.get('data');
+						var recordsetId = instance.get('recordsetId');
+
+						var record = event.target;
+
+						var recordId = record.get('recordId');
+
+						var fieldsMap = instance._normalizeRecordData(record);
+
+						var recordIndex = data.indexOf(record);
+
+						if (recordId > 0) {
+							SpreadSheet.updateRecord(
+								recordId,
+								recordIndex,
+								fieldsMap,
+								true
+							);
+						} else {
+							SpreadSheet.addRecord(
+								recordsetId,
+								recordIndex,
+								fieldsMap,
+								function(json) {
+									if (json.recordId > 0) {
+										record.set('recordId', json.recordId, {
+											silent: true
+										});
+									}
+								}
+							);
+						}
+					}
+				},
+
+				_randomString(length) {
+					var random = Math.random();
+
+					var randomString = random.toString(36);
+
+					return randomString.substring(length);
+				},
+
+				_setDataStableSort(data) {
+					data.sort = function(options) {
+						if (this.comparator) {
+							options = options || {};
+
+							var models = this._items.concat();
+
+							A.ArraySort.stableSort(
+								models,
+								A.bind(this._sort, this)
+							);
+
+							var facade = A.merge(options, {
+								models,
+								src: 'sort'
+							});
+
+							if (options.silent) {
+								this._defResetFn(facade);
+							} else {
+								this.fire('reset', facade);
+							}
+						}
+
+						return this;
+					};
+				},
+
+				addEmptyRows(num) {
+					var instance = this;
+
+					var columns = instance.get('columns');
+					var data = instance.get('data');
+
+					var keys = columns.map(function(item) {
+						return item.key;
+					});
+
+					data.add(SpreadSheet.buildEmptyRecords(num, keys));
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._setDataStableSort(instance.get('data'));
+
+					instance.set('scrollable', true);
+
+					instance.on('dataChange', instance._onDataChange);
+					instance.on('model:change', instance._onRecordUpdate);
+				},
+
+				updateMinDisplayRows(minDisplayRows, callback) {
+					var instance = this;
+
+					callback =
+						(callback && A.bind(callback, instance)) || EMPTY_FN;
+
+					var recordsetId = instance.get('recordsetId');
+
+					Liferay.Service(
+						'/ddl.ddlrecordset/update-min-display-rows',
+						{
+							minDisplayRows,
+							recordSetId: recordsetId,
+							serviceContext: JSON.stringify({
+								scopeGroupId: themeDisplay.getScopeGroupId(),
+								userId: themeDisplay.getUserId()
+							})
+						},
+						callback
+					);
+				}
+			},
+
+			updateRecord(recordId, displayIndex, fieldsMap, merge, callback) {
 				var instance = this;
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
@@ -760,10 +743,10 @@ AUI.add(
 				Liferay.Service(
 					'/ddl.ddlrecord/update-record',
 					{
-						displayIndex: displayIndex,
+						displayIndex,
 						fieldsMap: JSON.stringify(fieldsMap),
 						mergeFields: merge,
-						recordId: recordId,
+						recordId,
 						serviceContext: JSON.stringify({
 							scopeGroupId: themeDisplay.getScopeGroupId(),
 							userId: themeDisplay.getUserId(),
@@ -778,9 +761,7 @@ AUI.add(
 		Liferay.SpreadSheet = SpreadSheet;
 
 		var DDLUtil = {
-			previewDialog: null,
-
-			openPreviewDialog: function(content) {
+			openPreviewDialog(content) {
 				var instance = this;
 
 				var previewDialog = instance.previewDialog;
@@ -799,7 +780,9 @@ AUI.add(
 
 					previewDialog.set('bodyContent', content);
 				}
-			}
+			},
+
+			previewDialog: null
 		};
 
 		Liferay.DDLUtil = DDLUtil;

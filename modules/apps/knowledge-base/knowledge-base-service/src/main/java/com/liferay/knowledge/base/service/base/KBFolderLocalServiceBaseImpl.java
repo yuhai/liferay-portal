@@ -57,7 +57,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -71,12 +70,11 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.knowledge.base.service.impl.KBFolderLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class KBFolderLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements KBFolderLocalService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KBFolderLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.knowledge.base.service.KBFolderLocalServiceUtil</code>.

@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileShortcutLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileShortcutLocalServiceUtil} to access the document library file shortcut local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileShortcutLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ChangesetCollection}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ChangesetCollection
  * @generated
  */
-@ProviderType
 public class ChangesetCollectionWrapper
 	extends BaseModelWrapper<ChangesetCollection>
 	implements ChangesetCollection, ModelWrapper<ChangesetCollection> {
@@ -226,6 +223,11 @@ public class ChangesetCollectionWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a changeset collection model instance should use the <code>ChangesetCollection</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.util.Accessor;
 @ProviderType
 public interface BigDecimalEntry extends BigDecimalEntryModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.tools.service.builder.test.model.impl.BigDecimalEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

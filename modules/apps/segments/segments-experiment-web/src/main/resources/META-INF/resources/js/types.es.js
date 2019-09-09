@@ -39,7 +39,8 @@ const SegmentsVariantType = PropTypes.shape({
 	segmentsExperienceId: PropTypes.string.isRequired,
 	segmentsExperimentId: PropTypes.string.isRequired,
 	segmentsExperimentRelId: PropTypes.string.isRequired,
-	split: PropTypes.number.isRequired
+	split: PropTypes.number.isRequired,
+	winner: PropTypes.bool
 });
 
 const SegmentsExperimentGoal = PropTypes.shape({

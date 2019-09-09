@@ -16,8 +16,6 @@ package com.liferay.message.boards.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link MBMailingListLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBMailingListLocalService
  * @generated
  */
-@ProviderType
 public class MBMailingListLocalServiceWrapper
 	implements MBMailingListLocalService,
 			   ServiceWrapper<MBMailingListLocalService> {
@@ -36,6 +33,11 @@ public class MBMailingListLocalServiceWrapper
 		_mbMailingListLocalService = mbMailingListLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MBMailingListLocalServiceUtil} to access the message boards mailing list local service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBMailingListLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.message.boards.model.MBMailingList addMailingList(
 			long userId, long groupId, long categoryId, String emailAddress,

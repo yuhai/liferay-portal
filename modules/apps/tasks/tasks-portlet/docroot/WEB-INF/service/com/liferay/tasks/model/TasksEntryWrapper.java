@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link TasksEntry}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see TasksEntry
  * @generated
  */
-@ProviderType
 public class TasksEntryWrapper
 	extends BaseModelWrapper<TasksEntry>
 	implements TasksEntry, ModelWrapper<TasksEntry> {
@@ -350,6 +347,11 @@ public class TasksEntryWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a tasks entry model instance should use the <code>TasksEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

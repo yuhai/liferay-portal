@@ -61,7 +61,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -78,12 +77,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = CalendarResourcePersistence.class)
-@ProviderType
 public class CalendarResourcePersistenceImpl
 	extends BasePersistenceImpl<CalendarResource>
 	implements CalendarResourcePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>CalendarResourceUtil</code> to access the calendar resource persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialActivitySet
 	extends PersistedModel, SocialActivitySetModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.social.model.impl.SocialActivitySetImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

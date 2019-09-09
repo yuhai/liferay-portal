@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsExperiment
 	extends PersistedModel, SegmentsExperimentModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.segments.model.impl.SegmentsExperimentImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -75,5 +75,9 @@ public interface SegmentsExperiment
 
 	public com.liferay.portal.kernel.util.UnicodeProperties
 		getTypeSettingsProperties();
+
+	public long getWinnerSegmentsExperienceId();
+
+	public String getWinnerSegmentsExperienceKey();
 
 }

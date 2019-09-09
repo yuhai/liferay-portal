@@ -43,8 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The persistence implementation for the membership request service.
  *
@@ -55,12 +53,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
 public class MembershipRequestPersistenceImpl
 	extends BasePersistenceImpl<MembershipRequest>
 	implements MembershipRequestPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>MembershipRequestUtil</code> to access the membership request persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

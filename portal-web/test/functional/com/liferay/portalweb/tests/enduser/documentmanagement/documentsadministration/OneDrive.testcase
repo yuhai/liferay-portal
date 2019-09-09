@@ -66,6 +66,14 @@ definition {
 		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		OneDrive.goToOneDrive();
+
+		for (var documentTitle : list "Excel Sheet Title,PowerPoint Presentation Title,Word Doc Title") {
+			OneDrive.deleteDocument(dmDocumentTitle = "${documentTitle}");
+		}
+
+		Navigator.openURL();
 	}
 
 	@description = "This test ensures that an Excel sheet can be added via the OneDrive editor."
@@ -77,26 +85,19 @@ definition {
 
 		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Excel");
 
-		MicrosoftLogin.accountSignIn(
-			userEmail = "${userName}",
-			userPassword = "${userPassword}",
-			windowTitle = "Sign in to your account");
-
-		MicrosoftLogin.confirmMicrosoftApp();
-
-		OneDrive.editTitle(
+		OneDrive.AddDocument(
 			dmDocumentTitle = "Excel Sheet Title",
-			key_documentType = "xlsx");
+			key_documentTitle = "Excel Sheet Title.xlsx");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMDocument.viewCheckedoutPG(
-			dmDocumentTitle = "Untitled",
+			dmDocumentTitle = "Excel Sheet Title",
 			status = "Draft");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMDocument.checkinPG(dmDocumentTitle = "Untitled");
+		DMDocument.checkinPG(dmDocumentTitle = "Excel Sheet Title");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
@@ -115,26 +116,19 @@ definition {
 
 		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "PowerPoint");
 
-		MicrosoftLogin.accountSignIn(
-			userEmail = "${userName}",
-			userPassword = "${userPassword}",
-			windowTitle = "Sign in to your account");
-
-		MicrosoftLogin.confirmMicrosoftApp();
-
-		OneDrive.editTitle(
+		OneDrive.AddDocument(
 			dmDocumentTitle = "PowerPoint Presentation Title",
-			key_documentType = "pptx");
+			key_documentTitle = "PowerPoint Presentation Title.pptx");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMDocument.viewCheckedoutPG(
-			dmDocumentTitle = "Untitled",
+			dmDocumentTitle = "PowerPoint Presentation Title",
 			status = "Draft");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMDocument.checkinPG(dmDocumentTitle = "Untitled");
+		DMDocument.checkinPG(dmDocumentTitle = "PowerPoint Presentation Title");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
@@ -153,26 +147,19 @@ definition {
 
 		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Word");
 
-		MicrosoftLogin.accountSignIn(
-			userEmail = "${userName}",
-			userPassword = "${userPassword}",
-			windowTitle = "Sign in to your account");
-
-		MicrosoftLogin.confirmMicrosoftApp();
-
-		OneDrive.editTitle(
+		OneDrive.AddDocument(
 			dmDocumentTitle = "Word Doc Title",
-			key_documentType = "docx");
+			key_documentTitle = "Word Doc Title.docx");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMDocument.viewCheckedoutPG(
-			dmDocumentTitle = "Untitled",
+			dmDocumentTitle = "Word Doc Title",
 			status = "Draft");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMDocument.checkinPG(dmDocumentTitle = "Untitled");
+		DMDocument.checkinPG(dmDocumentTitle = "Word Doc Title");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
@@ -195,13 +182,6 @@ definition {
 			dmDocumentTitle = "Document_2.xlsx");
 
 		OneDrive.gotoEdit(dmDocumentTitle = "Document_2.xlsx");
-
-		MicrosoftLogin.accountSignIn(
-			userEmail = "${userName}",
-			userPassword = "${userPassword}",
-			windowTitle = "Sign in to your account");
-
-		MicrosoftLogin.confirmMicrosoftApp();
 
 		OneDrive.editTitle(
 			dmDocumentTitle = "Excel Sheet Title Edited",
@@ -239,13 +219,6 @@ definition {
 
 		OneDrive.gotoEdit(dmDocumentTitle = "Document_2.pptx");
 
-		MicrosoftLogin.accountSignIn(
-			userEmail = "${userName}",
-			userPassword = "${userPassword}",
-			windowTitle = "Sign in to your account");
-
-		MicrosoftLogin.confirmMicrosoftApp();
-
 		OneDrive.editTitle(
 			dmDocumentTitle = "Powerpoint Presentation Title Edited",
 			key_documentTitle = "Document_2.pptx");
@@ -281,13 +254,6 @@ definition {
 			dmDocumentTitle = "Document_2.docx");
 
 		OneDrive.gotoEdit(dmDocumentTitle = "Document_2.docx");
-
-		MicrosoftLogin.accountSignIn(
-			userEmail = "${userName}",
-			userPassword = "${userPassword}",
-			windowTitle = "Sign in to your account");
-
-		MicrosoftLogin.confirmMicrosoftApp();
 
 		OneDrive.editTitle(
 			dmDocumentTitle = "Word Doc Title Edited",

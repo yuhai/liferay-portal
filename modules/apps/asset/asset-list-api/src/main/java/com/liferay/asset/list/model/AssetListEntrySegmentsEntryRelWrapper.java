@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetListEntrySegmentsEntryRel}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetListEntrySegmentsEntryRel
  * @generated
  */
-@ProviderType
 public class AssetListEntrySegmentsEntryRelWrapper
 	extends BaseModelWrapper<AssetListEntrySegmentsEntryRel>
 	implements AssetListEntrySegmentsEntryRel,
@@ -284,6 +281,11 @@ public class AssetListEntrySegmentsEntryRelWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset list entry segments entry rel model instance should use the <code>AssetListEntrySegmentsEntryRel</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

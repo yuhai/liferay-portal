@@ -92,8 +92,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the group local service.
  *
@@ -105,12 +103,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portal.service.impl.GroupLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class GroupLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements GroupLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>GroupLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.GroupLocalServiceUtil</code>.

@@ -54,23 +54,7 @@ AUI.add(
 			NAME: 'menufilter',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._renderUI();
-					instance._bindUIACBase();
-					instance._syncUIACBase();
-				},
-
-				reset: function() {
-					var instance = this;
-
-					instance.get('inputNode').val(STR_EMPTY);
-
-					instance._menuItems.removeClass(CSS_HIDE);
-				},
-
-				_filterMenu: function(event) {
+				_filterMenu(event) {
 					var instance = this;
 
 					instance._menuItems.addClass(CSS_HIDE);
@@ -80,7 +64,7 @@ AUI.add(
 					});
 				},
 
-				_renderUI: function() {
+				_renderUI() {
 					var instance = this;
 
 					var node = instance.get('content');
@@ -96,6 +80,22 @@ AUI.add(
 					instance._menuItems = menuItems;
 
 					instance.on('results', instance._filterMenu, instance);
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._renderUI();
+					instance._bindUIACBase();
+					instance._syncUIACBase();
+				},
+
+				reset() {
+					var instance = this;
+
+					instance.get('inputNode').val(STR_EMPTY);
+
+					instance._menuItems.removeClass(CSS_HIDE);
 				}
 			}
 		});

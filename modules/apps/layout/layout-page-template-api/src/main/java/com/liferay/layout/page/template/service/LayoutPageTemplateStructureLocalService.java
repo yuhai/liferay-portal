@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutPageTemplateStructureLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutPageTemplateStructureLocalServiceUtil} to access the layout page template structure local service. Add custom service methods to <code>com.liferay.layout.page.template.service.impl.LayoutPageTemplateStructureLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

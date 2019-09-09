@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.layout.content.page.editor.sidebar.panel.ContentPageEditorSidebarPanel;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
@@ -33,6 +34,8 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
+import java.util.List;
+
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,13 +48,13 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 	public ContentPageEditorLayoutPageTemplateDisplayContext(
 		HttpServletRequest httpServletRequest, RenderResponse renderResponse,
-		String className, long classPK, boolean pageIsDisplayPage,
-		FragmentRendererController fragmentRendererController,
-		CommentManager commentManager) {
+		boolean pageIsDisplayPage, CommentManager commentManager,
+		List<ContentPageEditorSidebarPanel> contentPageEditorSidebarPanels,
+		FragmentRendererController fragmentRendererController) {
 
 		super(
-			httpServletRequest, renderResponse, className, classPK,
-			commentManager, fragmentRendererController);
+			httpServletRequest, renderResponse, commentManager,
+			contentPageEditorSidebarPanels, fragmentRendererController);
 
 		_pageIsDisplayPage = pageIsDisplayPage;
 	}
@@ -64,16 +67,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 		SoyContext soyContext = super.getEditorSoyContext();
 
-		soyContext.put(
-			"getInfoClassTypesURL",
-			getFragmentEntryActionURL("/content_layout/get_info_class_types")
-		).put(
-			"getInfoDisplayContributorsURL",
-			getFragmentEntryActionURL(
-				"/content_layout/get_info_display_contributors")
-		).put(
-			"lastSaveDate", StringPool.BLANK
-		);
+		soyContext.put("lastSaveDate", StringPool.BLANK);
 
 		if (_pageIsDisplayPage) {
 			soyContext.put(
@@ -107,12 +101,6 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			soyContext.put("status", LanguageUtil.get(request, statusLabel));
 		}
 
-		soyContext.put(
-			"updateLayoutPageTemplateEntryAssetTypeURL",
-			getFragmentEntryActionURL(
-				"/content_layout" +
-					"/update_layout_page_template_entry_asset_type"));
-
 		_editorSoyContext = soyContext;
 
 		return _editorSoyContext;
@@ -139,7 +127,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			return _layoutPageTemplateEntry;
 		}
 
-		Layout draftLayout = LayoutLocalServiceUtil.getLayout(classPK);
+		Layout draftLayout = themeDisplay.getLayout();
 
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(
 			draftLayout.getClassPK());
@@ -163,7 +151,9 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				layoutPageTemplateEntry.getClassName());
 
-		if (assetRendererFactory == null) {
+		if ((assetRendererFactory == null) ||
+			!assetRendererFactory.isSupportsClassTypes()) {
+
 			return null;
 		}
 
@@ -215,9 +205,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 		String subtypeLabel = _getMappingSubtypeLabel();
 
-		if ((layoutPageTemplateEntry.getClassTypeId() >= 0) &&
-			Validator.isNotNull(subtypeLabel)) {
-
+		if (Validator.isNotNull(subtypeLabel)) {
 			SoyContext subtypeSoyContext =
 				SoyContextFactoryUtil.createSoyContext();
 

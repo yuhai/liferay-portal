@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link LayoutBranch}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutBranch
  * @generated
  */
-@ProviderType
 public class LayoutBranchWrapper
 	extends BaseModelWrapper<LayoutBranch>
 	implements LayoutBranch, ModelWrapper<LayoutBranch> {
@@ -267,6 +264,11 @@ public class LayoutBranchWrapper
 		return model.isMaster();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a layout branch model instance should use the <code>LayoutBranch</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

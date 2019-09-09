@@ -47,12 +47,65 @@ AUI.add(
 
 			EXTENDS: A.Plugin.Base,
 
-			NAME: NAME,
+			NAME,
 
 			NS: NAME,
 
 			prototype: {
-				initializer: function() {
+				_calculateDimensions() {
+					var instance = this;
+
+					var region = instance.get('host').get('region');
+
+					instance.get('clone').setStyles({
+						left: region.left + 'px',
+						width: region.width + 'px'
+					});
+
+					instance.set(
+						'hostMidpoint',
+						region.top + region.height / 2
+					);
+				},
+
+				_onScroll(event) {
+					var instance = this;
+
+					var scrollTop = event.currentTarget.get('scrollTop');
+
+					var hudcrumbs = instance.get('clone');
+
+					var action = 'hide';
+
+					if (scrollTop >= instance.get('hostMidpoint')) {
+						action = 'show';
+					}
+
+					if (instance.lastAction != action) {
+						hudcrumbs[action]();
+					}
+
+					instance.lastAction = action;
+				},
+
+				_onStartNavigate() {
+					var instance = this;
+
+					instance.get('clone').hide();
+				},
+
+				destructor() {
+					var instance = this;
+
+					Liferay.detach('startNavigate', instance._onStartNavigate);
+
+					var win = instance._win;
+
+					win.detach('scroll', instance._onScrollTask);
+					win.detach('windowresize', instance._calculateDimensions);
+				},
+
+				initializer() {
 					var instance = this;
 
 					var breadcrumbs = instance.get('host');
@@ -94,59 +147,6 @@ AUI.add(
 						instance._onStartNavigate,
 						instance
 					);
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					Liferay.detach('startNavigate', instance._onStartNavigate);
-
-					var win = instance._win;
-
-					win.detach('scroll', instance._onScrollTask);
-					win.detach('windowresize', instance._calculateDimensions);
-				},
-
-				_calculateDimensions: function(event) {
-					var instance = this;
-
-					var region = instance.get('host').get('region');
-
-					instance.get('clone').setStyles({
-						left: region.left + 'px',
-						width: region.width + 'px'
-					});
-
-					instance.set(
-						'hostMidpoint',
-						region.top + region.height / 2
-					);
-				},
-
-				_onScroll: function(event) {
-					var instance = this;
-
-					var scrollTop = event.currentTarget.get('scrollTop');
-
-					var hudcrumbs = instance.get('clone');
-
-					var action = 'hide';
-
-					if (scrollTop >= instance.get('hostMidpoint')) {
-						action = 'show';
-					}
-
-					if (instance.lastAction != action) {
-						hudcrumbs[action]();
-					}
-
-					instance.lastAction = action;
-				},
-
-				_onStartNavigate: function(event) {
-					var instance = this;
-
-					instance.get('clone').hide();
 				}
 			}
 		});

@@ -47,7 +47,7 @@ public abstract class BackgroundTaskServiceBaseImpl
 	extends BaseServiceImpl
 	implements BackgroundTaskService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>BackgroundTaskService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.background.task.service.BackgroundTaskServiceUtil</code>.

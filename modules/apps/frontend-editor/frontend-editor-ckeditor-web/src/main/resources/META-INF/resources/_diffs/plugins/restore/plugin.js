@@ -16,10 +16,10 @@
 	var pluginName = 'restore';
 
 	CKEDITOR.plugins.add(pluginName, {
-		init: function(editor) {
+		init(editor) {
 			editor.addCommand(pluginName, {
 				canUndo: false,
-				exec: function(editor) {
+				exec(editor) {
 					editor.fire('restoreContent');
 				}
 			});

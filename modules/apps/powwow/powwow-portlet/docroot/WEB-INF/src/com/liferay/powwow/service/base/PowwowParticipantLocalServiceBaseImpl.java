@@ -51,8 +51,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the powwow participant local service.
  *
@@ -64,12 +62,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.powwow.service.impl.PowwowParticipantLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class PowwowParticipantLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements PowwowParticipantLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PowwowParticipantLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.powwow.service.PowwowParticipantLocalServiceUtil</code>.

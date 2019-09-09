@@ -17,8 +17,6 @@ package com.liferay.portlet.exportimport.model.impl;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the ExportImportConfiguration service. Represents a row in the &quot;ExportImportConfiguration&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,12 +29,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ExportImportConfiguration
  * @generated
  */
-@ProviderType
 public abstract class ExportImportConfigurationBaseImpl
 	extends ExportImportConfigurationModelImpl
 	implements ExportImportConfiguration {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a export import configuration model instance should use the <code>ExportImportConfiguration</code> interface instead.

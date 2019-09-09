@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link PortletItem}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PortletItem
  * @generated
  */
-@ProviderType
 public class PortletItemWrapper
 	extends BaseModelWrapper<PortletItem>
 	implements PortletItem, ModelWrapper<PortletItem> {
@@ -268,6 +265,11 @@ public class PortletItemWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a portlet item model instance should use the <code>PortletItem</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

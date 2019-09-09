@@ -49,7 +49,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface MDRRuleGroupService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MDRRuleGroupServiceUtil} to access the mdr rule group remote service. Add custom service methods to <code>com.liferay.mobile.device.rules.service.impl.MDRRuleGroupServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

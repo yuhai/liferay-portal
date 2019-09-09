@@ -42,7 +42,7 @@ AUI.add(
 			ATTRS: {
 				aceOptions: {
 					validator: Lang.isObject,
-					valueFn: function() {
+					valueFn() {
 						var instance = this;
 
 						var aceEditor = instance.getEditor();
@@ -62,7 +62,7 @@ AUI.add(
 				},
 
 				height: {
-					validator: function(value) {
+					validator(value) {
 						return Lang.isString(value) || Lang.isNumber(value);
 					},
 					value: 'auto'
@@ -70,7 +70,7 @@ AUI.add(
 
 				themes: {
 					validator: Array.isArray,
-					valueFn: function() {
+					valueFn() {
 						return [
 							{
 								cssClass: '',
@@ -89,7 +89,7 @@ AUI.add(
 				},
 
 				width: {
-					validator: function(value) {
+					validator(value) {
 						return Lang.isString(value) || Lang.isNumber(value);
 					},
 					value: '100%'
@@ -105,26 +105,61 @@ AUI.add(
 			NS: 'liferaysourceeditor',
 
 			prototype: {
-				CONTENT_TEMPLATE: null,
-
-				initializer: function() {
+				_highlightActiveGutterLine(line) {
 					var instance = this;
 
-					var aceEditor = instance.getEditor();
+					var session = instance.getSession();
 
-					aceEditor.setOptions(instance.get('aceOptions'));
+					if (instance._currentLine !== null) {
+						session.removeGutterDecoration(
+							instance._currentLine,
+							CSS_ACTIVE_CELL
+						);
+					}
 
-					instance._initializeThemes();
-					instance._highlightActiveGutterLine(0);
+					session.addGutterDecoration(line, CSS_ACTIVE_CELL);
 
-					// LPS-67768
+					instance._currentLine = line;
+				},
 
-					if (UA.linux && UA.chrome) {
-						aceEditor.renderer.$computeLayerConfig();
+				_initializeThemes() {
+					var instance = this;
+
+					var themes = instance.get(STR_THEMES);
+
+					if (themes.length) {
+						instance
+							.get(STR_BOUNDING_BOX)
+							.addClass(themes[0].cssClass);
 					}
 				},
 
-				bindUI: function() {
+				_notifyEditorChange(data) {
+					var instance = this;
+
+					instance.fire('change', {
+						change: data,
+						newVal: instance.get('value')
+					});
+				},
+
+				_updateActiveLine() {
+					var instance = this;
+
+					var line = instance.getEditor().getCursorPosition().row;
+
+					var session = instance.getSession();
+
+					if (session.isRowFolded(line)) {
+						line = session.getRowFoldStart(line);
+					}
+
+					instance._highlightActiveGutterLine(line);
+				},
+
+				CONTENT_TEMPLATE: null,
+
+				bindUI() {
 					var instance = this;
 
 					var updateActiveLineFn = A.bind(
@@ -145,7 +180,7 @@ AUI.add(
 					);
 				},
 
-				destructor: function() {
+				destructor() {
 					var instance = this;
 
 					var aceEditor = instance.getEditor();
@@ -157,7 +192,7 @@ AUI.add(
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
-				getEditor: function() {
+				getEditor() {
 					var instance = this;
 
 					if (!instance.editor) {
@@ -183,7 +218,24 @@ AUI.add(
 					return instance.editor;
 				},
 
-				switchTheme: function(themeToSwitch) {
+				initializer() {
+					var instance = this;
+
+					var aceEditor = instance.getEditor();
+
+					aceEditor.setOptions(instance.get('aceOptions'));
+
+					instance._initializeThemes();
+					instance._highlightActiveGutterLine(0);
+
+					// LPS-67768
+
+					if (UA.linux && UA.chrome) {
+						aceEditor.renderer.$computeLayerConfig();
+					}
+				},
+
+				switchTheme(themeToSwitch) {
 					var instance = this;
 
 					var themes = instance.get(STR_THEMES);
@@ -212,63 +264,11 @@ AUI.add(
 					instance._currentThemeIndex = currentThemeIndex;
 
 					instance.fire('themeSwitched', {
-						currentThemeIndex: currentThemeIndex,
-						nextThemeIndex: nextThemeIndex,
-						prevThemeIndex: prevThemeIndex,
-						themes: themes
+						currentThemeIndex,
+						nextThemeIndex,
+						prevThemeIndex,
+						themes
 					});
-				},
-
-				_highlightActiveGutterLine: function(line) {
-					var instance = this;
-
-					var session = instance.getSession();
-
-					if (instance._currentLine !== null) {
-						session.removeGutterDecoration(
-							instance._currentLine,
-							CSS_ACTIVE_CELL
-						);
-					}
-
-					session.addGutterDecoration(line, CSS_ACTIVE_CELL);
-
-					instance._currentLine = line;
-				},
-
-				_initializeThemes: function() {
-					var instance = this;
-
-					var themes = instance.get(STR_THEMES);
-
-					if (themes.length) {
-						instance
-							.get(STR_BOUNDING_BOX)
-							.addClass(themes[0].cssClass);
-					}
-				},
-
-				_notifyEditorChange: function(data) {
-					var instance = this;
-
-					instance.fire('change', {
-						change: data,
-						newVal: instance.get('value')
-					});
-				},
-
-				_updateActiveLine: function() {
-					var instance = this;
-
-					var line = instance.getEditor().getCursorPosition().row;
-
-					var session = instance.getSession();
-
-					if (session.isRowFolded(line)) {
-						line = session.getRowFoldStart(line);
-					}
-
-					instance._highlightActiveGutterLine(line);
 				}
 			}
 		});

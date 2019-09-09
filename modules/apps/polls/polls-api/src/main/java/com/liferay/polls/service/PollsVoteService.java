@@ -44,7 +44,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface PollsVoteService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PollsVoteServiceUtil} to access the polls vote remote service. Add custom service methods to <code>com.liferay.polls.service.impl.PollsVoteServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

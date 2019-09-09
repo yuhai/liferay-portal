@@ -86,6 +86,7 @@ export const EDITABLE_FIELD_CONFIG_KEYS = {
 	imageLink: 'imageLink',
 	imageSource: 'imageSource',
 	imageTarget: 'imageTarget',
+	imageTitle: 'imageTitle',
 	textAlignment: 'textAlignment',
 	textColor: 'textColor',
 	textStyle: 'textStyle'

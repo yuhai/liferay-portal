@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link LayoutFriendlyURL}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutFriendlyURL
  * @generated
  */
-@ProviderType
 public class LayoutFriendlyURLWrapper
 	extends BaseModelWrapper<LayoutFriendlyURL>
 	implements LayoutFriendlyURL, ModelWrapper<LayoutFriendlyURL> {
@@ -320,6 +317,11 @@ public class LayoutFriendlyURLWrapper
 		return model.isPrivateLayout();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a layout friendly url model instance should use the <code>LayoutFriendlyURL</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLFileRank}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileRank
  * @generated
  */
-@ProviderType
 public class DLFileRankWrapper
 	extends BaseModelWrapper<DLFileRank>
 	implements DLFileRank, ModelWrapper<DLFileRank> {
@@ -201,6 +198,11 @@ public class DLFileRankWrapper
 		return model.isActive();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a document library file rank model instance should use the <code>DLFileRank</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -57,7 +57,7 @@ import java.util.Map;
 public interface LocalizedEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LocalizedEntryLocalServiceUtil} to access the localized entry local service. Add custom service methods to <code>com.liferay.portal.tools.service.builder.test.service.impl.LocalizedEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

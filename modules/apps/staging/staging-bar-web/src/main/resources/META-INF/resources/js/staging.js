@@ -15,10 +15,8 @@
 AUI.add(
 	'liferay-staging',
 	function(A) {
-		var Lang = A.Lang;
-
 		var StagingBar = {
-			init: function(config) {
+			init(config) {
 				var instance = this;
 
 				var namespace = config.namespace;
@@ -37,7 +35,7 @@ AUI.add(
 					fireOnce: true
 				});
 
-				Liferay.after('initStagingBar', function(event) {
+				Liferay.after('initStagingBar', function() {
 					var body = A.getBody();
 
 					if (body.hasClass('has-staging-bar')) {

@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link UserTrackerPath}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see UserTrackerPath
  * @generated
  */
-@ProviderType
 public class UserTrackerPathWrapper
 	extends BaseModelWrapper<UserTrackerPath>
 	implements UserTrackerPath, ModelWrapper<UserTrackerPath> {
@@ -163,6 +160,11 @@ public class UserTrackerPathWrapper
 		return model.getUserTrackerPathId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a user tracker path model instance should use the <code>UserTrackerPath</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

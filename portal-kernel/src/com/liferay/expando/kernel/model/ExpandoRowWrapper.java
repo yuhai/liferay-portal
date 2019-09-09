@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ExpandoRow}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ExpandoRow
  * @generated
  */
-@ProviderType
 public class ExpandoRowWrapper
 	extends BaseModelWrapper<ExpandoRow>
 	implements ExpandoRow, ModelWrapper<ExpandoRow> {
@@ -147,6 +144,11 @@ public class ExpandoRowWrapper
 		return model.getTableId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a expando row model instance should use the <code>ExpandoRow</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

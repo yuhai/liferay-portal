@@ -65,7 +65,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -79,12 +78,11 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.portal.workflow.kaleo.service.impl.KaleoNodeLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class KaleoNodeLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements KaleoNodeLocalService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoNodeLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalServiceUtil</code>.

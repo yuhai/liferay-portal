@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SystemEventModel
 	extends AttachedModel, BaseModel<SystemEvent>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a system event model instance should use the {@link SystemEvent} interface instead.

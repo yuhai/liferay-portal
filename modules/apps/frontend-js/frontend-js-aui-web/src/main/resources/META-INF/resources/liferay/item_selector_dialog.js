@@ -53,13 +53,13 @@ AUI.add(
 					validator: Lang.isString
 				},
 
-				zIndex: {
-					validator: Lang.isNumber
-				},
-
 				visible: {
 					validator: Lang.isBoolean,
 					value: false
+				},
+
+				zIndex: {
+					validator: Lang.isNumber
 				}
 			},
 
@@ -68,16 +68,33 @@ AUI.add(
 			NS: 'item-selector-dialog',
 
 			prototype: {
+				_onItemSelected(event) {
+					var instance = this;
+
+					var currentItem = event.data;
+
+					var dialog = Util.getWindow(instance.get(STR_EVENT_NAME));
+
+					var addButton = dialog
+						.getToolbar('footer')
+						.get('boundingBox')
+						.one('#addButton');
+
+					Util.toggleDisabled(addButton, !currentItem);
+
+					instance._currentItem = currentItem;
+				},
+
 				/*
 				 * @deprecated since 7.2, unused
 				 */
-				close: function() {
+				close() {
 					var instance = this;
 
 					Util.getWindow(instance.get(STR_EVENT_NAME)).hide();
 				},
 
-				open: function() {
+				open() {
 					var instance = this;
 
 					var strings = instance.get('strings');
@@ -94,12 +111,12 @@ AUI.add(
 					Util.selectEntity(
 						{
 							dialog: {
-								cssClass: instance.get('dialogClasses'),
 								constrain: true,
+								cssClass: instance.get('dialogClasses'),
 								destroyOnHide: true,
 								modal: true,
 								on: {
-									visibleChange: function(event) {
+									visibleChange(event) {
 										if (!event.newVal) {
 											instance.set(
 												STR_SELECTED_ITEM,
@@ -116,7 +133,7 @@ AUI.add(
 										id: 'cancelButton',
 										label: strings.cancel,
 										on: {
-											click: function() {
+											click() {
 												instance.close();
 											}
 										}
@@ -127,7 +144,7 @@ AUI.add(
 										id: 'addButton',
 										label: strings.add,
 										on: {
-											click: function() {
+											click() {
 												instance._selectedItem =
 													instance._currentItem;
 												instance.close();
@@ -135,9 +152,9 @@ AUI.add(
 										}
 									}
 								],
-								zIndex: zIndex
+								zIndex
 							},
-							eventName: eventName,
+							eventName,
 							id: eventName,
 							stack: !zIndex,
 							title: instance.get('title'),
@@ -145,23 +162,6 @@ AUI.add(
 						},
 						A.bind(instance._onItemSelected, instance)
 					);
-				},
-
-				_onItemSelected: function(event) {
-					var instance = this;
-
-					var currentItem = event.data;
-
-					var dialog = Util.getWindow(instance.get(STR_EVENT_NAME));
-
-					var addButton = dialog
-						.getToolbar('footer')
-						.get('boundingBox')
-						.one('#addButton');
-
-					Util.toggleDisabled(addButton, !currentItem);
-
-					instance._currentItem = currentItem;
 				}
 			}
 		});

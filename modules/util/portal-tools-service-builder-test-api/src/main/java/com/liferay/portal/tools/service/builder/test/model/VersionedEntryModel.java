@@ -41,7 +41,7 @@ public interface VersionedEntryModel
 	extends BaseModel<VersionedEntry>, MVCCModel,
 			VersionedModel<VersionedEntryVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a versioned entry model instance should use the {@link VersionedEntry} interface instead.

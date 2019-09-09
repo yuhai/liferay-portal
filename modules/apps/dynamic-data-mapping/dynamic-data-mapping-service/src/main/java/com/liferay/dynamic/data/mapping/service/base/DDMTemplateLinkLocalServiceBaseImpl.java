@@ -46,7 +46,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -60,13 +59,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.dynamic.data.mapping.service.impl.DDMTemplateLinkLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DDMTemplateLinkLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMTemplateLinkLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalServiceUtil</code>.

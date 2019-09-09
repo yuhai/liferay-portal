@@ -53,101 +53,11 @@ class DataLayoutBuilder extends Component {
 		}
 	}
 
-	getFieldTypes() {
-		const {fieldTypes} = this.props;
-
-		return fieldTypes;
+	dispatch(event, payload) {
+		this.refs.layoutProvider.dispatch(event, payload);
 	}
 
-	render() {
-		const {
-			context,
-			defaultLanguageId,
-			editingLanguageId,
-			fieldTypes,
-			portletNamespace,
-			spritemap
-		} = this.props;
-
-		const layoutProviderProps = {
-			...this.props,
-			defaultLanguageId,
-			editingLanguageId,
-			events: {
-				pagesChanged: this._handlePagesChanged.bind(this)
-			},
-			initialPages: context.pages,
-			initialPaginationMode: context.paginationMode,
-			ref: 'layoutProvider'
-		};
-
-		const LayoutProviderTag = LayoutProvider;
-
-		return (
-			<div class={'ddm-form-builder'}>
-				<LayoutProviderTag {...layoutProviderProps}>
-					<FormBuilder
-						defaultLanguageId={defaultLanguageId}
-						editingLanguageId={editingLanguageId}
-						fieldTypes={fieldTypes}
-						portletNamespace={portletNamespace}
-						paginationMode={'wizard'}
-						ref="builder"
-						spritemap={spritemap}
-					/>
-				</LayoutProviderTag>
-			</div>
-		);
-	}
-
-	_getTranslationManager() {
-		let promise;
-
-		const translationManager = Liferay.component('translationManager');
-
-		if (translationManager) {
-			promise = Promise.resolve(translationManager);
-		} else {
-			promise = Liferay.componentReady('translationManager');
-		}
-
-		return promise;
-	}
-
-	_handlePagesChanged({newVal}) {
-		const {dataDefinitionInputId, dataLayoutInputId} = this.props;
-
-		if (dataDefinitionInputId && dataLayoutInputId) {
-			const dataDefinitionInput = document.querySelector(
-				`#${dataDefinitionInputId}`
-			);
-			const dataLayoutInput = document.querySelector(
-				`#${dataLayoutInputId}`
-			);
-
-			const data = this._serialize(newVal);
-
-			dataLayoutInput.value = data.layout;
-			dataDefinitionInput.value = data.definition;
-		}
-	}
-
-	_isCustomProperty(name) {
-		const fields = [
-			'defaultValue',
-			'fieldType',
-			'indexable',
-			'label',
-			'localizable',
-			'name',
-			'repeatable',
-			'tip'
-		];
-
-		return fields.indexOf(name) === -1;
-	}
-
-	_serialize(pages) {
+	getDefinitionAndLayout(pages) {
 		const {availableLanguageIds, defaultLanguageId} = this.props;
 		const columnDefinitions = [];
 		const pagesVisitor = new PagesVisitor(pages);
@@ -198,12 +108,12 @@ class DataLayoutBuilder extends Component {
 		);
 
 		return {
-			definition: JSON.stringify({
+			definition: {
 				availableLanguageIds,
 				dataDefinitionFields: columnDefinitions,
 				defaultLanguageId
-			}),
-			layout: JSON.stringify({
+			},
+			layout: {
 				dataLayoutPages: newPages.map(page => {
 					const rows = page.rows.map(row => {
 						const columns = row.columns.map(column => {
@@ -225,8 +135,121 @@ class DataLayoutBuilder extends Component {
 					};
 				}),
 				paginationMode: 'wizard'
-			})
+			}
 		};
+	}
+
+	getFieldTypes() {
+		const {fieldTypes} = this.props;
+
+		return fieldTypes;
+	}
+
+	getProvider() {
+		return this.refs.layoutProvider;
+	}
+
+	getStore() {
+		return {
+			...this.refs.layoutProvider.state
+		};
+	}
+
+	render() {
+		const {
+			context,
+			defaultLanguageId,
+			editingLanguageId,
+			fieldTypes,
+			portletNamespace,
+			spritemap
+		} = this.props;
+
+		const layoutProviderProps = {
+			...this.props,
+			defaultLanguageId,
+			editingLanguageId,
+			events: {
+				pagesChanged: this._handlePagesChanged.bind(this)
+			},
+			initialPages: context.pages,
+			initialPaginationMode: context.paginationMode,
+			ref: 'layoutProvider'
+		};
+
+		const LayoutProviderTag = LayoutProvider;
+
+		return (
+			<div class={'ddm-form-builder'}>
+				<LayoutProviderTag {...layoutProviderProps}>
+					<FormBuilder
+						defaultLanguageId={defaultLanguageId}
+						editingLanguageId={editingLanguageId}
+						fieldTypes={fieldTypes}
+						portletNamespace={portletNamespace}
+						paginationMode={'wizard'}
+						ref="builder"
+						spritemap={spritemap}
+					/>
+				</LayoutProviderTag>
+			</div>
+		);
+	}
+
+	serialize(pages) {
+		const {definition, layout} = this.getDefinitionAndLayout(pages);
+
+		return {
+			definition: JSON.stringify(definition),
+			layout: JSON.stringify(layout)
+		};
+	}
+
+	_getTranslationManager() {
+		let promise;
+
+		const translationManager = Liferay.component('translationManager');
+
+		if (translationManager) {
+			promise = Promise.resolve(translationManager);
+		} else {
+			promise = Liferay.componentReady('translationManager');
+		}
+
+		return promise;
+	}
+
+	_handlePagesChanged({newVal}) {
+		const {dataDefinitionInputId, dataLayoutInputId} = this.props;
+
+		if (dataDefinitionInputId && dataLayoutInputId) {
+			const dataDefinitionInput = document.querySelector(
+				`#${dataDefinitionInputId}`
+			);
+			const dataLayoutInput = document.querySelector(
+				`#${dataLayoutInputId}`
+			);
+
+			const data = this.serialize(newVal);
+
+			dataLayoutInput.value = data.layout;
+			dataDefinitionInput.value = data.definition;
+		}
+	}
+
+	_isCustomProperty(name) {
+		const fields = [
+			'defaultValue',
+			'fieldType',
+			'indexable',
+			'label',
+			'localizable',
+			'name',
+			'repeatable',
+			'tip'
+		];
+
+		return fields.indexOf(name) === -1;
 	}
 
 	_setContext(context) {

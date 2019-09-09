@@ -42,9 +42,9 @@ AUI.add(
 			'</span>';
 
 		var MAP_HIDDEN_FIELD_ATTRS = {
-			checkbox: ['readOnly'],
-
 			DEFAULT: ['readOnly', 'width'],
+
+			checkbox: ['readOnly'],
 
 			separator: [
 				'indexType',
@@ -70,7 +70,7 @@ AUI.add(
 		);
 
 		DEFAULTS_FORM_VALIDATOR.RULES.structureFieldName = function(value) {
-			return /^[\w\-]+$/.test(value);
+			return /^[\w-]+$/.test(value);
 		};
 
 		// Updates icons to produce lexicon SVG markup instead of default glyphicon
@@ -109,7 +109,43 @@ AUI.add(
 		};
 
 		A.mix(ReadOnlyFormBuilderSupport.prototype, {
-			initializer: function() {
+			_afterFieldRender(event) {
+				var field = event.target;
+
+				if (instanceOf(field, A.FormBuilderField)) {
+					var readOnlyAttributes = AArray.map(
+						field.getPropertyModel(),
+						function(item) {
+							return item.attributeName;
+						}
+					);
+
+					field.set('readOnlyAttributes', readOnlyAttributes);
+				}
+			},
+
+			_afterRenderReadOnlyFormBuilder() {
+				var instance = this;
+
+				instance.tabView.enableTab(1);
+				instance.openEditProperties(instance.get('fields').item(0));
+				instance.tabView
+					.getTabs()
+					.item(0)
+					.hide();
+			},
+
+			_onMouseOverFieldReadOnlyFormBuilder(event) {
+				var field = A.Widget.getByNode(event.currentTarget);
+
+				field.controlsToolbar.hide();
+
+				field
+					.get('boundingBox')
+					.removeClass('form-builder-field-hover');
+			},
+
+			initializer() {
 				var instance = this;
 
 				if (instance.get('readOnly')) {
@@ -130,42 +166,6 @@ AUI.add(
 						'.form-builder-field'
 					);
 				}
-			},
-
-			_afterFieldRender: function(event) {
-				var field = event.target;
-
-				if (instanceOf(field, A.FormBuilderField)) {
-					var readOnlyAttributes = AArray.map(
-						field.getPropertyModel(),
-						function(item) {
-							return item.attributeName;
-						}
-					);
-
-					field.set('readOnlyAttributes', readOnlyAttributes);
-				}
-			},
-
-			_afterRenderReadOnlyFormBuilder: function() {
-				var instance = this;
-
-				instance.tabView.enableTab(1);
-				instance.openEditProperties(instance.get('fields').item(0));
-				instance.tabView
-					.getTabs()
-					.item(0)
-					.hide();
-			},
-
-			_onMouseOverFieldReadOnlyFormBuilder: function(event) {
-				var field = A.Widget.getByNode(event.currentTarget);
-
-				field.controlsToolbar.hide();
-
-				field
-					.get('boundingBox')
-					.removeClass('form-builder-field-hover');
 			}
 		});
 
@@ -175,7 +175,7 @@ AUI.add(
 			ATTRS: {
 				availableFields: {
 					validator: isObject,
-					valueFn: function() {
+					valueFn() {
 						return LiferayFormBuilder.AVAILABLE_FIELDS.DEFAULT;
 					}
 				},
@@ -255,9 +255,7 @@ AUI.add(
 				},
 
 				validator: {
-					setter: function(val) {
-						var instance = this;
-
+					setter(val) {
 						var config = A.merge(
 							{
 								fieldStrings: {
@@ -283,9 +281,9 @@ AUI.add(
 				}
 			},
 
-			EXTENDS: A.FormBuilder,
-
 			AUGMENTS: [ReadOnlyFormBuilderSupport],
+
+			EXTENDS: A.FormBuilder,
 
 			LOCALIZABLE_FIELD_ATTRS: [
 				'label',
@@ -314,33 +312,516 @@ AUI.add(
 			],
 
 			prototype: {
-				initializer: function() {
+				_afterEditingLocaleChange(event) {
 					var instance = this;
 
-					instance.MAP_HIDDEN_FIELD_ATTRS = A.clone(
-						MAP_HIDDEN_FIELD_ATTRS
+					instance._toggleInputDirection(event.newVal);
+				},
+
+				_afterFieldsChange(event) {
+					var instance = this;
+
+					var tabs = instance.tabView.getTabs();
+
+					var activeTabIndex = tabs.indexOf(
+						instance.tabView.getActiveTab()
 					);
 
-					var translationManager = (instance.translationManager = new Liferay.TranslationManager(
-						instance.get('translationManager')
-					));
+					if (activeTabIndex === SETTINGS_TAB_INDEX) {
+						instance.editField(event.newVal.item(0));
+					}
+				},
 
-					instance.after('render', function(event) {
-						translationManager.render();
-					});
-
-					instance.after('fieldsChange', instance._afterFieldsChange);
-
-					if (themeDisplay.isStatePopUp()) {
-						instance.addTarget(Liferay.Util.getOpener().Liferay);
+				_beforeGetEditor(record, column) {
+					if (column.key === 'name') {
+						return;
 					}
 
-					instance._toggleInputDirection(
-						translationManager.get('defaultLocale')
+					var instance = this;
+
+					var columnEditor = column.editor;
+
+					var recordEditor = record.get('editor');
+
+					var editor = recordEditor || columnEditor;
+
+					if (instanceOf(editor, A.BaseOptionsCellEditor)) {
+						if (editor.get('rendered')) {
+							instance._toggleOptionsEditorInputs(editor);
+						} else {
+							editor.after('render', function() {
+								instance._toggleOptionsEditorInputs(editor);
+							});
+						}
+					}
+
+					editor.after('render', function() {
+						editor.set('visible', true);
+
+						var boundingBox = editor.get('boundingBox');
+
+						if (boundingBox) {
+							boundingBox.show();
+						}
+					});
+				},
+
+				_deserializeField(fieldJSON, availableLanguageIds) {
+					var instance = this;
+
+					var fields = fieldJSON.fields;
+
+					if (isArray(fields)) {
+						fields.forEach(function(item) {
+							instance._deserializeField(
+								item,
+								availableLanguageIds
+							);
+						});
+					}
+
+					instance._deserializeFieldLocalizationMap(
+						fieldJSON,
+						availableLanguageIds
+					);
+					instance._deserializeFieldLocalizableAttributes(fieldJSON);
+				},
+
+				_deserializeFieldLocalizableAttributes(fieldJSON) {
+					var instance = this;
+
+					var defaultLocale = instance.translationManager.get(
+						'defaultLocale'
+					);
+					var editingLocale = instance.translationManager.get(
+						'editingLocale'
+					);
+
+					LiferayFormBuilder.LOCALIZABLE_FIELD_ATTRS.forEach(function(
+						item
+					) {
+						var localizedValue = fieldJSON[item];
+
+						if (item !== 'options' && localizedValue) {
+							fieldJSON[item] =
+								localizedValue[editingLocale] ||
+								localizedValue[defaultLocale];
+						}
+					});
+				},
+
+				_deserializeFieldLocalizationMap(
+					fieldJSON,
+					availableLanguageIds
+				) {
+					var instance = this;
+
+					availableLanguageIds.forEach(function(languageId) {
+						fieldJSON.localizationMap =
+							fieldJSON.localizationMap || {};
+						fieldJSON.localizationMap[languageId] = {};
+
+						LiferayFormBuilder.LOCALIZABLE_FIELD_ATTRS.forEach(
+							function(attribute) {
+								var attributeMap = fieldJSON[attribute];
+
+								if (attributeMap && attributeMap[languageId]) {
+									fieldJSON.localizationMap[languageId][
+										attribute
+									] = attributeMap[languageId];
+								}
+							}
+						);
+					});
+
+					if (fieldJSON.options) {
+						instance._deserializeFieldOptionsLocalizationMap(
+							fieldJSON,
+							availableLanguageIds
+						);
+					}
+				},
+
+				_deserializeFieldOptionsLocalizationMap(
+					fieldJSON,
+					availableLanguageIds
+				) {
+					var instance = this;
+
+					var labels;
+
+					var defaultLocale = instance.translationManager.get(
+						'defaultLocale'
+					);
+					var editingLocale = instance.translationManager.get(
+						'editingLocale'
+					);
+
+					fieldJSON.options.forEach(function(item) {
+						labels = item.label;
+
+						item.label =
+							labels[editingLocale] || labels[defaultLocale];
+
+						item.localizationMap = {};
+
+						availableLanguageIds.forEach(function(languageId) {
+							item.localizationMap[languageId] = {
+								label: labels[languageId]
+							};
+						});
+					});
+				},
+
+				_getGeneratedFieldName(label) {
+					var normalizedLabel = LiferayFormBuilder.Util.normalizeKey(
+						label
+					);
+
+					var generatedName = normalizedLabel;
+
+					if (
+						LiferayFormBuilder.Util.validateFieldName(generatedName)
+					) {
+						var counter = 1;
+
+						while (
+							LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.has(
+								generatedName
+							)
+						) {
+							generatedName = normalizedLabel + counter++;
+						}
+					}
+
+					return generatedName;
+				},
+
+				_getSerializedFields() {
+					var instance = this;
+
+					var fields = [];
+
+					instance.get('fields').each(function(field) {
+						fields.push(field.serialize());
+					});
+
+					return fields;
+				},
+
+				_onDataTableRender(event) {
+					var instance = this;
+
+					A.on(
+						instance._beforeGetEditor,
+						event.target,
+						'getEditor',
+						instance
 					);
 				},
 
-				bindUI: function() {
+				_onDefaultLocaleChange(event) {
+					var instance = this;
+
+					var fields = instance.get('fields');
+
+					var newVal = event.newVal;
+
+					var translationManager = instance.translationManager;
+
+					var availableLanguageIds = translationManager.get(
+						'availableLocales'
+					);
+
+					if (availableLanguageIds.indexOf(newVal) < 0) {
+						var config = {
+							fields,
+							newVal,
+							prevVal: event.prevVal
+						};
+
+						translationManager.addAvailableLocale(newVal);
+
+						instance._updateLocalizationMaps(config);
+					}
+				},
+
+				_onMouseOutField(event) {
+					var instance = this;
+
+					var field = A.Widget.getByNode(event.currentTarget);
+
+					instance._setInvalidDDHandles(field, 'remove');
+
+					LiferayFormBuilder.superclass._onMouseOutField.apply(
+						instance,
+						arguments
+					);
+				},
+
+				_onMouseOverField(event) {
+					var instance = this;
+
+					var field = A.Widget.getByNode(event.currentTarget);
+
+					instance._setInvalidDDHandles(field, 'add');
+
+					LiferayFormBuilder.superclass._onMouseOverField.apply(
+						instance,
+						arguments
+					);
+				},
+
+				_onPropertyModelChange(event) {
+					var instance = this;
+
+					var fieldNameEditionDisabled = instance.get(
+						'fieldNameEditionDisabled'
+					);
+
+					var changed = event.changed;
+
+					var attributeName = event.target.get('attributeName');
+
+					var editingField = instance.editingField;
+
+					var readOnlyAttributes = editingField.get(
+						'readOnlyAttributes'
+					);
+
+					if (
+						Object.prototype.hasOwnProperty.call(
+							changed,
+							'value'
+						) &&
+						readOnlyAttributes.indexOf('name') === -1
+					) {
+						if (attributeName === 'name') {
+							editingField.set(
+								'autoGeneratedName',
+								event.autoGeneratedName === true
+							);
+						} else if (
+							attributeName === 'label' &&
+							editingField.get('autoGeneratedName') &&
+							!fieldNameEditionDisabled
+						) {
+							var translationManager =
+								instance.translationManager;
+
+							if (
+								translationManager.get('editingLocale') ===
+								translationManager.get('defaultLocale')
+							) {
+								var generatedName = instance._getGeneratedFieldName(
+									changed.value.newVal
+								);
+
+								if (
+									LiferayFormBuilder.Util.validateFieldName(
+										generatedName
+									)
+								) {
+									var nameModel = instance.propertyList
+										.get('data')
+										.filter(function(item) {
+											return (
+												item.get('attributeName') ===
+												'name'
+											);
+										});
+
+									if (nameModel.length) {
+										nameModel[0].set(
+											'value',
+											generatedName,
+											{
+												autoGeneratedName: true
+											}
+										);
+									}
+								}
+							}
+						} else if (attributeName === 'required') {
+							var state = changed.value.newVal === 'true';
+							var requiredNode = editingField
+								._getFieldNode()
+								.one('.lexicon-icon-asterisk');
+
+							if (requiredNode) {
+								requiredNode.toggle(state);
+							}
+						}
+					}
+				},
+
+				_renderSettings() {
+					var instance = this;
+
+					instance._renderPropertyList();
+
+					// Dynamically removes unnecessary icons from editor toolbar buttons
+
+					var defaultGetEditorFn = instance.propertyList.getEditor;
+
+					instance.propertyList.getEditor = function() {
+						var editor = defaultGetEditorFn.apply(this, arguments);
+
+						if (editor) {
+							var defaultSetToolbarFn = A.bind(
+								editor._setToolbar,
+								editor
+							);
+
+							editor._setToolbar = function(val) {
+								var toolbar = defaultSetToolbarFn(val);
+
+								if (toolbar && toolbar.children) {
+									toolbar.children = toolbar.children.map(
+										function(children) {
+											children = children.map(function(
+												item
+											) {
+												delete item.icon;
+
+												return item;
+											});
+
+											return children;
+										}
+									);
+								}
+
+								return toolbar;
+							};
+						}
+
+						return editor;
+					};
+				},
+
+				_setAvailableFields(val) {
+					var fields = val.map(function(item) {
+						return instanceOf(item, A.PropertyBuilderAvailableField)
+							? item
+							: new A.LiferayAvailableField(item);
+					});
+
+					fields.sort(function(a, b) {
+						return A.ArraySort.compare(
+							a.get('label'),
+							b.get('label')
+						);
+					});
+
+					return fields;
+				},
+
+				_setFields() {
+					var instance = this;
+
+					LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.clear();
+
+					return LiferayFormBuilder.superclass._setFields.apply(
+						instance,
+						arguments
+					);
+				},
+
+				_setFieldsSortableListConfig() {
+					var instance = this;
+
+					var config = LiferayFormBuilder.superclass._setFieldsSortableListConfig.apply(
+						instance,
+						arguments
+					);
+
+					config.dd.plugins = [
+						{
+							cfg: {
+								constrain: '#main-content'
+							},
+							fn: A.Plugin.DDConstrained
+						},
+						{
+							cfg: {
+								horizontal: false,
+								node: '#main-content'
+							},
+							fn: A.Plugin.DDNodeScroll
+						}
+					];
+
+					return config;
+				},
+
+				_setInvalidDDHandles(field, type) {
+					var instance = this;
+
+					var methodName = type + 'Invalid';
+
+					instance.eachParentField(field, function(parent) {
+						var parentBB = parent.get('boundingBox');
+
+						parentBB.dd[methodName]('#' + parentBB.attr('id'));
+					});
+				},
+
+				_toggleInputDirection(locale) {
+					var rtl = Liferay.Language.direction[locale] === 'rtl';
+
+					BODY.toggleClass('form-builder-ltr-inputs', !rtl);
+					BODY.toggleClass('form-builder-rtl-inputs', rtl);
+				},
+
+				_toggleOptionsEditorInputs(editor) {
+					var instance = this;
+
+					var boundingBox = editor.get('boundingBox');
+
+					if (boundingBox.hasClass('radiocelleditor')) {
+						var defaultLocale = instance.translationManager.get(
+							'defaultLocale'
+						);
+						var editingLocale = instance.translationManager.get(
+							'editingLocale'
+						);
+
+						var inputs = boundingBox.all(
+							'.celleditor-edit-input-value'
+						);
+
+						Liferay.Util.toggleDisabled(
+							inputs,
+							defaultLocale !== editingLocale
+						);
+					}
+				},
+
+				_updateLocalizationMaps(config) {
+					var instance = this;
+
+					var fields = config.fields;
+					var newVal = config.newVal;
+					var prevVal = config.prevVal;
+
+					fields._items.forEach(function(field) {
+						var childFields = field.get('fields');
+						var localizationMap = field.get('localizationMap');
+
+						var config = {
+							fields: childFields,
+							newVal,
+							prevVal
+						};
+
+						localizationMap[newVal] = localizationMap[prevVal];
+
+						instance._updateLocalizationMaps(config);
+					});
+				},
+
+				bindUI() {
 					var instance = this;
 
 					LiferayFormBuilder.superclass.bindUI.apply(
@@ -375,7 +856,7 @@ AUI.add(
 					);
 				},
 
-				createField: function() {
+				createField() {
 					var instance = this;
 
 					var field = LiferayFormBuilder.superclass.createField.apply(
@@ -383,13 +864,13 @@ AUI.add(
 						arguments
 					);
 
-					if (field.name === 'ddm-image' && field.get('required')) {
+					if (field.name === 'ddm-image' && !field.get('required')) {
 						var requiredNode = field
 							._getFieldNode()
-							.one('.glyphicon-asterisk');
+							.one('.lexicon-icon-asterisk');
 
 						if (requiredNode) {
-							requiredNode.toggle(true);
+							requiredNode.toggle(false);
 						}
 					}
 
@@ -447,7 +928,7 @@ AUI.add(
 					return field;
 				},
 
-				deserializeDefinitionFields: function(content) {
+				deserializeDefinitionFields(content) {
 					var instance = this;
 
 					var availableLanguageIds = content.availableLanguageIds;
@@ -464,7 +945,7 @@ AUI.add(
 					return fields;
 				},
 
-				eachParentField: function(field, fn) {
+				eachParentField(field, fn) {
 					var instance = this;
 
 					var parent = field.get('parent');
@@ -476,7 +957,7 @@ AUI.add(
 					}
 				},
 
-				getContent: function() {
+				getContent() {
 					var instance = this;
 
 					var definition = {};
@@ -495,7 +976,7 @@ AUI.add(
 					return JSON.stringify(definition, null, 4);
 				},
 
-				getContentValue: function() {
+				getContentValue() {
 					var instance = this;
 
 					return window[
@@ -504,7 +985,33 @@ AUI.add(
 					]();
 				},
 
-				plotField: function(field, container) {
+				initializer() {
+					var instance = this;
+
+					instance.MAP_HIDDEN_FIELD_ATTRS = A.clone(
+						MAP_HIDDEN_FIELD_ATTRS
+					);
+
+					var translationManager = (instance.translationManager = new Liferay.TranslationManager(
+						instance.get('translationManager')
+					));
+
+					instance.after('render', function() {
+						translationManager.render();
+					});
+
+					instance.after('fieldsChange', instance._afterFieldsChange);
+
+					if (themeDisplay.isStatePopUp()) {
+						instance.addTarget(Liferay.Util.getOpener().Liferay);
+					}
+
+					instance._toggleInputDirection(
+						translationManager.get('defaultLocale')
+					);
+				},
+
+				plotField(field) {
 					var instance = this;
 
 					LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.put(
@@ -516,523 +1023,12 @@ AUI.add(
 						instance,
 						arguments
 					);
-				},
-
-				_afterEditingLocaleChange: function(event) {
-					var instance = this;
-
-					instance._toggleInputDirection(event.newVal);
-				},
-
-				_afterFieldsChange: function(event) {
-					var instance = this;
-
-					var tabs = instance.tabView.getTabs();
-
-					var activeTabIndex = tabs.indexOf(
-						instance.tabView.getActiveTab()
-					);
-
-					if (activeTabIndex === SETTINGS_TAB_INDEX) {
-						instance.editField(event.newVal.item(0));
-					}
-				},
-
-				_beforeGetEditor: function(record, column) {
-					if (column.key === 'name') {
-						return;
-					}
-
-					var instance = this;
-
-					var columnEditor = column.editor;
-
-					var recordEditor = record.get('editor');
-
-					var editor = recordEditor || columnEditor;
-
-					if (instanceOf(editor, A.BaseOptionsCellEditor)) {
-						if (editor.get('rendered')) {
-							instance._toggleOptionsEditorInputs(editor);
-						} else {
-							editor.after('render', function() {
-								instance._toggleOptionsEditorInputs(editor);
-							});
-						}
-					}
-
-					editor.after('render', function() {
-						editor.set('visible', true);
-
-						var boundingBox = editor.get('boundingBox');
-
-						if (boundingBox) {
-							boundingBox.show();
-						}
-					});
-				},
-
-				_deserializeField: function(fieldJSON, availableLanguageIds) {
-					var instance = this;
-
-					var fields = fieldJSON.fields;
-
-					if (isArray(fields)) {
-						fields.forEach(function(item, index) {
-							instance._deserializeField(
-								item,
-								availableLanguageIds
-							);
-						});
-					}
-
-					instance._deserializeFieldLocalizationMap(
-						fieldJSON,
-						availableLanguageIds
-					);
-					instance._deserializeFieldLocalizableAttributes(fieldJSON);
-				},
-
-				_deserializeFieldLocalizableAttributes: function(fieldJSON) {
-					var instance = this;
-
-					var defaultLocale = instance.translationManager.get(
-						'defaultLocale'
-					);
-					var editingLocale = instance.translationManager.get(
-						'editingLocale'
-					);
-
-					LiferayFormBuilder.LOCALIZABLE_FIELD_ATTRS.forEach(function(
-						item,
-						index
-					) {
-						var localizedValue = fieldJSON[item];
-
-						if (item !== 'options' && localizedValue) {
-							fieldJSON[item] =
-								localizedValue[editingLocale] ||
-								localizedValue[defaultLocale];
-						}
-					});
-				},
-
-				_deserializeFieldLocalizationMap: function(
-					fieldJSON,
-					availableLanguageIds
-				) {
-					var instance = this;
-
-					availableLanguageIds.forEach(function(languageId) {
-						fieldJSON.localizationMap =
-							fieldJSON.localizationMap || {};
-						fieldJSON.localizationMap[languageId] = {};
-
-						LiferayFormBuilder.LOCALIZABLE_FIELD_ATTRS.forEach(
-							function(attribute) {
-								var attributeMap = fieldJSON[attribute];
-
-								if (attributeMap && attributeMap[languageId]) {
-									fieldJSON.localizationMap[languageId][
-										attribute
-									] = attributeMap[languageId];
-								}
-							}
-						);
-					});
-
-					if (fieldJSON.options) {
-						instance._deserializeFieldOptionsLocalizationMap(
-							fieldJSON,
-							availableLanguageIds
-						);
-					}
-				},
-
-				_deserializeFieldOptionsLocalizationMap: function(
-					fieldJSON,
-					availableLanguageIds
-				) {
-					var instance = this;
-
-					var labels;
-
-					var defaultLocale = instance.translationManager.get(
-						'defaultLocale'
-					);
-					var editingLocale = instance.translationManager.get(
-						'editingLocale'
-					);
-
-					fieldJSON.options.forEach(function(item, index) {
-						labels = item.label;
-
-						item.label =
-							labels[editingLocale] || labels[defaultLocale];
-
-						item.localizationMap = {};
-
-						availableLanguageIds.forEach(function(languageId) {
-							item.localizationMap[languageId] = {
-								label: labels[languageId]
-							};
-						});
-					});
-				},
-
-				_getGeneratedFieldName: function(label) {
-					var instance = this;
-
-					var normalizedLabel = LiferayFormBuilder.Util.normalizeKey(
-						label
-					);
-
-					var generatedName = normalizedLabel;
-
-					if (
-						LiferayFormBuilder.Util.validateFieldName(generatedName)
-					) {
-						var counter = 1;
-
-						while (
-							LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.has(
-								generatedName
-							)
-						) {
-							generatedName = normalizedLabel + counter++;
-						}
-					}
-
-					return generatedName;
-				},
-
-				_getSerializedFields: function() {
-					var instance = this;
-
-					var fields = [];
-
-					instance.get('fields').each(function(field) {
-						fields.push(field.serialize());
-					});
-
-					return fields;
-				},
-
-				_onDataTableRender: function(event) {
-					var instance = this;
-
-					A.on(
-						instance._beforeGetEditor,
-						event.target,
-						'getEditor',
-						instance
-					);
-				},
-
-				_onDefaultLocaleChange: function(event) {
-					var instance = this;
-
-					var fields = instance.get('fields');
-
-					var newVal = event.newVal;
-
-					var translationManager = instance.translationManager;
-
-					var availableLanguageIds = translationManager.get(
-						'availableLocales'
-					);
-
-					if (availableLanguageIds.indexOf(newVal) < 0) {
-						var config = {
-							fields: fields,
-							newVal: newVal,
-							prevVal: event.prevVal
-						};
-
-						translationManager.addAvailableLocale(newVal);
-
-						instance._updateLocalizationMaps(config);
-					}
-				},
-
-				_onMouseOutField: function(event) {
-					var instance = this;
-
-					var field = A.Widget.getByNode(event.currentTarget);
-
-					instance._setInvalidDDHandles(field, 'remove');
-
-					LiferayFormBuilder.superclass._onMouseOutField.apply(
-						instance,
-						arguments
-					);
-				},
-
-				_onMouseOverField: function(event) {
-					var instance = this;
-
-					var field = A.Widget.getByNode(event.currentTarget);
-
-					instance._setInvalidDDHandles(field, 'add');
-
-					LiferayFormBuilder.superclass._onMouseOverField.apply(
-						instance,
-						arguments
-					);
-				},
-
-				_onPropertyModelChange: function(event) {
-					var instance = this;
-
-					var fieldNameEditionDisabled = instance.get(
-						'fieldNameEditionDisabled'
-					);
-
-					var changed = event.changed;
-
-					var attributeName = event.target.get('attributeName');
-
-					var editingField = instance.editingField;
-
-					var readOnlyAttributes = editingField.get(
-						'readOnlyAttributes'
-					);
-
-					if (
-						changed.hasOwnProperty('value') &&
-						readOnlyAttributes.indexOf('name') === -1
-					) {
-						if (attributeName === 'name') {
-							editingField.set(
-								'autoGeneratedName',
-								event.autoGeneratedName === true
-							);
-						} else if (
-							attributeName === 'label' &&
-							editingField.get('autoGeneratedName') &&
-							!fieldNameEditionDisabled
-						) {
-							var translationManager =
-								instance.translationManager;
-
-							if (
-								translationManager.get('editingLocale') ===
-								translationManager.get('defaultLocale')
-							) {
-								var generatedName = instance._getGeneratedFieldName(
-									changed.value.newVal
-								);
-
-								if (
-									LiferayFormBuilder.Util.validateFieldName(
-										generatedName
-									)
-								) {
-									var nameModel = instance.propertyList
-										.get('data')
-										.filter(function(item, index) {
-											return (
-												item.get('attributeName') ===
-												'name'
-											);
-										});
-
-									if (nameModel.length) {
-										nameModel[0].set(
-											'value',
-											generatedName,
-											{
-												autoGeneratedName: true
-											}
-										);
-									}
-								}
-							}
-						} else if (attributeName === 'required') {
-							var state = changed.value.newVal === 'true';
-							var requiredNode = editingField
-								._getFieldNode()
-								.one('.glyphicon-asterisk');
-
-							if (requiredNode) {
-								requiredNode.toggle(state);
-							}
-						}
-					}
-				},
-
-				_renderSettings: function() {
-					var instance = this;
-
-					instance._renderPropertyList();
-
-					// Dynamically removes unnecessary icons from editor toolbar buttons
-
-					var defaultGetEditorFn = instance.propertyList.getEditor;
-
-					instance.propertyList.getEditor = function() {
-						var editor = defaultGetEditorFn.apply(this, arguments);
-
-						if (editor) {
-							var defaultSetToolbarFn = A.bind(
-								editor._setToolbar,
-								editor
-							);
-
-							editor._setToolbar = function(val) {
-								var toolbar = defaultSetToolbarFn(val);
-
-								if (toolbar && toolbar.children) {
-									toolbar.children = toolbar.children.map(
-										function(children) {
-											children = children.map(function(
-												item
-											) {
-												delete item.icon;
-
-												return item;
-											});
-
-											return children;
-										}
-									);
-								}
-
-								return toolbar;
-							};
-						}
-
-						return editor;
-					};
-				},
-
-				_setAvailableFields: function(val) {
-					var instance = this;
-
-					var fields = val.map(function(item, index) {
-						return instanceOf(item, A.PropertyBuilderAvailableField)
-							? item
-							: new A.LiferayAvailableField(item);
-					});
-
-					fields.sort(function(a, b) {
-						return A.ArraySort.compare(
-							a.get('label'),
-							b.get('label')
-						);
-					});
-
-					return fields;
-				},
-
-				_setFields: function() {
-					var instance = this;
-
-					LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.clear();
-
-					return LiferayFormBuilder.superclass._setFields.apply(
-						instance,
-						arguments
-					);
-				},
-
-				_setFieldsSortableListConfig: function() {
-					var instance = this;
-
-					var config = LiferayFormBuilder.superclass._setFieldsSortableListConfig.apply(
-						instance,
-						arguments
-					);
-
-					config.dd.plugins = [
-						{
-							cfg: {
-								constrain: '#main-content'
-							},
-							fn: A.Plugin.DDConstrained
-						},
-						{
-							cfg: {
-								horizontal: false,
-								node: '#main-content'
-							},
-							fn: A.Plugin.DDNodeScroll
-						}
-					];
-
-					return config;
-				},
-
-				_setInvalidDDHandles: function(field, type) {
-					var instance = this;
-
-					var methodName = type + 'Invalid';
-
-					instance.eachParentField(field, function(parent) {
-						var parentBB = parent.get('boundingBox');
-
-						parentBB.dd[methodName]('#' + parentBB.attr('id'));
-					});
-				},
-
-				_toggleInputDirection: function(locale) {
-					var rtl = Liferay.Language.direction[locale] === 'rtl';
-
-					BODY.toggleClass('form-builder-ltr-inputs', !rtl);
-					BODY.toggleClass('form-builder-rtl-inputs', rtl);
-				},
-
-				_toggleOptionsEditorInputs: function(editor) {
-					var instance = this;
-
-					var boundingBox = editor.get('boundingBox');
-
-					if (boundingBox.hasClass('radiocelleditor')) {
-						var defaultLocale = instance.translationManager.get(
-							'defaultLocale'
-						);
-						var editingLocale = instance.translationManager.get(
-							'editingLocale'
-						);
-
-						var inputs = boundingBox.all(
-							'.celleditor-edit-input-value'
-						);
-
-						Liferay.Util.toggleDisabled(
-							inputs,
-							defaultLocale !== editingLocale
-						);
-					}
-				},
-
-				_updateLocalizationMaps: function(config) {
-					var instance = this;
-
-					var fields = config.fields;
-					var newVal = config.newVal;
-					var prevVal = config.prevVal;
-
-					fields._items.forEach(function(field) {
-						var childFields = field.get('fields');
-						var localizationMap = field.get('localizationMap');
-
-						var config = {
-							fields: childFields,
-							newVal: newVal,
-							prevVal: prevVal
-						};
-
-						localizationMap[newVal] = localizationMap[prevVal];
-
-						instance._updateLocalizationMaps(config);
-					});
 				}
 			}
 		});
 
 		LiferayFormBuilder.Util = {
-			getFileEntry: function(fileJSON, callback) {
+			getFileEntry(fileJSON, callback) {
 				var instance = this;
 
 				fileJSON = instance.parseJSON(fileJSON);
@@ -1047,9 +1043,7 @@ AUI.add(
 				);
 			},
 
-			getFileEntryURL: function(fileEntry) {
-				var instance = this;
-
+			getFileEntryURL(fileEntry) {
 				var buffer = [
 					themeDisplay.getPathContext(),
 					'documents',
@@ -1061,9 +1055,7 @@ AUI.add(
 				return buffer.join('/');
 			},
 
-			normalizeKey: function(key) {
-				var instance = this;
-
+			normalizeKey(key) {
 				key = key.trim();
 
 				for (var i = 0; i < key.length; i++) {
@@ -1084,9 +1076,7 @@ AUI.add(
 				return key.replace(/\s+/gi, '');
 			},
 
-			normalizeValue: function(value) {
-				var instance = this;
-
+			normalizeValue(value) {
 				if (isUndefined(value)) {
 					value = STR_BLANK;
 				}
@@ -1094,9 +1084,7 @@ AUI.add(
 				return value;
 			},
 
-			parseJSON: function(value) {
-				var instance = this;
-
+			parseJSON(value) {
 				var data = {};
 
 				try {
@@ -1106,7 +1094,7 @@ AUI.add(
 				return data;
 			},
 
-			validateFieldName: function(fieldName) {
+			validateFieldName(fieldName) {
 				var valid = true;
 
 				if (REGEX_HYPHEN.test(fieldName)) {

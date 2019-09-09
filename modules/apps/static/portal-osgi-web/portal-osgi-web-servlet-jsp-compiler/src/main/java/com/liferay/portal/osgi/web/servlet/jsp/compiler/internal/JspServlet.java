@@ -17,6 +17,7 @@ package com.liferay.portal.osgi.web.servlet.jsp.compiler.internal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.servlet.JspFactorySwapper;
 
@@ -68,6 +69,8 @@ import javax.servlet.jsp.JspFactory;
 
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.runtime.TagHandlerPool;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleReference;
@@ -147,6 +150,9 @@ public class JspServlet extends HttpServlet {
 
 		final ServletContext servletContext = servletConfig.getServletContext();
 
+		servletContext.setAttribute(
+			InstanceManager.class.getName(), new SimpleInstanceManager());
+
 		ClassLoader classLoader = servletContext.getClassLoader();
 
 		if (!(classLoader instanceof BundleReference)) {
@@ -156,6 +162,10 @@ public class JspServlet extends HttpServlet {
 		Thread currentThread = Thread.currentThread();
 
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+
+		SystemProperties.set(
+			"org.apache.jasper.runtime.JspFactoryImpl.USE_POOL",
+			Boolean.FALSE.toString());
 
 		try {
 			currentThread.setContextClassLoader(classLoader);
@@ -192,17 +202,13 @@ public class JspServlet extends HttpServlet {
 		defaults.put(
 			"compilerClassName",
 			"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal." +
-				"JspCompiler");
+				"CompilerWrapper");
 		defaults.put("compilerSourceVM", "1.8");
 		defaults.put("compilerTargetVM", "1.8");
 		defaults.put(
 			"development",
 			String.valueOf(PropsValues.WORK_DIR_OVERRIDE_ENABLED));
 		defaults.put("httpMethods", "GET,POST,HEAD");
-		defaults.put(
-			"jspCompilerClassName",
-			"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal." +
-				"CompilerWrapper");
 		defaults.put("keepgenerated", "false");
 		defaults.put("logVerbosityLevel", "NONE");
 		defaults.put("saveBytecode", "true");

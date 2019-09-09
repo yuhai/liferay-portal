@@ -21,8 +21,6 @@ AUI.add(
 
 		var STR_CLICK = 'click';
 
-		var STR_RESPONSE_DATA = 'responseData';
-
 		var AddContent = A.Component.create({
 			AUGMENTS: [ControlMenu.AddContentSearch, Liferay.PortletBase],
 
@@ -31,34 +29,13 @@ AUI.add(
 			NAME: 'addcontent',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._config = config;
-					instance._delta = config.delta;
-					instance._displayStyle = config.displayStyle;
-
-					instance._addContentForm = instance.byId('addContentForm');
-					instance._entriesPanel = instance.byId('entriesContainer');
-
-					instance._entriesPanel.plug(A.Plugin.ParseContent);
-
-					instance._bindUI();
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_afterSuccess: function(response) {
+				_afterSuccess(response) {
 					var instance = this;
 
 					instance._entriesPanel.setContent(response);
 				},
 
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					instance._eventHandles.push(
@@ -79,7 +56,7 @@ AUI.add(
 					);
 				},
 
-				_refreshContentList: function(event) {
+				_refreshContentList(event) {
 					var instance = this;
 
 					var delta = event.delta;
@@ -123,6 +100,27 @@ AUI.add(
 						.then(function(response) {
 							instance._afterSuccess(response);
 						});
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer(config) {
+					var instance = this;
+
+					instance._config = config;
+					instance._delta = config.delta;
+					instance._displayStyle = config.displayStyle;
+
+					instance._addContentForm = instance.byId('addContentForm');
+					instance._entriesPanel = instance.byId('entriesContainer');
+
+					instance._entriesPanel.plug(A.Plugin.ParseContent);
+
+					instance._bindUI();
 				}
 			}
 		});

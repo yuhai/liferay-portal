@@ -60,7 +60,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -77,12 +76,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = SiteNavigationMenuPersistence.class)
-@ProviderType
 public class SiteNavigationMenuPersistenceImpl
 	extends BasePersistenceImpl<SiteNavigationMenu>
 	implements SiteNavigationMenuPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>SiteNavigationMenuUtil</code> to access the site navigation menu persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.

@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MicroblogsEntryPersistence
 	extends BasePersistence<MicroblogsEntry> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MicroblogsEntryUtil} to access the microblogs entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileEntryTypePersistence
 	extends BasePersistence<DLFileEntryType> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileEntryTypeUtil} to access the document library file entry type persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

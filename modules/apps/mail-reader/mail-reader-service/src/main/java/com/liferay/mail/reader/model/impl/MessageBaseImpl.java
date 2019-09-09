@@ -17,8 +17,6 @@ package com.liferay.mail.reader.model.impl;
 import com.liferay.mail.reader.model.Message;
 import com.liferay.mail.reader.service.MessageLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the Message service. Represents a row in the &quot;Mail_Message&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,11 +29,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Message
  * @generated
  */
-@ProviderType
 public abstract class MessageBaseImpl
 	extends MessageModelImpl implements Message {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a message model instance should use the <code>Message</code> interface instead.

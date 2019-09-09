@@ -98,171 +98,7 @@ AUI.add(
 			NAME: 'scheduler-event-recorder',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					var popoverBB = instance.popover.get('boundingBox');
-
-					popoverBB.delegate(
-						'click',
-						instance._handleEventAnswer,
-						'.calendar-event-answer',
-						instance
-					);
-				},
-
-				getTemplateData: function() {
-					var instance = this;
-
-					var editing = true;
-
-					var schedulerEvent = instance.get('event');
-
-					if (!schedulerEvent) {
-						editing = false;
-
-						schedulerEvent = instance;
-					}
-
-					var calendarContainer = instance.get('calendarContainer');
-
-					var calendar = calendarContainer.getCalendar(
-						schedulerEvent.get('calendarId')
-					);
-
-					var permissions = calendar.get('permissions');
-
-					var templateData = SchedulerEventRecorder.superclass.getTemplateData.apply(
-						this,
-						arguments
-					);
-
-					return A.merge(templateData, {
-						acceptLinkEnabled: instance._hasWorkflowStatusPermission(
-							schedulerEvent,
-							CalendarWorkflow.STATUS_APPROVED
-						),
-						allDay: schedulerEvent.get('allDay'),
-						availableCalendars: calendarContainer.get(
-							'availableCalendars'
-						),
-						calendar: calendar,
-						calendarIds: AObject.keys(
-							calendarContainer.get('availableCalendars')
-						),
-						declineLinkEnabled: instance._hasWorkflowStatusPermission(
-							schedulerEvent,
-							CalendarWorkflow.STATUS_DENIED
-						),
-						editing: editing,
-						endTime: templateData.endDate,
-						hasWorkflowInstanceLink: schedulerEvent.get(
-							'hasWorkflowInstanceLink'
-						),
-						instanceIndex: schedulerEvent.get('instanceIndex'),
-						maybeLinkEnabled: instance._hasWorkflowStatusPermission(
-							schedulerEvent,
-							CalendarWorkflow.STATUS_MAYBE
-						),
-						permissions: permissions,
-						startTime: templateData.startDate,
-						status: schedulerEvent.get('status'),
-						workflowStatus: CalendarWorkflow
-					});
-				},
-
-				getUpdatedSchedulerEvent: function(optAttrMap) {
-					var instance = this;
-
-					var attrMap = {
-						color: instance.get('color')
-					};
-
-					var event = instance.get('event');
-
-					if (event) {
-						var calendarContainer = instance.get(
-							'calendarContainer'
-						);
-
-						var calendar = calendarContainer.getCalendar(
-							event.get('calendarId')
-						);
-
-						if (calendar) {
-							attrMap.color = calendar.get('color');
-						}
-					}
-
-					return SchedulerEventRecorder.superclass.getUpdatedSchedulerEvent.call(
-						instance,
-						A.merge(attrMap, optAttrMap)
-					);
-				},
-
-				isMasterBooking: Lang.emptyFnFalse,
-
-				populateForm: function() {
-					var instance = this;
-
-					var bodyTemplate = instance.get('bodyTemplate');
-
-					var headerTemplate = instance.get('headerTemplate');
-
-					var templateData = instance.getTemplateData();
-
-					if (
-						A.instanceOf(bodyTemplate, A.Template) &&
-						A.instanceOf(headerTemplate, A.Template)
-					) {
-						instance.popover.setStdModContent(
-							'body',
-							bodyTemplate.parse(templateData)
-						);
-						instance.popover.setStdModContent(
-							'header',
-							headerTemplate.parse(templateData)
-						);
-
-						instance.popover.addToolbar(
-							instance._getFooterToolbar(),
-							'footer'
-						);
-					} else {
-						SchedulerEventRecorder.superclass.populateForm.apply(
-							instance,
-							arguments
-						);
-					}
-
-					instance.popover.addToolbar(
-						[
-							{
-								cssClass: 'close',
-								label: '\u00D7',
-								on: {
-									click: A.bind(
-										instance._handleCancelEvent,
-										instance
-									)
-								},
-								render: true
-							}
-						],
-						'body'
-					);
-
-					if (instance.popover.headerNode) {
-						instance.popover.headerNode.toggleClass(
-							'hide',
-							!templateData.permissions.VIEW_BOOKING_DETAILS
-						);
-					}
-
-					instance._showResources();
-				},
-
-				_getFooterToolbar: function() {
+				_getFooterToolbar() {
 					var instance = this;
 
 					var schedulerEvent = instance.get('event');
@@ -376,7 +212,7 @@ AUI.add(
 					return children;
 				},
 
-				_handleEditEvent: function(event) {
+				_handleEditEvent() {
 					var instance = this;
 
 					var scheduler = instance.get('scheduler');
@@ -427,7 +263,7 @@ AUI.add(
 					Liferay.Util.openWindow({
 						dialog: {
 							after: {
-								destroy: function(event) {
+								destroy() {
 									scheduler.load();
 								}
 							},
@@ -448,7 +284,7 @@ AUI.add(
 					instance.hidePopover();
 				},
 
-				_handleEventAnswer: function(event) {
+				_handleEventAnswer(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -507,7 +343,7 @@ AUI.add(
 					}
 				},
 
-				_handleViewEvent: function(event) {
+				_handleViewEvent(event) {
 					var instance = this;
 
 					var viewCalendarBookingURL = decodeURIComponent(
@@ -525,7 +361,7 @@ AUI.add(
 					Liferay.Util.openWindow({
 						dialog: {
 							after: {
-								destroy: function(event) {
+								destroy() {
 									schedulerEvent.syncWithServer();
 								}
 							},
@@ -545,22 +381,19 @@ AUI.add(
 					event.domEvent.preventDefault();
 				},
 
-				_hasDeleteButton: function(permissions, calendar, status) {
+				_hasDeleteButton(permissions, calendar, _status) {
 					return permissions.MANAGE_BOOKINGS && calendar;
 				},
 
-				_hasEditButton: function(permissions, calendar, status) {
+				_hasEditButton(permissions, _calendar, _status) {
 					return permissions.MANAGE_BOOKINGS;
 				},
 
-				_hasSaveButton: function(permissions, calendar, status) {
+				_hasSaveButton(permissions, _calendar, _status) {
 					return permissions.MANAGE_BOOKINGS;
 				},
 
-				_hasWorkflowStatusPermission: function(
-					schedulerEvent,
-					newStatus
-				) {
+				_hasWorkflowStatusPermission(schedulerEvent, newStatus) {
 					var instance = this;
 
 					var hasPermission = false;
@@ -589,7 +422,7 @@ AUI.add(
 					return hasPermission;
 				},
 
-				_renderPopOver: function() {
+				_renderPopOver() {
 					var instance = this;
 
 					var popoverBB = instance.popover.get('boundingBox');
@@ -631,7 +464,7 @@ AUI.add(
 					);
 				},
 
-				_showResources: function() {
+				_showResources() {
 					var instance = this;
 
 					var schedulerEvent = instance.get('event');
@@ -685,7 +518,7 @@ AUI.add(
 					instance._syncInvitees();
 				},
 
-				_syncInvitees: function() {
+				_syncInvitees() {
 					var instance = this;
 
 					var schedulerEvent = instance.get('event');
@@ -747,9 +580,7 @@ AUI.add(
 					}
 				},
 
-				_syncInviteesContent: function(contentNode, calendarResources) {
-					var instance = this;
-
+				_syncInviteesContent(contentNode, calendarResources) {
 					var values = calendarResources.map(function(item) {
 						return item.name;
 					});
@@ -769,6 +600,170 @@ AUI.add(
 					}
 
 					messageNode.html(messageHTML);
+				},
+
+				getTemplateData() {
+					var instance = this;
+
+					var editing = true;
+
+					var schedulerEvent = instance.get('event');
+
+					if (!schedulerEvent) {
+						editing = false;
+
+						schedulerEvent = instance;
+					}
+
+					var calendarContainer = instance.get('calendarContainer');
+
+					var calendar = calendarContainer.getCalendar(
+						schedulerEvent.get('calendarId')
+					);
+
+					var permissions = calendar.get('permissions');
+
+					var templateData = SchedulerEventRecorder.superclass.getTemplateData.apply(
+						this,
+						arguments
+					);
+
+					return A.merge(templateData, {
+						acceptLinkEnabled: instance._hasWorkflowStatusPermission(
+							schedulerEvent,
+							CalendarWorkflow.STATUS_APPROVED
+						),
+						allDay: schedulerEvent.get('allDay'),
+						availableCalendars: calendarContainer.get(
+							'availableCalendars'
+						),
+						calendar,
+						calendarIds: AObject.keys(
+							calendarContainer.get('availableCalendars')
+						),
+						declineLinkEnabled: instance._hasWorkflowStatusPermission(
+							schedulerEvent,
+							CalendarWorkflow.STATUS_DENIED
+						),
+						editing,
+						endTime: templateData.endDate,
+						hasWorkflowInstanceLink: schedulerEvent.get(
+							'hasWorkflowInstanceLink'
+						),
+						instanceIndex: schedulerEvent.get('instanceIndex'),
+						maybeLinkEnabled: instance._hasWorkflowStatusPermission(
+							schedulerEvent,
+							CalendarWorkflow.STATUS_MAYBE
+						),
+						permissions,
+						startTime: templateData.startDate,
+						status: schedulerEvent.get('status'),
+						workflowStatus: CalendarWorkflow
+					});
+				},
+
+				getUpdatedSchedulerEvent(optAttrMap) {
+					var instance = this;
+
+					var attrMap = {
+						color: instance.get('color')
+					};
+
+					var event = instance.get('event');
+
+					if (event) {
+						var calendarContainer = instance.get(
+							'calendarContainer'
+						);
+
+						var calendar = calendarContainer.getCalendar(
+							event.get('calendarId')
+						);
+
+						if (calendar) {
+							attrMap.color = calendar.get('color');
+						}
+					}
+
+					return SchedulerEventRecorder.superclass.getUpdatedSchedulerEvent.call(
+						instance,
+						A.merge(attrMap, optAttrMap)
+					);
+				},
+
+				initializer() {
+					var instance = this;
+
+					var popoverBB = instance.popover.get('boundingBox');
+
+					popoverBB.delegate(
+						'click',
+						instance._handleEventAnswer,
+						'.calendar-event-answer',
+						instance
+					);
+				},
+
+				isMasterBooking: Lang.emptyFnFalse,
+
+				populateForm() {
+					var instance = this;
+
+					var bodyTemplate = instance.get('bodyTemplate');
+
+					var headerTemplate = instance.get('headerTemplate');
+
+					var templateData = instance.getTemplateData();
+
+					if (
+						A.instanceOf(bodyTemplate, A.Template) &&
+						A.instanceOf(headerTemplate, A.Template)
+					) {
+						instance.popover.setStdModContent(
+							'body',
+							bodyTemplate.parse(templateData)
+						);
+						instance.popover.setStdModContent(
+							'header',
+							headerTemplate.parse(templateData)
+						);
+
+						instance.popover.addToolbar(
+							instance._getFooterToolbar(),
+							'footer'
+						);
+					} else {
+						SchedulerEventRecorder.superclass.populateForm.apply(
+							instance,
+							arguments
+						);
+					}
+
+					instance.popover.addToolbar(
+						[
+							{
+								cssClass: 'close',
+								label: '\u00D7',
+								on: {
+									click: A.bind(
+										instance._handleCancelEvent,
+										instance
+									)
+								},
+								render: true
+							}
+						],
+						'body'
+					);
+
+					if (instance.popover.headerNode) {
+						instance.popover.headerNode.toggleClass(
+							'hide',
+							!templateData.permissions.VIEW_BOOKING_DETAILS
+						);
+					}
+
+					instance._showResources();
 				}
 			}
 		});

@@ -41,7 +41,6 @@ import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -52,7 +51,6 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	service = ExportImportConfigurationParameterMapFactory.class
 )
-@ProviderType
 public class ExportImportConfigurationParameterMapFactoryImpl
 	implements ExportImportConfigurationParameterMapFactory {
 
@@ -500,9 +498,10 @@ public class ExportImportConfigurationParameterMapFactoryImpl
 				if ((portletDataAll || controlValue) &&
 					(portletDataHandlerBoolean.getClassName() != null)) {
 
-					if (portletDataHandlerBoolean.getReferrerClassName() ==
-							null) {
+					String referrerClassName =
+						portletDataHandlerBoolean.getReferrerClassName();
 
+					if (referrerClassName == null) {
 						parameterMap.put(
 							portletDataHandlerBoolean.getClassName(),
 							new String[] {Boolean.TRUE.toString()});
@@ -510,9 +509,7 @@ public class ExportImportConfigurationParameterMapFactoryImpl
 					else {
 						parameterMap.put(
 							portletDataHandlerBoolean.getClassName() +
-								StringPool.POUND +
-									portletDataHandlerBoolean.
-										getReferrerClassName(),
+								StringPool.POUND + referrerClassName,
 							new String[] {Boolean.TRUE.toString()});
 					}
 				}

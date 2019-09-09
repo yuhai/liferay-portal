@@ -738,6 +738,26 @@ public abstract class BaseWikiNodeResourceTestCase {
 				sb.append(", ");
 			}
 
+			if (Objects.equals(
+					"numberOfWikiPages", additionalAssertFieldName)) {
+
+				sb.append(additionalAssertFieldName);
+				sb.append(": ");
+
+				Object value = wikiNode.getNumberOfWikiPages();
+
+				if (value instanceof String) {
+					sb.append("\"");
+					sb.append(value);
+					sb.append("\"");
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append(", ");
+			}
+
 			if (Objects.equals("siteId", additionalAssertFieldName)) {
 				sb.append(additionalAssertFieldName);
 				sb.append(": ");
@@ -760,6 +780,8 @@ public abstract class BaseWikiNodeResourceTestCase {
 		sb.append("}");
 
 		List<GraphQLField> graphQLFields = getGraphQLFields();
+
+		graphQLFields.add(new GraphQLField("id"));
 
 		GraphQLField graphQLField = new GraphQLField(
 			"mutation",
@@ -950,8 +972,6 @@ public abstract class BaseWikiNodeResourceTestCase {
 	protected List<GraphQLField> getGraphQLFields() {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		graphQLFields.add(new GraphQLField("id"));
-
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
@@ -1074,9 +1094,9 @@ public abstract class BaseWikiNodeResourceTestCase {
 
 		for (String fieldName : getAdditionalAssertFieldNames()) {
 			if (Objects.equals("description", fieldName)) {
-				if (!Objects.equals(
+				if (!Objects.deepEquals(
 						wikiNode.getDescription(),
-						(String)jsonObject.getString("description"))) {
+						jsonObject.getString("description"))) {
 
 					return false;
 				}
@@ -1085,8 +1105,8 @@ public abstract class BaseWikiNodeResourceTestCase {
 			}
 
 			if (Objects.equals("id", fieldName)) {
-				if (!Objects.equals(
-						wikiNode.getId(), (Long)jsonObject.getLong("id"))) {
+				if (!Objects.deepEquals(
+						wikiNode.getId(), jsonObject.getLong("id"))) {
 
 					return false;
 				}
@@ -1095,9 +1115,8 @@ public abstract class BaseWikiNodeResourceTestCase {
 			}
 
 			if (Objects.equals("name", fieldName)) {
-				if (!Objects.equals(
-						wikiNode.getName(),
-						(String)jsonObject.getString("name"))) {
+				if (!Objects.deepEquals(
+						wikiNode.getName(), jsonObject.getString("name"))) {
 
 					return false;
 				}
@@ -1105,10 +1124,10 @@ public abstract class BaseWikiNodeResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("siteId", fieldName)) {
-				if (!Objects.equals(
-						wikiNode.getSiteId(),
-						(Long)jsonObject.getLong("siteId"))) {
+			if (Objects.equals("numberOfWikiPages", fieldName)) {
+				if (!Objects.deepEquals(
+						wikiNode.getNumberOfWikiPages(),
+						jsonObject.getInt("numberOfWikiPages"))) {
 
 					return false;
 				}
@@ -1305,6 +1324,7 @@ public abstract class BaseWikiNodeResourceTestCase {
 				description = RandomTestUtil.randomString();
 				id = RandomTestUtil.randomLong();
 				name = RandomTestUtil.randomString();
+				numberOfWikiPages = RandomTestUtil.randomInt();
 				siteId = testGroup.getGroupId();
 			}
 		};
@@ -1358,6 +1378,8 @@ public abstract class BaseWikiNodeResourceTestCase {
 					sb.append(",");
 				}
 
+				sb.setLength(sb.length() - 1);
+
 				sb.append(")");
 			}
 
@@ -1368,6 +1390,8 @@ public abstract class BaseWikiNodeResourceTestCase {
 					sb.append(graphQLField.toString());
 					sb.append(",");
 				}
+
+				sb.setLength(sb.length() - 1);
 
 				sb.append("}");
 			}

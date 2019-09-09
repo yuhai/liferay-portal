@@ -18,7 +18,11 @@ AUI.add(
 		var NATIVE_MSG = !!window.postMessage;
 
 		var MarketplaceMessenger = {
-			init: function(options, initMessage) {
+			_messages: [],
+			_targetFrame: null,
+			_targetURI: null,
+
+			init(options, initMessage) {
 				var instance = this;
 
 				if (A.Lang.isString(options)) {
@@ -36,7 +40,7 @@ AUI.add(
 				}
 			},
 
-			postMessage: function(message) {
+			postMessage(message) {
 				var instance = this;
 
 				if (NATIVE_MSG) {
@@ -58,7 +62,7 @@ AUI.add(
 				}
 			},
 
-			receiveMessage: function(callback, validator) {
+			receiveMessage(callback, validator) {
 				var instance = this;
 
 				validator = validator || instance._targetURI;
@@ -96,17 +100,13 @@ AUI.add(
 				}
 			},
 
-			setTargetFrame: function(targetFrame) {
+			setTargetFrame(targetFrame) {
 				this._targetFrame = targetFrame;
 			},
 
-			setTargetURI: function(targetURI) {
+			setTargetURI(targetURI) {
 				this._targetURI = targetURI;
-			},
-
-			_messages: [],
-			_targetFrame: null,
-			_targetURI: null
+			}
 		};
 
 		Liferay.MarketplaceMessenger = MarketplaceMessenger;
@@ -121,7 +121,7 @@ AUI.add(
 	'liferay-marketplace-util',
 	function(A) {
 		var MarketplaceUtil = {
-			namespaceObject: function(namespace, object) {
+			namespaceObject(namespace, object) {
 				var returnObject = {};
 
 				var keys = A.Object.keys(object);

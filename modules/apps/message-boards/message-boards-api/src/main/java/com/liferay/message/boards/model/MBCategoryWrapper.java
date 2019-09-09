@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MBCategory}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBCategory
  * @generated
  */
-@ProviderType
 public class MBCategoryWrapper
 	extends BaseModelWrapper<MBCategory>
 	implements MBCategory, ModelWrapper<MBCategory> {
@@ -623,6 +620,11 @@ public class MBCategoryWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a message boards category model instance should use the <code>MBCategory</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

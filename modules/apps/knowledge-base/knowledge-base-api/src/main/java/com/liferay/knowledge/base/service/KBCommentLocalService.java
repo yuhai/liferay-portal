@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KBCommentLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KBCommentLocalServiceUtil} to access the kb comment local service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBCommentLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

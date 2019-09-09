@@ -40,7 +40,7 @@ import java.io.Serializable;
 public interface LocalizedEntryLocalizationModel
 	extends BaseModel<LocalizedEntryLocalization>, MVCCModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a localized entry localization model instance should use the {@link LocalizedEntryLocalization} interface instead.

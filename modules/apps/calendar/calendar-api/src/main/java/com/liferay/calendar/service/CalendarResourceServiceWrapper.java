@@ -16,8 +16,6 @@ package com.liferay.calendar.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link CalendarResourceService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CalendarResourceService
  * @generated
  */
-@ProviderType
 public class CalendarResourceServiceWrapper
 	implements CalendarResourceService,
 			   ServiceWrapper<CalendarResourceService> {
@@ -36,6 +33,11 @@ public class CalendarResourceServiceWrapper
 		_calendarResourceService = calendarResourceService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link CalendarResourceServiceUtil} to access the calendar resource remote service. Add custom service methods to <code>com.liferay.calendar.service.impl.CalendarResourceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.calendar.model.CalendarResource addCalendarResource(
 			long groupId, long classNameId, long classPK, String classUuid,

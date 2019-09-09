@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MDRRuleGroup}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MDRRuleGroup
  * @generated
  */
-@ProviderType
 public class MDRRuleGroupWrapper
 	extends BaseModelWrapper<MDRRuleGroup>
 	implements MDRRuleGroup, ModelWrapper<MDRRuleGroup> {
@@ -407,6 +404,11 @@ public class MDRRuleGroupWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a mdr rule group model instance should use the <code>MDRRuleGroup</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetEntryUsagePersistence
 	extends BasePersistence<AssetEntryUsage> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetEntryUsageUtil} to access the asset entry usage persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

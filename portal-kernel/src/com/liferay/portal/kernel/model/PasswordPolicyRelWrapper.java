@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link PasswordPolicyRel}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PasswordPolicyRel
  * @generated
  */
-@ProviderType
 public class PasswordPolicyRelWrapper
 	extends BaseModelWrapper<PasswordPolicyRel>
 	implements PasswordPolicyRel, ModelWrapper<PasswordPolicyRel> {
@@ -172,6 +169,11 @@ public class PasswordPolicyRelWrapper
 		return model.getPrimaryKey();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a password policy rel model instance should use the <code>PasswordPolicyRel</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

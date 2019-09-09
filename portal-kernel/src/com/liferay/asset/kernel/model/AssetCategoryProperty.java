@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetCategoryProperty
 	extends AssetCategoryPropertyModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

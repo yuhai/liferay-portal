@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link TrashVersion}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see TrashVersion
  * @generated
  */
-@ProviderType
 public class TrashVersionWrapper
 	extends BaseModelWrapper<TrashVersion>
 	implements TrashVersion, ModelWrapper<TrashVersion> {
@@ -207,6 +204,11 @@ public class TrashVersionWrapper
 		return model.getVersionId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a trash version model instance should use the <code>TrashVersion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

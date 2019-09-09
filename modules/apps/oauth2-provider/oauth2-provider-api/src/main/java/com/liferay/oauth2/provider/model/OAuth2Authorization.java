@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OAuth2Authorization
 	extends OAuth2AuthorizationModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

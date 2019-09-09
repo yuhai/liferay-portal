@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SiteNavigationMenuModel
 	extends BaseModel<SiteNavigationMenu>, ShardedModel, StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a site navigation menu model instance should use the {@link SiteNavigationMenu} interface instead.

@@ -58,7 +58,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileRankLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileRankLocalServiceUtil} to access the document library file rank local service. Add custom service methods to <code>com.liferay.document.library.file.rank.service.impl.DLFileRankLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

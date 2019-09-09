@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutPageTemplateStructureRelPersistence
 	extends BasePersistence<LayoutPageTemplateStructureRel> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutPageTemplateStructureRelUtil} to access the layout page template structure rel persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

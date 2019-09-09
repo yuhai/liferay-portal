@@ -70,13 +70,335 @@ AUI.add(
 			NAME: 'autofields',
 
 			prototype: {
-				initializer: function(config) {
+				_addHandleClass(node) {
 					var instance = this;
 
-					instance.config = config;
+					var sortableHandle = instance.config.sortableHandle;
+
+					if (sortableHandle) {
+						node.all(sortableHandle).addClass(
+							'handle-sort-vertical'
+						);
+					}
 				},
 
-				addRow: function(node) {
+				_attachSubmitListener() {
+					Liferay.on(
+						'submitForm',
+						A.bind('fire', Liferay, 'saveAutoFields')
+					);
+
+					AutoFields.prototype._attachSubmitListener = Lang.emptyFn;
+				},
+
+				_clearForm(node) {
+					node.all('input, select, textarea').each(function(item) {
+						var tag = item.get('nodeName').toLowerCase();
+
+						var type = item.getAttribute('type');
+
+						if (
+							type == 'text' ||
+							type == 'password' ||
+							tag == 'textarea'
+						) {
+							item.val('');
+						} else if (type == 'checkbox' || type == 'radio') {
+							item.attr('checked', false);
+						} else if (tag == 'select') {
+							var selectedIndex = 0;
+
+							if (item.getAttribute('showEmptyOption')) {
+								selectedIndex = -1;
+							}
+
+							item.attr('selectedIndex', selectedIndex);
+						}
+					});
+
+					CSS_VALIDATION_HELPER_CLASSES.forEach(function(item) {
+						node.all('.' + item).removeClass(item);
+					});
+				},
+
+				_clearHiddenRows(item) {
+					var instance = this;
+
+					if (instance._isHiddenRow(item)) {
+						item.remove(true);
+					}
+				},
+
+				_clearInputsLocalized(node) {
+					node.all('.language-value').attr('placeholder', '');
+					node.all('.lfr-input-localized-state').removeClass(
+						'lfr-input-localized-state-error'
+					);
+					node.all('.palette-item')
+						.removeClass('palette-item-selected')
+						.removeClass('lfr-input-localized');
+					node.all('.lfr-input-localized-default').addClass(
+						'palette-item-selected'
+					);
+				},
+
+				_createClone(node) {
+					var instance = this;
+
+					var currentRow = node;
+
+					var clone = currentRow.clone();
+
+					var guid = instance._guid++;
+
+					var formValidator = instance._getFormValidator(node);
+
+					var inputsLocalized = node.all('.language-value');
+
+					var clonedRow;
+
+					if (instance.url) {
+						clonedRow = instance._createCloneFromURL(clone, guid);
+					} else {
+						clonedRow = instance._createCloneFromMarkup(
+							clone,
+							guid,
+							formValidator,
+							inputsLocalized
+						);
+					}
+
+					return clonedRow;
+				},
+
+				_createCloneFromMarkup(
+					node,
+					guid,
+					formValidator,
+					inputsLocalized
+				) {
+					var instance = this;
+
+					var fieldStrings;
+
+					var rules;
+
+					if (formValidator) {
+						fieldStrings = formValidator.get('fieldStrings');
+
+						rules = formValidator.get('rules');
+					}
+
+					node.all('input, select, textarea, span, div').each(
+						function(item) {
+							var inputNodeName = item.attr('nodeName');
+							var inputType = item.attr('type');
+
+							var oldName = item.attr('name') || item.attr('id');
+
+							var newName = oldName.replace(
+								/([0-9]+)([_A-Za-z]*)$/,
+								guid + '$2'
+							);
+
+							if (inputType == 'radio') {
+								oldName = item.attr('id');
+
+								item.attr('checked', '');
+								item.attr('value', guid);
+								item.attr('id', newName);
+							} else if (
+								inputNodeName == 'button' ||
+								inputNodeName == 'div' ||
+								inputNodeName == 'span'
+							) {
+								if (oldName) {
+									item.attr('id', newName);
+								}
+							} else {
+								item.attr('name', newName);
+								item.attr('id', newName);
+							}
+
+							if (fieldStrings && fieldStrings[oldName]) {
+								fieldStrings[newName] = fieldStrings[oldName];
+							}
+
+							if (rules && rules[oldName]) {
+								rules[newName] = rules[oldName];
+							}
+
+							if (item.attr('aria-describedby')) {
+								item.attr(
+									'aria-describedby',
+									newName + '_desc'
+								);
+							}
+
+							node.all('label[for=' + oldName + ']').attr(
+								'for',
+								newName
+							);
+						}
+					);
+
+					instance._clearInputsLocalized(node);
+
+					inputsLocalized.each(function(item) {
+						var inputId = item.attr('id');
+
+						var inputLocalized;
+
+						if (inputId) {
+							inputLocalized =
+								Liferay.InputLocalized._registered[inputId];
+
+							if (inputLocalized) {
+								Liferay.component(inputId).render();
+							}
+
+							inputLocalized =
+								Liferay.InputLocalized._instances[inputId];
+						}
+
+						instance._registerInputLocalized(inputLocalized, guid);
+					});
+
+					node.all('.form-validator-stack').remove();
+					node.all('.help-inline').remove();
+
+					instance._clearForm(node);
+
+					node.all('input[type=hidden]').val('');
+
+					return node;
+				},
+
+				_createCloneFromURL(node, guid) {
+					var instance = this;
+
+					var contentBox = node.one('> div');
+
+					contentBox.html(TPL_LOADING);
+
+					contentBox.plug(A.Plugin.ParseContent);
+
+					var data = {
+						index: guid
+					};
+
+					var namespace = instance.urlNamespace
+						? instance.urlNamespace
+						: instance.namespace;
+
+					var namespacedData = Liferay.Util.ns(namespace, data);
+
+					Liferay.Util.fetch(instance.url, {
+						body: Liferay.Util.objectToFormData(namespacedData),
+						method: 'POST'
+					})
+						.then(response => response.text())
+						.then(response => contentBox.setContent(response));
+
+					return node;
+				},
+
+				_getFormValidator(node) {
+					var formValidator;
+
+					var form = node.ancestor('form');
+
+					if (form) {
+						var formId = form.attr('id');
+
+						formValidator = Liferay.Form.get(formId).formValidator;
+					}
+
+					return formValidator;
+				},
+
+				_guid: 0,
+
+				_isHiddenRow(row) {
+					return row.hasClass(row._hideClass || 'hide');
+				},
+
+				_makeSortable(sortableHandle) {
+					var instance = this;
+
+					var rows = instance._contentBox.all('.lfr-form-row');
+
+					instance._addHandleClass(rows);
+
+					instance._sortable = new A.Sortable({
+						container: instance._contentBox,
+						handles: [sortableHandle],
+						nodes: '.lfr-form-row',
+						opacity: 0
+					});
+
+					instance._undoManager.on('clearList', function() {
+						rows.all('.lfr-form-row').each(function(item) {
+							if (instance._isHiddenRow(item)) {
+								A.DD.DDM.getDrag(item).destroy();
+							}
+						});
+					});
+				},
+
+				_registerInputLocalized(inputLocalized, guid) {
+					var inputLocalizedId = inputLocalized
+						.get('id')
+						.replace(/([0-9]+)$/, guid);
+
+					var inputLocalizedNamespaceId =
+						inputLocalized.get('namespace') + inputLocalizedId;
+
+					Liferay.InputLocalized.register(inputLocalizedNamespaceId, {
+						boundingBox:
+							'#' + inputLocalizedNamespaceId + 'BoundingBox',
+						columns: inputLocalized.get('columns'),
+						contentBox:
+							'#' + inputLocalizedNamespaceId + 'ContentBox',
+						defaultLanguageId: inputLocalized.get(
+							'defaultLanguageId'
+						),
+						fieldPrefix: inputLocalized.get('fieldPrefix'),
+						fieldPrefixSeparator: inputLocalized.get(
+							'fieldPrefixSeparator'
+						),
+						id: inputLocalizedId,
+						inputPlaceholder: '#' + inputLocalizedNamespaceId,
+						items: inputLocalized.get('items'),
+						itemsError: inputLocalized.get('itemsError'),
+						lazy: true,
+						name: inputLocalizedId,
+						namespace: inputLocalized.get('namespace'),
+						toggleSelection: inputLocalized.get('toggleSelection'),
+						translatedLanguages: inputLocalized.get(
+							'translatedLanguages'
+						)
+					});
+				},
+
+				_updateContentButtons() {
+					var instance = this;
+
+					var minimumRows = instance.minimumRows;
+
+					if (minimumRows) {
+						var deleteRowButtons = instance._contentBox.all(
+							'.lfr-form-row:not(.hide) .delete-row'
+						);
+
+						Liferay.Util.toggleDisabled(
+							deleteRowButtons,
+							deleteRowButtons.size() <= minimumRows
+						);
+					}
+				},
+
+				addRow(node) {
 					var instance = this;
 
 					var clone = instance._createClone(node);
@@ -106,7 +428,7 @@ AUI.add(
 					}
 				},
 
-				deleteRow: function(node) {
+				deleteRow(node) {
 					var instance = this;
 
 					var contentBox = instance._contentBox;
@@ -128,10 +450,7 @@ AUI.add(
 
 						node.hide();
 
-						CSS_VALIDATION_HELPER_CLASSES.forEach(function(
-							item,
-							index
-						) {
+						CSS_VALIDATION_HELPER_CLASSES.forEach(function(item) {
 							var disabledClass = item + '-disabled';
 
 							node.all('.' + item).replaceClass(
@@ -152,8 +471,7 @@ AUI.add(
 							rules = formValidator.get('rules');
 
 							node.all('input, select, textarea').each(function(
-								item,
-								index
+								item
 							) {
 								var name = item.attr('name') || item.attr('id');
 
@@ -169,7 +487,7 @@ AUI.add(
 							});
 						}
 
-						instance._undoManager.add(function(stateData) {
+						instance._undoManager.add(function() {
 							if (rules) {
 								AObject.each(deletedRules, function(
 									item,
@@ -180,8 +498,7 @@ AUI.add(
 							}
 
 							CSS_VALIDATION_HELPER_CLASSES.forEach(function(
-								item,
-								index
+								item
 							) {
 								var disabledClass = item + '-disabled';
 
@@ -213,7 +530,13 @@ AUI.add(
 					instance._updateContentButtons();
 				},
 
-				render: function() {
+				initializer(config) {
+					var instance = this;
+
+					instance.config = config;
+				},
+
+				render() {
 					var instance = this;
 
 					var baseContainer = A.Node.create(
@@ -309,7 +632,7 @@ AUI.add(
 						instance.save(event.form);
 					});
 
-					instance._undoManager.on('clearList', function(event) {
+					instance._undoManager.on('clearList', function() {
 						contentBox
 							.all('.lfr-form-row')
 							.each(instance._clearHiddenRows, instance);
@@ -320,19 +643,19 @@ AUI.add(
 					return instance;
 				},
 
-				reset: function() {
+				reset() {
 					var instance = this;
 
 					var contentBox = instance._contentBox;
 
-					contentBox.all('.lfr-form-row').each(function(item, index) {
+					contentBox.all('.lfr-form-row').each(function(item) {
 						instance.deleteRow(item);
 					});
 
 					instance._undoManager.clear();
 				},
 
-				save: function(form) {
+				save(form) {
 					var instance = this;
 
 					var contentBox = form || instance._contentBox;
@@ -346,7 +669,7 @@ AUI.add(
 					instance._fieldIndexes.val(fieldOrder);
 				},
 
-				serialize: function(filter) {
+				serialize(filter) {
 					var instance = this;
 
 					var visibleRows = instance._contentBox
@@ -359,7 +682,7 @@ AUI.add(
 						serializedData =
 							filter.call(instance, visibleRows) || [];
 					} else {
-						visibleRows.each(function(item, index) {
+						visibleRows.each(function(item) {
 							var formField = item.one('input, textarea, select');
 
 							var fieldId = formField.attr('id');
@@ -377,347 +700,7 @@ AUI.add(
 					}
 
 					return serializedData.join();
-				},
-
-				_addHandleClass: function(node) {
-					var instance = this;
-
-					var sortableHandle = instance.config.sortableHandle;
-
-					if (sortableHandle) {
-						node.all(sortableHandle).addClass(
-							'handle-sort-vertical'
-						);
-					}
-				},
-
-				_attachSubmitListener: function() {
-					var instance = this;
-
-					Liferay.on(
-						'submitForm',
-						A.bind('fire', Liferay, 'saveAutoFields')
-					);
-
-					AutoFields.prototype._attachSubmitListener = Lang.emptyFn;
-				},
-
-				_clearForm: function(node) {
-					node.all('input, select, textarea').each(function(
-						item,
-						index
-					) {
-						var tag = item.get('nodeName').toLowerCase();
-
-						var type = item.getAttribute('type');
-
-						if (
-							type == 'text' ||
-							type == 'password' ||
-							tag == 'textarea'
-						) {
-							item.val('');
-						} else if (type == 'checkbox' || type == 'radio') {
-							item.attr('checked', false);
-						} else if (tag == 'select') {
-							var selectedIndex = 0;
-
-							if (item.getAttribute('showEmptyOption')) {
-								selectedIndex = -1;
-							}
-
-							item.attr('selectedIndex', selectedIndex);
-						}
-					});
-
-					CSS_VALIDATION_HELPER_CLASSES.forEach(function(
-						item,
-						index
-					) {
-						node.all('.' + item).removeClass(item);
-					});
-				},
-
-				_clearHiddenRows: function(item, index) {
-					var instance = this;
-
-					if (instance._isHiddenRow(item)) {
-						item.remove(true);
-					}
-				},
-
-				_clearInputsLocalized: function(node) {
-					node.all('.language-value').attr('placeholder', '');
-					node.all('.lfr-input-localized-state').removeClass(
-						'lfr-input-localized-state-error'
-					);
-					node.all('.palette-item')
-						.removeClass('palette-item-selected')
-						.removeClass('lfr-input-localized');
-					node.all('.lfr-input-localized-default').addClass(
-						'palette-item-selected'
-					);
-				},
-
-				_createClone: function(node) {
-					var instance = this;
-
-					var currentRow = node;
-
-					var clone = currentRow.clone();
-
-					var guid = instance._guid++;
-
-					var formValidator = instance._getFormValidator(node);
-
-					var inputsLocalized = node.all('.language-value');
-
-					var clonedRow;
-
-					if (instance.url) {
-						clonedRow = instance._createCloneFromURL(clone, guid);
-					} else {
-						clonedRow = instance._createCloneFromMarkup(
-							clone,
-							guid,
-							formValidator,
-							inputsLocalized
-						);
-					}
-
-					return clonedRow;
-				},
-
-				_createCloneFromMarkup: function(
-					node,
-					guid,
-					formValidator,
-					inputsLocalized
-				) {
-					var instance = this;
-
-					var fieldStrings;
-
-					var rules;
-
-					if (formValidator) {
-						fieldStrings = formValidator.get('fieldStrings');
-
-						rules = formValidator.get('rules');
-					}
-
-					node.all('input, select, textarea, span, div').each(
-						function(item, index) {
-							var inputNodeName = item.attr('nodeName');
-							var inputType = item.attr('type');
-
-							var oldName = item.attr('name') || item.attr('id');
-
-							var newName = oldName.replace(
-								/([0-9]+)([_A-Za-z]*)$/,
-								guid + '$2'
-							);
-
-							if (inputType == 'radio') {
-								oldName = item.attr('id');
-
-								item.attr('checked', '');
-								item.attr('value', guid);
-								item.attr('id', newName);
-							} else if (
-								inputNodeName == 'button' ||
-								inputNodeName == 'div' ||
-								inputNodeName == 'span'
-							) {
-								if (oldName) {
-									item.attr('id', newName);
-								}
-							} else {
-								item.attr('name', newName);
-								item.attr('id', newName);
-							}
-
-							if (fieldStrings && fieldStrings[oldName]) {
-								fieldStrings[newName] = fieldStrings[oldName];
-							}
-
-							if (rules && rules[oldName]) {
-								rules[newName] = rules[oldName];
-							}
-
-							if (item.attr('aria-describedby')) {
-								item.attr(
-									'aria-describedby',
-									newName + '_desc'
-								);
-							}
-
-							node.all('label[for=' + oldName + ']').attr(
-								'for',
-								newName
-							);
-						}
-					);
-
-					instance._clearInputsLocalized(node);
-
-					inputsLocalized.each(function(item, index) {
-						var inputId = item.attr('id');
-
-						var inputLocalized;
-
-						if (inputId) {
-							inputLocalized =
-								Liferay.InputLocalized._registered[inputId];
-
-							if (inputLocalized) {
-								Liferay.component(inputId).render();
-							}
-
-							inputLocalized =
-								Liferay.InputLocalized._instances[inputId];
-						}
-
-						instance._registerInputLocalized(inputLocalized, guid);
-					});
-
-					node.all('.form-validator-stack').remove();
-					node.all('.help-inline').remove();
-
-					instance._clearForm(node);
-
-					node.all('input[type=hidden]').val('');
-
-					return node;
-				},
-
-				_createCloneFromURL: function(node, guid) {
-					var instance = this;
-
-					var contentBox = node.one('> div');
-
-					contentBox.html(TPL_LOADING);
-
-					contentBox.plug(A.Plugin.ParseContent);
-
-					var data = {
-						index: guid
-					};
-
-					var namespace = instance.urlNamespace
-						? instance.urlNamespace
-						: instance.namespace;
-
-					var namespacedData = Liferay.Util.ns(namespace, data);
-
-					Liferay.Util.fetch(instance.url, {
-						body: Liferay.Util.objectToFormData(namespacedData),
-						method: 'POST'
-					})
-						.then(response => response.text())
-						.then(response => contentBox.setContent(response));
-
-					return node;
-				},
-
-				_getFormValidator: function(node) {
-					var instance = this;
-
-					var formValidator;
-
-					var form = node.ancestor('form');
-
-					if (form) {
-						var formId = form.attr('id');
-
-						formValidator = Liferay.Form.get(formId).formValidator;
-					}
-
-					return formValidator;
-				},
-
-				_isHiddenRow: function(row) {
-					var instance = this;
-
-					return row.hasClass(row._hideClass || 'hide');
-				},
-
-				_makeSortable: function(sortableHandle) {
-					var instance = this;
-
-					var rows = instance._contentBox.all('.lfr-form-row');
-
-					instance._addHandleClass(rows);
-
-					instance._sortable = new A.Sortable({
-						container: instance._contentBox,
-						handles: [sortableHandle],
-						nodes: '.lfr-form-row',
-						opacity: 0
-					});
-
-					instance._undoManager.on('clearList', function(event) {
-						rows.all('.lfr-form-row').each(function(item, index) {
-							if (instance._isHiddenRow(item)) {
-								A.DD.DDM.getDrag(item).destroy();
-							}
-						});
-					});
-				},
-
-				_registerInputLocalized: function(inputLocalized, guid) {
-					var inputLocalizedId = inputLocalized
-						.get('id')
-						.replace(/([0-9]+)$/, guid);
-
-					var inputLocalizedNamespaceId =
-						inputLocalized.get('namespace') + inputLocalizedId;
-
-					Liferay.InputLocalized.register(inputLocalizedNamespaceId, {
-						boundingBox:
-							'#' + inputLocalizedNamespaceId + 'BoundingBox',
-						columns: inputLocalized.get('columns'),
-						contentBox:
-							'#' + inputLocalizedNamespaceId + 'ContentBox',
-						defaultLanguageId: inputLocalized.get(
-							'defaultLanguageId'
-						),
-						fieldPrefix: inputLocalized.get('fieldPrefix'),
-						fieldPrefixSeparator: inputLocalized.get(
-							'fieldPrefixSeparator'
-						),
-						id: inputLocalizedId,
-						inputPlaceholder: '#' + inputLocalizedNamespaceId,
-						items: inputLocalized.get('items'),
-						itemsError: inputLocalized.get('itemsError'),
-						lazy: true,
-						name: inputLocalizedId,
-						namespace: inputLocalized.get('namespace'),
-						toggleSelection: inputLocalized.get('toggleSelection'),
-						translatedLanguages: inputLocalized.get(
-							'translatedLanguages'
-						)
-					});
-				},
-
-				_updateContentButtons: function() {
-					var instance = this;
-
-					var minimumRows = instance.minimumRows;
-
-					if (minimumRows) {
-						var deleteRowButtons = instance._contentBox.all(
-							'.lfr-form-row:not(.hide) .delete-row'
-						);
-
-						Liferay.Util.toggleDisabled(
-							deleteRowButtons,
-							deleteRowButtons.size() <= minimumRows
-						);
-					}
-				},
-
-				_guid: 0
+				}
 			}
 		});
 

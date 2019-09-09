@@ -46,7 +46,9 @@
 						"errorMessage": {
 							"en_US": "Field ChildField must not be empty."
 						},
-						"expression": "!ChildField.isEmpty()"
+						"expression": {
+							"value": "!ChildField.isEmpty()"
+						}
 					},
 					"visibilityExpression": "true"
 				}
@@ -64,7 +66,9 @@
 				"errorMessage": {
 					"en_US": "Field ParentField must not be empty."
 				},
-				"expression": "!ParentField.isEmpty()"
+				"expression": {
+					"value": "!ParentField.isEmpty()"
+				}
 			},
 			"visibilityExpression": "true"
 		},
@@ -97,7 +101,9 @@
 				"errorMessage": {
 					"en_US": "Field BooleanField must not be empty."
 				},
-				"expression": "!BooleanField.isEmpty()"
+				"expression": {
+					"value": "!BooleanField.isEmpty()"
+				}
 			},
 			"visibilityExpression": "false"
 		},
@@ -132,7 +138,9 @@
 				"errorMessage": {
 					"en_US": "Field SelectField must not be empty."
 				},
-				"expression": "!SelectField.isEmpty()"
+				"expression": {
+					"value": "!SelectField.isEmpty()"
+				}
 			},
 			"visibilityExpression": "true"
 		},
@@ -158,7 +166,9 @@
 				"errorMessage": {
 					"en_US": "Field TextField must not be empty."
 				},
-				"expression": "!TextField.isEmpty()"
+				"expression": {
+					"value": "!TextField.isEmpty()"
+				}
 			},
 			"visibilityExpression": "true"
 		},

@@ -1,6 +1,6 @@
-@import 'bourbon';
-@import 'utilities';
+@import 'atlas-variables';
 
+@import 'utilities';
 @import 'date-picker';
 @import 'field-type-checkbox-switch';
 
@@ -105,7 +105,7 @@ body .ddm-user-view-content {
 			border-width: 0 0 2px;
 		}
 
-		@include keyframes(spin) {
+		@keyframes spin {
 			100% {
 				transform: rotate(359deg);
 			}

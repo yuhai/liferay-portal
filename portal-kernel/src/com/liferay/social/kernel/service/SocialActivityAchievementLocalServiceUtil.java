@@ -16,8 +16,6 @@ package com.liferay.social.kernel.service;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the local service utility for SocialActivityAchievement. This utility wraps
  * <code>com.liferay.portlet.social.service.impl.SocialActivityAchievementLocalServiceImpl</code> and
@@ -30,13 +28,18 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivityAchievementLocalService
  * @generated
  */
-@ProviderType
 public class SocialActivityAchievementLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.social.service.impl.SocialActivityAchievementLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
+	 */
+
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SocialActivityAchievementLocalServiceUtil} to access the social activity achievement local service. Add custom service methods to <code>com.liferay.portlet.social.service.impl.SocialActivityAchievementLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addActivityAchievement(
 			long userId, long groupId,

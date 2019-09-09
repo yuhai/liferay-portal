@@ -16,7 +16,7 @@ AUI.add(
 	'document-library-checkin',
 	function(A) {
 		var DocumentLibraryCheckin = {
-			showDialog: function(namespace, callback) {
+			showDialog(namespace, callback) {
 				var contentId = namespace + 'versionDetails';
 				var versionDetailsDialog = Liferay.Util.Window.getWindow({
 					dialog: {
@@ -28,7 +28,7 @@ AUI.add(
 								cssClass: 'btn-link',
 								label: Liferay.Language.get('cancel'),
 								on: {
-									click: function() {
+									click() {
 										Liferay.Util.getWindow(
 											contentId + 'Dialog'
 										).destroy();
@@ -39,7 +39,7 @@ AUI.add(
 								cssClass: 'btn-primary',
 								label: Liferay.Language.get('save'),
 								on: {
-									click: function() {
+									click() {
 										var versionIncrease = false;
 										var versionIncreaseElement = document.querySelector(
 											"input[name='" +

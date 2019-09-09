@@ -46,7 +46,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -60,12 +59,11 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.change.tracking.service.impl.CTPreferencesLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class CTPreferencesLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements CTPreferencesLocalService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CTPreferencesLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.change.tracking.service.CTPreferencesLocalServiceUtil</code>.

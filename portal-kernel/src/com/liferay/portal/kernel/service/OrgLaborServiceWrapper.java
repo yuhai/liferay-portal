@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link OrgLaborService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OrgLaborService
  * @generated
  */
-@ProviderType
 public class OrgLaborServiceWrapper
 	implements OrgLaborService, ServiceWrapper<OrgLaborService> {
 
@@ -31,6 +29,11 @@ public class OrgLaborServiceWrapper
 		_orgLaborService = orgLaborService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link OrgLaborServiceUtil} to access the org labor remote service. Add custom service methods to <code>com.liferay.portal.service.impl.OrgLaborServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.OrgLabor addOrgLabor(
 			long organizationId, long typeId, int sunOpen, int sunClose,
@@ -73,7 +76,7 @@ public class OrgLaborServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _orgLaborService.getOSGiServiceIdentifier();
 	}
 

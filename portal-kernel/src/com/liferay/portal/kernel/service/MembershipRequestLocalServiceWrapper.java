@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link MembershipRequestLocalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MembershipRequestLocalService
  * @generated
  */
-@ProviderType
 public class MembershipRequestLocalServiceWrapper
 	implements MembershipRequestLocalService,
 			   ServiceWrapper<MembershipRequestLocalService> {
@@ -34,10 +32,15 @@ public class MembershipRequestLocalServiceWrapper
 		_membershipRequestLocalService = membershipRequestLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MembershipRequestLocalServiceUtil} to access the membership request local service. Add custom service methods to <code>com.liferay.portal.service.impl.MembershipRequestLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.MembershipRequest
 			addMembershipRequest(
-				long userId, long groupId, String comments,
+				long userId, long groupId, java.lang.String comments,
 				ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -307,7 +310,7 @@ public class MembershipRequestLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _membershipRequestLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -369,9 +372,9 @@ public class MembershipRequestLocalServiceWrapper
 
 	@Override
 	public void updateStatus(
-			long replierUserId, long membershipRequestId, String replyComments,
-			long statusId, boolean addUserToGroup,
-			ServiceContext serviceContext)
+			long replierUserId, long membershipRequestId,
+			java.lang.String replyComments, long statusId,
+			boolean addUserToGroup, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_membershipRequestLocalService.updateStatus(

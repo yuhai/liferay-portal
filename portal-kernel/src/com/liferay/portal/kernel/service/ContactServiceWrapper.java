@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link ContactService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ContactService
  * @generated
  */
-@ProviderType
 public class ContactServiceWrapper
 	implements ContactService, ServiceWrapper<ContactService> {
 
@@ -31,6 +29,11 @@ public class ContactServiceWrapper
 		_contactService = contactService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ContactServiceUtil} to access the contact remote service. Add custom service methods to <code>com.liferay.portal.service.impl.ContactServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Contact>
 			getCompanyContacts(long companyId, int start, int end)
@@ -75,7 +78,7 @@ public class ContactServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _contactService.getOSGiServiceIdentifier();
 	}
 

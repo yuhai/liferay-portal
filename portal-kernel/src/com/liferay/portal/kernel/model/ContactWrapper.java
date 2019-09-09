@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Contact}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Contact
  * @generated
  */
-@ProviderType
 public class ContactWrapper
 	extends BaseModelWrapper<Contact>
 	implements Contact, ModelWrapper<Contact> {
@@ -594,6 +591,11 @@ public class ContactWrapper
 		return model.isUser();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a contact model instance should use the <code>Contact</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

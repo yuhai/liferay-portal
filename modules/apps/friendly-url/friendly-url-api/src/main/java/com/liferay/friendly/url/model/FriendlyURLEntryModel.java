@@ -42,7 +42,7 @@ public interface FriendlyURLEntryModel
 	extends AttachedModel, BaseModel<FriendlyURLEntry>, MVCCModel, ShardedModel,
 			StagedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a friendly url entry model instance should use the {@link FriendlyURLEntry} interface instead.

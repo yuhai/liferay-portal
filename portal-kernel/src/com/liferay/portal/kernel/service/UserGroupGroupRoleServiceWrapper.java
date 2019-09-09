@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link UserGroupGroupRoleService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see UserGroupGroupRoleService
  * @generated
  */
-@ProviderType
 public class UserGroupGroupRoleServiceWrapper
 	implements UserGroupGroupRoleService,
 			   ServiceWrapper<UserGroupGroupRoleService> {
@@ -34,6 +32,11 @@ public class UserGroupGroupRoleServiceWrapper
 		_userGroupGroupRoleService = userGroupGroupRoleService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link UserGroupGroupRoleServiceUtil} to access the user group group role remote service. Add custom service methods to <code>com.liferay.portal.service.impl.UserGroupGroupRoleServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void addUserGroupGroupRoles(
 			long userGroupId, long groupId, long[] roleIds)
@@ -76,7 +79,7 @@ public class UserGroupGroupRoleServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _userGroupGroupRoleService.getOSGiServiceIdentifier();
 	}
 

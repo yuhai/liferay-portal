@@ -19,7 +19,7 @@
 			plus: themeDisplay.getPathThemeImages() + '/arrows/01_plus.png'
 		},
 
-		publishToLive: function(options) {
+		publishToLive(options) {
 			options = options || {};
 
 			Liferay.Util.openWindow({
@@ -27,7 +27,7 @@
 					constrain: true,
 					modal: true,
 					on: {
-						visibleChange: function(event) {
+						visibleChange(event) {
 							var instance = this;
 
 							if (!event.newVal) {

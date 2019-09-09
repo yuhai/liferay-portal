@@ -41,7 +41,7 @@ import java.math.BigDecimal;
 public interface BigDecimalEntryModel
 	extends BaseModel<BigDecimalEntry>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a big decimal entry model instance should use the {@link BigDecimalEntry} interface instead.

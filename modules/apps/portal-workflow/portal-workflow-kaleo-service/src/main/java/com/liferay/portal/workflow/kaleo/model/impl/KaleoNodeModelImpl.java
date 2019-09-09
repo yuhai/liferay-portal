@@ -44,8 +44,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the KaleoNode service. Represents a row in the &quot;KaleoNode&quot; database table, with each column mapped to a property of this class.
  *
@@ -57,11 +55,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoNodeImpl
  * @generated
  */
-@ProviderType
 public class KaleoNodeModelImpl
 	extends BaseModelImpl<KaleoNode> implements KaleoNodeModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a kaleo node model instance should use the <code>KaleoNode</code> interface instead.

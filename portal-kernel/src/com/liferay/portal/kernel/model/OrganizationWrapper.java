@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Organization}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Organization
  * @generated
  */
-@ProviderType
 public class OrganizationWrapper
 	extends BaseModelWrapper<Organization>
 	implements Organization, ModelWrapper<Organization> {
@@ -537,6 +534,11 @@ public class OrganizationWrapper
 		return model.isRoot();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a organization model instance should use the <code>Organization</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

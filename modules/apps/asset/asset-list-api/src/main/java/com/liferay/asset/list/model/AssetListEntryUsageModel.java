@@ -40,7 +40,7 @@ public interface AssetListEntryUsageModel
 	extends AttachedModel, BaseModel<AssetListEntryUsage>, ShardedModel,
 			StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset list entry usage model instance should use the {@link AssetListEntryUsage} interface instead.

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Website}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Website
  * @generated
  */
-@ProviderType
 public class WebsiteWrapper
 	extends BaseModelWrapper<Website>
 	implements Website, ModelWrapper<Website> {
@@ -337,6 +334,11 @@ public class WebsiteWrapper
 		return model.isPrimary();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a website model instance should use the <code>Website</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

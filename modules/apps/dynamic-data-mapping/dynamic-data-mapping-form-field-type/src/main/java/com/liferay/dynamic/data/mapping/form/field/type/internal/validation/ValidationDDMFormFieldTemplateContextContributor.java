@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.validation;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -59,8 +58,6 @@ public class ValidationDDMFormFieldTemplateContextContributor
 	protected Map<String, Object> getValue(
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		Map<String, Object> value = new HashMap<>();
-
 		String valueString = ddmFormFieldRenderingContext.getValue();
 
 		if (Validator.isNotNull(valueString)) {
@@ -68,12 +65,19 @@ public class ValidationDDMFormFieldTemplateContextContributor
 				JSONObject valueJSONObject = jsonFactory.createJSONObject(
 					valueString);
 
-				value.put(
-					"errorMessage",
-					valueJSONObject.getJSONObject("errorMessage"));
-
-				value.put(
-					"expression", valueJSONObject.getString("expression"));
+				return new HashMap() {
+					{
+						put(
+							"errorMessage",
+							valueJSONObject.getJSONObject("errorMessage"));
+						put(
+							"expression",
+							valueJSONObject.getJSONObject("expression"));
+						put(
+							"parameter",
+							valueJSONObject.getJSONObject("parameter"));
+					}
+				};
 			}
 			catch (JSONException jsone) {
 				if (_log.isWarnEnabled()) {
@@ -81,12 +85,14 @@ public class ValidationDDMFormFieldTemplateContextContributor
 				}
 			}
 		}
-		else {
-			value.put("errorMessage", jsonFactory.createJSONObject());
-			value.put("expression", StringPool.BLANK);
-		}
 
-		return value;
+		return new HashMap() {
+			{
+				put("errorMessage", jsonFactory.createJSONObject());
+				put("expression", jsonFactory.createJSONObject());
+				put("parameter", jsonFactory.createJSONObject());
+			}
+		};
 	}
 
 	@Reference

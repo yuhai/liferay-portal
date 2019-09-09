@@ -14,6 +14,7 @@
 
 package com.liferay.segments.model.impl;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,8 +34,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model implementation for the SegmentsExperiment service. Represents a row in the &quot;SegmentsExperiment&quot; database table, with each column mapped to a property of this class.
  *
@@ -44,7 +43,6 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  * @author Eduardo García
  */
-@ProviderType
 public class SegmentsExperimentImpl extends SegmentsExperimentBaseImpl {
 
 	/**
@@ -130,6 +128,34 @@ public class SegmentsExperimentImpl extends SegmentsExperimentBaseImpl {
 		}
 
 		return _typeSettingsProperties;
+	}
+
+	@Override
+	public long getWinnerSegmentsExperienceId() {
+		UnicodeProperties typeSettingsProperties = getTypeSettingsProperties();
+
+		return GetterUtil.getLong(
+			typeSettingsProperties.getProperty("winnerSegmentsExperienceId"),
+			-1);
+	}
+
+	@Override
+	public String getWinnerSegmentsExperienceKey() {
+		long winnerSegmentsExperienceId = getWinnerSegmentsExperienceId();
+
+		if (winnerSegmentsExperienceId < 0) {
+			return StringPool.BLANK;
+		}
+
+		SegmentsExperience winnerSegmentsExperience =
+			SegmentsExperienceLocalServiceUtil.fetchSegmentsExperience(
+				winnerSegmentsExperienceId);
+
+		if (winnerSegmentsExperience != null) {
+			return winnerSegmentsExperience.getSegmentsExperienceKey();
+		}
+
+		return SegmentsExperienceConstants.KEY_DEFAULT;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

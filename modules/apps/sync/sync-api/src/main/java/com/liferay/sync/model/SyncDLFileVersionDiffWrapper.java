@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SyncDLFileVersionDiff}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SyncDLFileVersionDiff
  * @generated
  */
-@ProviderType
 public class SyncDLFileVersionDiffWrapper
 	extends BaseModelWrapper<SyncDLFileVersionDiff>
 	implements SyncDLFileVersionDiff, ModelWrapper<SyncDLFileVersionDiff> {
@@ -184,6 +181,11 @@ public class SyncDLFileVersionDiffWrapper
 		return model.getTargetFileVersionId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a sync dl file version diff model instance should use the <code>SyncDLFileVersionDiff</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTaskAssignmentInstancePersistence
 	extends BasePersistence<KaleoTaskAssignmentInstance> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoTaskAssignmentInstanceUtil} to access the kaleo task assignment instance persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

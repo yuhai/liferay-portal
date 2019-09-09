@@ -78,6 +78,7 @@ describe('RuleList', () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 	});
+
 	afterEach(() => {
 		if (component) {
 			component.dispose();

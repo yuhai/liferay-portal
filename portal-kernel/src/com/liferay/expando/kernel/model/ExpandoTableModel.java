@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ExpandoTableModel
 	extends BaseModel<ExpandoTable>, ShardedModel, TypedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a expando table model instance should use the {@link ExpandoTable} interface instead.

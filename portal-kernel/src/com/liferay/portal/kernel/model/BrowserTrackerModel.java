@@ -31,7 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BrowserTrackerModel
 	extends BaseModel<BrowserTracker>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a browser tracker model instance should use the {@link BrowserTracker} interface instead.

@@ -58,60 +58,7 @@ AUI.add(
 			NS: 'state',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._eventHandles = [
-						instance.afterHostEvent(
-							'*:childrenChange',
-							instance._onNodeChildrenChange,
-							instance
-						),
-						instance.afterHostEvent(
-							'*:expandedChange',
-							instance._onNodeExpandedChange,
-							instance
-						),
-						instance.afterHostEvent(
-							'*:ioSuccess',
-							instance._onNodeIOSuccess,
-							instance
-						),
-						instance.afterHostEvent(
-							'checkContentDisplayTreeAppend',
-							instance._onCheckContentDisplayTreeAppend,
-							instance
-						),
-						instance.afterHostEvent(
-							'selectableNodeCheckedChange',
-							instance._onSelectableNodeCheckedChange,
-							instance
-						),
-						instance.afterHostEvent(
-							'selectableNodeChildrenChange',
-							instance._onSelectableNodeChildrenChange,
-							instance
-						),
-						instance.afterHostEvent(
-							'selectableTreeAppend',
-							instance._onSelectableTreeAppend,
-							instance
-						),
-						instance.afterHostEvent(
-							'selectableTreeRender',
-							instance._onSelectableTreeRender,
-							instance
-						)
-					];
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_invokeSessionClick: function(data, callback) {
+				_invokeSessionClick(data, callback) {
 					A.mix(data, {
 						p_auth: Liferay.authToken,
 						useHttpSession: true
@@ -130,10 +77,10 @@ AUI.add(
 								callback(text);
 							}
 						})
-						.catch(error => {});
+						.catch(() => {});
 				},
 
-				_matchParentNode: function(node) {
+				_matchParentNode(node) {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -156,14 +103,14 @@ AUI.add(
 
 					if (!Lang.isUndefined(checked)) {
 						instance._updateCheckedNodes({
-							checked: checked,
+							checked,
 							forceChildrenState: true,
-							node: node
+							node
 						});
 					}
 				},
 
-				_onCheckContentDisplayTreeAppend: function(event) {
+				_onCheckContentDisplayTreeAppend() {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -171,15 +118,13 @@ AUI.add(
 					host.restoreSelectedNode();
 				},
 
-				_onNodeChildrenChange: function(event) {
-					var instance = this;
-
+				_onNodeChildrenChange(event) {
 					var target = event.target;
 
 					target.set('alwaysShowHitArea', event.newVal.length > 0);
 				},
 
-				_onNodeExpandedChange: function(event) {
+				_onNodeExpandedChange(event) {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -207,7 +152,7 @@ AUI.add(
 					}
 				},
 
-				_onNodeIOSuccess: function(event) {
+				_onNodeIOSuccess(event) {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -247,7 +192,7 @@ AUI.add(
 					instance._invokeSessionClick(
 						{
 							cmd: 'get',
-							key: key
+							key
 						},
 						function(responseData) {
 							try {
@@ -273,7 +218,7 @@ AUI.add(
 					host.restoreSelectedNode();
 				},
 
-				_onSelectableNodeCheckedChange: function(event) {
+				_onSelectableNodeCheckedChange(event) {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -297,7 +242,7 @@ AUI.add(
 					});
 				},
 
-				_onSelectableNodeChildrenChange: function(event) {
+				_onSelectableNodeChildrenChange(event) {
 					var instance = this;
 
 					var node = event.node;
@@ -306,20 +251,20 @@ AUI.add(
 						instance._updateCheckedNodes({
 							checked: true,
 							forceChildrenState: true,
-							node: node
+							node
 						});
 					}
 
 					instance._restoreCheckedNode(node);
 				},
 
-				_onSelectableTreeAppend: function(event) {
+				_onSelectableTreeAppend(event) {
 					var instance = this;
 
 					instance._restoreCheckedNode(event.node);
 				},
 
-				_onSelectableTreeRender: function(event) {
+				_onSelectableTreeRender() {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -332,7 +277,7 @@ AUI.add(
 					instance._restoreCheckedNode(rootNode);
 				},
 
-				_restoreCheckedNode: function(node) {
+				_restoreCheckedNode(node) {
 					var instance = this;
 
 					var plid = instance.get(STR_HOST).extractPlid(node);
@@ -352,7 +297,7 @@ AUI.add(
 					);
 				},
 
-				_updateCheckedNodes: function(nodeConfig) {
+				_updateCheckedNodes(nodeConfig) {
 					var instance = this;
 
 					var checked = nodeConfig.checked;
@@ -414,18 +359,14 @@ AUI.add(
 						A.each(children, function(child) {
 							instance._updateCheckedNodes({
 								checked: childrenChecked,
-								forceChildrenState: forceChildrenState,
+								forceChildrenState,
 								node: child
 							});
 						});
 					}
 				},
 
-				_updateSessionTreeCheckedState: function(
-					treeId,
-					nodeId,
-					state
-				) {
+				_updateSessionTreeCheckedState(treeId, nodeId, state) {
 					var instance = this;
 
 					var data = {
@@ -436,7 +377,7 @@ AUI.add(
 					instance._updateSessionTreeClick(treeId, data);
 				},
 
-				_updateSessionTreeClick: function(treeId, data) {
+				_updateSessionTreeClick(treeId, data) {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -448,7 +389,7 @@ AUI.add(
 							groupId: root.groupId,
 							privateLayout: root.privateLayout,
 							recursive: true,
-							treeId: treeId
+							treeId
 						},
 						data
 					);
@@ -467,18 +408,71 @@ AUI.add(
 								instance.set(STR_CHECKED_NODES, checkedNodes);
 							}
 						})
-						.catch(error => {});
+						.catch(() => {});
 				},
 
-				_updateSessionTreeOpenedState: function(treeId, nodeId, state) {
+				_updateSessionTreeOpenedState(treeId, nodeId, state) {
 					var instance = this;
 
 					var data = {
-						nodeId: nodeId,
+						nodeId,
 						openNode: state
 					};
 
 					instance._updateSessionTreeClick(treeId, data);
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._eventHandles = [
+						instance.afterHostEvent(
+							'*:childrenChange',
+							instance._onNodeChildrenChange,
+							instance
+						),
+						instance.afterHostEvent(
+							'*:expandedChange',
+							instance._onNodeExpandedChange,
+							instance
+						),
+						instance.afterHostEvent(
+							'*:ioSuccess',
+							instance._onNodeIOSuccess,
+							instance
+						),
+						instance.afterHostEvent(
+							'checkContentDisplayTreeAppend',
+							instance._onCheckContentDisplayTreeAppend,
+							instance
+						),
+						instance.afterHostEvent(
+							'selectableNodeCheckedChange',
+							instance._onSelectableNodeCheckedChange,
+							instance
+						),
+						instance.afterHostEvent(
+							'selectableNodeChildrenChange',
+							instance._onSelectableNodeChildrenChange,
+							instance
+						),
+						instance.afterHostEvent(
+							'selectableTreeAppend',
+							instance._onSelectableTreeAppend,
+							instance
+						),
+						instance.afterHostEvent(
+							'selectableTreeRender',
+							instance._onSelectableTreeRender,
+							instance
+						)
+					];
 				}
 			}
 		});

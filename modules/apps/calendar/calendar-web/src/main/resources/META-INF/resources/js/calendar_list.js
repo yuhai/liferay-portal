@@ -128,131 +128,7 @@ AUI.add(
 			UI_ATTRS: ['calendars'],
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance.simpleMenu = new Liferay.SimpleMenu(
-						instance.get('simpleMenu')
-					);
-				},
-
-				renderUI: function() {
-					var instance = this;
-
-					instance._renderCalendars();
-
-					instance.simpleMenu.render();
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					var contentBox = instance.get('contentBox');
-
-					instance.on(
-						'scheduler-calendar:colorChange',
-						instance._onCalendarColorChange,
-						instance
-					);
-					instance.on(
-						'scheduler-calendar:visibleChange',
-						instance._onCalendarVisibleChange,
-						instance
-					);
-					instance.on(
-						'simple-menu:visibleChange',
-						instance._onSimpleMenuVisibleChange,
-						instance
-					);
-
-					contentBox.delegate(
-						'click',
-						instance._onClick,
-						STR_DOT + CSS_CALENDAR_LIST_ITEM,
-						instance
-					);
-
-					contentBox.delegate(
-						'hover',
-						A.bind('_onHoverOver', instance),
-						A.bind('_onHoverOut', instance),
-						STR_DOT + CSS_CALENDAR_LIST_ITEM
-					);
-				},
-
-				add: function(calendar) {
-					var instance = this;
-
-					var calendars = instance.get('calendars');
-
-					calendars.push(calendar);
-
-					instance.set('calendars', calendars);
-				},
-
-				clear: function() {
-					var instance = this;
-
-					instance.set('calendars', []);
-				},
-
-				getCalendar: function(calendarId) {
-					var instance = this;
-
-					var calendars = instance.get('calendars');
-
-					var calendar = null;
-
-					for (var i = 0; i < calendars.length; i++) {
-						var cal = calendars[i];
-
-						if (cal.get('calendarId') === calendarId) {
-							calendar = cal;
-
-							break;
-						}
-					}
-
-					return calendar;
-				},
-
-				getCalendarByNode: function(node) {
-					var instance = this;
-
-					var calendars = instance.get('calendars');
-
-					return calendars[instance.items.indexOf(node)];
-				},
-
-				getCalendarNode: function(calendar) {
-					var instance = this;
-
-					var calendars = instance.get('calendars');
-
-					return instance.items.item(calendars.indexOf(calendar));
-				},
-
-				remove: function(calendar) {
-					var instance = this;
-
-					var calendars = instance.get('calendars');
-
-					if (calendars.length > 0) {
-						var index = calendars.indexOf(calendar);
-
-						if (index > -1) {
-							AArray.remove(calendars, index);
-						}
-					}
-
-					instance.fire('calendarRemoved', {
-						calendar: calendar
-					});
-
-					instance.set('calendars', calendars);
-				},
-
-				_clearCalendarColor: function(calendar) {
+				_clearCalendarColor(calendar) {
 					var instance = this;
 
 					var node = instance.getCalendarNode(calendar);
@@ -264,7 +140,7 @@ AUI.add(
 					colorNode.setAttribute('style', STR_BLANK);
 				},
 
-				_onCalendarColorChange: function(event) {
+				_onCalendarColorChange(event) {
 					var instance = this;
 
 					var target = event.target;
@@ -274,7 +150,7 @@ AUI.add(
 					}
 				},
 
-				_onCalendarVisibleChange: function(event) {
+				_onCalendarVisibleChange(event) {
 					var instance = this;
 
 					var target = event.target;
@@ -286,7 +162,7 @@ AUI.add(
 					}
 				},
 
-				_onClick: function(event) {
+				_onClick(event) {
 					var instance = this;
 
 					var target = event.target.ancestor(
@@ -332,7 +208,7 @@ AUI.add(
 					}
 				},
 
-				_onHoverOut: function(event) {
+				_onHoverOut(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -346,7 +222,7 @@ AUI.add(
 					currentTarget.removeClass(CSS_CALENDAR_LIST_ITEM_HOVER);
 				},
 
-				_onHoverOver: function(event) {
+				_onHoverOver(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -363,7 +239,7 @@ AUI.add(
 					}
 				},
 
-				_onSimpleMenuVisibleChange: function(event) {
+				_onSimpleMenuVisibleChange(event) {
 					var instance = this;
 
 					if (instance.activeNode && !event.newVal) {
@@ -373,7 +249,7 @@ AUI.add(
 					}
 				},
 
-				_renderCalendars: function() {
+				_renderCalendars() {
 					var instance = this;
 
 					var calendars = instance.get('calendars');
@@ -381,14 +257,14 @@ AUI.add(
 
 					instance.items = A.NodeList.create(
 						TPL_CALENDAR_LIST_ITEM.parse({
-							calendars: calendars
+							calendars
 						})
 					);
 
 					contentBox.setContent(instance.items);
 				},
 
-				_setCalendarColor: function(calendar, val) {
+				_setCalendarColor(calendar, val) {
 					var instance = this;
 
 					var node = instance.getCalendarNode(calendar);
@@ -403,7 +279,7 @@ AUI.add(
 					});
 				},
 
-				_setCalendars: function(val) {
+				_setCalendars(val) {
 					var instance = this;
 
 					var scheduler = instance.get('scheduler');
@@ -433,7 +309,7 @@ AUI.add(
 					return val;
 				},
 
-				_setSimpleMenu: function(val) {
+				_setSimpleMenu(val) {
 					var instance = this;
 
 					var result = val;
@@ -463,12 +339,136 @@ AUI.add(
 					return result;
 				},
 
-				_uiSetCalendars: function(val) {
+				_uiSetCalendars() {
 					var instance = this;
 
 					if (instance.get('rendered')) {
 						instance._renderCalendars();
 					}
+				},
+
+				add(calendar) {
+					var instance = this;
+
+					var calendars = instance.get('calendars');
+
+					calendars.push(calendar);
+
+					instance.set('calendars', calendars);
+				},
+
+				bindUI() {
+					var instance = this;
+
+					var contentBox = instance.get('contentBox');
+
+					instance.on(
+						'scheduler-calendar:colorChange',
+						instance._onCalendarColorChange,
+						instance
+					);
+					instance.on(
+						'scheduler-calendar:visibleChange',
+						instance._onCalendarVisibleChange,
+						instance
+					);
+					instance.on(
+						'simple-menu:visibleChange',
+						instance._onSimpleMenuVisibleChange,
+						instance
+					);
+
+					contentBox.delegate(
+						'click',
+						instance._onClick,
+						STR_DOT + CSS_CALENDAR_LIST_ITEM,
+						instance
+					);
+
+					contentBox.delegate(
+						'hover',
+						A.bind('_onHoverOver', instance),
+						A.bind('_onHoverOut', instance),
+						STR_DOT + CSS_CALENDAR_LIST_ITEM
+					);
+				},
+
+				clear() {
+					var instance = this;
+
+					instance.set('calendars', []);
+				},
+
+				getCalendar(calendarId) {
+					var instance = this;
+
+					var calendars = instance.get('calendars');
+
+					var calendar = null;
+
+					for (var i = 0; i < calendars.length; i++) {
+						var cal = calendars[i];
+
+						if (cal.get('calendarId') === calendarId) {
+							calendar = cal;
+
+							break;
+						}
+					}
+
+					return calendar;
+				},
+
+				getCalendarByNode(node) {
+					var instance = this;
+
+					var calendars = instance.get('calendars');
+
+					return calendars[instance.items.indexOf(node)];
+				},
+
+				getCalendarNode(calendar) {
+					var instance = this;
+
+					var calendars = instance.get('calendars');
+
+					return instance.items.item(calendars.indexOf(calendar));
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance.simpleMenu = new Liferay.SimpleMenu(
+						instance.get('simpleMenu')
+					);
+				},
+
+				remove(calendar) {
+					var instance = this;
+
+					var calendars = instance.get('calendars');
+
+					if (calendars.length > 0) {
+						var index = calendars.indexOf(calendar);
+
+						if (index > -1) {
+							AArray.remove(calendars, index);
+						}
+					}
+
+					instance.fire('calendarRemoved', {
+						calendar
+					});
+
+					instance.set('calendars', calendars);
+				},
+
+				renderUI() {
+					var instance = this;
+
+					instance._renderCalendars();
+
+					instance.simpleMenu.render();
 				}
 			}
 		});

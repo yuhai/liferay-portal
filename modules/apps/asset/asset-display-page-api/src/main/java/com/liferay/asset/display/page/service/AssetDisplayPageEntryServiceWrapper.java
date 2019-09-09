@@ -16,8 +16,6 @@ package com.liferay.asset.display.page.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link AssetDisplayPageEntryService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetDisplayPageEntryService
  * @generated
  */
-@ProviderType
 public class AssetDisplayPageEntryServiceWrapper
 	implements AssetDisplayPageEntryService,
 			   ServiceWrapper<AssetDisplayPageEntryService> {
@@ -36,6 +33,11 @@ public class AssetDisplayPageEntryServiceWrapper
 		_assetDisplayPageEntryService = assetDisplayPageEntryService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link AssetDisplayPageEntryServiceUtil} to access the asset display page entry remote service. Add custom service methods to <code>com.liferay.asset.display.page.service.impl.AssetDisplayPageEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.asset.display.page.model.AssetDisplayPageEntry
 			addAssetDisplayPageEntry(

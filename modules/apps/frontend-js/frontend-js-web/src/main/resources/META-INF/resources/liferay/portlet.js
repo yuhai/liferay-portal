@@ -22,37 +22,7 @@
 	var TPL_NOT_AJAXABLE = '<div class="alert alert-info">{0}</div>';
 
 	var Portlet = {
-		list: [],
-
-		readyCounter: 0,
-
-		destroyComponents: function(portletId) {
-			Liferay.destroyComponents(function(component, componentConfig) {
-				return portletId === componentConfig.portletId;
-			});
-		},
-
-		isStatic: function(portletId) {
-			var instance = this;
-
-			var id = Util.getPortletId(portletId.id || portletId);
-
-			return id in instance._staticPortlets;
-		},
-
-		refreshLayout: function(portletBoundary) {},
-
-		register: function(portletId) {
-			var instance = this;
-
-			if (instance.list.indexOf(portletId) < 0) {
-				instance.list.push(portletId);
-			}
-		},
-
-		_defCloseFn: function(event) {
-			var instance = this;
-
+		_defCloseFn(event) {
 			event.portlet.remove(true);
 
 			if (!event.nestedPortlet) {
@@ -79,7 +49,7 @@
 			}
 		},
 
-		_loadMarkupHeadElements: function(response, loadHTML) {
+		_loadMarkupHeadElements(response) {
 			var markupHeadElements = response.markupHeadElements;
 
 			if (markupHeadElements && markupHeadElements.length) {
@@ -95,7 +65,7 @@
 			}
 		},
 
-		_loadPortletFiles: function(response, loadHTML) {
+		_loadPortletFiles(response, loadHTML) {
 			var footerCssPaths = response.footerCssPaths || [];
 			var headerCssPaths = response.headerCssPaths || [];
 
@@ -127,7 +97,7 @@
 
 			if (javascriptPaths.length) {
 				A.Get.script(javascriptPaths, {
-					onEnd: function(obj) {
+					onEnd() {
 						loadHTML(responseHTML);
 					}
 				});
@@ -136,7 +106,7 @@
 			}
 		},
 
-		_mergeOptions: function(portlet, options) {
+		_mergeOptions(portlet, options) {
 			options = options || {};
 
 			options.doAsUserId =
@@ -148,7 +118,35 @@
 			return options;
 		},
 
-		_staticPortlets: {}
+		_staticPortlets: {},
+
+		destroyComponents(portletId) {
+			Liferay.destroyComponents(function(_component, componentConfig) {
+				return portletId === componentConfig.portletId;
+			});
+		},
+
+		isStatic(portletId) {
+			var instance = this;
+
+			var id = Util.getPortletId(portletId.id || portletId);
+
+			return id in instance._staticPortlets;
+		},
+
+		list: [],
+
+		readyCounter: 0,
+
+		refreshLayout(_portletBoundary) {},
+
+		register(portletId) {
+			var instance = this;
+
+			if (instance.list.indexOf(portletId) < 0) {
+				instance.list.push(portletId);
+			}
+		}
 	};
 
 	Liferay.provide(
@@ -191,7 +189,7 @@
 				}
 
 				Liferay.fire('addPortlet', {
-					portlet: portlet
+					portlet
 				});
 			};
 
@@ -252,7 +250,7 @@
 			var data = {
 				cmd: 'add',
 				dataType: 'JSON',
-				doAsUserId: doAsUserId,
+				doAsUserId,
 				p_auth: Liferay.authToken,
 				p_l_id: plid,
 				p_p_col_id: currentColumnId,
@@ -261,7 +259,7 @@
 				p_p_id: portletId,
 				p_p_isolated: true,
 				p_v_l_s_g_id: themeDisplay.getSiteGroupId(),
-				portletData: portletData
+				portletData
 			};
 
 			var firstPortlet = container.one('.portlet-boundary');
@@ -278,11 +276,11 @@
 			data.currentURL = Liferay.currentURL;
 
 			instance.addHTML({
-				beforePortletLoaded: beforePortletLoaded,
-				data: data,
-				onComplete: onComplete,
-				placeHolder: placeHolder,
-				url: url
+				beforePortletLoaded,
+				data,
+				onComplete,
+				placeHolder,
+				url
 			});
 		},
 		['aui-base']
@@ -476,8 +474,6 @@
 		Portlet,
 		'minimize',
 		function(portlet, el, options) {
-			var instance = this;
-
 			options = options || {};
 
 			var doAsUserId =
@@ -526,7 +522,7 @@
 
 					var formData = Liferay.Util.objectToFormData({
 						cmd: 'minimize',
-						doAsUserId: doAsUserId,
+						doAsUserId,
 						p_auth: Liferay.authToken,
 						p_l_id: plid,
 						p_p_id: portlet.portletId,
@@ -543,7 +539,7 @@
 					).then(response => {
 						if (response.ok && restore) {
 							var data = {
-								doAsUserId: doAsUserId,
+								doAsUserId,
 								p_l_id: plid,
 								p_p_boundary: false,
 								p_p_id: portlet.portletId,
@@ -604,12 +600,12 @@
 						events = ['focus', 'mousemove'];
 					}
 
-					var handle = portlet.on(events, function(event) {
+					var handle = portlet.on(events, function() {
 						Util.portletTitleEdit({
 							doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
 							obj: portlet,
 							plid: themeDisplay.getPlid(),
-							portletId: portletId
+							portletId
 						});
 
 						handle.detach();
@@ -618,15 +614,15 @@
 			}
 
 			Liferay.fire('portletReady', {
-				portlet: portlet,
-				portletId: portletId
+				portlet,
+				portletId
 			});
 
 			instance.readyCounter++;
 
 			if (instance.readyCounter === instance.list.length) {
 				Liferay.fire('allPortletsReady', {
-					portletId: portletId
+					portletId
 				});
 			}
 		},
@@ -644,7 +640,12 @@
 			if (portlet) {
 				data = data || portlet.refreshURLData || {};
 
-				if (!data.hasOwnProperty('portletAjaxable')) {
+				if (
+					!Object.prototype.hasOwnProperty.call(
+						data,
+						'portletAjaxable'
+					)
+				) {
 					data.portletAjaxable = true;
 				}
 
@@ -677,7 +678,7 @@
 
 					instance.addHTML({
 						data: A.mix(params, data, true),
-						onComplete: function(portlet, portletId) {
+						onComplete(portlet, portletId) {
 							portlet.refreshURL = url;
 
 							if (portlet) {
@@ -687,13 +688,13 @@
 							Liferay.fire(
 								portlet.portletId + ':portletRefreshed',
 								{
-									portlet: portlet,
-									portletId: portletId
+									portlet,
+									portletId
 								}
 							);
 						},
-						placeHolder: placeHolder,
-						url: url
+						placeHolder,
+						url
 					});
 				} else if (!portlet.getData('pendingRefresh')) {
 					portlet.setData('pendingRefresh', true);
@@ -740,8 +741,6 @@
 		Portlet,
 		'openWindow',
 		function(options) {
-			var instance = this;
-
 			var bodyCssClass = options.bodyCssClass;
 			var destroyOnHide = options.destroyOnHide;
 			var namespace = options.namespace;
@@ -783,16 +782,16 @@
 					{
 						cache: false,
 						dialog: {
-							destroyOnHide: destroyOnHide
+							destroyOnHide
 						},
 						dialogIframe: {
-							bodyCssClass: bodyCssClass,
+							bodyCssClass,
 							id: namespace + 'configurationIframe',
-							uri: uri
+							uri
 						},
 						id: namespace + 'configurationIframeDialog',
 						title: titleHtml,
-						uri: uri
+						uri
 					},
 					function(dialog) {
 						dialog.once('drag:init', function() {

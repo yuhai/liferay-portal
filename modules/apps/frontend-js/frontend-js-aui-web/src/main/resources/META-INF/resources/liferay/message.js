@@ -34,7 +34,7 @@ AUI.add(
 		var Message = A.Component.create({
 			ATTRS: {
 				closeButton: {
-					valueFn: function() {
+					valueFn() {
 						return A.Node.create(TPL_HIDE_NOTICES);
 					}
 				},
@@ -44,7 +44,7 @@ AUI.add(
 				},
 
 				hideAllNotices: {
-					valueFn: function() {
+					valueFn() {
 						var instance = this;
 
 						return A.Node.create(
@@ -81,56 +81,92 @@ AUI.add(
 				hideAllNotices: '.btn-link'
 			},
 
-			NAME: NAME,
+			NAME,
 
 			UI_ATTRS: ['dismissible', 'persistent', 'type'],
 
 			prototype: {
-				initializer: function() {
+				_afterVisibleChange(event) {
 					var instance = this;
 
-					instance._boundingBox = instance.get('boundingBox');
-					instance._contentBox = instance.get('contentBox');
+					var messageVisible = event.newVal;
 
-					instance._cssDismissible = instance.getClassName(
-						'dismissible'
-					);
-					instance._cssPersistent = instance.getClassName(
-						'persistent'
-					);
-				},
+					instance._contentBox.toggle(messageVisible);
 
-				renderUI: function() {
-					var instance = this;
+					instance.get('trigger').toggle(!messageVisible);
 
-					var dismissible = instance.get('dismissible');
+					if (instance.get('persistent')) {
+						var sessionData = {};
 
-					if (dismissible) {
-						var trigger = instance.get('trigger');
-
-						instance._trigger = trigger;
-
-						var closeButton = instance.get('closeButton');
-
-						if (instance.get('persistenceCategory')) {
-							var hideAllNotices = instance.get('hideAllNotices');
-
-							instance._contentBox.append(hideAllNotices);
-
-							instance._contentBox.addClass('dismiss-all-notes');
-
-							instance._hideAllNotices = hideAllNotices;
+						if (themeDisplay.isImpersonated()) {
+							sessionData.doAsUserId = themeDisplay.getDoAsUserIdEncoded();
 						}
 
-						instance._closeButton = closeButton;
+						if (event.categoryVisible === false) {
+							sessionData[
+								instance.get('persistenceCategory')
+							] = true;
+						}
 
-						instance._contentBox.prepend(closeButton);
+						sessionData[instance.get('id')] = messageVisible;
+
+						Object.entries(sessionData).forEach((key, value) => {
+							Liferay.Util.Session.set(key, value);
+						});
 					}
-
-					instance._dismissible = dismissible;
 				},
 
-				bindUI: function() {
+				_onCloseButtonClick() {
+					var instance = this;
+
+					instance.hide();
+				},
+
+				_onHideAllClick() {
+					var instance = this;
+
+					instance.set('visible', false, EVENT_DATA_DISMISS_ALL);
+				},
+
+				_onTriggerClick() {
+					var instance = this;
+
+					instance.show();
+				},
+
+				_uiSetDismissible(value) {
+					var instance = this;
+
+					instance._boundingBox.toggleClass(
+						instance._cssDismissible,
+						value
+					);
+				},
+
+				_uiSetPersistent(value) {
+					var instance = this;
+
+					instance._boundingBox.toggleClass(
+						instance._cssPersistent,
+						value
+					);
+				},
+
+				_uiSetType(value) {
+					var instance = this;
+
+					var contentBox = instance._contentBox;
+
+					var cssClass = contentBox
+						.attr('class')
+						.replace(REGEX_CSS_TYPE, '');
+
+					cssClass += ' ' + instance.getClassName(value);
+
+					contentBox.attr('class', cssClass);
+				},
+
+				bindUI() {
 					var instance = this;
 
 					if (instance._dismissible) {
@@ -171,84 +207,48 @@ AUI.add(
 					}
 				},
 
-				_afterVisibleChange: function(event) {
+				initializer() {
 					var instance = this;
 
-					var messageVisible = event.newVal;
+					instance._boundingBox = instance.get('boundingBox');
+					instance._contentBox = instance.get('contentBox');
 
-					instance._contentBox.toggle(messageVisible);
+					instance._cssDismissible = instance.getClassName(
+						'dismissible'
+					);
+					instance._cssPersistent = instance.getClassName(
+						'persistent'
+					);
+				},
 
-					instance.get('trigger').toggle(!messageVisible);
+				renderUI() {
+					var instance = this;
 
-					if (instance.get('persistent')) {
-						var sessionData = {};
+					var dismissible = instance.get('dismissible');
 
-						if (themeDisplay.isImpersonated()) {
-							sessionData.doAsUserId = themeDisplay.getDoAsUserIdEncoded();
+					if (dismissible) {
+						var trigger = instance.get('trigger');
+
+						instance._trigger = trigger;
+
+						var closeButton = instance.get('closeButton');
+
+						if (instance.get('persistenceCategory')) {
+							var hideAllNotices = instance.get('hideAllNotices');
+
+							instance._contentBox.append(hideAllNotices);
+
+							instance._contentBox.addClass('dismiss-all-notes');
+
+							instance._hideAllNotices = hideAllNotices;
 						}
 
-						if (event.categoryVisible === false) {
-							sessionData[
-								instance.get('persistenceCategory')
-							] = true;
-						}
+						instance._closeButton = closeButton;
 
-						sessionData[instance.get('id')] = messageVisible;
-
-						Object.entries(sessionData).forEach((key, value) => {
-							Liferay.Util.Session.set(key, value);
-						});
+						instance._contentBox.prepend(closeButton);
 					}
-				},
 
-				_onCloseButtonClick: function(event) {
-					var instance = this;
-
-					instance.hide();
-				},
-
-				_onHideAllClick: function(event) {
-					var instance = this;
-
-					instance.set('visible', false, EVENT_DATA_DISMISS_ALL);
-				},
-
-				_onTriggerClick: function(event) {
-					var instance = this;
-
-					instance.show();
-				},
-
-				_uiSetDismissible: function(value) {
-					var instance = this;
-
-					instance._boundingBox.toggleClass(
-						instance._cssDismissible,
-						value
-					);
-				},
-
-				_uiSetPersistent: function(value) {
-					var instance = this;
-
-					instance._boundingBox.toggleClass(
-						instance._cssPersistent,
-						value
-					);
-				},
-
-				_uiSetType: function(value) {
-					var instance = this;
-
-					var contentBox = instance._contentBox;
-
-					var cssClass = contentBox
-						.attr('class')
-						.replace(REGEX_CSS_TYPE, '');
-
-					cssClass += ' ' + instance.getClassName(value);
-
-					contentBox.attr('class', cssClass);
+					instance._dismissible = dismissible;
 				}
 			}
 		});

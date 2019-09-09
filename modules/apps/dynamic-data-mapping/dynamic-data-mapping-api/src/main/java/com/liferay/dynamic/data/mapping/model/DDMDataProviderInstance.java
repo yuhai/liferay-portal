@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMDataProviderInstance
 	extends DDMDataProviderInstanceModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

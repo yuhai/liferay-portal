@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OAuth2ApplicationScopeAliasesPersistence
 	extends BasePersistence<OAuth2ApplicationScopeAliases> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationScopeAliasesUtil} to access the o auth2 application scope aliases persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetTag}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetTag
  * @generated
  */
-@ProviderType
 public class AssetTagWrapper
 	extends BaseModelWrapper<AssetTag>
 	implements AssetTag, ModelWrapper<AssetTag> {
@@ -260,6 +257,11 @@ public class AssetTagWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset tag model instance should use the <code>AssetTag</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 
@@ -294,7 +296,12 @@ public class DDMFormBuilderContextFactoryHelper {
 		Set<Locale> availableLocales,
 		DDMFormFieldValidation ddmFormFieldValidation) {
 
+		if (ddmFormFieldValidation == null) {
+			return null;
+		}
+
 		JSONObject errorMessageJSONObject = _jsonFactory.createJSONObject();
+		JSONObject parameterJSONObject = _jsonFactory.createJSONObject();
 
 		for (Locale availableLocale : availableLocales) {
 			LocalizedValue errorMessageLocalizedValue =
@@ -303,13 +310,35 @@ public class DDMFormBuilderContextFactoryHelper {
 			errorMessageJSONObject.put(
 				LocaleUtil.toLanguageId(availableLocale),
 				errorMessageLocalizedValue.getString(availableLocale));
+
+			LocalizedValue parameterLocalizedValue =
+				ddmFormFieldValidation.getParameterLocalizedValue();
+
+			parameterJSONObject.put(
+				LocaleUtil.toLanguageId(availableLocale),
+				parameterLocalizedValue.getString(availableLocale));
 		}
+
+		DDMFormFieldValidationExpression ddmFormFieldValidationExpression =
+			ddmFormFieldValidation.getDDMFormFieldValidationExpression();
+
+		JSONObject expressionJSONObject = _jsonFactory.createJSONObject();
+
+		expressionJSONObject.put(
+			"name",
+			GetterUtil.getString(ddmFormFieldValidationExpression.getName())
+		).put(
+			"value",
+			GetterUtil.getString(ddmFormFieldValidationExpression.getValue())
+		);
 
 		return new UnlocalizedValue(
 			JSONUtil.put(
 				"errorMessage", errorMessageJSONObject
 			).put(
-				"expression", ddmFormFieldValidation.getExpression()
+				"expression", expressionJSONObject
+			).put(
+				"parameter", parameterJSONObject
 			).toString());
 	}
 

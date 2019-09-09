@@ -20,6 +20,7 @@ AUI.add(
 
 		var REGEX_MATCH_EVERYTHING = /.*/;
 
+		// eslint-disable-next-line no-empty-character-class
 		var REGEX_MATCH_NOTHING = /^[]/;
 
 		var STR_ACTIONS_WILDCARD = '*';
@@ -53,7 +54,7 @@ AUI.add(
 				},
 
 				keepSelection: {
-					setter: function(keepSelection) {
+					setter(keepSelection) {
 						if (Lang.isString(keepSelection)) {
 							keepSelection = new RegExp(keepSelection);
 						} else if (!Lang.isRegExp(keepSelection)) {
@@ -91,7 +92,193 @@ AUI.add(
 			NS: 'select',
 
 			prototype: {
-				initializer: function() {
+				_addRestoreTask() {
+					var instance = this;
+
+					var host = instance.get(STR_HOST);
+
+					Liferay.DOMTaskRunner.addTask({
+						action: A.Plugin.SearchContainerSelect.restoreTask,
+						condition:
+							A.Plugin.SearchContainerSelect.testRestoreTask,
+						params: {
+							containerId: host.get(STR_CONTENT_BOX).attr('id'),
+							rowClassNameActive: instance.get(
+								STR_ROW_CLASS_NAME_ACTIVE
+							),
+							rowSelector: instance.get(STR_ROW_SELECTOR),
+							searchContainerId: host.get('id')
+						}
+					});
+				},
+
+				_addRestoreTaskState() {
+					var instance = this;
+
+					var host = instance.get(STR_HOST);
+
+					var elements = [];
+
+					var selectedElements = instance.getAllSelectedElements();
+
+					selectedElements.each(function(item) {
+						elements.push({
+							name: item.attr('name'),
+							value: item.val()
+						});
+					});
+
+					Liferay.DOMTaskRunner.addTaskState({
+						data: {
+							bulkSelection: instance.get('bulkSelection'),
+							elements,
+							selector:
+								instance.get(STR_ROW_SELECTOR) +
+								' ' +
+								STR_CHECKBOX_SELECTOR
+						},
+						owner: host.get('id')
+					});
+				},
+
+				_getActions(elements) {
+					var instance = this;
+
+					var actions = elements
+						.getDOMNodes()
+						.map(function(node) {
+							return A.one(node).ancestor(
+								instance.get(STR_ROW_SELECTOR)
+							);
+						})
+						.filter(function(item) {
+							var itemActions;
+
+							if (item) {
+								itemActions = item.getData('actions');
+							}
+
+							return (
+								itemActions !== undefined &&
+								itemActions !== STR_ACTIONS_WILDCARD
+							);
+						})
+						.map(function(item) {
+							return item.getData('actions').split(',');
+						});
+
+					return actions.reduce(function(
+						commonActions,
+						elementActions
+					) {
+						return commonActions.filter(function(action) {
+							return elementActions.indexOf(action) != -1;
+						});
+					},
+					actions[0]);
+				},
+
+				_getAllElements(onlySelected) {
+					var instance = this;
+
+					return instance._getElements(
+						STR_CHECKBOX_SELECTOR,
+						onlySelected
+					);
+				},
+
+				_getCurrentPageElements(onlySelected) {
+					var instance = this;
+
+					return instance._getElements(
+						instance.get(STR_ROW_SELECTOR) +
+							' ' +
+							STR_CHECKBOX_SELECTOR,
+						onlySelected
+					);
+				},
+
+				_getElements(selector, onlySelected) {
+					var instance = this;
+
+					var host = instance.get(STR_HOST);
+
+					var checked = onlySelected ? ':' + STR_CHECKED : '';
+
+					return host.get(STR_CONTENT_BOX).all(selector + checked);
+				},
+
+				_isActionUrl(url) {
+					var uri = new A.Url(url);
+
+					return uri.getParameter('p_p_lifecycle') === 1;
+				},
+
+				_notifyRowToggle() {
+					var instance = this;
+
+					var allSelectedElements = instance.getAllSelectedElements();
+
+					var payload = {
+						actions: instance._getActions(allSelectedElements),
+						elements: {
+							allElements: instance._getAllElements(),
+							allSelectedElements,
+							currentPageElements: instance._getCurrentPageElements(),
+							currentPageSelectedElements: instance.getCurrentPageSelectedElements()
+						}
+					};
+
+					instance.get(STR_HOST).fire('rowToggled', payload);
+				},
+
+				_onClickRowSelector(config, event) {
+					var instance = this;
+
+					var row = event.currentTarget.ancestor(
+						instance.get(STR_ROW_SELECTOR)
+					);
+
+					instance.toggleRow(config, row);
+				},
+
+				_onStartNavigate(event) {
+					var instance = this;
+
+					if (
+						!instance._isActionUrl(event.path) &&
+						instance.get('keepSelection').test(unescape(event.path))
+					) {
+						instance._addRestoreTask();
+						instance._addRestoreTaskState();
+					}
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				getAllSelectedElements() {
+					var instance = this;
+
+					return instance._getAllElements(true);
+				},
+
+				getCurrentPageElements() {
+					var instance = this;
+
+					return instance._getCurrentPageElements();
+				},
+
+				getCurrentPageSelectedElements() {
+					var instance = this;
+
+					return instance._getCurrentPageElements(true);
+				},
+
+				initializer() {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -142,35 +329,11 @@ AUI.add(
 					];
 				},
 
-				destructor: function() {
-					var instance = this;
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				getAllSelectedElements: function() {
-					var instance = this;
-
-					return instance._getAllElements(true);
-				},
-
-				getCurrentPageElements: function() {
-					var instance = this;
-
-					return instance._getCurrentPageElements();
-				},
-
-				getCurrentPageSelectedElements: function() {
-					var instance = this;
-
-					return instance._getCurrentPageElements(true);
-				},
-
-				isSelected: function(element) {
+				isSelected(element) {
 					return element.one(STR_CHECKBOX_SELECTOR).attr(STR_CHECKED);
 				},
 
-				toggleAllRows: function(selected, bulkSelection) {
+				toggleAllRows(selected, bulkSelection) {
 					var instance = this;
 
 					var elements = bulkSelection
@@ -193,7 +356,7 @@ AUI.add(
 					instance._notifyRowToggle();
 				},
 
-				toggleRow: function(config, row) {
+				toggleRow(config, row) {
 					var instance = this;
 
 					if (config && config.toggleCheckbox) {
@@ -207,172 +370,10 @@ AUI.add(
 					row.toggleClass(instance.get(STR_ROW_CLASS_NAME_ACTIVE));
 
 					instance._notifyRowToggle();
-				},
-
-				_addRestoreTask: function() {
-					var instance = this;
-
-					var host = instance.get(STR_HOST);
-
-					Liferay.DOMTaskRunner.addTask({
-						action: A.Plugin.SearchContainerSelect.restoreTask,
-						condition:
-							A.Plugin.SearchContainerSelect.testRestoreTask,
-						params: {
-							containerId: host.get(STR_CONTENT_BOX).attr('id'),
-							rowClassNameActive: instance.get(
-								STR_ROW_CLASS_NAME_ACTIVE
-							),
-							rowSelector: instance.get(STR_ROW_SELECTOR),
-							searchContainerId: host.get('id')
-						}
-					});
-				},
-
-				_addRestoreTaskState: function() {
-					var instance = this;
-
-					var host = instance.get(STR_HOST);
-
-					var elements = [];
-
-					var selectedElements = instance.getAllSelectedElements();
-
-					selectedElements.each(function(item, index) {
-						elements.push({
-							name: item.attr('name'),
-							value: item.val()
-						});
-					});
-
-					Liferay.DOMTaskRunner.addTaskState({
-						data: {
-							bulkSelection: instance.get('bulkSelection'),
-							elements: elements,
-							selector:
-								instance.get(STR_ROW_SELECTOR) +
-								' ' +
-								STR_CHECKBOX_SELECTOR
-						},
-						owner: host.get('id')
-					});
-				},
-
-				_getActions: function(elements) {
-					var instance = this;
-
-					var actions = elements
-						.getDOMNodes()
-						.map(function(node) {
-							return A.one(node).ancestor(
-								instance.get(STR_ROW_SELECTOR)
-							);
-						})
-						.filter(function(item) {
-							var itemActions;
-
-							if (item) {
-								itemActions = item.getData('actions');
-							}
-
-							return (
-								itemActions !== undefined &&
-								itemActions !== STR_ACTIONS_WILDCARD
-							);
-						})
-						.map(function(item) {
-							return item.getData('actions').split(',');
-						});
-
-					return actions.reduce(function(
-						commonActions,
-						elementActions
-					) {
-						return commonActions.filter(function(action) {
-							return elementActions.indexOf(action) != -1;
-						});
-					},
-					actions[0]);
-				},
-
-				_getAllElements: function(onlySelected) {
-					var instance = this;
-
-					return instance._getElements(
-						STR_CHECKBOX_SELECTOR,
-						onlySelected
-					);
-				},
-
-				_getCurrentPageElements: function(onlySelected) {
-					var instance = this;
-
-					return instance._getElements(
-						instance.get(STR_ROW_SELECTOR) +
-							' ' +
-							STR_CHECKBOX_SELECTOR,
-						onlySelected
-					);
-				},
-
-				_getElements: function(selector, onlySelected) {
-					var instance = this;
-
-					var host = instance.get(STR_HOST);
-
-					var checked = onlySelected ? ':' + STR_CHECKED : '';
-
-					return host.get(STR_CONTENT_BOX).all(selector + checked);
-				},
-
-				_isActionUrl: function(url) {
-					var uri = new A.Url(url);
-
-					return uri.getParameter('p_p_lifecycle') === 1;
-				},
-
-				_notifyRowToggle: function() {
-					var instance = this;
-
-					var allSelectedElements = instance.getAllSelectedElements();
-
-					var payload = {
-						actions: instance._getActions(allSelectedElements),
-						elements: {
-							allElements: instance._getAllElements(),
-							allSelectedElements: allSelectedElements,
-							currentPageElements: instance._getCurrentPageElements(),
-							currentPageSelectedElements: instance.getCurrentPageSelectedElements()
-						}
-					};
-
-					instance.get(STR_HOST).fire('rowToggled', payload);
-				},
-
-				_onClickRowSelector: function(config, event) {
-					var instance = this;
-
-					var row = event.currentTarget.ancestor(
-						instance.get(STR_ROW_SELECTOR)
-					);
-
-					instance.toggleRow(config, row);
-				},
-
-				_onStartNavigate: function(event) {
-					var instance = this;
-
-					if (
-						!instance._isActionUrl(event.path) &&
-						instance.get('keepSelection').test(unescape(event.path))
-					) {
-						instance._addRestoreTask();
-						instance._addRestoreTaskState();
-					}
 				}
 			},
 
-			restoreTask: function(state, params, node) {
+			restoreTask(state, params, node) {
 				var container = A.one(node).one('#' + params.containerId);
 
 				container.setData('bulkSelection', state.data.bulkSelection);
@@ -409,7 +410,7 @@ AUI.add(
 				}
 			},
 
-			testRestoreTask: function(state, params, node) {
+			testRestoreTask(state, params, node) {
 				return (
 					state.owner === params.searchContainerId &&
 					A.one(node).one('#' + params.containerId)

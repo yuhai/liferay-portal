@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the layout template local service.
  *
@@ -42,12 +40,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portal.service.impl.LayoutTemplateLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class LayoutTemplateLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements LayoutTemplateLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutTemplateLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.LayoutTemplateLocalServiceUtil</code>.

@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface JournalFolder
 	extends JournalFolderModel, PersistedModel, TreeModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.journal.model.impl.JournalFolderImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecordSetVersion}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDLRecordSetVersion
  * @generated
  */
-@ProviderType
 public class DDLRecordSetVersionWrapper
 	extends BaseModelWrapper<DDLRecordSetVersion>
 	implements DDLRecordSetVersion, ModelWrapper<DDLRecordSetVersion> {
@@ -609,6 +606,11 @@ public class DDLRecordSetVersionWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddl record set version model instance should use the <code>DDLRecordSetVersion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

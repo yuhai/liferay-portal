@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructureLayout}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMStructureLayout
  * @generated
  */
-@ProviderType
 public class DDMStructureLayoutWrapper
 	extends BaseModelWrapper<DDMStructureLayout>
 	implements DDMStructureLayout, ModelWrapper<DDMStructureLayout> {
@@ -486,6 +483,11 @@ public class DDMStructureLayoutWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm structure layout model instance should use the <code>DDMStructureLayout</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

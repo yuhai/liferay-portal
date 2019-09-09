@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface VirtualHostModel
 	extends BaseModel<VirtualHost>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a virtual host model instance should use the {@link VirtualHost} interface instead.

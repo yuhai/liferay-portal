@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SyncDevice}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SyncDevice
  * @generated
  */
-@ProviderType
 public class SyncDeviceWrapper
 	extends BaseModelWrapper<SyncDevice>
 	implements SyncDevice, ModelWrapper<SyncDevice> {
@@ -294,6 +291,11 @@ public class SyncDeviceWrapper
 		return model.isSupported();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a sync device model instance should use the <code>SyncDevice</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

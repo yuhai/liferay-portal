@@ -89,7 +89,7 @@
 						condition: {
 							name:
 								'liferay-product-navigation-control-menu-portlet-dd',
-							test: function(A) {
+							test(A) {
 								return !A.UA.mobile;
 							},
 							trigger: [

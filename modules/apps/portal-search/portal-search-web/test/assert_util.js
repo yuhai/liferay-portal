@@ -12,7 +12,7 @@
  * details.
  */
 
-AUI().use('aui', function(A) {
+AUI().use('aui', function() {
 	Liferay.Test = Liferay.Test || {};
 
 	var includes = function(array, value) {

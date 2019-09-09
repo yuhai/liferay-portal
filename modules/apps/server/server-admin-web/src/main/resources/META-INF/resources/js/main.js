@@ -56,39 +56,7 @@ AUI.add(
 			NAME: 'admin',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._eventHandles = [];
-
-					instance.bindUI();
-				},
-
-				bindUI: function() {
-					var instance = this;
-
-					instance._eventHandles.push(
-						instance
-							.get(STR_FORM)
-							.delegate(
-								STR_CLICK,
-								A.bind('_onSubmit', instance),
-								instance.get('submitButton')
-							)
-					);
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					A.Array.invoke(instance._eventHandles, 'detach');
-
-					instance._eventHandles = null;
-
-					A.clearTimeout(instance._laterTimeout);
-				},
-
-				_addInputsFromData: function(data) {
+				_addInputsFromData(data) {
 					var instance = this;
 
 					var form = instance.get(STR_FORM);
@@ -112,7 +80,7 @@ AUI.add(
 					form.append(inputsArray.join(''));
 				},
 
-				_installXuggler: function(event) {
+				_installXuggler() {
 					var instance = this;
 
 					var form = instance.get(STR_FORM);
@@ -134,7 +102,7 @@ AUI.add(
 					);
 
 					A.one('#adminXugglerPanelContent').load(url, {
-						data: data,
+						data,
 						loadingMask: {
 							'strings.loading': Liferay.Language.get(
 								'xuggler-library-is-installing'
@@ -145,7 +113,7 @@ AUI.add(
 					});
 				},
 
-				_onSubmit: function(event) {
+				_onSubmit(event) {
 					var instance = this;
 
 					var data = event.currentTarget.getData();
@@ -173,6 +141,38 @@ AUI.add(
 					} else {
 						submitForm(form, instance.get(STR_URL));
 					}
+				},
+
+				bindUI() {
+					var instance = this;
+
+					instance._eventHandles.push(
+						instance
+							.get(STR_FORM)
+							.delegate(
+								STR_CLICK,
+								A.bind('_onSubmit', instance),
+								instance.get('submitButton')
+							)
+					);
+				},
+
+				destructor() {
+					var instance = this;
+
+					A.Array.invoke(instance._eventHandles, 'detach');
+
+					instance._eventHandles = null;
+
+					A.clearTimeout(instance._laterTimeout);
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._eventHandles = [];
+
+					instance.bindUI();
 				}
 			}
 		});

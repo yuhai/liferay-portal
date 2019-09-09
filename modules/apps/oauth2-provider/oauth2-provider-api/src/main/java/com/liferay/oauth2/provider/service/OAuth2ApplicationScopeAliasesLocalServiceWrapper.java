@@ -16,8 +16,6 @@ package com.liferay.oauth2.provider.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link OAuth2ApplicationScopeAliasesLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OAuth2ApplicationScopeAliasesLocalService
  * @generated
  */
-@ProviderType
 public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 	implements OAuth2ApplicationScopeAliasesLocalService,
 			   ServiceWrapper<OAuth2ApplicationScopeAliasesLocalService> {
@@ -38,6 +35,11 @@ public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 			oAuth2ApplicationScopeAliasesLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationScopeAliasesLocalServiceUtil} to access the o auth2 application scope aliases local service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationScopeAliasesLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases
 			addOAuth2ApplicationScopeAliases(

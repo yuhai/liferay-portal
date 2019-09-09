@@ -1,4 +1,4 @@
-@import 'bourbon';
+@import 'atlas-variables';
 
 .portlet-login {
 	.form {
@@ -23,6 +23,6 @@
 	.signed-in {
 		display: inline-block;
 
-		@include hyphens;
+		@include hyphens();
 	}
 }

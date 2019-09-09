@@ -18,6 +18,7 @@ import com.liferay.portal.vulcan.graphql.servlet.ServletData;
 import com.liferay.segments.asah.rest.internal.graphql.mutation.v1_0.Mutation;
 import com.liferay.segments.asah.rest.internal.graphql.query.v1_0.Query;
 import com.liferay.segments.asah.rest.resource.v1_0.ExperimentResource;
+import com.liferay.segments.asah.rest.resource.v1_0.ExperimentRunResource;
 import com.liferay.segments.asah.rest.resource.v1_0.StatusResource;
 
 import javax.annotation.Generated;
@@ -41,6 +42,8 @@ public class ServletDataImpl implements ServletData {
 	public void activate(BundleContext bundleContext) {
 		Mutation.setExperimentResourceComponentServiceObjects(
 			_experimentResourceComponentServiceObjects);
+		Mutation.setExperimentRunResourceComponentServiceObjects(
+			_experimentRunResourceComponentServiceObjects);
 		Mutation.setStatusResourceComponentServiceObjects(
 			_statusResourceComponentServiceObjects);
 	}
@@ -67,6 +70,10 @@ public class ServletDataImpl implements ServletData {
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<ExperimentResource>
 		_experimentResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<ExperimentRunResource>
+		_experimentRunResourceComponentServiceObjects;
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<StatusResource>

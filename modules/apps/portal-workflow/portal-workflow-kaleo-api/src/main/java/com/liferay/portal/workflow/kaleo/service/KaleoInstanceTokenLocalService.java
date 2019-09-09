@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoInstanceTokenLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoInstanceTokenLocalServiceUtil} to access the kaleo instance token local service. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoInstanceTokenLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

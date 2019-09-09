@@ -165,327 +165,7 @@ AUI.add(
 			NAME: 'contactscenter',
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					instance._config = config;
-
-					instance._namespace = config.namespace;
-
-					instance._contactCenterToolbar = instance.byId(
-						'contactCenterToolbarButtons'
-					);
-					instance._userToolbar = instance.byId('userToolbarButtons');
-
-					instance._detailUserView = instance.byId('detailUserView');
-					instance._selectedUsersView = instance.byId(
-						'selectedUsersView'
-					);
-
-					instance._messageContainer = instance.byId(
-						'messageContainer'
-					);
-
-					instance._addConnectionButton = instance.byId(
-						'addConnectionButton'
-					);
-					instance._blockButton = instance.byId('blockButton');
-					instance._exportButton = instance.byId('exportButton');
-					instance._followButton = instance.byId('followButton');
-					instance._removeConnectionButton = instance.byId(
-						'removeConnectionButton'
-					);
-					instance._sendMessageButton = instance.byId(
-						'sendMessageButton'
-					);
-					instance._unblockButton = instance.byId('unblockButton');
-					instance._unfollowButton = instance.byId('unfollowButton');
-
-					instance._contactsCheckBox = A.one('.contacts-result');
-
-					instance._checkAll = instance.byId('checkAll');
-
-					instance._checkAll.on(
-						'click',
-						instance._onCheckAll,
-						instance
-					);
-
-					instance._buttonAddConnectionUserIds = [];
-					instance._buttonBlockUserIds = [];
-					instance._buttonExportUserIds = [];
-					instance._buttonFollowUserIds = [];
-					instance._buttonRemoveConnectionUserIds = [];
-					instance._buttonUnBlockUserIds = [];
-					instance._buttonUnFollowUserIds = [];
-
-					instance._numSelectedContacts = 0;
-
-					instance._createContactList(config);
-
-					instance._defaultMessageError = config.defaultMessageError;
-					instance._defaultMessageSuccess =
-						config.defaultMessageSuccess;
-
-					instance._maxResultCount = config.maxResultCount;
-
-					instance._showIcon = config.showIcon;
-				},
-
-				addContactResult: function(data) {
-					var instance = this;
-
-					instance._setVisibleSelectedUsersView();
-
-					var contact = instance._renderContact(data);
-
-					if (instance._numSelectedContacts <= 0) {
-						instance._selectedUsersView.html(contact);
-
-						instance._contactCenterToolbar.show();
-
-						instance._userToolbar.empty();
-					} else {
-						instance._selectedUsersView.append(contact);
-					}
-
-					instance._numSelectedContacts++;
-
-					instance._updateToolbarButtonsAdd(data);
-
-					instance._messageContainer.empty();
-
-					instance._checkAll.set(
-						'checked',
-						instance._contactsCheckBox
-							.all(CSS_NOT_SELECTED_CHECKBOX)
-							.size() <= 0
-					);
-				},
-
-				addContactResults: function(data) {
-					var instance = this;
-
-					var contacts = data.contacts;
-
-					contacts.map(function(contact) {
-						instance.addContactResult(contact);
-					});
-				},
-
-				closePopup: function() {
-					var instance = this;
-
-					if (instance._popup) {
-						instance._popup.hide();
-					}
-				},
-
-				deleteContactResult: function(userId) {
-					var instance = this;
-
-					instance._setVisibleSelectedUsersView();
-
-					var user = A.one('#user-' + userId);
-
-					if (user) {
-						user.remove(true);
-
-						instance._numSelectedContacts--;
-
-						instance._updateToolbarButtonsRemove(userId);
-
-						if (instance._numSelectedContacts <= 0) {
-							instance._clearContactResult();
-						}
-
-						instance._messageContainer.empty();
-
-						instance._checkAll.set('checked', false);
-					}
-				},
-
-				deleteContactResults: function(userIds) {
-					var instance = this;
-
-					userIds.map(function(userId) {
-						instance.deleteContactResult(userId);
-					});
-				},
-
-				renderContent: function(data, clear) {
-					var instance = this;
-
-					if (clear) {
-						instance._clearContactResult();
-					}
-
-					instance._setVisibleDetailUserView();
-
-					var content = Node.create(data);
-
-					var contactSummary = instance.one(
-						'#contactSummary',
-						content
-					);
-
-					if (contactSummary) {
-						instance._detailUserView.empty();
-
-						instance._detailUserView.plug(ParseContent);
-
-						instance._detailUserView.setContent(contactSummary);
-					}
-
-					var userToolbar = instance.one('#contactsToolbar', content);
-
-					if (userToolbar) {
-						instance._userToolbar.empty();
-
-						instance._userToolbar.plug(ParseContent);
-
-						instance._userToolbar.setContent(userToolbar);
-					}
-				},
-
-				renderEntry: function(data, lastNameAnchor) {
-					var instance = this;
-
-					var contact = data.contact;
-
-					instance._renderEntryDetailView(contact);
-					instance._renderEntryToolbar(contact);
-
-					var contactList = data.contactList;
-
-					var contactUserHTML = instance._renderResult(
-						contactList,
-						true,
-						lastNameAnchor
-					);
-
-					var contactResultContent = A.one(
-						'.contacts-portlet .contacts-result'
-					);
-
-					contactResultContent.html(contactUserHTML.join(''));
-
-					instance.showMessage(true, data.message);
-				},
-
-				renderSelectedContacts: function(data, lastNameAnchor) {
-					var instance = this;
-
-					var contacts = data.contacts;
-
-					if (contacts && contacts.length > 0) {
-						if (
-							!instance._detailUserView.hasClass('hide') &&
-							contacts.length == 1
-						) {
-							var user = contacts[0].user;
-
-							instance._updateUserToolBar(user);
-							instance._updateUserIcons(user);
-						} else {
-							instance._clearContactResult();
-
-							contacts.map(function(contact) {
-								instance.addContactResult(contact);
-							});
-						}
-					}
-
-					var contactList = data.contactList;
-
-					var contactUserHTML = instance._renderResult(
-						contactList,
-						true,
-						lastNameAnchor
-					);
-
-					var contactResultContent = A.one(
-						'.contacts-portlet .contacts-result'
-					);
-
-					contactResultContent.html(contactUserHTML.join(''));
-
-					instance.showMessage(true, data.message);
-				},
-
-				showMessage: function(success, message) {
-					var instance = this;
-
-					if (instance._messageContainer) {
-						if (success) {
-							if (!message || message == '') {
-								message = instance._defaultMessageSuccess;
-							}
-
-							instance._messageContainer.html(
-								'<span class="alert alert-success">' +
-									message +
-									'</span>'
-							);
-						} else {
-							if (!message || message == '') {
-								message = instance._defaultMessageError;
-							}
-
-							instance._messageContainer.html(
-								'<span class="alert alert-danger">' +
-									message +
-									'</span>'
-							);
-						}
-					}
-				},
-
-				showMoreResult: function(responseData, lastNameAnchor) {
-					var instance = this;
-
-					var contactUserHTML = instance._renderResult(
-						responseData,
-						false,
-						lastNameAnchor
-					);
-
-					var contactResultContent = A.one(
-						'.contacts-portlet .contacts-result'
-					);
-					var moreResults = A.one('.contacts-portlet .more-results');
-
-					moreResults.remove();
-
-					contactResultContent.append(contactUserHTML.join(''));
-				},
-
-				showPopup: function(title, uri) {
-					var instance = this;
-
-					instance._getPopup();
-
-					instance._popup.show();
-
-					instance._popup.titleNode.html(title);
-
-					instance._popup.io.set('uri', uri);
-
-					instance._popup.io.start();
-				},
-
-				updateContacts: function(keywords, filterBy) {
-					var instance = this;
-
-					if (instance._contactList) {
-						instance._contactList.sendRequest(
-							keywords,
-							instance._getRequestTemplate(filterBy)
-						);
-					}
-				},
-
-				_clearContactResult: function() {
+				_clearContactResult() {
 					var instance = this;
 
 					instance._detailUserView.empty();
@@ -520,7 +200,7 @@ AUI.add(
 					instance._checkAll.set('checked', false);
 				},
 
-				_createContactList: function(config) {
+				_createContactList(config) {
 					var instance = this;
 
 					var contactsResult = config.contactsResult;
@@ -531,14 +211,14 @@ AUI.add(
 						inputNode: contactsSearchInput,
 						listNode: contactsResult,
 						minQueryLength: 0,
-						requestTemplate: function(query) {
+						requestTemplate(query) {
 							var data = {};
 
 							data[instance._namespace + 'keywords'] = query;
 
 							return data;
 						},
-						resultTextLocator: function(response) {
+						resultTextLocator(response) {
 							var result = '';
 
 							if (typeof response.toString != STR_UNDEFINED) {
@@ -562,7 +242,7 @@ AUI.add(
 					instance._contactList = contactList;
 				},
 
-				_createDataSource: function(url) {
+				_createDataSource(url) {
 					var instance = this;
 
 					return new A.DataSource.IO({
@@ -570,7 +250,7 @@ AUI.add(
 							method: 'POST'
 						},
 						on: {
-							request: function(event) {
+							request(event) {
 								var contactFilter = A.one(
 									'#' + instance._namespace + 'filterBy'
 								);
@@ -604,7 +284,7 @@ AUI.add(
 					});
 				},
 
-				_deleteEntry: function(contact) {
+				_deleteEntry(contact) {
 					var instance = this;
 
 					var config = instance._config;
@@ -635,7 +315,7 @@ AUI.add(
 							.then(response => {
 								return response.text();
 							})
-							.then(data => {
+							.then(() => {
 								location.href = contact.redirect;
 							})
 							.catch(() => {
@@ -644,7 +324,7 @@ AUI.add(
 					}
 				},
 
-				_editEntry: function(contact) {
+				_editEntry(contact) {
 					var instance = this;
 
 					var config = instance._config;
@@ -670,7 +350,7 @@ AUI.add(
 					);
 				},
 
-				_getPopup: function() {
+				_getPopup() {
 					var instance = this;
 
 					if (!instance._popup) {
@@ -696,7 +376,7 @@ AUI.add(
 					}
 				},
 
-				_getRequestTemplate: function(filterBy) {
+				_getRequestTemplate(filterBy) {
 					var instance = this;
 
 					return function(query) {
@@ -712,7 +392,7 @@ AUI.add(
 					};
 				},
 
-				_onCheckAll: function(event) {
+				_onCheckAll(event) {
 					var instance = this;
 
 					var config = instance._config;
@@ -748,7 +428,7 @@ AUI.add(
 								.then(data => {
 									instance.addContactResults(data);
 								})
-								.catch(err => {
+								.catch(() => {
 									instance.showMessage(false);
 								});
 						}
@@ -765,7 +445,7 @@ AUI.add(
 					}
 				},
 
-				_renderContact: function(data) {
+				_renderContact(data) {
 					var instance = this;
 
 					var user = data.user;
@@ -789,7 +469,7 @@ AUI.add(
 					});
 				},
 
-				_renderEntryDetailView: function(contact) {
+				_renderEntryDetailView(contact) {
 					var instance = this;
 
 					var icon = '';
@@ -812,7 +492,7 @@ AUI.add(
 					instance._detailUserView.setContent(contactSummary);
 				},
 
-				_renderEntryToolbar: function(contact) {
+				_renderEntryToolbar(contact) {
 					var instance = this;
 
 					instance._userToolbar.empty();
@@ -825,7 +505,7 @@ AUI.add(
 								icon: 'icon-edit',
 								label: Liferay.Language.get('edit'),
 								on: {
-									click: function(event) {
+									click() {
 										instance._editEntry(contact);
 									}
 								}
@@ -834,7 +514,7 @@ AUI.add(
 								icon: 'icon-remove',
 								label: Liferay.Language.get('delete'),
 								on: {
-									click: function(event) {
+									click() {
 										instance._deleteEntry(contact);
 									}
 								}
@@ -843,9 +523,7 @@ AUI.add(
 					}).render();
 				},
 
-				_renderResult: function(data, displayMessage, lastNameAnchor) {
-					var instance = this;
-
+				_renderResult(data, displayMessage, lastNameAnchor) {
 					var count = data.count;
 					var results = data.users;
 
@@ -986,7 +664,7 @@ AUI.add(
 					return buffer;
 				},
 
-				_setVisibleDetailUserView: function() {
+				_setVisibleDetailUserView() {
 					var instance = this;
 
 					instance._contactCenterToolbar.hide();
@@ -996,7 +674,7 @@ AUI.add(
 					instance._selectedUsersView.hide();
 				},
 
-				_setVisibleSelectedUsersView: function() {
+				_setVisibleSelectedUsersView() {
 					var instance = this;
 
 					instance._userToolbar.empty();
@@ -1008,13 +686,13 @@ AUI.add(
 					instance._selectedUsersView.show();
 				},
 
-				_showButton: function(node) {
+				_showButton(node) {
 					node.show();
 
 					node.removeClass('hidden');
 				},
 
-				_updateContactsResult: function(event) {
+				_updateContactsResult(event) {
 					var instance = this;
 
 					var data = JSON.parse(event.data.responseText);
@@ -1033,7 +711,7 @@ AUI.add(
 					);
 				},
 
-				_updateToolbarButtonsAdd: function(data) {
+				_updateToolbarButtonsAdd(data) {
 					var instance = this;
 
 					var user = data.user;
@@ -1095,7 +773,7 @@ AUI.add(
 					}
 				},
 
-				_updateToolbarButtonsRemove: function(userId) {
+				_updateToolbarButtonsRemove(userId) {
 					var instance = this;
 
 					var blockUserIdIndex = instance._buttonBlockUserIds.indexOf(
@@ -1225,9 +903,7 @@ AUI.add(
 					}
 				},
 
-				_updateUserIcons: function(user) {
-					var instance = this;
-
+				_updateUserIcons(user) {
 					var contactsAction = A.one('.contacts-action');
 
 					contactsAction.hide();
@@ -1266,7 +942,7 @@ AUI.add(
 					contactsAction.show();
 				},
 
-				_updateUserToolBar: function(user) {
+				_updateUserToolBar(user) {
 					var instance = this;
 
 					instance._userToolbar.hide();
@@ -1314,6 +990,326 @@ AUI.add(
 					}
 
 					instance._userToolbar.show();
+				},
+
+				addContactResult(data) {
+					var instance = this;
+
+					instance._setVisibleSelectedUsersView();
+
+					var contact = instance._renderContact(data);
+
+					if (instance._numSelectedContacts <= 0) {
+						instance._selectedUsersView.html(contact);
+
+						instance._contactCenterToolbar.show();
+
+						instance._userToolbar.empty();
+					} else {
+						instance._selectedUsersView.append(contact);
+					}
+
+					instance._numSelectedContacts++;
+
+					instance._updateToolbarButtonsAdd(data);
+
+					instance._messageContainer.empty();
+
+					instance._checkAll.set(
+						'checked',
+						instance._contactsCheckBox
+							.all(CSS_NOT_SELECTED_CHECKBOX)
+							.size() <= 0
+					);
+				},
+
+				addContactResults(data) {
+					var instance = this;
+
+					var contacts = data.contacts;
+
+					contacts.map(function(contact) {
+						instance.addContactResult(contact);
+					});
+				},
+
+				closePopup() {
+					var instance = this;
+
+					if (instance._popup) {
+						instance._popup.hide();
+					}
+				},
+
+				deleteContactResult(userId) {
+					var instance = this;
+
+					instance._setVisibleSelectedUsersView();
+
+					var user = A.one('#user-' + userId);
+
+					if (user) {
+						user.remove(true);
+
+						instance._numSelectedContacts--;
+
+						instance._updateToolbarButtonsRemove(userId);
+
+						if (instance._numSelectedContacts <= 0) {
+							instance._clearContactResult();
+						}
+
+						instance._messageContainer.empty();
+
+						instance._checkAll.set('checked', false);
+					}
+				},
+
+				deleteContactResults(userIds) {
+					var instance = this;
+
+					userIds.map(function(userId) {
+						instance.deleteContactResult(userId);
+					});
+				},
+
+				initializer(config) {
+					var instance = this;
+
+					instance._config = config;
+
+					instance._namespace = config.namespace;
+
+					instance._contactCenterToolbar = instance.byId(
+						'contactCenterToolbarButtons'
+					);
+					instance._userToolbar = instance.byId('userToolbarButtons');
+
+					instance._detailUserView = instance.byId('detailUserView');
+					instance._selectedUsersView = instance.byId(
+						'selectedUsersView'
+					);
+
+					instance._messageContainer = instance.byId(
+						'messageContainer'
+					);
+
+					instance._addConnectionButton = instance.byId(
+						'addConnectionButton'
+					);
+					instance._blockButton = instance.byId('blockButton');
+					instance._exportButton = instance.byId('exportButton');
+					instance._followButton = instance.byId('followButton');
+					instance._removeConnectionButton = instance.byId(
+						'removeConnectionButton'
+					);
+					instance._sendMessageButton = instance.byId(
+						'sendMessageButton'
+					);
+					instance._unblockButton = instance.byId('unblockButton');
+					instance._unfollowButton = instance.byId('unfollowButton');
+
+					instance._contactsCheckBox = A.one('.contacts-result');
+
+					instance._checkAll = instance.byId('checkAll');
+
+					instance._checkAll.on(
+						'click',
+						instance._onCheckAll,
+						instance
+					);
+
+					instance._buttonAddConnectionUserIds = [];
+					instance._buttonBlockUserIds = [];
+					instance._buttonExportUserIds = [];
+					instance._buttonFollowUserIds = [];
+					instance._buttonRemoveConnectionUserIds = [];
+					instance._buttonUnBlockUserIds = [];
+					instance._buttonUnFollowUserIds = [];
+
+					instance._numSelectedContacts = 0;
+
+					instance._createContactList(config);
+
+					instance._defaultMessageError = config.defaultMessageError;
+					instance._defaultMessageSuccess =
+						config.defaultMessageSuccess;
+
+					instance._maxResultCount = config.maxResultCount;
+
+					instance._showIcon = config.showIcon;
+				},
+
+				renderContent(data, clear) {
+					var instance = this;
+
+					if (clear) {
+						instance._clearContactResult();
+					}
+
+					instance._setVisibleDetailUserView();
+
+					var content = Node.create(data);
+
+					var contactSummary = instance.one(
+						'#contactSummary',
+						content
+					);
+
+					if (contactSummary) {
+						instance._detailUserView.empty();
+
+						instance._detailUserView.plug(ParseContent);
+
+						instance._detailUserView.setContent(contactSummary);
+					}
+
+					var userToolbar = instance.one('#contactsToolbar', content);
+
+					if (userToolbar) {
+						instance._userToolbar.empty();
+
+						instance._userToolbar.plug(ParseContent);
+
+						instance._userToolbar.setContent(userToolbar);
+					}
+				},
+
+				renderEntry(data, lastNameAnchor) {
+					var instance = this;
+
+					var contact = data.contact;
+
+					instance._renderEntryDetailView(contact);
+					instance._renderEntryToolbar(contact);
+
+					var contactList = data.contactList;
+
+					var contactUserHTML = instance._renderResult(
+						contactList,
+						true,
+						lastNameAnchor
+					);
+
+					var contactResultContent = A.one(
+						'.contacts-portlet .contacts-result'
+					);
+
+					contactResultContent.html(contactUserHTML.join(''));
+
+					instance.showMessage(true, data.message);
+				},
+
+				renderSelectedContacts(data, lastNameAnchor) {
+					var instance = this;
+
+					var contacts = data.contacts;
+
+					if (contacts && contacts.length > 0) {
+						if (
+							!instance._detailUserView.hasClass('hide') &&
+							contacts.length == 1
+						) {
+							var user = contacts[0].user;
+
+							instance._updateUserToolBar(user);
+							instance._updateUserIcons(user);
+						} else {
+							instance._clearContactResult();
+
+							contacts.map(function(contact) {
+								instance.addContactResult(contact);
+							});
+						}
+					}
+
+					var contactList = data.contactList;
+
+					var contactUserHTML = instance._renderResult(
+						contactList,
+						true,
+						lastNameAnchor
+					);
+
+					var contactResultContent = A.one(
+						'.contacts-portlet .contacts-result'
+					);
+
+					contactResultContent.html(contactUserHTML.join(''));
+
+					instance.showMessage(true, data.message);
+				},
+
+				showMessage(success, message) {
+					var instance = this;
+
+					if (instance._messageContainer) {
+						if (success) {
+							if (!message || message == '') {
+								message = instance._defaultMessageSuccess;
+							}
+
+							instance._messageContainer.html(
+								'<span class="alert alert-success">' +
+									message +
+									'</span>'
+							);
+						} else {
+							if (!message || message == '') {
+								message = instance._defaultMessageError;
+							}
+
+							instance._messageContainer.html(
+								'<span class="alert alert-danger">' +
+									message +
+									'</span>'
+							);
+						}
+					}
+				},
+
+				showMoreResult(responseData, lastNameAnchor) {
+					var instance = this;
+
+					var contactUserHTML = instance._renderResult(
+						responseData,
+						false,
+						lastNameAnchor
+					);
+
+					var contactResultContent = A.one(
+						'.contacts-portlet .contacts-result'
+					);
+					var moreResults = A.one('.contacts-portlet .more-results');
+
+					moreResults.remove();
+
+					contactResultContent.append(contactUserHTML.join(''));
+				},
+
+				showPopup(title, uri) {
+					var instance = this;
+
+					instance._getPopup();
+
+					instance._popup.show();
+
+					instance._popup.titleNode.html(title);
+
+					instance._popup.io.set('uri', uri);
+
+					instance._popup.io.start();
+				},
+
+				updateContacts(keywords, filterBy) {
+					var instance = this;
+
+					if (instance._contactList) {
+						instance._contactList.sendRequest(
+							keywords,
+							instance._getRequestTemplate(filterBy)
+						);
+					}
 				}
 			}
 		});
@@ -1325,7 +1321,7 @@ AUI.add(
 			A.Base,
 			[A.AutoCompleteBase],
 			{
-				initializer: function(config) {
+				initializer(config) {
 					this._listNode = A.one(config.listNode);
 
 					this._bindUIACBase();

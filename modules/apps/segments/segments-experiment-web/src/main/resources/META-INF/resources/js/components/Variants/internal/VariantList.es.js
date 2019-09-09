@@ -43,6 +43,7 @@ function VariantList({
 						segmentsExperienceId={variant.segmentsExperienceId}
 						split={variant.split}
 						variantId={variant.segmentsExperimentRelId}
+						winner={variant.winner}
 					/>
 				);
 			})}

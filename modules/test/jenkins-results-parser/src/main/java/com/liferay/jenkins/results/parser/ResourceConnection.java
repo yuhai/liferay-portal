@@ -19,44 +19,6 @@ package com.liferay.jenkins.results.parser;
  */
 public class ResourceConnection implements Comparable {
 
-	public ResourceConnection(
-		ResourceMonitor resourceMonitor, EtcdUtil.Node node) {
-
-		_resourceMonitor = resourceMonitor;
-		_node = node;
-	}
-
-	public ResourceConnection(
-		ResourceMonitor resourceMonitor, String connectionName) {
-
-		this(resourceMonitor, connectionName, null);
-	}
-
-	public ResourceConnection(
-		ResourceMonitor resourceMonitor, String connectionName, State state) {
-
-		_resourceMonitor = resourceMonitor;
-
-		String etcdServerURL = _resourceMonitor.getEtcdServerURL();
-		String key = _resourceMonitor.getKey() + "/" + connectionName;
-
-		if (state != null) {
-			_node = EtcdUtil.put(etcdServerURL, key, state.toString());
-
-			return;
-		}
-
-		EtcdUtil.Node node = EtcdUtil.get(etcdServerURL, key);
-
-		if (node != null) {
-			_node = node;
-
-			return;
-		}
-
-		_node = EtcdUtil.put(etcdServerURL, key, State.IN_QUEUE.toString());
-	}
-
 	@Override
 	public int compareTo(Object o) {
 		if (!(o instanceof ResourceConnection)) {
@@ -74,18 +36,36 @@ public class ResourceConnection implements Comparable {
 		return _node.getCreatedIndex();
 	}
 
-	public String getKey() {
-		return _node.getKey();
+	public Long getInQueueAge() {
+		if (_inQueueStartTime == null) {
+			return 0L;
+		}
+
+		if (_inUseStartTime == null) {
+			return System.currentTimeMillis() - _inQueueStartTime;
+		}
+
+		return _inUseStartTime - _inQueueStartTime;
 	}
 
-	public String getMonitorName() {
-		return _resourceMonitor.getName();
+	public Long getInUseAge() {
+		if (_inUseStartTime == null) {
+			return 0L;
+		}
+
+		return System.currentTimeMillis() - _inUseStartTime;
+	}
+
+	public String getKey() {
+		return _key;
 	}
 
 	public String getName() {
-		String key = _node.getKey();
+		return _name;
+	}
 
-		return key.replace(_resourceMonitor.getKey() + "/", "");
+	public ResourceMonitor getResourceMonitor() {
+		return _resourceMonitor;
 	}
 
 	public State getState() {
@@ -95,8 +75,13 @@ public class ResourceConnection implements Comparable {
 	public void setState(State state) {
 		if (!state.equals(State.RETIRE)) {
 			_node = EtcdUtil.put(
-				_resourceMonitor.getEtcdServerURL(), _node.getKey(),
-				state.toString());
+				_resourceMonitor.getEtcdServerURL(), _key, state.toString());
+
+			_setInQueueStartTime();
+
+			if (state == State.IN_USE) {
+				_setInUseStartTime();
+			}
 
 			return;
 		}
@@ -105,7 +90,7 @@ public class ResourceConnection implements Comparable {
 			_node.delete();
 		}
 		else {
-			System.out.println("Node " + _node.getKey() + " does not exist.");
+			System.out.println("Node " + _key + " does not exist.");
 		}
 	}
 
@@ -115,6 +100,71 @@ public class ResourceConnection implements Comparable {
 
 	}
 
+	protected ResourceConnection(
+		EtcdUtil.Node node, ResourceMonitor resourceMonitor) {
+
+		_node = node;
+		_resourceMonitor = resourceMonitor;
+
+		_key = _node.getKey();
+
+		_name = _key.replace(_resourceMonitor.getKey() + "/", "");
+
+		_setInQueueStartTime();
+
+		_setInUseStartTime();
+	}
+
+	protected ResourceConnection(String name, ResourceMonitor resourceMonitor) {
+		_name = name;
+		_resourceMonitor = resourceMonitor;
+
+		_key = JenkinsResultsParserUtil.combine(
+			_resourceMonitor.getKey(), "/", name);
+
+		String etcdServerURL = _resourceMonitor.getEtcdServerURL();
+
+		EtcdUtil.Node node = EtcdUtil.get(etcdServerURL, _key);
+
+		if (node != null) {
+			_node = node;
+
+			return;
+		}
+
+		_node = EtcdUtil.put(etcdServerURL, _key, State.IN_QUEUE.toString());
+
+		_setInQueueStartTime();
+
+		_setInUseStartTime();
+	}
+
+	private void _setInQueueStartTime() {
+		if (_inQueueStartTime != null) {
+			return;
+		}
+
+		_inQueueStartTime = System.currentTimeMillis();
+	}
+
+	private void _setInUseStartTime() {
+		if (_inUseStartTime != null) {
+			return;
+		}
+
+		State state = getState();
+
+		if (state != State.IN_USE) {
+			return;
+		}
+
+		_inUseStartTime = System.currentTimeMillis();
+	}
+
+	private Long _inQueueStartTime;
+	private Long _inUseStartTime;
+	private final String _key;
+	private final String _name;
 	private EtcdUtil.Node _node;
 	private final ResourceMonitor _resourceMonitor;
 

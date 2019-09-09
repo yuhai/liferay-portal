@@ -24,8 +24,6 @@ import java.rmi.RemoteException;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the SOAP utility for the
  * <code>SegmentsExperienceServiceUtil</code> service
@@ -65,7 +63,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperienceServiceHttp
  * @generated
  */
-@ProviderType
 public class SegmentsExperienceServiceSoap {
 
 	public static com.liferay.segments.model.SegmentsExperienceSoap
@@ -103,6 +100,25 @@ public class SegmentsExperienceServiceSoap {
 			com.liferay.segments.model.SegmentsExperience returnValue =
 				SegmentsExperienceServiceUtil.deleteSegmentsExperience(
 					segmentsExperienceId);
+
+			return com.liferay.segments.model.SegmentsExperienceSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.segments.model.SegmentsExperienceSoap
+			fetchSegmentsExperience(long groupId, String segmentsExperienceKey)
+		throws RemoteException {
+
+		try {
+			com.liferay.segments.model.SegmentsExperience returnValue =
+				SegmentsExperienceServiceUtil.fetchSegmentsExperience(
+					groupId, segmentsExperienceKey);
 
 			return com.liferay.segments.model.SegmentsExperienceSoap.
 				toSoapModel(returnValue);

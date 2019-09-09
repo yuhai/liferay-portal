@@ -50,7 +50,7 @@ public abstract class LayoutPrototypeServiceBaseImpl
 	extends BaseServiceImpl
 	implements LayoutPrototypeService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutPrototypeService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.LayoutPrototypeServiceUtil</code>.

@@ -40,7 +40,7 @@ public interface KaleoTaskAssignmentInstanceModel
 	extends BaseModel<KaleoTaskAssignmentInstance>, GroupedModel, MVCCModel,
 			ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kaleo task assignment instance model instance should use the {@link KaleoTaskAssignmentInstance} interface instead.

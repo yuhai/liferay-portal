@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Folder}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Folder
  * @generated
  */
-@ProviderType
 public class FolderWrapper
 	extends BaseModelWrapper<Folder> implements Folder, ModelWrapper<Folder> {
 
@@ -242,6 +239,11 @@ public class FolderWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a folder model instance should use the <code>Folder</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

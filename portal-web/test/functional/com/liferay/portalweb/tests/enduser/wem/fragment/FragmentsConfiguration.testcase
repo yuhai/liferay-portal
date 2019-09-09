@@ -1,0 +1,87 @@
+@component-name = "portal-wcm"
+definition {
+
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Fragments";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		JSONFragment.addFragmentCollection(
+			groupName = "Test Site Name",
+			name = "Collection Name");
+
+		FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@description = "This is a test for LPS-97184. Invalid fragment configuration cannot be published and offers useful advice."
+	@priority = "4"
+	test AddInvalidConfiguration {
+		property test.name.skip.portal.instance = "FragmentsConfiguration#AddInvalidConfiguration";
+
+		FragmentsAdmin.addSection(fragmentName = "Fragment Name");
+
+		FragmentsEditor.gotoConfigurationTab();
+
+		FragmentsEditor.typeFileContent(fileName = "fragment_configuration_invalid.json");
+
+		FragmentsEditor.gotoCodeTab();
+
+		task ("Assert there is an error message in the fragment editor preview") {
+			SelectFrame.selectFrameNoLoading(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+
+			Alert.viewErrorMessage(errorMessage = "Fragment configuration is invalid.");
+
+			Alert.viewErrorMessage(errorMessage = "/fieldSets/0/fields/0: required key [defaultValue] not found");
+
+			Alert.viewErrorMessage(errorMessage = "fieldSets/0/fields/0/typeOptions: required key [validValues] not found");
+
+			Alert.viewErrorMessage(errorMessage = "/fieldSets/0/fields/0/typeOptions: extraneous key [values] is not permitted");
+
+			SelectFrame.selectFrameTop();
+		}
+
+		task ("Publish the fragment and assert there is an error message") {
+			Button.clickPublish();
+
+			Alert.viewErrorMessage(errorMessage = "Please provide a valid configuration for the fragment.");
+		}
+	}
+
+	@description = "This is a test for LPS-97184. Valid fragment configuration can be published."
+	@priority = "4"
+	test AddValidConfiguration {
+		property test.name.skip.portal.instance = "FragmentsConfiguration#AddValidConfiguration";
+
+		FragmentsAdmin.addSection(fragmentName = "Fragment Name");
+
+		FragmentsEditor.gotoConfigurationTab();
+
+		FragmentsEditor.typeFileContent(fileName = "fragment_configuration.json");
+
+		FragmentsEditor.gotoCodeTab();
+
+		FragmentsEditor.typeFileContent(fileName = "fragment_configuration.html");
+
+		FragmentsEditor.publish();
+	}
+
+}

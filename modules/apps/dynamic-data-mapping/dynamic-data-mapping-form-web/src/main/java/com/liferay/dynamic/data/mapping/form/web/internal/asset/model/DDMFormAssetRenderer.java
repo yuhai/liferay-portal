@@ -147,7 +147,7 @@ public class DDMFormAssetRenderer
 	@Override
 	public String getTitle(Locale locale) {
 		return LanguageUtil.format(
-			locale, "new-entry-for-form-x", _formInstance.getName(locale),
+			locale, "form-record-for-form-x", _formInstance.getName(locale),
 			false);
 	}
 

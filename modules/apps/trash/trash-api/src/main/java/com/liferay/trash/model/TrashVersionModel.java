@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface TrashVersionModel
 	extends AttachedModel, BaseModel<TrashVersion>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a trash version model instance should use the {@link TrashVersion} interface instead.

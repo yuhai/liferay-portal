@@ -33,7 +33,7 @@ function getFormTemplate(keywords, emptySearchEnabled) {
 describe('Liferay.Search.SearchBar', function() {
 	describe('.getKeywords', function() {
 		it(
-			'should return the keywords',
+			'returns the keywords',
 			withAlloyUI(
 				function(done, A) {
 					var form = A.Node.create(getFormTemplate('example'));
@@ -51,7 +51,7 @@ describe('Liferay.Search.SearchBar', function() {
 
 	describe('.isSubmitEnabled', function() {
 		it(
-			'should be false with no keywords',
+			'is false with no keywords',
 			withAlloyUI(
 				function(done, A) {
 					var form = A.Node.create(getFormTemplate());
@@ -70,7 +70,7 @@ describe('Liferay.Search.SearchBar', function() {
 		);
 
 		it(
-			'should be true with keywords',
+			'is true with keywords',
 			withAlloyUI(
 				function(done, A) {
 					var form = A.Node.create(getFormTemplate('example'));
@@ -86,7 +86,7 @@ describe('Liferay.Search.SearchBar', function() {
 		);
 
 		it(
-			'should be true if no keyword but keyword-free search enabled',
+			'is true if no keyword but keyword-free search enabled',
 			withAlloyUI(
 				function(done, A) {
 					var form = A.Node.create(getFormTemplate('', true));
@@ -107,7 +107,7 @@ describe('Liferay.Search.SearchBar', function() {
 
 	describe.skip('.updateQueryString', function() {
 		it(
-			'should remove p_p_id, p_p_state, start and add query keyword',
+			'removes p_p_id, p_p_state, start and add query keyword',
 			withAlloyUI(
 				function(done, A) {
 					var form = A.Node.create(getFormTemplate('example'));

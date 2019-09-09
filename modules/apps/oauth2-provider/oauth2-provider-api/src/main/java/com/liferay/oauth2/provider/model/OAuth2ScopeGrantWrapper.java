@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link OAuth2ScopeGrant}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OAuth2ScopeGrant
  * @generated
  */
-@ProviderType
 public class OAuth2ScopeGrantWrapper
 	extends BaseModelWrapper<OAuth2ScopeGrant>
 	implements OAuth2ScopeGrant, ModelWrapper<OAuth2ScopeGrant> {
@@ -189,6 +186,11 @@ public class OAuth2ScopeGrantWrapper
 		return model.getScopeAliasesList();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a o auth2 scope grant model instance should use the <code>OAuth2ScopeGrant</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link BrowserTracker}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see BrowserTracker
  * @generated
  */
-@ProviderType
 public class BrowserTrackerWrapper
 	extends BaseModelWrapper<BrowserTracker>
 	implements BrowserTracker, ModelWrapper<BrowserTracker> {
@@ -155,6 +152,11 @@ public class BrowserTrackerWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a browser tracker model instance should use the <code>BrowserTracker</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

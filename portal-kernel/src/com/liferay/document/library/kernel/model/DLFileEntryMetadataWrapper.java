@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DLFileEntryMetadata}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileEntryMetadata
  * @generated
  */
-@ProviderType
 public class DLFileEntryMetadataWrapper
 	extends BaseModelWrapper<DLFileEntryMetadata>
 	implements DLFileEntryMetadata, ModelWrapper<DLFileEntryMetadata> {
@@ -204,6 +201,11 @@ public class DLFileEntryMetadataWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a document library file entry metadata model instance should use the <code>DLFileEntryMetadata</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

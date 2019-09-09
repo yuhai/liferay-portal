@@ -16,8 +16,6 @@ package com.liferay.oauth2.provider.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link OAuth2AuthorizationService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OAuth2AuthorizationService
  * @generated
  */
-@ProviderType
 public class OAuth2AuthorizationServiceWrapper
 	implements OAuth2AuthorizationService,
 			   ServiceWrapper<OAuth2AuthorizationService> {
@@ -36,6 +33,11 @@ public class OAuth2AuthorizationServiceWrapper
 		_oAuth2AuthorizationService = oAuth2AuthorizationService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link OAuth2AuthorizationServiceUtil} to access the o auth2 authorization remote service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public java.util.List<com.liferay.oauth2.provider.model.OAuth2Authorization>
 			getApplicationOAuth2Authorizations(

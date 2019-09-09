@@ -40,7 +40,7 @@ public interface DDMFormInstanceRecordModel
 	extends BaseModel<DDMFormInstanceRecord>, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddm form instance record model instance should use the {@link DDMFormInstanceRecord} interface instead.

@@ -63,7 +63,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MDRRuleGroupLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MDRRuleGroupLocalServiceUtil} to access the mdr rule group local service. Add custom service methods to <code>com.liferay.mobile.device.rules.service.impl.MDRRuleGroupLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

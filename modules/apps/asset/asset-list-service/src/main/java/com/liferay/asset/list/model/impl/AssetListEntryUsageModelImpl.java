@@ -48,8 +48,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the AssetListEntryUsage service. Represents a row in the &quot;AssetListEntryUsage&quot; database table, with each column mapped to a property of this class.
  *
@@ -61,12 +59,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetListEntryUsageImpl
  * @generated
  */
-@ProviderType
 public class AssetListEntryUsageModelImpl
 	extends BaseModelImpl<AssetListEntryUsage>
 	implements AssetListEntryUsageModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset list entry usage model instance should use the <code>AssetListEntryUsage</code> interface instead.

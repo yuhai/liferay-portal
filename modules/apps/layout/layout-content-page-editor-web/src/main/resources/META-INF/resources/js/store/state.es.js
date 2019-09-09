@@ -358,13 +358,6 @@ const INITIAL_STATE = {
 	).value([]),
 
 	/**
-	 * When true, it indicates that configuration is enabled
-	 * @review
-	 * @type {boolean}
-	 */
-	enableConfiguration: Config.bool().value(false),
-
-	/**
 	 * Fragment id to indicate if that fragment editor has to be cleared.
 	 * @default ''
 	 * @review
@@ -474,12 +467,12 @@ const INITIAL_STATE = {
 	getInfoDisplayContributorsURL: Config.string().value(''),
 
 	/**
-	 * Get mapped content url
+	 * Get page content url
 	 * @default undefined
 	 * @review
 	 * @type {string}
 	 */
-	getMappedContentsURL: Config.string().value(''),
+	getPageContentsURL: Config.string().value(''),
 
 	/**
 	 * Id of the last element that was hovered
@@ -558,11 +551,19 @@ const INITIAL_STATE = {
 	mappedAssetEntries: Config.array().value([]),
 
 	/**
+	 * URL for getting the list of mapping fields
+	 * @default ''
+	 * @review
+	 * @type {string}
+	 */
+	mappingFieldsURL: Config.string().value(''),
+
+	/**
 	 * @default []
 	 * @review
 	 * @type {Array<{name: string, status: { label: string, style: string }, title: string, usagesCount: number}>}
 	 */
-	mappedContents: Config.arrayOf(
+	pageContents: Config.arrayOf(
 		Config.shapeOf({
 			name: Config.string(),
 			status: Config.shapeOf({
@@ -573,14 +574,6 @@ const INITIAL_STATE = {
 			usagesCount: Config.number()
 		})
 	).value([]),
-
-	/**
-	 * URL for getting the list of mapping fields
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	mappingFieldsURL: Config.string().value(''),
 
 	/**
 	 * Portlet namespace needed for prefixing form inputs
@@ -658,54 +651,6 @@ const INITIAL_STATE = {
 	 * @type {string}
 	 */
 	segmentsExperienceId: Config.string().value(),
-
-	/**
-	 * EditableId of the field that is being mapped
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	selectMappingDialogEditableId: Config.string().value(''),
-
-	/**
-	 * Editable type of the field that is being mapped
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	selectMappingDialogEditableType: Config.string().value(''),
-
-	/**
-	 * FragmentEntryLinkId of the field that is being mapped
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	selectMappingDialogFragmentEntryLinkId: Config.string().value(''),
-
-	/**
-	 * Mapped field ID of the field that is being mapped
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	selectMappingDialogMappedFieldId: Config.string().value(''),
-
-	/**
-	 * Flag indicating if the SelectMappingDialog should be shown
-	 * @default false
-	 * @review
-	 * @type {boolean}
-	 */
-	selectMappingDialogVisible: Config.bool().value(false),
-
-	/**
-	 * Flag indicating if the SelectMappingTypeDialog should be shown
-	 * @default false
-	 * @review
-	 * @type {boolean}
-	 */
-	selectMappingTypeDialogVisible: Config.bool().value(false),
 
 	/**
 	 * Selected items
@@ -806,14 +751,6 @@ const INITIAL_STATE = {
 	 * @type {string}
 	 */
 	updateLayoutPageTemplateDataURL: Config.string().value(''),
-
-	/**
-	 * URL for updating the asset type associated to a template.
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	updateLayoutPageTemplateEntryAssetTypeURL: Config.string().value(''),
 
 	/**
 	 * Available widgets that can be dragged inside the existing Page Template,

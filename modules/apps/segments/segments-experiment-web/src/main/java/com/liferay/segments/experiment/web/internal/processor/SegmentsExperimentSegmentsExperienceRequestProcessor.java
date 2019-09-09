@@ -38,8 +38,10 @@ import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.segments.service.SegmentsExperimentLocalService;
 import com.liferay.segments.service.SegmentsExperimentRelLocalService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import javax.servlet.http.Cookie;
@@ -77,7 +79,7 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 		}
 
 		long segmentsExperienceId = _getSelectedSegmentsExperienceId(
-			httpServletRequest, themeDisplay.isSignedIn());
+			httpServletRequest, themeDisplay);
 
 		if (segmentsExperienceId != -1) {
 			return new long[] {segmentsExperienceId};
@@ -90,7 +92,7 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 			SegmentsExperiment segmentsExperiment =
 				_segmentsExperimentLocalService.fetchSegmentsExperiment(
 					segmentsExperienceId, classNameId, classPK,
-					new int[] {SegmentsExperimentConstants.STATUS_RUNNING});
+					SegmentsExperimentConstants.Status.getSplitStatusValues());
 
 			if (segmentsExperiment != null) {
 				httpServletRequest.setAttribute(
@@ -112,13 +114,17 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 
 		_unsetCookie(httpServletRequest, httpServletResponse);
 
-		long[] allSegmentsExperienceIds = ArrayUtil.append(
-			segmentsExperienceIds, SegmentsExperienceConstants.ID_DEFAULT);
+		LongStream stream = Arrays.stream(segmentsExperienceIds);
+
+		segmentsExperienceId = stream.findFirst(
+		).orElse(
+			SegmentsExperienceConstants.ID_DEFAULT
+		);
 
 		List<SegmentsExperiment> segmentsExperiments =
 			_segmentsExperimentLocalService.
 				getSegmentsExperienceSegmentsExperiments(
-					allSegmentsExperienceIds, classNameId, classPK,
+					new long[] {segmentsExperienceId}, classNameId, classPK,
 					new int[] {SegmentsExperimentConstants.STATUS_RUNNING}, 0,
 					1);
 
@@ -126,7 +132,7 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"No experiment running for the user experiences " +
-						StringUtil.merge(allSegmentsExperienceIds));
+						StringUtil.merge(segmentsExperienceIds));
 			}
 
 			return segmentsExperienceIds;
@@ -203,6 +209,12 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 			StringPool.BLANK
 		);
 
+		return _getSegmentsExperienceId(groupId, segmentsExperienceKey);
+	}
+
+	private long _getSegmentsExperienceId(
+		long groupId, String segmentsExperienceKey) {
+
 		if (Objects.equals(
 				segmentsExperienceKey,
 				SegmentsExperienceConstants.KEY_DEFAULT)) {
@@ -238,29 +250,36 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessor
 	}
 
 	private long _getSelectedSegmentsExperienceId(
-		HttpServletRequest httpServletRequest, boolean signedIn) {
+		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
 
-		if (!signedIn) {
+		if (!themeDisplay.isSignedIn()) {
 			return -1;
 		}
 
 		long selectedSegmentsExperienceId = ParamUtil.getLong(
 			httpServletRequest, "segmentsExperienceId", -1);
 
-		if ((selectedSegmentsExperienceId != -1) &&
-			(selectedSegmentsExperienceId !=
-				SegmentsExperienceConstants.ID_DEFAULT)) {
+		if (selectedSegmentsExperienceId != -1) {
+			if (selectedSegmentsExperienceId ==
+					SegmentsExperienceConstants.ID_DEFAULT) {
+
+				return selectedSegmentsExperienceId;
+			}
 
 			SegmentsExperience segmentsExperience =
 				_segmentsExperienceLocalService.fetchSegmentsExperience(
 					selectedSegmentsExperienceId);
 
-			if (segmentsExperience == null) {
-				return -1;
+			if (segmentsExperience != null) {
+				return selectedSegmentsExperienceId;
 			}
 		}
 
-		return selectedSegmentsExperienceId;
+		String selectedSegmentsExperienceKey = ParamUtil.getString(
+			httpServletRequest, "segmentsExperienceKey");
+
+		return _getSegmentsExperienceId(
+			themeDisplay.getScopeGroupId(), selectedSegmentsExperienceKey);
 	}
 
 	private void _setCookie(

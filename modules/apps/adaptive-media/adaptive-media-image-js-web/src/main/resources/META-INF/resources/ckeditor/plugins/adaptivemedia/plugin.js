@@ -29,13 +29,7 @@
 	var TPL_SOURCE_TAG = '<source srcset="{srcset}" media="{media}">';
 
 	CKEDITOR.plugins.add('adaptivemedia', {
-		init: function(editor) {
-			var instance = this;
-
-			instance._bindEvent(editor);
-		},
-
-		_bindEvent: function(editor) {
+		_bindEvent(editor) {
 			var instance = this;
 
 			editor.on('beforeCommandExec', function(event) {
@@ -59,11 +53,7 @@
 			});
 		},
 
-		_getImgElement: function(
-			imageSrc,
-			selectedItem,
-			fileEntryAttributeName
-		) {
+		_getImgElement(imageSrc, selectedItem, fileEntryAttributeName) {
 			var imgEl = CKEDITOR.dom.element.createFromHtml('<img>');
 
 			if (
@@ -84,7 +74,7 @@
 			return imgEl;
 		},
 
-		_getPictureElement: function(selectedItem, fileEntryAttributeName) {
+		_getPictureElement(selectedItem, fileEntryAttributeName) {
 			var pictureEl;
 
 			try {
@@ -120,9 +110,9 @@
 
 				var pictureHtml = Lang.sub(TPL_PICTURE_TAG, {
 					defaultSrc: itemValue.defaultSource,
-					fileEntryAttributeName: fileEntryAttributeName,
+					fileEntryAttributeName,
 					fileEntryId: itemValue.fileEntryId,
-					sources: sources
+					sources
 				});
 
 				pictureEl = CKEDITOR.dom.element.createFromHtml(pictureHtml);
@@ -131,7 +121,7 @@
 			return pictureEl;
 		},
 
-		_isEmptySelection: function(editor) {
+		_isEmptySelection(editor) {
 			var selection = editor.getSelection();
 
 			var ranges = selection.getRanges();
@@ -142,7 +132,7 @@
 			);
 		},
 
-		_onSelectedImageChange: function(editor, imageSrc, selectedItem) {
+		_onSelectedImageChange(editor, imageSrc, selectedItem) {
 			var instance = this;
 
 			var el;
@@ -191,7 +181,7 @@
 					editor.fire('editorInteraction', {
 						nativeEvent: {},
 						selectionData: {
-							element: element,
+							element,
 							region: element.getClientRect()
 						}
 					});
@@ -199,6 +189,12 @@
 					editor.execCommand('enter');
 				}
 			}
+		},
+
+		init(editor) {
+			var instance = this;
+
+			instance._bindEvent(editor);
 		}
 	});
 })();

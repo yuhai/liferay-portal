@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AnnouncementsFlagPersistence
 	extends BasePersistence<AnnouncementsFlag> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AnnouncementsFlagUtil} to access the announcements flag persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

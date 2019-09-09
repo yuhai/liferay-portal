@@ -32,7 +32,10 @@
 				"errorMessage": {
 					"en_US": "You must check this box to continue."
 				},
-				"expression": "Boolean2282"
+				"expression": {
+					"name": "name",
+					"value": "Boolean2282"
+				}
 			},
 			"visibilityExpression": "true"
 		},

@@ -48,7 +48,7 @@ public abstract class AssetCategoryPropertyServiceBaseImpl
 	implements AssetCategoryPropertyService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetCategoryPropertyService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.category.property.service.AssetCategoryPropertyServiceUtil</code>.

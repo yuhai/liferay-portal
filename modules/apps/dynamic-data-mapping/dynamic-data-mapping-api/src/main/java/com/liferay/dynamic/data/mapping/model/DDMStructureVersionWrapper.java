@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructureVersion}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMStructureVersion
  * @generated
  */
-@ProviderType
 public class DDMStructureVersionWrapper
 	extends BaseModelWrapper<DDMStructureVersion>
 	implements DDMStructureVersion, ModelWrapper<DDMStructureVersion> {
@@ -646,6 +643,11 @@ public class DDMStructureVersionWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm structure version model instance should use the <code>DDMStructureVersion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

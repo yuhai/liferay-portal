@@ -45,7 +45,7 @@ public abstract class OrgLaborServiceBaseImpl
 	extends BaseServiceImpl
 	implements OrgLaborService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>OrgLaborService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.OrgLaborServiceUtil</code>.

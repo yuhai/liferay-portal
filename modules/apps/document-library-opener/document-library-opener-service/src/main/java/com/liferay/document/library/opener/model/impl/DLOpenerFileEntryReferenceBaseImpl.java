@@ -17,8 +17,6 @@ package com.liferay.document.library.opener.model.impl;
 import com.liferay.document.library.opener.model.DLOpenerFileEntryReference;
 import com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the DLOpenerFileEntryReference service. Represents a row in the &quot;DLOpenerFileEntryReference&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,12 +29,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLOpenerFileEntryReference
  * @generated
  */
-@ProviderType
 public abstract class DLOpenerFileEntryReferenceBaseImpl
 	extends DLOpenerFileEntryReferenceModelImpl
 	implements DLOpenerFileEntryReference {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a dl opener file entry reference model instance should use the <code>DLOpenerFileEntryReference</code> interface instead.

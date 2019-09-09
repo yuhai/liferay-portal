@@ -16,8 +16,6 @@ package com.liferay.knowledge.base.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link KBArticleLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KBArticleLocalService
  * @generated
  */
-@ProviderType
 public class KBArticleLocalServiceWrapper
 	implements KBArticleLocalService, ServiceWrapper<KBArticleLocalService> {
 
@@ -35,6 +32,11 @@ public class KBArticleLocalServiceWrapper
 		_kbArticleLocalService = kbArticleLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link KBArticleLocalServiceUtil} to access the kb article local service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBArticleLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry addAttachment(
 			long userId, long resourcePrimKey, String fileName,

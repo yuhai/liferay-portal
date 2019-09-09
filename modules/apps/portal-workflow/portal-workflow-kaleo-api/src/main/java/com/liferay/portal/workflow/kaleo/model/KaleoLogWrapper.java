@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KaleoLog}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoLog
  * @generated
  */
-@ProviderType
 public class KaleoLogWrapper
 	extends BaseModelWrapper<KaleoLog>
 	implements KaleoLog, ModelWrapper<KaleoLog> {
@@ -623,6 +620,11 @@ public class KaleoLogWrapper
 		return model.isTerminalKaleoNode();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kaleo log model instance should use the <code>KaleoLog</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

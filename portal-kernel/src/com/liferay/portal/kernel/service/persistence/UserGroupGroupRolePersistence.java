@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface UserGroupGroupRolePersistence
 	extends BasePersistence<UserGroupGroupRole> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link UserGroupGroupRoleUtil} to access the user group group role persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

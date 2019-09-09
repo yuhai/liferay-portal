@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CTPreferencesPersistence
 	extends BasePersistence<CTPreferences> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link CTPreferencesUtil} to access the ct preferences persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

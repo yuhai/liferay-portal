@@ -43,8 +43,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the DDMStorageLink service. Represents a row in the &quot;DDMStorageLink&quot; database table, with each column mapped to a property of this class.
  *
@@ -56,11 +54,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMStorageLinkImpl
  * @generated
  */
-@ProviderType
 public class DDMStorageLinkModelImpl
 	extends BaseModelImpl<DDMStorageLink> implements DDMStorageLinkModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a ddm storage link model instance should use the <code>DDMStorageLink</code> interface instead.

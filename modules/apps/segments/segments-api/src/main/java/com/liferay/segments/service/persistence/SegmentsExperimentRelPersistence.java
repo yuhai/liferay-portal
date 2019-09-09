@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsExperimentRelPersistence
 	extends BasePersistence<SegmentsExperimentRel> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentRelUtil} to access the segments experiment rel persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

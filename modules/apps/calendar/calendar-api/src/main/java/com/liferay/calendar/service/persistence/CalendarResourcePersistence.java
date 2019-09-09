@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CalendarResourcePersistence
 	extends BasePersistence<CalendarResource> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link CalendarResourceUtil} to access the calendar resource persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

@@ -84,12 +84,6 @@ public class AddLayoutPageTemplateEntryMVCActionCommand
 					layoutPageTemplateCollectionId, name, type,
 					WorkflowConstants.STATUS_DRAFT, serviceContext);
 
-			if (SessionErrors.contains(
-					actionRequest, "layoutPageTemplateEntryNameInvalid")) {
-
-				addSuccessMessage(actionRequest, actionResponse);
-			}
-
 			JSONObject jsonObject = JSONUtil.put(
 				"redirectURL",
 				getRedirectURL(actionRequest, layoutPageTemplateEntry));
@@ -97,12 +91,7 @@ public class AddLayoutPageTemplateEntryMVCActionCommand
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse, jsonObject);
 
-			if (type ==
-					LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) {
-
-				MultiSessionMessages.add(actionRequest, "displayPageAdded");
-			}
-			else if (type == LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) {
+			if (type == LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) {
 				MultiSessionMessages.add(
 					actionRequest, "layoutPageTemplateAdded");
 			}

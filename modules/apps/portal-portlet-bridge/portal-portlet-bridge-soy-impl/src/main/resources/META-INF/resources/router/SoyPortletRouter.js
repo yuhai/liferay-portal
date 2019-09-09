@@ -15,7 +15,6 @@
 import {openToast} from 'frontend-js-web';
 import {RequestScreen, utils} from 'senna';
 import {toRegex} from 'metal-path-parser';
-import Component from 'metal-component';
 import dom from 'metal-dom';
 import Router from 'metal-router';
 import State from 'metal-state';
@@ -154,7 +153,7 @@ class SoyPortletRouter extends State {
 						loadedState.javaScriptLoaderModule,
 						module => {
 							super.maybeRedirectRouter();
-							let component = module.default;
+							const component = module.default;
 
 							component.RENDERER.setInjectedData(
 								loadedState._INJECTED_DATA_
@@ -510,7 +509,7 @@ class SoyPortletRouter extends State {
 			openToast({
 				message,
 				title,
-				type: type
+				type
 			});
 		}
 	}
@@ -580,13 +579,6 @@ SoyPortletRouter.STATE = {
 	/**
 	 * @instance
 	 * @memberof SoyPortletRouter
-	 * @type {Array<string>}
-	 */
-	friendlyURLRoutes: {},
-
-	/**
-	 * @instance
-	 * @memberof SoyPortletRouter
 	 * @type {string}
 	 */
 	friendlyURLMapping: {},
@@ -597,6 +589,13 @@ SoyPortletRouter.STATE = {
 	 * @type {string}
 	 */
 	friendlyURLPrefix: {},
+
+	/**
+	 * @instance
+	 * @memberof SoyPortletRouter
+	 * @type {Array<string>}
+	 */
+	friendlyURLRoutes: {},
 
 	/**
 	 * @instance

@@ -52,8 +52,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the expando row local service.
  *
@@ -65,12 +63,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portlet.expando.service.impl.ExpandoRowLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class ExpandoRowLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements ExpandoRowLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ExpandoRowLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.expando.kernel.service.ExpandoRowLocalServiceUtil</code>.

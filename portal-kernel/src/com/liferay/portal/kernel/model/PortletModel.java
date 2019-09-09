@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PortletModel
 	extends BaseModel<Portlet>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a portlet model instance should use the {@link Portlet} interface instead.

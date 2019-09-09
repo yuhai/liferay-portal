@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataDefinitionFieldLink
 	extends DEDataDefinitionFieldLinkModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.data.engine.model.impl.DEDataDefinitionFieldLinkImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

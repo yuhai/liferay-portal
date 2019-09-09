@@ -16,8 +16,6 @@ package com.liferay.document.library.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DLFileShortcutService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFileShortcutService
  * @generated
  */
-@ProviderType
 public class DLFileShortcutServiceWrapper
 	implements DLFileShortcutService, ServiceWrapper<DLFileShortcutService> {
 
@@ -35,6 +32,11 @@ public class DLFileShortcutServiceWrapper
 		_dlFileShortcutService = dlFileShortcutService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DLFileShortcutServiceUtil} to access the document library file shortcut remote service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileShortcutServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.document.library.kernel.model.DLFileShortcut
 			addFileShortcut(

@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetListEntryAssetEntryRelLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetListEntryAssetEntryRelLocalServiceUtil} to access the asset list entry asset entry rel local service. Add custom service methods to <code>com.liferay.asset.list.service.impl.AssetListEntryAssetEntryRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

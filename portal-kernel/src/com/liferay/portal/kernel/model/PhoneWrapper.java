@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Phone}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Phone
  * @generated
  */
-@ProviderType
 public class PhoneWrapper
 	extends BaseModelWrapper<Phone> implements Phone, ModelWrapper<Phone> {
 
@@ -336,6 +333,11 @@ public class PhoneWrapper
 		return model.isPrimary();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a phone model instance should use the <code>Phone</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

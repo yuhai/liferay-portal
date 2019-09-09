@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMTemplateVersion}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMTemplateVersion
  * @generated
  */
-@ProviderType
 public class DDMTemplateVersionWrapper
 	extends BaseModelWrapper<DDMTemplateVersion>
 	implements DDMTemplateVersion, ModelWrapper<DDMTemplateVersion> {
@@ -644,6 +641,11 @@ public class DDMTemplateVersionWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm template version model instance should use the <code>DDMTemplateVersion</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

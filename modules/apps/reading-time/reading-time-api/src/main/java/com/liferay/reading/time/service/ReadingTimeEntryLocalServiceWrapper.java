@@ -16,8 +16,6 @@ package com.liferay.reading.time.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ReadingTimeEntryLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ReadingTimeEntryLocalService
  * @generated
  */
-@ProviderType
 public class ReadingTimeEntryLocalServiceWrapper
 	implements ReadingTimeEntryLocalService,
 			   ServiceWrapper<ReadingTimeEntryLocalService> {
@@ -36,6 +33,11 @@ public class ReadingTimeEntryLocalServiceWrapper
 		_readingTimeEntryLocalService = readingTimeEntryLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ReadingTimeEntryLocalServiceUtil} to access the reading time entry local service. Add custom service methods to <code>com.liferay.reading.time.service.impl.ReadingTimeEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.reading.time.model.ReadingTimeEntry addReadingTimeEntry(
 		com.liferay.portal.kernel.model.GroupedModel groupedModel,

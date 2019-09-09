@@ -55,9 +55,9 @@ export default withRouter(({match: {url}}) => {
 					activeClassName="active"
 					className="nav-link"
 					onClick={blur}
-					to={`${url}/deployments`}
+					to={`${url}/apps`}
 				>
-					{Liferay.Language.get('deployments')}
+					{Liferay.Language.get('apps')}
 				</NavLink>
 			</Item>
 		</ClayNavigationBar>

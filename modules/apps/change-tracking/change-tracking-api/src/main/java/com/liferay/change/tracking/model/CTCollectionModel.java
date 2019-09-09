@@ -41,7 +41,7 @@ public interface CTCollectionModel
 	extends AuditedModel, BaseModel<CTCollection>, MVCCModel, ShardedModel,
 			WorkflowedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ct collection model instance should use the {@link CTCollection} interface instead.

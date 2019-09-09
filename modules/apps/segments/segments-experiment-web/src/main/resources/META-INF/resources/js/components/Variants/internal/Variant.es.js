@@ -31,7 +31,8 @@ function Variant({
 	onVariantEdition,
 	segmentsExperienceId,
 	split,
-	variantId
+	variantId,
+	winner
 }) {
 	const [openDropdown, setOpenDropdown] = useState(false);
 	const {editVariantLayoutURL} = useContext(SegmentsExperimentsContext);
@@ -46,11 +47,19 @@ function Variant({
 						displayType="unstyled"
 						onClick={_handleVariantNavigation}
 					>
+						{winner && (
+							<ClayIcon
+								className="mr-1 text-success"
+								symbol="check-circle-full"
+							/>
+						)}
+
 						{control ? (
 							<>
 								<span className="mr-2">
 									{Liferay.Language.get('variant-control')}
 								</span>
+
 								<ClayIcon symbol="lock" />
 							</>
 						) : (
@@ -148,7 +157,8 @@ Variant.propTypes = {
 	onVariantEdition: PropTypes.func.isRequired,
 	segmentsExperienceId: PropTypes.string.isRequired,
 	split: PropTypes.number,
-	variantId: PropTypes.string.isRequired
+	variantId: PropTypes.string.isRequired,
+	winner: PropTypes.bool
 };
 
 export default Variant;

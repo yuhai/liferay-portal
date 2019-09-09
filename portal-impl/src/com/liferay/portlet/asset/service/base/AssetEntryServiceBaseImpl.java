@@ -58,7 +58,7 @@ public abstract class AssetEntryServiceBaseImpl
 	extends BaseServiceImpl
 	implements AssetEntryService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.kernel.service.AssetEntryServiceUtil</code>.

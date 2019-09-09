@@ -47,7 +47,7 @@ public abstract class FragmentCollectionServiceBaseImpl
 	extends BaseServiceImpl
 	implements FragmentCollectionService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>FragmentCollectionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.fragment.service.FragmentCollectionServiceUtil</code>.

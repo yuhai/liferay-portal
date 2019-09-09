@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MBMessage}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBMessage
  * @generated
  */
-@ProviderType
 public class MBMessageWrapper
 	extends BaseModelWrapper<MBMessage>
 	implements MBMessage, ModelWrapper<MBMessage> {
@@ -826,6 +823,11 @@ public class MBMessageWrapper
 		return model.isScheduled();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a message-boards message model instance should use the <code>MBMessage</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

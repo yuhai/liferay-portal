@@ -203,6 +203,7 @@ describe('RuleBuilder', () => {
 
 		component = new RuleBuilder(baseConfig);
 	});
+
 	afterEach(() => {
 		const addbutton = document.querySelector('#addFieldButton');
 
@@ -212,6 +213,7 @@ describe('RuleBuilder', () => {
 
 		dom.exitDocument(addbutton);
 	});
+
 	it('renders the list of rules when mode is set to view', () => {
 		component.setState({mode: 'view'});
 

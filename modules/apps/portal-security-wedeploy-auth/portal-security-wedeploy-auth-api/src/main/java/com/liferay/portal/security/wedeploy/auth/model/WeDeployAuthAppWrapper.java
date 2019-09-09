@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link WeDeployAuthApp}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WeDeployAuthApp
  * @generated
  */
-@ProviderType
 public class WeDeployAuthAppWrapper
 	extends BaseModelWrapper<WeDeployAuthApp>
 	implements WeDeployAuthApp, ModelWrapper<WeDeployAuthApp> {
@@ -242,6 +239,11 @@ public class WeDeployAuthAppWrapper
 		return model.getWeDeployAuthAppId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a we deploy auth app model instance should use the <code>WeDeployAuthApp</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

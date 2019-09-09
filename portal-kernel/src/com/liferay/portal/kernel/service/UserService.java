@@ -54,7 +54,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface UserService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link UserServiceUtil} to access the user remote service. Add custom service methods to <code>com.liferay.portal.service.impl.UserServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

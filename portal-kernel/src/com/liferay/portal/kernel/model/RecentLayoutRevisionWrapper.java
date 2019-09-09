@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link RecentLayoutRevision}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see RecentLayoutRevision
  * @generated
  */
-@ProviderType
 public class RecentLayoutRevisionWrapper
 	extends BaseModelWrapper<RecentLayoutRevision>
 	implements RecentLayoutRevision, ModelWrapper<RecentLayoutRevision> {
@@ -209,6 +206,11 @@ public class RecentLayoutRevisionWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a recent layout revision model instance should use the <code>RecentLayoutRevision</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

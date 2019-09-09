@@ -39,7 +39,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTimerModel
 	extends BaseModel<KaleoTimer>, GroupedModel, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kaleo timer model instance should use the {@link KaleoTimer} interface instead.

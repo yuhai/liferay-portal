@@ -24,6 +24,8 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldValue
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -40,6 +42,7 @@ import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidator;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
@@ -100,34 +103,56 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 	}
 
 	protected boolean evaluateValidationExpression(
-			String expressionString, String ddmFormFieldName, String dataType,
-			String valueString)
+			String dataType, String ddmFormFieldName,
+			DDMFormFieldValidation ddmFormFieldValidation, Locale locale,
+			Value value)
 		throws DDMFormValuesValidationException {
 
-		if (Validator.isNull(valueString)) {
+		if ((value == null) || Validator.isNull(value.getString(locale))) {
 			return true;
 		}
 
 		try {
-			DDMExpression<Boolean> ddmExpression =
-				_ddmExpressionFactory.createBooleanDDMExpression(
-					expressionString);
+			DDMExpression<Boolean> ddmExpression = null;
+
+			DDMFormFieldValidationExpression ddmFormFieldValidationExpression =
+				ddmFormFieldValidation.getDDMFormFieldValidationExpression();
+
+			if (ddmFormFieldValidation.getParameterLocalizedValue() != null) {
+				LocalizedValue parameterLocalizedValue =
+					ddmFormFieldValidation.getParameterLocalizedValue();
+
+				ddmExpression =
+					_ddmExpressionFactory.createBooleanDDMExpression(
+						StringUtil.replace(
+							ddmFormFieldValidationExpression.getValue(),
+							"{parameter}",
+							parameterLocalizedValue.getString(locale)));
+			}
+			else {
+				ddmExpression =
+					_ddmExpressionFactory.createBooleanDDMExpression(
+						ddmFormFieldValidationExpression.getValue());
+			}
 
 			if (dataType.equals(FieldConstants.BOOLEAN)) {
 				ddmExpression.setBooleanVariableValue(
-					ddmFormFieldName, GetterUtil.getBoolean(valueString));
+					ddmFormFieldName,
+					GetterUtil.getBoolean(value.getString(locale)));
 			}
 			else if (dataType.equals(FieldConstants.DOUBLE)) {
 				ddmExpression.setDoubleVariableValue(
-					ddmFormFieldName, GetterUtil.getDouble(valueString));
+					ddmFormFieldName,
+					GetterUtil.getDouble(value.getString(locale)));
 			}
 			else if (dataType.equals(FieldConstants.INTEGER)) {
 				ddmExpression.setIntegerVariableValue(
-					ddmFormFieldName, GetterUtil.getInteger(valueString));
+					ddmFormFieldName,
+					GetterUtil.getInteger(value.getString(locale)));
 			}
 			else {
 				ddmExpression.setStringVariableValue(
-					ddmFormFieldName, valueString);
+					ddmFormFieldName, value.getString(locale));
 			}
 
 			return ddmExpression.evaluate();
@@ -287,16 +312,10 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 			return;
 		}
 
-		String validationExpression = ddmFormFieldValidation.getExpression();
-
-		if (Validator.isNull(validationExpression)) {
-			return;
-		}
-
 		for (Locale locale : value.getAvailableLocales()) {
 			boolean valid = evaluateValidationExpression(
-				validationExpression, ddmFormField.getName(),
-				ddmFormField.getDataType(), value.getString(locale));
+				ddmFormField.getDataType(), ddmFormField.getName(),
+				ddmFormFieldValidation, locale, value);
 
 			if (!valid) {
 				throw new MustSetValidValue(ddmFormField.getName());

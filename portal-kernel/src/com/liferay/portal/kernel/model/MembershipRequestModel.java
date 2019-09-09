@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MembershipRequestModel
 	extends BaseModel<MembershipRequest>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a membership request model instance should use the {@link MembershipRequest} interface instead.

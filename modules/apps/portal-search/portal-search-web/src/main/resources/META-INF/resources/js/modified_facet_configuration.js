@@ -24,7 +24,7 @@ AUI.add(
 		};
 
 		A.mix(ModifiedFacetConfiguration.prototype, {
-			_onSubmit: function(event) {
+			_onSubmit(event) {
 				var instance = this;
 
 				event.preventDefault();
@@ -43,8 +43,8 @@ AUI.add(
 					var range = item.one('.range-input').val();
 
 					ranges.push({
-						label: label,
-						range: range
+						label,
+						range
 					});
 				});
 

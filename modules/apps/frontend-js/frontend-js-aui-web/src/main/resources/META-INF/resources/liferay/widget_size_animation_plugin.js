@@ -47,12 +47,55 @@ AUI.add(
 
 			EXTENDS: A.Plugin.Base,
 
-			NAME: NAME,
+			NAME,
 
 			NS: NAME,
 
 			prototype: {
-				initializer: function(config) {
+				_alignWidget() {
+					var instance = this;
+
+					if (instance.get('align')) {
+						instance.get(STR_HOST).align();
+					}
+				},
+
+				_animWidgetSize(size) {
+					var instance = this;
+
+					var host = instance.get(STR_HOST);
+
+					instance._anim.stop();
+
+					var attrs = {
+						height: size.height,
+						width: size.width
+					};
+
+					if (!instance.get('preventTransition')) {
+						instance._anim.set('to', attrs);
+
+						instance._anim.run();
+					} else {
+						instance.fire(STR_START);
+
+						host.setAttrs(attrs);
+
+						instance._alignWidget();
+
+						instance.fire(STR_END);
+					}
+				},
+
+				destructor() {
+					var instance = this;
+
+					instance.get(STR_HOST).removeAttr(STR_SIZE);
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
 					var instance = this;
 
 					var host = instance.get(STR_HOST);
@@ -84,49 +127,6 @@ AUI.add(
 					];
 
 					instance._eventHandles = eventHandles;
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					instance.get(STR_HOST).removeAttr(STR_SIZE);
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_alignWidget: function() {
-					var instance = this;
-
-					if (instance.get('align')) {
-						instance.get(STR_HOST).align();
-					}
-				},
-
-				_animWidgetSize: function(size) {
-					var instance = this;
-
-					var host = instance.get(STR_HOST);
-
-					instance._anim.stop();
-
-					var attrs = {
-						height: size.height,
-						width: size.width
-					};
-
-					if (!instance.get('preventTransition')) {
-						instance._anim.set('to', attrs);
-
-						instance._anim.run();
-					} else {
-						instance.fire(STR_START);
-
-						host.setAttrs(attrs);
-
-						instance._alignWidget();
-
-						instance.fire(STR_END);
-					}
 				}
 			}
 		});

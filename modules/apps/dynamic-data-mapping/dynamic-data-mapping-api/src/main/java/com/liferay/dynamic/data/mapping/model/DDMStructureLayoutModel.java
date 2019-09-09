@@ -46,7 +46,7 @@ public interface DDMStructureLayoutModel
 	extends BaseModel<DDMStructureLayout>, GroupedModel, LocalizedModel,
 			MVCCModel, ShardedModel, StagedAuditedModel, TypedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddm structure layout model instance should use the {@link DDMStructureLayout} interface instead.

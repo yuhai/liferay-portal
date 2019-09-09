@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface UserGroupModel
 	extends BaseModel<UserGroup>, MVCCModel, ShardedModel, StagedAuditedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a user group model instance should use the {@link UserGroup} interface instead.

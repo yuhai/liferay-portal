@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.segments.model.SegmentsExperiment;
 
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -47,7 +48,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface SegmentsExperimentService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentServiceUtil} to access the segments experiment remote service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperimentServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -98,12 +99,14 @@ public interface SegmentsExperimentService extends BaseService {
 	public List<SegmentsExperiment> getSegmentsExperiments(
 		long groupId, long classNameId, long classPK);
 
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, double confidenceLevel, int status)
+	public SegmentsExperiment runSegmentsExperiment(
+			long segmentsExperimentId, double confidenceLevel,
+			Map<Long, Double> segmentsExperienceIdSplitMap)
 		throws PortalException;
 
-	public SegmentsExperiment updateSegmentsExperiment(
-			long segmentsExperimentId, int status)
+	public SegmentsExperiment runSegmentsExperiment(
+			String segmentsExperimentKey, double confidenceLevel,
+			Map<String, Double> segmentsExperienceKeySplitMap)
 		throws PortalException;
 
 	public SegmentsExperiment updateSegmentsExperiment(
@@ -111,8 +114,22 @@ public interface SegmentsExperimentService extends BaseService {
 			String goal, String goalTarget)
 		throws PortalException;
 
-	public SegmentsExperiment updateSegmentsExperiment(
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, int status)
+		throws PortalException;
+
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			long segmentsExperimentId, long winnerSegmentsExperienceId,
+			int status)
+		throws PortalException;
+
+	public SegmentsExperiment updateSegmentsExperimentStatus(
 			String segmentsExperimentKey, int status)
+		throws PortalException;
+
+	public SegmentsExperiment updateSegmentsExperimentStatus(
+			String segmentsExperimentKey, String winnerSegmentsExperienceKey,
+			int status)
 		throws PortalException;
 
 }

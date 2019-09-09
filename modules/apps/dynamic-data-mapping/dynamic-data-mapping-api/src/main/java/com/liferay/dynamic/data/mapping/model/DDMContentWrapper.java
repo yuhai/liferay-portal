@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMContent}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMContent
  * @generated
  */
-@ProviderType
 public class DDMContentWrapper
 	extends BaseModelWrapper<DDMContent>
 	implements DDMContent, ModelWrapper<DDMContent> {
@@ -353,6 +350,11 @@ public class DDMContentWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm content model instance should use the <code>DDMContent</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

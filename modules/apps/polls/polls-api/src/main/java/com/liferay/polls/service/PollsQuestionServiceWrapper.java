@@ -16,8 +16,6 @@ package com.liferay.polls.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link PollsQuestionService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PollsQuestionService
  * @generated
  */
-@ProviderType
 public class PollsQuestionServiceWrapper
 	implements PollsQuestionService, ServiceWrapper<PollsQuestionService> {
 
@@ -35,6 +32,11 @@ public class PollsQuestionServiceWrapper
 		_pollsQuestionService = pollsQuestionService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PollsQuestionServiceUtil} to access the polls question remote service. Add custom service methods to <code>com.liferay.polls.service.impl.PollsQuestionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.polls.model.PollsQuestion addQuestion(
 			java.util.Map<java.util.Locale, String> titleMap,

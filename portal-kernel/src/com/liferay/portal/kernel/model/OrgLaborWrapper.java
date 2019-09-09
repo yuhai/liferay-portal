@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link OrgLabor}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see OrgLabor
  * @generated
  */
-@ProviderType
 public class OrgLaborWrapper
 	extends BaseModelWrapper<OrgLabor>
 	implements OrgLabor, ModelWrapper<OrgLabor> {
@@ -390,6 +387,11 @@ public class OrgLaborWrapper
 		return model.getWedOpen();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a org labor model instance should use the <code>OrgLabor</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

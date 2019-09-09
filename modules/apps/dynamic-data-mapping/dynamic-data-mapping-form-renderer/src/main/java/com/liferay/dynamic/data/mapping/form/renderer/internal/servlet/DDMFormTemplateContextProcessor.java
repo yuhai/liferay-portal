@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
@@ -352,7 +353,7 @@ public class DDMFormTemplateContextProcessor {
 	protected void setDDMFormFieldValidation(
 		JSONObject jsonObject, DDMFormField ddmFormField) {
 
-		if (jsonObject == null) {
+		if ((jsonObject == null) || !jsonObject.has("expression")) {
 			return;
 		}
 
@@ -362,8 +363,29 @@ public class DDMFormTemplateContextProcessor {
 		ddmFormFieldValidation.setErrorMessageLocalizedValue(
 			getLocalizedValue(jsonObject.getString("errorMessage")));
 
-		ddmFormFieldValidation.setExpression(
-			jsonObject.getString("expression"));
+		JSONObject expressionJSONObject = jsonObject.getJSONObject(
+			"expression");
+
+		if (expressionJSONObject != null) {
+			ddmFormFieldValidation.setDDMFormFieldValidationExpression(
+				new DDMFormFieldValidationExpression() {
+					{
+						setName(expressionJSONObject.getString("name"));
+						setValue(expressionJSONObject.getString("value"));
+					}
+				});
+		}
+		else {
+			ddmFormFieldValidation.setDDMFormFieldValidationExpression(
+				new DDMFormFieldValidationExpression() {
+					{
+						setValue(jsonObject.getString("expression"));
+					}
+				});
+		}
+
+		ddmFormFieldValidation.setParameterLocalizedValue(
+			getLocalizedValue(jsonObject.getString("parameter")));
 
 		ddmFormField.setDDMFormFieldValidation(ddmFormFieldValidation);
 	}

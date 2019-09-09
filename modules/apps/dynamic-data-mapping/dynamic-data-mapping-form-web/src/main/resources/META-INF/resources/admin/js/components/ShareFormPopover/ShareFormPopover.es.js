@@ -92,7 +92,7 @@ class ShareFormPopover extends Component {
 											}
 										>
 											<use
-												xlinkHref={`${spritemap}#check`}
+												xlink:href={`${spritemap}#check`}
 											/>
 										</svg>
 									</span>

@@ -46,7 +46,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -60,13 +59,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.document.library.opener.service.impl.DLOpenerFileEntryReferenceLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DLOpenerFileEntryReferenceLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLOpenerFileEntryReferenceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLocalServiceUtil</code>.

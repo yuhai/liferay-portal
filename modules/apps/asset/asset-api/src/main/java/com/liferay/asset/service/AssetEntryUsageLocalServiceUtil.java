@@ -14,7 +14,6 @@
 
 package com.liferay.asset.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
@@ -31,10 +30,9 @@ import org.osgi.util.tracker.ServiceTracker;
  * @see AssetEntryUsageLocalService
  * @generated
  */
-@ProviderType
 public class AssetEntryUsageLocalServiceUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.asset.service.impl.AssetEntryUsageLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -367,6 +365,10 @@ public class AssetEntryUsageLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
+	}
+
+	public static int getUniqueAssetEntryUsagesCount(long assetEntryId) {
+		return getService().getUniqueAssetEntryUsagesCount(assetEntryId);
 	}
 
 	public static boolean hasDefaultAssetEntryUsage(long assetEntryId) {

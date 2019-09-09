@@ -48,7 +48,7 @@ public abstract class ExportImportServiceBaseImpl
 	extends BaseServiceImpl
 	implements ExportImportService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ExportImportService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.exportimport.kernel.service.ExportImportServiceUtil</code>.

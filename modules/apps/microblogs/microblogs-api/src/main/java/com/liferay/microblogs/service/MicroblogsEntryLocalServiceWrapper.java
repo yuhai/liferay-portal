@@ -16,8 +16,6 @@ package com.liferay.microblogs.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link MicroblogsEntryLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MicroblogsEntryLocalService
  * @generated
  */
-@ProviderType
 public class MicroblogsEntryLocalServiceWrapper
 	implements MicroblogsEntryLocalService,
 			   ServiceWrapper<MicroblogsEntryLocalService> {
@@ -36,6 +33,11 @@ public class MicroblogsEntryLocalServiceWrapper
 		_microblogsEntryLocalService = microblogsEntryLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MicroblogsEntryLocalServiceUtil} to access the microblogs entry local service. Add custom service methods to <code>com.liferay.microblogs.service.impl.MicroblogsEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.microblogs.model.MicroblogsEntry addMicroblogsEntry(
 			long userId, long creatorClassNameId, long creatorClassPK,

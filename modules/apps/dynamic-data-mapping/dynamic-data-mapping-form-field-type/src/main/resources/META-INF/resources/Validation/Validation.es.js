@@ -40,9 +40,10 @@ class Validation extends Component {
 		return {
 			...state,
 			...parsedState,
-			dataType: state.validation
-				? state.validation.dataType
-				: state.dataType,
+			dataType:
+				state.validation && state.validation.dataType
+					? state.validation.dataType
+					: state.dataType,
 			localizationMode: editingLanguageId !== defaultLanguageId
 		};
 	}
@@ -102,7 +103,7 @@ class Validation extends Component {
 		const {expression} = value;
 		let parameterMessage = '';
 		let selectedValidation;
-		const enableValidation = !!expression;
+		const enableValidation = !!expression.value;
 
 		if (enableValidation) {
 			selectedValidation = this._parseValidationFromExpression(
@@ -110,14 +111,12 @@ class Validation extends Component {
 			);
 
 			if (selectedValidation) {
-				parameterMessage = this._parseParameterMessageFromExpression(
-					expression,
-					selectedValidation
-				);
+				parameterMessage = selectedValidation.parameterMessage;
 			} else {
 				selectedValidation = {
+					name: this.validations[0].name,
 					parameterMessage: this.validations[0].parameterMessage,
-					value: this.validations[0].name
+					value: this.validations[0].template
 				};
 			}
 		}
@@ -128,25 +127,30 @@ class Validation extends Component {
 			this.value.errorMessage[editingLanguageId] ||
 			this.value.errorMessage[defaultLanguageId];
 
+		const parameter =
+			this.value.parameter[editingLanguageId] ||
+			this.value.parameter[defaultLanguageId];
+
 		return {
 			enableValidation,
 			errorMessage,
 			expression,
+			parameter,
 			parameterMessage,
 			selectedValidation
 		};
 	}
 
 	_getValue() {
-		let expression;
+		let expression = {};
 		const {
 			editingLanguageId,
 			validation: {fieldName: name}
 		} = this;
-		let parameterMessage = '';
+		let parameter = '';
 
-		if (this.refs.parameterMessage) {
-			parameterMessage = this.refs.parameterMessage.value;
+		if (this.refs.parameter) {
+			parameter = this.refs.parameter.value;
 		}
 
 		const enableValidation = this.refs.enableValidation.value;
@@ -157,19 +161,20 @@ class Validation extends Component {
 			!this.value.expression &&
 			this.context.validation
 		) {
-			selectedValidation = this.validations.find(validation =>
-				validation.regex.test(this.context.validation.expression)
+			selectedValidation = this.validations.find(
+				validation =>
+					validation.name === this.context.validation.expression.name
 			);
-			parameterMessage = this.context.validation.parameterMessage;
+			parameter = this.context.validation.parameterMessage;
 		}
 
-		const {template} = selectedValidation;
-
 		if (enableValidation) {
-			expression = subWords(template, {
-				name,
-				parameter: parameterMessage
-			});
+			expression = {
+				name: selectedValidation.name,
+				value: subWords(selectedValidation.template, {
+					name
+				})
+			};
 		}
 
 		return {
@@ -178,7 +183,11 @@ class Validation extends Component {
 				...this.value.errorMessage,
 				[editingLanguageId]: this.refs.errorMessage.value
 			},
-			expression
+			expression,
+			parameter: {
+				...this.value.parameter,
+				[editingLanguageId]: parameter
+			}
 		};
 	}
 
@@ -192,12 +201,6 @@ class Validation extends Component {
 		});
 	}
 
-	_parseParameterMessageFromExpression(expression, validation) {
-		const matches = validation.regex.exec(expression);
-
-		return matches && matches[2];
-	}
-
 	_parseValidationFromExpression(expression) {
 		const {validations} = this;
 		let validation;
@@ -207,8 +210,8 @@ class Validation extends Component {
 		}
 
 		if (expression) {
-			validation = validations.find(validation =>
-				validation.regex.test(expression)
+			validation = validations.find(
+				validation => validation.name === expression.name
 			);
 		}
 
@@ -275,15 +278,13 @@ Validation.STATE = {
 		.valueFn('_enableValidationValueFn'),
 
 	/**
-	 * @default ''
+	 * @default undefined
 	 * @instance
 	 * @memberof Validation
-	 * @type {String}
+	 * @type {?}
 	 */
 
-	expression: Config.string()
-		.internal()
-		.value(''),
+	expression: Config.object(),
 
 	/**
 	 * @default undefined
@@ -386,7 +387,8 @@ Validation.STATE = {
 
 	value: Config.shapeOf({
 		errorMessage: Config.object(),
-		expression: Config.string()
+		expression: Config.object(),
+		parameter: Config.object()
 	}).value({})
 };
 

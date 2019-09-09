@@ -70,8 +70,6 @@ definition {
 			exportTemplateName = "Export Template Name",
 			larFileName = "Export.Template");
 
-		Pause(locator1 = "3000");
-
 		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
@@ -132,8 +130,6 @@ definition {
 			value1 = "Successful");
 
 		LAR.downloadLar();
-
-		Pause(locator1 = "5000");
 
 		LAR.importSiteCP(
 			larFileName = "${larFileName}",
@@ -288,21 +284,21 @@ definition {
 			groupName = "Site Name",
 			name = "Collection Name");
 
-		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "site-name");
+		FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "site-name");
 
-		FragmentsAdmin.gotoCollection(collectionName = "Collection Name");
+		FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
 		FragmentsAdmin.addSection(fragmentName = "Fragment Name");
 
 		var fragmentHTML = '''<lfr-widget-web-content>''';
 
-		FragmentsAdmin.autocompleteFragmentHTML(
+		FragmentsEditor.autocompleteFragmentHTML(
 			autocompleteField = "lfr-widget-web-content",
 			fragmentHTML = "${fragmentHTML}");
 
 		PortletEntry.publish();
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentNavigator.gotoAddCP();
 
@@ -346,7 +342,7 @@ definition {
 			larFileName = "${larFileName}",
 			siteName = "New Site");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
 
@@ -473,7 +469,7 @@ definition {
 			groupName = "Guest",
 			title = "Web Content Title");
 
-		WebContent.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		LAR.exportPortlet(larFileName = "ExportWebContent.lar");
 
@@ -669,7 +665,7 @@ definition {
 			layoutName = "Site Child Child Page",
 			parentLayoutName = "Site Child Page");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		NavItem.gotoStructures();
 
@@ -684,7 +680,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		NavItem.gotoTemplates();
 
@@ -694,7 +690,7 @@ definition {
 			templateFieldNames = "Link to Page",
 			templateName = "WC Template Name");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -707,7 +703,7 @@ definition {
 
 		PortletEntry.publish();
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -1327,7 +1323,7 @@ definition {
 	@description = "This is a use case for LPS-83326."
 	@priority = "5"
 	test ExportImportWebcontentFolderWithWorkflow {
-		WebContent.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentFolder.addCP(
 			folderDescription = "WC Folder Description",
@@ -1338,17 +1334,17 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowRestriction = "Default Workflow");
 
-		WebContent.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		LAR.exportPortlet(larFileName = "WebContent_portlet.lar");
 
 		JSONGroup.addGroup(groupName = "Site Name");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		LAR.importPortlet(larFileName = "WebContent_portlet.lar");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentFolder.viewFolderWorkflow(
 			folderName = "WC Folder Name",
@@ -1390,7 +1386,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "Exported Structure");
 
-		WebContent.openWebContentAdmin(siteURLKey = "exported-site");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "exported-site");
 
 		NavItem.gotoTemplates();
 
@@ -1400,7 +1396,7 @@ definition {
 			templateFieldNames = "Text",
 			templateName = "Exported Template");
 
-		WebContent.openWebContentAdmin(siteURLKey = "exported-site");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "exported-site");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "Exported Structure");
 
@@ -1419,7 +1415,7 @@ definition {
 
 		WebContent.viewTitle(webContentTitle = "Exported Article");
 
-		WebContent.openWebContentAdmin(siteURLKey = "exported-site");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "exported-site");
 
 		LAR.exportPortlet(larFileName = "WebContent_portlet.lar");
 
@@ -1437,7 +1433,7 @@ definition {
 
 		LAR.importPortlet(larFileName = "WebContent_portlet.lar");
 
-		WebContent.openWebContentAdmin(siteURLKey = "imported-site");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "imported-site");
 
 		WebContent.viewWithStructureCP(webContentTitle = "Exported Article");
 
@@ -1445,7 +1441,7 @@ definition {
 			ddlRecordFieldData = "Liferay",
 			fieldName = "Separator");
 
-		WebContent.openWebContentAdmin(siteURLKey = "imported-site");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "imported-site");
 
 		NavItem.gotoStructures();
 
@@ -1465,7 +1461,7 @@ definition {
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
 
-		WebContent.openWebContentAdmin(siteURLKey = "imported-site");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "imported-site");
 
 		NavItem.gotoTemplates();
 
@@ -1553,7 +1549,7 @@ definition {
 			value1 = "Forbidden");
 	}
 
-	@description = "This is a use case for LPS-88831 and LPS-88889."
+	@description = "This is a use case for LPS-88831, LPS-88889 and LPS-88890."
 	@priority = "4"
 	test ExportWebContentWithDeletedReference {
 		JSONGroup.addGroup(groupName = "Site Name");
@@ -1569,7 +1565,7 @@ definition {
 			dmDocumentFile = "Document_1.txt",
 			dmDocumentTitle = "DM Document Title");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		NavItem.gotoStructures();
 
@@ -1577,7 +1573,7 @@ definition {
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		for (var structureFieldName : list "Documents and Media,Link to Page") {
+		for (var structureFieldName : list "Documents and Media,Link to Page,Image") {
 			DynamicDataMapping.addField(
 				field = "${structureFieldName}",
 				fieldFieldLabel = "${structureFieldName}",
@@ -1586,17 +1582,17 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		NavItem.gotoTemplates();
 
 		WebContentTemplates.addCP(
 			structureName = "WC Structure Name",
 			templateDescription = "WC Template Description",
-			templateFieldNames = "Documents and Media,Link to Page",
+			templateFieldNames = "Documents and Media,Link to Page,Image",
 			templateName = "WC Template Name");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -1607,6 +1603,7 @@ definition {
 			structureName = "WC Structure Name",
 			templateName = "WC Template Name",
 			webContentDocumentsAndMedia = "DM Document Title.txt",
+			webContentImageUnderDocumentsAndMedia = "Document_1.jpg",
 			webContentTitle = "WC WebContent Title");
 
 		PortletEntry.publish();
@@ -1617,11 +1614,15 @@ definition {
 
 		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
 
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+
+		DMDocument.deleteCP(dmDocumentTitle = "Document_1.jpg");
+
 		SitePages.openPagesAdmin(siteURLKey = "site-name");
 
 		SitePages.deletePage(pageName = "Test Page");
 
-		WebContent.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		LAR.exportPortlet(larFileName = "WebContent_portlet.lar");
 
@@ -1648,6 +1649,62 @@ definition {
 			cannotImport = "true",
 			larFileName = "bookmarks-corrupted.portlet.lar",
 			uploadFrom = "dependencies");
+	}
+
+	@description = "This is a use case for LPS-94738."
+	@priority = "4"
+	test ImportWCDReferenceAfterActivateStaging {
+		JSONGroup.addGroup(groupName = "Site Name A");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name A",
+			layoutName = "Test Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name A",
+			layoutName = "Test Page",
+			widgetName = "Web Content Display");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name A");
+
+		WebContent.addPGViaWCD(
+			webContentContent = "WebContent Content",
+			webContentTitle = "WebContent Title");
+
+		WebContent.viewPGViaWCD(webContentContent = "WebContent Content");
+
+		LAR.exportSiteCP();
+
+		var key_larFileName = "${larFileName}";
+
+		var larFileName = LAR.getLarFileName();
+
+		LAR.downloadLar();
+
+		JSONGroup.deleteGroupByName(groupName = "Site Name A");
+
+		JSONGroup.addGroup(groupName = "Site Name B");
+
+		SitePages.openPagesAdmin(siteURLKey = "site-name-b");
+
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			panel = "Site Administration",
+			portlet = "Staging");
+
+		Staging.activateStagingCP(siteName = "Site Name B");
+
+		LAR.importSiteCP(
+			larFileName = "${larFileName}",
+			siteName = "site-name-b-staging");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name B");
+
+		WebContent.viewPGViaWCD(webContentContent = "WebContent Content");
 	}
 
 	@description = "This is a test for LPS-91233."

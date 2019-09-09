@@ -16,8 +16,6 @@ package com.liferay.dynamic.data.mapping.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DDMFormInstanceVersionService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMFormInstanceVersionService
  * @generated
  */
-@ProviderType
 public class DDMFormInstanceVersionServiceWrapper
 	implements DDMFormInstanceVersionService,
 			   ServiceWrapper<DDMFormInstanceVersionService> {
@@ -36,6 +33,11 @@ public class DDMFormInstanceVersionServiceWrapper
 		_ddmFormInstanceVersionService = ddmFormInstanceVersionService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DDMFormInstanceVersionServiceUtil} to access the ddm form instance version remote service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMFormInstanceVersionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion
 			getFormInstanceVersion(long ddmFormInstanceVersionId)

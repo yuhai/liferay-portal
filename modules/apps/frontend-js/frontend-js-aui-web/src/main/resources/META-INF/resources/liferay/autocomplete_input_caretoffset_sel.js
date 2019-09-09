@@ -29,7 +29,7 @@ AUI.add(
 		var AutcompleteInputCaretOffset = function() {};
 
 		AutcompleteInputCaretOffset.prototype = {
-			_getCaretOffset: function(node) {
+			_getCaretOffset(node) {
 				var instance = this;
 
 				node = node || instance.get('inputNode');

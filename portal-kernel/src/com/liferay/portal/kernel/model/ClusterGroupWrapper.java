@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ClusterGroup}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ClusterGroupWrapper
 	extends BaseModelWrapper<ClusterGroup>
 	implements ClusterGroup, ModelWrapper<ClusterGroup> {
@@ -162,6 +159,11 @@ public class ClusterGroupWrapper
 		return model.isWholeCluster();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a cluster group model instance should use the <code>ClusterGroup</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

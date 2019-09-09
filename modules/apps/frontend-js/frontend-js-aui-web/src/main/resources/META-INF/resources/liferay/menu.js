@@ -104,7 +104,7 @@ AUI.add(
 		};
 
 		Menu.prototype = {
-			_closeActiveMenu: function() {
+			_closeActiveMenu() {
 				var instance = this;
 
 				var menu = instance._activeMenu;
@@ -142,8 +142,6 @@ AUI.add(
 			},
 
 			_getAlignPoints: A.cached(function(cssClass) {
-				var instance = this;
-
 				var alignPoints = DEFAULT_ALIGN_POINTS;
 
 				var defaultOverlayHorizontalAlign = STR_RIGHT;
@@ -195,7 +193,7 @@ AUI.add(
 				return alignPoints;
 			}),
 
-			_getMenu: function(trigger) {
+			_getMenu(trigger) {
 				var instance = this;
 
 				var overlay = instance._overlay;
@@ -334,7 +332,7 @@ AUI.add(
 				return menu;
 			},
 
-			_getMenuHeight: function(trigger, menu, listItems) {
+			_getMenuHeight(trigger, menu, listItems) {
 				var instance = this;
 
 				var cssClass = trigger.attr(ATTR_CLASS_NAME);
@@ -367,7 +365,7 @@ AUI.add(
 				return height;
 			},
 
-			_positionActiveMenu: function() {
+			_positionActiveMenu() {
 				var instance = this;
 
 				var menu = instance._activeMenu;
@@ -398,7 +396,7 @@ AUI.add(
 					}
 
 					overlay.setAttrs({
-						align: align,
+						align,
 						centered: false,
 						height: listNodeHeight,
 						modal: modalMask,
@@ -429,7 +427,7 @@ AUI.add(
 				}
 			},
 
-			_setARIARoles: function(trigger, menu, listContainer) {
+			_setARIARoles(trigger, menu) {
 				var links = menu.all(SELECTOR_ANCHOR);
 
 				var searchContainer = menu.one(SELECTOR_SEARCH_CONTAINER);
@@ -530,7 +528,7 @@ AUI.add(
 
 					bodyNode.on(
 						'key',
-						function(event) {
+						function() {
 							var activeTrigger = menuInstance._activeTrigger;
 
 							if (activeTrigger) {
@@ -587,9 +585,7 @@ AUI.add(
 		Liferay.provide(
 			Menu,
 			'_getLiveSearch',
-			function(trigger, menu) {
-				var instance = this;
-
+			function(_trigger, menu) {
 				var id = menu.guid();
 
 				var liveSearch = MAP_LIVE_SEARCH[id];
@@ -605,7 +601,7 @@ AUI.add(
 								.one('.taglib-text-icon')
 								.text()
 								.trim(),
-							node: node
+							node
 						});
 					});
 

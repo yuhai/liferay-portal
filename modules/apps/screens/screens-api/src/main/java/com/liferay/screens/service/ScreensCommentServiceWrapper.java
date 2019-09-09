@@ -16,8 +16,6 @@ package com.liferay.screens.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ScreensCommentService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ScreensCommentService
  * @generated
  */
-@ProviderType
 public class ScreensCommentServiceWrapper
 	implements ScreensCommentService, ServiceWrapper<ScreensCommentService> {
 
@@ -35,6 +32,11 @@ public class ScreensCommentServiceWrapper
 		_screensCommentService = screensCommentService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ScreensCommentServiceUtil} to access the screens comment remote service. Add custom service methods to <code>com.liferay.screens.service.impl.ScreensCommentServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.json.JSONObject addComment(
 			String className, long classPK, String body)

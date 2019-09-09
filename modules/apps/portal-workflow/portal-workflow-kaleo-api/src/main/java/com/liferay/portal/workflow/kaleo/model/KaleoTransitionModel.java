@@ -39,7 +39,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTransitionModel
 	extends BaseModel<KaleoTransition>, GroupedModel, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kaleo transition model instance should use the {@link KaleoTransition} interface instead.

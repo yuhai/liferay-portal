@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDLRecordSet}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDLRecordSet
  * @generated
  */
-@ProviderType
 public class DDLRecordSetWrapper
 	extends BaseModelWrapper<DDLRecordSet>
 	implements DDLRecordSet, ModelWrapper<DDLRecordSet> {
@@ -614,6 +611,11 @@ public class DDLRecordSetWrapper
 		return model.getVersionUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddl record set model instance should use the <code>DDLRecordSet</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

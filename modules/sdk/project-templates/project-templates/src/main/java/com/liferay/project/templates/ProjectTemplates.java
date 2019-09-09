@@ -185,8 +185,9 @@ public class ProjectTemplates {
 
 		JCommander jCommander = builder.build();
 
-		jCommander.parseWithoutValidation(args);
 		jCommander.setAcceptUnknownOptions(true);
+
+		jCommander.parseWithoutValidation(args);
 
 		File templateFile = ProjectTemplatesUtil.getTemplateFile(
 			projectTemplatesArgs);
@@ -222,7 +223,7 @@ public class ProjectTemplates {
 				jCommander.setProgramName("java -jar " + jarPath.getFileName());
 			}
 
-			jCommander.parse(args);
+			jCommander.parseWithoutValidation(args);
 
 			String template = projectTemplatesArgs.getTemplate();
 

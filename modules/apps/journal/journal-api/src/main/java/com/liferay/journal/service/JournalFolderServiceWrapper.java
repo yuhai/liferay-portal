@@ -16,8 +16,6 @@ package com.liferay.journal.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link JournalFolderService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see JournalFolderService
  * @generated
  */
-@ProviderType
 public class JournalFolderServiceWrapper
 	implements JournalFolderService, ServiceWrapper<JournalFolderService> {
 
@@ -35,6 +32,11 @@ public class JournalFolderServiceWrapper
 		_journalFolderService = journalFolderService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link JournalFolderServiceUtil} to access the journal folder remote service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFolderServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.journal.model.JournalFolder addFolder(
 			long groupId, long parentFolderId, String name, String description,

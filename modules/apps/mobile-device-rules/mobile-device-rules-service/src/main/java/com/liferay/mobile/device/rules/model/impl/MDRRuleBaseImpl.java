@@ -17,8 +17,6 @@ package com.liferay.mobile.device.rules.model.impl;
 import com.liferay.mobile.device.rules.model.MDRRule;
 import com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the MDRRule service. Represents a row in the &quot;MDRRule&quot; database table, with each column mapped to a property of this class.
  *
@@ -31,11 +29,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MDRRule
  * @generated
  */
-@ProviderType
 public abstract class MDRRuleBaseImpl
 	extends MDRRuleModelImpl implements MDRRule {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a mdr rule model instance should use the <code>MDRRule</code> interface instead.

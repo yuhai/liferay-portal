@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ServiceComponent}.
@@ -30,7 +28,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ServiceComponent
  * @generated
  */
-@ProviderType
 public class ServiceComponentWrapper
 	extends BaseModelWrapper<ServiceComponent>
 	implements ServiceComponent, ModelWrapper<ServiceComponent> {
@@ -177,6 +174,11 @@ public class ServiceComponentWrapper
 		return model.getTablesSQL();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a service component model instance should use the <code>ServiceComponent</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

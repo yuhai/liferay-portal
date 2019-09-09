@@ -33,64 +33,17 @@ AUI.add(
 
 			EXTENDS: A.Plugin.Base,
 
-			NAME: NAME,
+			NAME,
 
 			NS: NAME,
 
 			prototype: {
-				initializer: function(config) {
-					var instance = this;
-
-					var signInPortlet = instance.get('signInPortlet');
-
-					if (signInPortlet) {
-						instance._signInPortletBody = signInPortlet.one(
-							'.portlet-body'
-						);
-					}
-
-					var host = instance.get('host');
-
-					instance._host = host;
-					instance._signInPortlet = signInPortlet;
-
-					instance._signInURL = host.attr('href');
-
-					if (signInPortlet) {
-						var formNode = signInPortlet.one('form');
-
-						if (formNode) {
-							var form = Liferay.Form.get(formNode.attr('id'));
-
-							instance._formValidator = '';
-
-							if (form) {
-								instance._formValidator = form.formValidator;
-							}
-
-							instance._hasSignInForm = formNode.hasClass(
-								'sign-in-form'
-							);
-						}
-					}
-
-					instance._bindUI();
-				},
-
-				destructor: function() {
-					var dialog = Liferay.Util.getWindow(NAME);
-
-					if (dialog) {
-						dialog.destroy();
-					}
-				},
-
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					instance._host.on('click', A.bind('_load', instance));
 
-					var destroyModal = function(event) {
+					var destroyModal = function() {
 						instance.destroy();
 
 						Liferay.detach('screenLoad', destroyModal);
@@ -99,7 +52,7 @@ AUI.add(
 					Liferay.on('screenLoad', destroyModal);
 				},
 
-				_load: function(event) {
+				_load(event) {
 					var instance = this;
 
 					event.preventDefault();
@@ -114,7 +67,7 @@ AUI.add(
 					}
 				},
 
-				_loadDOM: function() {
+				_loadDOM() {
 					var instance = this;
 
 					var signInPortletBody = instance._signInPortletBody;
@@ -130,7 +83,7 @@ AUI.add(
 					);
 				},
 
-				_loadIO: function() {
+				_loadIO() {
 					var instance = this;
 
 					var modalSignInURL = Liferay.Util.addParams(
@@ -150,13 +103,13 @@ AUI.add(
 						.catch(() => instance._redirectPage());
 				},
 
-				_redirectPage: function() {
+				_redirectPage() {
 					var instance = this;
 
 					WIN.location.href = instance._signInURL;
 				},
 
-				_setModalContent: function(content) {
+				_setModalContent(content) {
 					var instance = this;
 
 					var dialog = Liferay.Util.getWindow(NAME);
@@ -166,7 +119,7 @@ AUI.add(
 							{
 								dialog: {
 									after: {
-										visibleChange: function(event) {
+										visibleChange(event) {
 											var signInPortletBody =
 												instance._signInPortletBody;
 
@@ -216,6 +169,53 @@ AUI.add(
 
 						dialog.show();
 					}
+				},
+
+				destructor() {
+					var dialog = Liferay.Util.getWindow(NAME);
+
+					if (dialog) {
+						dialog.destroy();
+					}
+				},
+
+				initializer() {
+					var instance = this;
+
+					var signInPortlet = instance.get('signInPortlet');
+
+					if (signInPortlet) {
+						instance._signInPortletBody = signInPortlet.one(
+							'.portlet-body'
+						);
+					}
+
+					var host = instance.get('host');
+
+					instance._host = host;
+					instance._signInPortlet = signInPortlet;
+
+					instance._signInURL = host.attr('href');
+
+					if (signInPortlet) {
+						var formNode = signInPortlet.one('form');
+
+						if (formNode) {
+							var form = Liferay.Form.get(formNode.attr('id'));
+
+							instance._formValidator = '';
+
+							if (form) {
+								instance._formValidator = form.formValidator;
+							}
+
+							instance._hasSignInForm = formNode.hasClass(
+								'sign-in-form'
+							);
+						}
+					}
+
+					instance._bindUI();
 				}
 			}
 		});

@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link PollsChoice}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PollsChoice
  * @generated
  */
-@ProviderType
 public class PollsChoiceWrapper
 	extends BaseModelWrapper<PollsChoice>
 	implements PollsChoice, ModelWrapper<PollsChoice> {
@@ -358,6 +355,11 @@ public class PollsChoiceWrapper
 		return model.getVotesCount();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a polls choice model instance should use the <code>PollsChoice</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -21,11 +21,12 @@ import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
+import com.liferay.fragment.util.FragmentEntryConfigUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
@@ -95,9 +96,9 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 	private String _renderFragmentEntry(
 		long fragmentEntryId, String css, String html, String js,
-		String namespace) {
+		String configuration, String namespace) {
 
-		StringBundler sb = new StringBundler(14);
+		StringBundler sb = new StringBundler(16);
 
 		sb.append("<div id=\"");
 
@@ -116,7 +117,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 		if (Validator.isNotNull(css)) {
 			sb.append("<style>");
-			sb.append(HtmlUtil.escapeCSS(css));
+			sb.append(css);
 			sb.append("</style>");
 		}
 
@@ -124,7 +125,9 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			sb.append("<script>(function() {");
 			sb.append("var fragmentElement = document.querySelector('#");
 			sb.append(fragmentIdSB.toString());
-			sb.append("');");
+			sb.append("'); var configuration = ");
+			sb.append(configuration);
+			sb.append(";");
 			sb.append(js);
 			sb.append(";}());</script>");
 		}
@@ -172,9 +175,16 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		html = _writePortletPaths(
 			fragmentEntryLink, html, httpServletRequest, httpServletResponse);
 
+		JSONObject configurationJSONObject =
+			FragmentEntryConfigUtil.getConfigurationJSONObject(
+				fragmentEntryLink.getConfiguration(),
+				fragmentEntryLink.getEditableValues(),
+				fragmentRendererContext.getSegmentsExperienceIds());
+
 		return _renderFragmentEntry(
-			fragmentEntryLink.getFragmentEntryId(), HtmlUtil.escapeCSS(css),
-			html, fragmentEntryLink.getJs(), fragmentEntryLink.getNamespace());
+			fragmentEntryLink.getFragmentEntryId(), css, html,
+			fragmentEntryLink.getJs(), configurationJSONObject.toString(),
+			fragmentEntryLink.getNamespace());
 	}
 
 	private String _writePortletPaths(

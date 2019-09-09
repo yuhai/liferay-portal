@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.tools.service.builder.test.model.UADPartialEntry;
 import com.liferay.portal.tools.service.builder.test.service.UADPartialEntryLocalServiceUtil;
 
@@ -31,11 +29,10 @@ import com.liferay.portal.tools.service.builder.test.service.UADPartialEntryLoca
  * @see UADPartialEntry
  * @generated
  */
-@ProviderType
 public abstract class UADPartialEntryBaseImpl
 	extends UADPartialEntryModelImpl implements UADPartialEntry {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a uad partial entry model instance should use the <code>UADPartialEntry</code> interface instead.

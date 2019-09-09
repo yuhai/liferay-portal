@@ -60,25 +60,7 @@ AUI.add(
 			NAME: 'liferay-management-bar',
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._searchContainerRegisterHandle = Liferay.on(
-						'search-container:registered',
-						instance._onSearchContainerRegistered,
-						instance
-					);
-				},
-
-				destructor: function() {
-					var instance = this;
-
-					instance._detachSearchContainerRegisterHandle();
-
-					new A.EventHandle(instance._eventHandles).detach();
-				},
-
-				_bindUI: function() {
+				_bindUI() {
 					var instance = this;
 
 					instance._eventHandles = [
@@ -105,7 +87,7 @@ AUI.add(
 					];
 				},
 
-				_detachSearchContainerRegisterHandle: function() {
+				_detachSearchContainerRegisterHandle() {
 					var instance = this;
 
 					var searchContainerRegisterHandle =
@@ -118,7 +100,7 @@ AUI.add(
 					}
 				},
 
-				_getSelectAllCheckBox: function() {
+				_getSelectAllCheckBox() {
 					var instance = this;
 
 					var selectAllCheckBox = instance._selectAllCheckBox;
@@ -136,7 +118,7 @@ AUI.add(
 					return selectAllCheckBox;
 				},
 
-				_onSearchContainerRegistered: function(event) {
+				_onSearchContainerRegistered(event) {
 					var instance = this;
 
 					var searchContainer = event.searchContainer;
@@ -153,7 +135,7 @@ AUI.add(
 					}
 				},
 
-				_onSearchContainerRowToggled: function(event) {
+				_onSearchContainerRowToggled(event) {
 					var instance = this;
 
 					var elements = event.elements;
@@ -181,7 +163,7 @@ AUI.add(
 					instance._toggleSecondaryBar(numberAllSelectedElements > 0);
 				},
 
-				_onSurfaceStartNavigate: function(event) {
+				_onSurfaceStartNavigate() {
 					var instance = this;
 
 					Liferay.DOMTaskRunner.addTask({
@@ -207,7 +189,7 @@ AUI.add(
 					});
 				},
 
-				_toggleSecondaryBar: function(show) {
+				_toggleSecondaryBar(show) {
 					var instance = this;
 
 					var managementBarContainer = instance
@@ -220,7 +202,7 @@ AUI.add(
 					);
 				},
 
-				_toggleSelectAll: function(event) {
+				_toggleSelectAll(event) {
 					var instance = this;
 
 					if (
@@ -240,7 +222,7 @@ AUI.add(
 					}
 				},
 
-				_toggleSelectAllCheckBox: function(checked, partial) {
+				_toggleSelectAllCheckBox(checked, partial) {
 					var instance = this;
 
 					var selectAllCheckBox = instance._getSelectAllCheckBox();
@@ -254,14 +236,32 @@ AUI.add(
 					}
 				},
 
-				_updateItemsCount: function(itemsCount) {
+				_updateItemsCount(itemsCount) {
 					var instance = this;
 
 					instance.get('itemsCountContainer').html(itemsCount);
+				},
+
+				destructor() {
+					var instance = this;
+
+					instance._detachSearchContainerRegisterHandle();
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._searchContainerRegisterHandle = Liferay.on(
+						'search-container:registered',
+						instance._onSearchContainerRegistered,
+						instance
+					);
 				}
 			},
 
-			restoreTask: function(state, params, node) {
+			restoreTask(state, params, node) {
 				var totalSelectedItems = state.data.elements.length;
 
 				node = A.one(node);
@@ -334,7 +334,7 @@ AUI.add(
 				}
 			},
 
-			testRestoreTask: function(state, params, node) {
+			testRestoreTask(state, params, node) {
 				var returnNode;
 
 				var currentNode = A.one(node);

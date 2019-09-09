@@ -41,7 +41,7 @@ public interface LayoutPageTemplateStructureModel
 	extends AttachedModel, BaseModel<LayoutPageTemplateStructure>, GroupedModel,
 			ShardedModel, StagedAuditedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout page template structure model instance should use the {@link LayoutPageTemplateStructure} interface instead.

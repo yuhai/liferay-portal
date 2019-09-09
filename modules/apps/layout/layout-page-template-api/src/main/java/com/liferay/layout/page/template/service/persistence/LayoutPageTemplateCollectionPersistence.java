@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutPageTemplateCollectionPersistence
 	extends BasePersistence<LayoutPageTemplateCollection> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutPageTemplateCollectionUtil} to access the layout page template collection persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

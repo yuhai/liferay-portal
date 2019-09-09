@@ -14,12 +14,12 @@
 
 import {render} from 'frontend-js-react-web';
 import React from 'react';
-import SegmentsExperimentsUtil from './util/index.es';
+import APIService from './util/APIService.es';
 import SegmentsExperimentsSidebar from './components/SegmentsExperimentsSidebar.es';
 import SegmentsExperimentsContext from './context.es';
 
 function renderComponent({props, context}) {
-	const {page, endpoints} = context;
+	const {page, endpoints, viewSegmentsExperimentDetailsURL} = context;
 	const {
 		createSegmentsExperimentURL,
 		createSegmentsVariantURL,
@@ -35,9 +35,7 @@ function renderComponent({props, context}) {
 	return (
 		<SegmentsExperimentsContext.Provider
 			value={{
-				editVariantLayoutURL: editSegmentsVariantLayoutURL,
-				page,
-				segmentsExperimentsUtil: SegmentsExperimentsUtil({
+				APIService: APIService({
 					contentPageEditorNamespace:
 						context.contentPageEditorNamespace,
 					endpoints: {
@@ -51,7 +49,10 @@ function renderComponent({props, context}) {
 						runSegmentsExperimentURL
 					},
 					namespace: context.namespace
-				})
+				}),
+				editVariantLayoutURL: editSegmentsVariantLayoutURL,
+				page,
+				viewSegmentsExperimentDetailsURL
 			}}
 		>
 			<SegmentsExperimentsSidebar
@@ -62,6 +63,10 @@ function renderComponent({props, context}) {
 				initialSelectedSegmentsExperienceId={
 					props.selectedSegmentsExperienceId
 				}
+				viewSegmentsExperimentDetailsURL={
+					props.viewSegmentsExperimentDetailsURL
+				}
+				winnerSegmentsVariantId={props.winnerSegmentsVariantId}
 			/>
 		</SegmentsExperimentsContext.Provider>
 	);

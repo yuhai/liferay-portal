@@ -16,7 +16,7 @@
 	var pluginName = 'lfrpopup';
 
 	CKEDITOR.plugins.add(pluginName, {
-		init: function(editor) {
+		init(editor) {
 			AUI().use('querystring-parse', function(A) {
 				editor.popup = function(url, width, height, options) {
 					var params = A.QueryString.parse(url.split('?')[1]);
@@ -34,11 +34,11 @@
 						dialog: {
 							zIndex: CKEDITOR.getNextZIndex()
 						},
-						height: height,
+						height,
 						stack: false,
 						title: options.title || '',
 						uri: url,
-						width: width
+						width
 					});
 				};
 			});

@@ -16,8 +16,6 @@ package com.liferay.document.library.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link DLFolderService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DLFolderService
  * @generated
  */
-@ProviderType
 public class DLFolderServiceWrapper
 	implements DLFolderService, ServiceWrapper<DLFolderService> {
 
@@ -33,6 +30,11 @@ public class DLFolderServiceWrapper
 		_dlFolderService = dlFolderService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link DLFolderServiceUtil} to access the document library folder remote service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFolderServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.document.library.kernel.model.DLFolder addFolder(
 			long groupId, long repositoryId, boolean mountPoint,

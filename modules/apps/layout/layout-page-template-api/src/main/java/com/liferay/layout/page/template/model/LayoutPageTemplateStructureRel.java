@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutPageTemplateStructureRel
 	extends LayoutPageTemplateStructureRelModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMDataProviderInstanceLinkModel
 	extends BaseModel<DDMDataProviderInstanceLink>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddm data provider instance link model instance should use the {@link DDMDataProviderInstanceLink} interface instead.

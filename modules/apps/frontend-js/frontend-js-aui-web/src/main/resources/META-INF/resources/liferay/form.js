@@ -19,17 +19,15 @@ AUI.add(
 
 		var Lang = A.Lang;
 
-		var formConfig;
-
 		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
 		var defaultAcceptFiles = DEFAULTS_FORM_VALIDATOR.RULES.acceptFiles;
 
 		var TABS_SECTION_STR = 'TabsSection';
 
-		var REGEX_NUMBER = /^[+\-]?(\d+)([.|,]\d+)*([eE][+-]?\d+)?$/;
+		var REGEX_NUMBER = /^[+-]?(\d+)([.|,]\d+)*([eE][+-]?\d+)?$/;
 
-		var REGEX_URL = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(https?\:\/\/|www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
+		var REGEX_URL = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(https?:\/\/|www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
 
 		var acceptFiles = function(val, node, ruleValue) {
 			if (ruleValue && ruleValue.split(',').includes('*')) {
@@ -39,7 +37,7 @@ AUI.add(
 			return defaultAcceptFiles(val, node, ruleValue);
 		};
 
-		var maxFileSize = function(val, node, ruleValue) {
+		var maxFileSize = function(_val, node, ruleValue) {
 			var nodeType = node.get('type').toLowerCase();
 
 			if (nodeType === 'file') {
@@ -49,21 +47,21 @@ AUI.add(
 			return true;
 		};
 
-		var number = function(val, node, ruleValue) {
+		var number = function(val, _node, _ruleValue) {
 			return REGEX_NUMBER && REGEX_NUMBER.test(val);
 		};
 
-		var url = function(val, node, ruleValue) {
+		var url = function(val, _node, _ruleValue) {
 			return REGEX_URL && REGEX_URL.test(val);
 		};
 
 		A.mix(
 			DEFAULTS_FORM_VALIDATOR.RULES,
 			{
-				acceptFiles: acceptFiles,
-				maxFileSize: maxFileSize,
-				number: number,
-				url: url
+				acceptFiles,
+				maxFileSize,
+				number,
+				url
 			},
 			true
 		);
@@ -118,9 +116,11 @@ AUI.add(
 		);
 
 		var Form = A.Component.create({
+			_INSTANCES: {},
+
 			ATTRS: {
 				fieldRules: {
-					setter: function(val) {
+					setter(val) {
 						var instance = this;
 
 						instance._processFieldRules(val);
@@ -131,7 +131,7 @@ AUI.add(
 				id: {},
 				namespace: {},
 				onSubmit: {
-					valueFn: function() {
+					valueFn() {
 						var instance = this;
 
 						return instance._onSubmit;
@@ -145,99 +145,14 @@ AUI.add(
 
 			EXTENDS: A.Base,
 
+			get(id) {
+				var instance = this;
+
+				return instance._INSTANCES[id];
+			},
+
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					var id = instance.get('id');
-
-					var form = document[id];
-					var formNode = A.one(form);
-
-					instance.form = form;
-					instance.formNode = formNode;
-
-					if (formNode) {
-						var formValidator = new A.FormValidator({
-							boundingBox: formNode,
-							validateOnBlur: instance.get('validateOnBlur')
-						});
-
-						A.Do.before(
-							'_focusInvalidFieldTab',
-							formValidator,
-							'focusInvalidField',
-							instance
-						);
-
-						A.Do.before(
-							'_validatable',
-							formValidator,
-							'validatable',
-							instance
-						);
-
-						instance.formValidator = formValidator;
-
-						instance._processFieldRules();
-
-						instance._bindForm();
-					}
-				},
-
-				addRule: function(
-					fieldName,
-					validatorName,
-					errorMessage,
-					body,
-					custom
-				) {
-					var instance = this;
-
-					var fieldRules = instance.get('fieldRules');
-
-					var ruleIndex = instance._findRuleIndex(
-						fieldRules,
-						fieldName,
-						validatorName
-					);
-
-					if (ruleIndex == -1) {
-						fieldRules.push({
-							body: body || '',
-							custom: custom || false,
-							errorMessage: errorMessage || '',
-							fieldName: fieldName,
-							validatorName: validatorName
-						});
-
-						instance._processFieldRules(fieldRules);
-					}
-				},
-
-				removeRule: function(fieldName, validatorName) {
-					var instance = this;
-
-					var fieldRules = instance.get('fieldRules');
-
-					var ruleIndex = instance._findRuleIndex(
-						fieldRules,
-						fieldName,
-						validatorName
-					);
-
-					if (ruleIndex != -1) {
-						var rule = fieldRules[ruleIndex];
-
-						instance.formValidator.resetField(rule.fieldName);
-
-						fieldRules.splice(ruleIndex, 1);
-
-						instance._processFieldRules(fieldRules);
-					}
-				},
-
-				_afterGetFieldsByName: function(fieldName) {
+				_afterGetFieldsByName(fieldName) {
 					var instance = this;
 
 					var editorString = 'Editor';
@@ -255,7 +170,7 @@ AUI.add(
 					}
 				},
 
-				_bindForm: function() {
+				_bindForm() {
 					var instance = this;
 
 					var formNode = instance.formNode;
@@ -289,7 +204,7 @@ AUI.add(
 					);
 				},
 
-				_defaultSubmitFn: function(event) {
+				_defaultSubmitFn(event) {
 					var instance = this;
 
 					if (!event.stopped) {
@@ -297,7 +212,7 @@ AUI.add(
 					}
 				},
 
-				_findRuleIndex: function(fieldRules, fieldName, validatorName) {
+				_findRuleIndex(fieldRules, fieldName, validatorName) {
 					var ruleIndex = -1;
 
 					AArray.some(fieldRules, function(element, index) {
@@ -314,7 +229,7 @@ AUI.add(
 					return ruleIndex;
 				},
 
-				_focusInvalidFieldTab: function() {
+				_focusInvalidFieldTab() {
 					var instance = this;
 
 					var formNode = instance.formNode;
@@ -363,7 +278,7 @@ AUI.add(
 					}
 				},
 
-				_onEditorBlur: function(event) {
+				_onEditorBlur(event) {
 					var instance = this;
 
 					var formValidator = instance.formValidator;
@@ -371,9 +286,7 @@ AUI.add(
 					formValidator.validateField(event.target);
 				},
 
-				_onFieldFocusChange: function(event) {
-					var instance = this;
-
+				_onFieldFocusChange(event) {
 					var row = event.currentTarget.ancestor('.field');
 
 					if (row) {
@@ -384,7 +297,7 @@ AUI.add(
 					}
 				},
 
-				_onSubmit: function(event) {
+				_onSubmit(event) {
 					var instance = this;
 
 					event.preventDefault();
@@ -394,7 +307,7 @@ AUI.add(
 					}, 0);
 				},
 
-				_onSubmitError: function(event) {
+				_onSubmitError() {
 					var instance = this;
 
 					var collapsiblePanels = instance.formNode.all(
@@ -414,7 +327,7 @@ AUI.add(
 					});
 				},
 
-				_onValidatorSubmit: function(event) {
+				_onValidatorSubmit(event) {
 					var instance = this;
 
 					var onSubmit = instance.get('onSubmit');
@@ -422,7 +335,7 @@ AUI.add(
 					onSubmit.call(instance, event.validator.formEvent);
 				},
 
-				_processFieldRule: function(rules, strings, rule) {
+				_processFieldRule(rules, strings, rule) {
 					var instance = this;
 
 					var value = true;
@@ -486,7 +399,7 @@ AUI.add(
 					}
 				},
 
-				_processFieldRules: function(fieldRules) {
+				_processFieldRules(fieldRules) {
 					var instance = this;
 
 					if (!fieldRules) {
@@ -512,23 +425,19 @@ AUI.add(
 					}
 				},
 
-				_removeFieldAttribute: function(name, fieldName) {
-					var instance = this;
-
+				_removeFieldAttribute(name, fieldName) {
 					if (name === 'disabled') {
 						this.formValidator.validateField(fieldName);
 					}
 				},
 
-				_setFieldAttribute: function(name, value, fieldName) {
-					var instance = this;
-
+				_setFieldAttribute(name, value, fieldName) {
 					if (name === 'disabled') {
 						this.formValidator.resetField(fieldName);
 					}
 				},
 
-				_validatable: function(field) {
+				_validatable(field) {
 					var result;
 
 					if (field.test(':disabled')) {
@@ -536,22 +445,99 @@ AUI.add(
 					}
 
 					return result;
+				},
+
+				addRule(fieldName, validatorName, errorMessage, body, custom) {
+					var instance = this;
+
+					var fieldRules = instance.get('fieldRules');
+
+					var ruleIndex = instance._findRuleIndex(
+						fieldRules,
+						fieldName,
+						validatorName
+					);
+
+					if (ruleIndex == -1) {
+						fieldRules.push({
+							body: body || '',
+							custom: custom || false,
+							errorMessage: errorMessage || '',
+							fieldName,
+							validatorName
+						});
+
+						instance._processFieldRules(fieldRules);
+					}
+				},
+
+				initializer() {
+					var instance = this;
+
+					var id = instance.get('id');
+
+					var form = document[id];
+					var formNode = A.one(form);
+
+					instance.form = form;
+					instance.formNode = formNode;
+
+					if (formNode) {
+						var formValidator = new A.FormValidator({
+							boundingBox: formNode,
+							validateOnBlur: instance.get('validateOnBlur')
+						});
+
+						A.Do.before(
+							'_focusInvalidFieldTab',
+							formValidator,
+							'focusInvalidField',
+							instance
+						);
+
+						A.Do.before(
+							'_validatable',
+							formValidator,
+							'validatable',
+							instance
+						);
+
+						instance.formValidator = formValidator;
+
+						instance._processFieldRules();
+
+						instance._bindForm();
+					}
+				},
+
+				removeRule(fieldName, validatorName) {
+					var instance = this;
+
+					var fieldRules = instance.get('fieldRules');
+
+					var ruleIndex = instance._findRuleIndex(
+						fieldRules,
+						fieldName,
+						validatorName
+					);
+
+					if (ruleIndex != -1) {
+						var rule = fieldRules[ruleIndex];
+
+						instance.formValidator.resetField(rule.fieldName);
+
+						fieldRules.splice(ruleIndex, 1);
+
+						instance._processFieldRules(fieldRules);
+					}
 				}
-			},
-
-			get: function(id) {
-				var instance = this;
-
-				return instance._INSTANCES[id];
 			},
 
 			/*
 			 * @deprecated since 7.2, unused
 			 */
-			register: function(config) {
+			register(config) {
 				var instance = this;
-
-				formConfig = config;
 
 				var form = new Liferay.Form(config);
 
@@ -560,14 +546,12 @@ AUI.add(
 				instance._INSTANCES[formName] = form;
 
 				Liferay.fire('form:registered', {
-					form: form,
-					formName: formName
+					form,
+					formName
 				});
 
 				return form;
-			},
-
-			_INSTANCES: {}
+			}
 		});
 
 		Liferay.Form = Form;

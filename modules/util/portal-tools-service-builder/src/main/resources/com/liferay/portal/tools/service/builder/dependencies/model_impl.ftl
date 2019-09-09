@@ -12,7 +12,6 @@
 
 package ${packagePath}.model.impl;
 
-import ${serviceBuilder.getCompatJavaClassName("ProviderType")};
 import ${serviceBuilder.getCompatJavaClassName("StringBundler")};
 
 <#if entity.hasCompoundPK()>
@@ -124,11 +123,9 @@ import java.util.function.Function;
 <#if entity.jsonEnabled>
 	@JSON(strict = true)
 </#if>
-
-@ProviderType
 public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> implements ${entity.name}Model {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a ${entity.humanName} model instance should use the <code>${apiPackagePath}.model.${entity.name}</code> interface instead.

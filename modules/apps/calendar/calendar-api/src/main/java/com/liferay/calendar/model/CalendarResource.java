@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CalendarResource
 	extends CalendarResourceModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.calendar.model.impl.CalendarResourceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

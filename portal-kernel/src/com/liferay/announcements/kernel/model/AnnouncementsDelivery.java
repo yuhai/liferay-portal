@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AnnouncementsDelivery
 	extends AnnouncementsDeliveryModel, PersistedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.announcements.model.impl.AnnouncementsDeliveryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

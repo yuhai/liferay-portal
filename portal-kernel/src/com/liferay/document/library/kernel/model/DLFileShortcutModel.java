@@ -43,7 +43,7 @@ public interface DLFileShortcutModel
 	extends BaseModel<DLFileShortcut>, MVCCModel, ShardedModel,
 			StagedGroupedModel, TrashedModel, WorkflowedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a document library file shortcut model instance should use the {@link DLFileShortcut} interface instead.

@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface JournalContentSearchModel
 	extends BaseModel<JournalContentSearch>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a journal content search model instance should use the {@link JournalContentSearch} interface instead.

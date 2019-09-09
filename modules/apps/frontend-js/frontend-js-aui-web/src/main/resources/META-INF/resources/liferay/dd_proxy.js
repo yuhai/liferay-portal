@@ -22,7 +22,7 @@ AUI.add(
 		A.mix(
 			DDM,
 			{
-				_createFrame: function() {
+				_createFrame() {
 					if (!DDM._proxy) {
 						DDM._proxy = true;
 
@@ -46,7 +46,7 @@ AUI.add(
 					}
 				},
 
-				_setFrame: function(drag) {
+				_setFrame(drag) {
 					var activeHandle;
 
 					var cursor = 'auto';
@@ -66,7 +66,7 @@ AUI.add(
 
 					dragNode.setStyles({
 						border: drag.proxy.get('borderStyle'),
-						cursor: cursor,
+						cursor,
 						display: 'block',
 						visibility: 'hidden'
 					});

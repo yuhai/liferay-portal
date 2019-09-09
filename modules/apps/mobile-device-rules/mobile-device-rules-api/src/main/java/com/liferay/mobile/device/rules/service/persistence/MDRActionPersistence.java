@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface MDRActionPersistence extends BasePersistence<MDRAction> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MDRActionUtil} to access the mdr action persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

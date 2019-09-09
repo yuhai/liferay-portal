@@ -40,8 +40,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the AssetEntryAssetCategoryRel service. Represents a row in the &quot;AssetEntryAssetCategoryRel&quot; database table, with each column mapped to a property of this class.
  *
@@ -53,12 +51,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see AssetEntryAssetCategoryRelImpl
  * @generated
  */
-@ProviderType
 public class AssetEntryAssetCategoryRelModelImpl
 	extends BaseModelImpl<AssetEntryAssetCategoryRel>
 	implements AssetEntryAssetCategoryRelModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset entry asset category rel model instance should use the <code>AssetEntryAssetCategoryRel</code> interface instead.

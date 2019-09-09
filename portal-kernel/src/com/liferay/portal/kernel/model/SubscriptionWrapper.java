@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Subscription}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class SubscriptionWrapper
 	extends BaseModelWrapper<Subscription>
 	implements Subscription, ModelWrapper<Subscription> {
@@ -270,6 +267,11 @@ public class SubscriptionWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a subscription model instance should use the <code>Subscription</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

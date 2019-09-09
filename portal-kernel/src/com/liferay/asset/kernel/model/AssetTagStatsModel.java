@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetTagStatsModel
 	extends BaseModel<AssetTagStats>, ShardedModel, TypedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset tag stats model instance should use the {@link AssetTagStats} interface instead.

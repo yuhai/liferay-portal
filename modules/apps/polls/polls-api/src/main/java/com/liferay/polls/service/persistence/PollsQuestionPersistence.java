@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PollsQuestionPersistence
 	extends BasePersistence<PollsQuestion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PollsQuestionUtil} to access the polls question persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

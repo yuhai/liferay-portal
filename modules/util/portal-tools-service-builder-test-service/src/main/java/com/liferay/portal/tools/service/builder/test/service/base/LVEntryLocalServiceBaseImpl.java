@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.service.base;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -75,13 +73,12 @@ import javax.sql.DataSource;
  * @see com.liferay.portal.tools.service.builder.test.service.impl.LVEntryLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class LVEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements LVEntryLocalService, IdentifiableOSGiService,
 			   VersionService<LVEntry, LVEntryVersion> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LVEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.tools.service.builder.test.service.LVEntryLocalServiceUtil</code>.

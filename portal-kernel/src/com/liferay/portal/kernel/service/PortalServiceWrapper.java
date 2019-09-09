@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link PortalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PortalService
  * @generated
  */
-@ProviderType
 public class PortalServiceWrapper
 	implements PortalService, ServiceWrapper<PortalService> {
 
@@ -31,8 +29,13 @@ public class PortalServiceWrapper
 		_portalService = portalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PortalServiceUtil} to access the portal remote service. Add custom service methods to <code>com.liferay.portal.service.impl.PortalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
-	public String getAutoDeployDirectory() {
+	public java.lang.String getAutoDeployDirectory() {
 		return _portalService.getAutoDeployDirectory();
 	}
 
@@ -47,28 +50,28 @@ public class PortalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _portalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
-	public String getVersion() {
+	public java.lang.String getVersion() {
 		return _portalService.getVersion();
 	}
 
 	@Override
-	public void testAddClassName_Rollback(String classNameValue) {
+	public void testAddClassName_Rollback(java.lang.String classNameValue) {
 		_portalService.testAddClassName_Rollback(classNameValue);
 	}
 
 	@Override
-	public void testAddClassName_Success(String classNameValue) {
+	public void testAddClassName_Success(java.lang.String classNameValue) {
 		_portalService.testAddClassName_Success(classNameValue);
 	}
 
 	@Override
 	public void testAddClassNameAndTestTransactionPortletBar_PortalRollback(
-		String transactionPortletBarText) {
+		java.lang.String transactionPortletBarText) {
 
 		_portalService.
 			testAddClassNameAndTestTransactionPortletBar_PortalRollback(
@@ -77,7 +80,7 @@ public class PortalServiceWrapper
 
 	@Override
 	public void testAddClassNameAndTestTransactionPortletBar_PortletRollback(
-		String transactionPortletBarText) {
+		java.lang.String transactionPortletBarText) {
 
 		_portalService.
 			testAddClassNameAndTestTransactionPortletBar_PortletRollback(
@@ -86,7 +89,7 @@ public class PortalServiceWrapper
 
 	@Override
 	public void testAddClassNameAndTestTransactionPortletBar_Success(
-		String transactionPortletBarText) {
+		java.lang.String transactionPortletBarText) {
 
 		_portalService.testAddClassNameAndTestTransactionPortletBar_Success(
 			transactionPortletBarText);

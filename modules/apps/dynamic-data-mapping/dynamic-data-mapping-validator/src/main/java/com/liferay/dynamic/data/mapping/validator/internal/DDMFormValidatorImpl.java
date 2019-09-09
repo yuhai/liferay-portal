@@ -21,6 +21,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException;
@@ -237,7 +238,8 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 				ddmFormField, "tip", ddmFormAvailableLocales,
 				ddmFormDefaultLocale);
 
-			validateDDMFormFieldValidationExpression(ddmFormField);
+			validateDDMFormFieldValidationExpression(
+				ddmFormField, ddmFormAvailableLocales);
 			validateDDMFormFieldVisibilityExpression(ddmFormField);
 
 			validateDDMFormFields(
@@ -263,7 +265,7 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 	}
 
 	protected void validateDDMFormFieldValidationExpression(
-			DDMFormField ddmFormField)
+			DDMFormField ddmFormField, Set<Locale> locales)
 		throws DDMFormValidationException {
 
 		DDMFormFieldValidation ddmFormFieldValidation =
@@ -273,19 +275,32 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 			return;
 		}
 
-		String validationExpression = ddmFormFieldValidation.getExpression();
-
-		if (Validator.isNull(validationExpression)) {
-			return;
-		}
+		DDMFormFieldValidationExpression ddmFormFieldValidationExpression =
+			ddmFormFieldValidation.getDDMFormFieldValidationExpression();
 
 		try {
-			_ddmExpressionFactory.createBooleanDDMExpression(
-				validationExpression);
+			if (ddmFormFieldValidation.getParameterLocalizedValue() == null) {
+				_ddmExpressionFactory.createBooleanDDMExpression(
+					ddmFormFieldValidationExpression.getValue());
+			}
+			else {
+				String value = ddmFormFieldValidationExpression.getValue();
+
+				LocalizedValue parameterLocalizedValue =
+					ddmFormFieldValidation.getParameterLocalizedValue();
+
+				for (Locale locale : locales) {
+					_ddmExpressionFactory.createBooleanDDMExpression(
+						value.replace(
+							"{parameter}",
+							parameterLocalizedValue.getString(locale)));
+				}
+			}
 		}
 		catch (DDMExpressionException ddmee) {
 			throw new MustSetValidValidationExpression(
-				ddmFormField.getName(), validationExpression);
+				ddmFormField.getName(),
+				ddmFormFieldValidationExpression.getValue());
 		}
 	}
 

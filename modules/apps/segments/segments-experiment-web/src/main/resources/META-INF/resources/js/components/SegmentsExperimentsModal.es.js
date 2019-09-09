@@ -40,7 +40,7 @@ function SegmentsExperimentsModal({
 	});
 	const [inputDescription, setInputDescription] = useState(description);
 	const [inputGoal, setInputGoal] = useState(
-		goal || (goals[0] && goals[0].value)
+		(goal && goal.value) || (goals[0] && goals[0].value)
 	);
 	const [inputName, setInputName] = useState(name);
 	const [invalidForm, setInvalidForm] = useState(false);
@@ -144,14 +144,23 @@ function SegmentsExperimentsModal({
 	}
 
 	/**
-	 * Triggers `onTestCreation` and closes the modal
+	 * Triggers `onSave` prop
+	 *
+	 * Resets `goalTarget` if goal is not 'click'
 	 */
 	function _handleSave() {
 		if (!invalidForm) {
+			const goalTarget =
+				inputGoal === 'click'
+					? goal && goal.target
+						? goal.target
+						: ''
+					: '';
+
 			onSave({
 				description: inputDescription,
 				goal: inputGoal,
-				goalTarget: '',
+				goalTarget,
 				name: inputName,
 				segmentsExperienceId,
 				segmentsExperimentId

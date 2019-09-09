@@ -16,8 +16,6 @@ package com.liferay.message.boards.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link MBCategoryService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MBCategoryService
  * @generated
  */
-@ProviderType
 public class MBCategoryServiceWrapper
 	implements MBCategoryService, ServiceWrapper<MBCategoryService> {
 
@@ -33,6 +30,11 @@ public class MBCategoryServiceWrapper
 		_mbCategoryService = mbCategoryService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MBCategoryServiceUtil} to access the message boards category remote service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBCategoryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.message.boards.model.MBCategory addCategory(
 			long userId, long parentCategoryId, String name, String description,

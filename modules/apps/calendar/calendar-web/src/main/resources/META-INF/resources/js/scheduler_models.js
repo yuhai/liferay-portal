@@ -40,28 +40,26 @@ AUI.add(
 
 		var CalendarUtil = Liferay.CalendarUtil;
 
-		var SchedulerModelSync = function(config) {};
+		var SchedulerModelSync = function() {};
 
 		SchedulerModelSync.prototype = {
-			sync: function(action, options, callback) {
-				var instance = this;
-
-				var actionMethod = instance['_do' + toInitialCap(action)];
-
-				if (isFunction(actionMethod)) {
-					actionMethod.apply(instance, [options, callback]);
-				}
-			},
-
-			_doRead: function() {
-				var instance = this;
-
+			_doRead() {
 				var args = arguments;
 
 				var callback = args[args.length - 1];
 
 				if (isFunction(callback)) {
 					callback();
+				}
+			},
+
+			sync(action, options, callback) {
+				var instance = this;
+
+				var actionMethod = instance['_do' + toInitialCap(action)];
+
+				if (isFunction(actionMethod)) {
+					actionMethod.apply(instance, [options, callback]);
 				}
 			}
 		};
@@ -81,7 +79,7 @@ AUI.add(
 				},
 
 				content: {
-					getter: function(val) {
+					getter(val) {
 						var content = val;
 
 						if (val) {
@@ -90,7 +88,7 @@ AUI.add(
 
 						return content;
 					},
-					setter: function(val) {
+					setter(val) {
 						var content = val;
 
 						if (val) {
@@ -166,7 +164,7 @@ AUI.add(
 				},
 
 				reminder: {
-					getter: function() {
+					getter() {
 						var instance = this;
 
 						return (
@@ -212,9 +210,140 @@ AUI.add(
 			]),
 
 			prototype: {
+				_isPastEvent() {
+					var instance = this;
+
+					var endDate = instance.get('endDate');
+
+					var result;
+
+					var scheduler = instance.get('scheduler');
+
+					if (scheduler) {
+						var currentTime = scheduler.get('currentTime');
+
+						result = endDate.getTime() < currentTime.getTime();
+					} else {
+						result = false;
+					}
+
+					return result;
+				},
+
+				_isShortDurationEventIntersecting(evtStartDate) {
+					var instance = this;
+					var shortDurationEventIntersecting = false;
+
+					if (instance.getMinutesDuration() < 30) {
+						var earlierEvtStartDate = DateMath.subtract(
+							DateMath.clone(evtStartDate),
+							DateMath.MINUTES,
+							30
+						);
+						var endDate = instance.get('endDate');
+
+						shortDurationEventIntersecting =
+							DateMath.between(
+								endDate,
+								earlierEvtStartDate,
+								evtStartDate
+							) || DateMath.compare(endDate, evtStartDate);
+					}
+
+					return shortDurationEventIntersecting;
+				},
+
+				_onLoadingChange(event) {
+					var instance = this;
+
+					instance._uiSetLoading(event.newVal);
+				},
+
+				_onStartDateChange(event) {
+					var instance = this;
+
+					instance._uiSetStartDate(event.newVal);
+				},
+
+				_onStatusChange(event) {
+					var instance = this;
+
+					instance._uiSetStatus(event.newVal);
+				},
+
+				_uiSetEndDate(val) {
+					var instance = this;
+
+					Liferay.SchedulerEvent.superclass._uiSetEndDate.apply(
+						instance,
+						arguments
+					);
+
+					var node = instance.get('node');
+
+					node.attr(
+						'data-endDate',
+						instance._formatDate(val, '%m/%d/%Y')
+					);
+					node.attr(
+						'data-endTime',
+						instance._formatDate(val, '%I:%M %p')
+					);
+				},
+
+				_uiSetLoading(val) {
+					var instance = this;
+
+					instance
+						.get('node')
+						.toggleClass('calendar-portlet-event-loading', val);
+				},
+
+				_uiSetStartDate(val) {
+					var instance = this;
+
+					var node = instance.get('node');
+
+					node.attr(
+						'data-startDate',
+						instance._formatDate(val, '%m/%d/%Y')
+					);
+					node.attr(
+						'data-startTime',
+						instance._formatDate(val, '%I:%M %p')
+					);
+				},
+
+				_uiSetStatus(val) {
+					var instance = this;
+
+					var node = instance.get('node');
+
+					node.toggleClass(
+						'calendar-portlet-event-approved',
+						val === CalendarWorkflow.STATUS_APPROVED
+					);
+					node.toggleClass(
+						'calendar-portlet-event-denied',
+						val === CalendarWorkflow.STATUS_DENIED
+					);
+					node.toggleClass(
+						'calendar-portlet-event-draft',
+						val === CalendarWorkflow.STATUS_DRAFT
+					);
+					node.toggleClass(
+						'calendar-portlet-event-maybe',
+						val === CalendarWorkflow.STATUS_MAYBE
+					);
+					node.toggleClass(
+						'calendar-portlet-event-pending',
+						val === CalendarWorkflow.STATUS_PENDING
+					);
+				},
+
 				eventModel: Liferay.SchedulerEvent,
 
-				initializer: function() {
+				initializer() {
 					var instance = this;
 
 					instance._uiSetLoading(instance.get('loading'));
@@ -226,27 +355,7 @@ AUI.add(
 					instance.on('statusChange', instance._onStatusChange);
 				},
 
-				syncUI: function() {
-					var instance = this;
-
-					Liferay.SchedulerEvent.superclass.syncUI.apply(
-						instance,
-						arguments
-					);
-
-					instance._uiSetStatus(instance.get('status'));
-				},
-
-				isMasterBooking: function() {
-					var instance = this;
-
-					return (
-						instance.get('parentCalendarBookingId') ===
-						instance.get('calendarBookingId')
-					);
-				},
-
-				intersects: function(evt) {
+				intersects(evt) {
 					var instance = this;
 
 					var endDate = instance.get('endDate');
@@ -263,7 +372,16 @@ AUI.add(
 					);
 				},
 
-				isRecurring: function() {
+				isMasterBooking() {
+					var instance = this;
+
+					return (
+						instance.get('parentCalendarBookingId') ===
+						instance.get('calendarBookingId')
+					);
+				},
+
+				isRecurring() {
 					var instance = this;
 
 					return (
@@ -273,7 +391,7 @@ AUI.add(
 					);
 				},
 
-				syncNodeColorUI: function() {
+				syncNodeColorUI() {
 					var instance = this;
 
 					Liferay.SchedulerEvent.superclass.syncNodeColorUI.apply(
@@ -303,7 +421,18 @@ AUI.add(
 					}
 				},
 
-				syncWithServer: function() {
+				syncUI() {
+					var instance = this;
+
+					Liferay.SchedulerEvent.superclass.syncUI.apply(
+						instance,
+						arguments
+					);
+
+					instance._uiSetStatus(instance.get('status'));
+				},
+
+				syncWithServer() {
 					var instance = this;
 
 					var calendarBookingId = instance.get('calendarBookingId');
@@ -323,137 +452,6 @@ AUI.add(
 							CalendarUtil,
 							schedulerEvents
 						)
-					);
-				},
-
-				_isPastEvent: function() {
-					var instance = this;
-
-					var endDate = instance.get('endDate');
-
-					var result;
-
-					var scheduler = instance.get('scheduler');
-
-					if (scheduler) {
-						var currentTime = scheduler.get('currentTime');
-
-						result = endDate.getTime() < currentTime.getTime();
-					} else {
-						result = false;
-					}
-
-					return result;
-				},
-
-				_isShortDurationEventIntersecting: function(evtStartDate) {
-					var instance = this;
-					var shortDurationEventIntersecting = false;
-
-					if (instance.getMinutesDuration() < 30) {
-						var earlierEvtStartDate = DateMath.subtract(
-							DateMath.clone(evtStartDate),
-							DateMath.MINUTES,
-							30
-						);
-						var endDate = instance.get('endDate');
-
-						shortDurationEventIntersecting =
-							DateMath.between(
-								endDate,
-								earlierEvtStartDate,
-								evtStartDate
-							) || DateMath.compare(endDate, evtStartDate);
-					}
-
-					return shortDurationEventIntersecting;
-				},
-
-				_onLoadingChange: function(event) {
-					var instance = this;
-
-					instance._uiSetLoading(event.newVal);
-				},
-
-				_onStartDateChange: function(event) {
-					var instance = this;
-
-					instance._uiSetStartDate(event.newVal);
-				},
-
-				_onStatusChange: function(event) {
-					var instance = this;
-
-					instance._uiSetStatus(event.newVal);
-				},
-
-				_uiSetEndDate: function(val) {
-					var instance = this;
-
-					Liferay.SchedulerEvent.superclass._uiSetEndDate.apply(
-						instance,
-						arguments
-					);
-
-					var node = instance.get('node');
-
-					node.attr(
-						'data-endDate',
-						instance._formatDate(val, '%m/%d/%Y')
-					);
-					node.attr(
-						'data-endTime',
-						instance._formatDate(val, '%I:%M %p')
-					);
-				},
-
-				_uiSetLoading: function(val) {
-					var instance = this;
-
-					instance
-						.get('node')
-						.toggleClass('calendar-portlet-event-loading', val);
-				},
-
-				_uiSetStartDate: function(val) {
-					var instance = this;
-
-					var node = instance.get('node');
-
-					node.attr(
-						'data-startDate',
-						instance._formatDate(val, '%m/%d/%Y')
-					);
-					node.attr(
-						'data-startTime',
-						instance._formatDate(val, '%I:%M %p')
-					);
-				},
-
-				_uiSetStatus: function(val) {
-					var instance = this;
-
-					var node = instance.get('node');
-
-					node.toggleClass(
-						'calendar-portlet-event-approved',
-						val === CalendarWorkflow.STATUS_APPROVED
-					);
-					node.toggleClass(
-						'calendar-portlet-event-denied',
-						val === CalendarWorkflow.STATUS_DENIED
-					);
-					node.toggleClass(
-						'calendar-portlet-event-draft',
-						val === CalendarWorkflow.STATUS_DRAFT
-					);
-					node.toggleClass(
-						'calendar-portlet-event-maybe',
-						val === CalendarWorkflow.STATUS_MAYBE
-					);
-					node.toggleClass(
-						'calendar-portlet-event-pending',
-						val === CalendarWorkflow.STATUS_PENDING
 					);
 				}
 			}
@@ -506,7 +504,7 @@ AUI.add(
 
 				permissions: {
 					lazyAdd: false,
-					setter: function(val) {
+					setter(val) {
 						var instance = this;
 
 						instance.set('disabled', !val.MANAGE_BOOKINGS);
@@ -527,30 +525,7 @@ AUI.add(
 			NAME: 'scheduler-calendar',
 
 			prototype: {
-				getDisplayName: function() {
-					var instance = this;
-
-					var name = instance.get('name');
-
-					var showCalendarResourceName = instance.get(
-						'showCalendarResourceName'
-					);
-
-					if (showCalendarResourceName) {
-						var calendarResourceName = instance.get(
-							'calendarResourceName'
-						);
-
-						name = CalendarUtil.getCalendarName(
-							name,
-							calendarResourceName
-						);
-					}
-
-					return name;
-				},
-
-				_afterColorChange: function(event) {
+				_afterColorChange(event) {
 					var instance = this;
 
 					Calendar.superclass._afterColorChange.apply(
@@ -578,7 +553,7 @@ AUI.add(
 					}
 				},
 
-				_afterVisibleChange: function(event) {
+				_afterVisibleChange() {
 					var instance = this;
 
 					Calendar.superclass._afterVisibleChange.apply(
@@ -589,6 +564,29 @@ AUI.add(
 					var scheduler = instance.get('scheduler');
 
 					scheduler.syncEventsUI();
+				},
+
+				getDisplayName() {
+					var instance = this;
+
+					var name = instance.get('name');
+
+					var showCalendarResourceName = instance.get(
+						'showCalendarResourceName'
+					);
+
+					if (showCalendarResourceName) {
+						var calendarResourceName = instance.get(
+							'calendarResourceName'
+						);
+
+						name = CalendarUtil.getCalendarName(
+							name,
+							calendarResourceName
+						);
+					}
+
+					return name;
 				}
 			}
 		});
@@ -600,56 +598,7 @@ AUI.add(
 			A.SchedulerEvents,
 			[Liferay.SchedulerModelSync],
 			{
-				getEventsPerPage: function(activeView, eventsPerPage) {
-					var instance = this;
-
-					var viewName = activeView.get('name');
-
-					if (viewName !== 'agenda') {
-						eventsPerPage = -1;
-					}
-
-					return eventsPerPage;
-				},
-
-				getLoadEndDate: function(activeView, maxDaysDisplayed) {
-					var instance = this;
-
-					var date = activeView.getNextDate();
-
-					var viewName = activeView.get('name');
-
-					if (viewName === 'agenda') {
-						date = DateMath.add(
-							date,
-							DateMath.DAY,
-							maxDaysDisplayed
-						);
-
-						date = DateMath.subtract(date, DateMath.MINUTES, 1);
-					} else if (viewName === 'month') {
-						date = DateMath.add(date, DateMath.WEEK, 1);
-					}
-
-					return date;
-				},
-
-				getLoadStartDate: function(activeView) {
-					var instance = this;
-
-					var scheduler = activeView.get('scheduler');
-					var viewName = activeView.get('name');
-
-					var date = scheduler.get('viewDate');
-
-					if (viewName === 'month') {
-						date = DateMath.subtract(date, DateMath.WEEK, 1);
-					}
-
-					return date;
-				},
-
-				_doRead: function(options, callback) {
+				_doRead(_options, callback) {
 					var instance = this;
 
 					var scheduler = instance.get('scheduler');
@@ -691,6 +640,49 @@ AUI.add(
 							callback(null, calendarBookings);
 						}
 					);
+				},
+
+				getEventsPerPage(activeView, eventsPerPage) {
+					var viewName = activeView.get('name');
+
+					if (viewName !== 'agenda') {
+						eventsPerPage = -1;
+					}
+
+					return eventsPerPage;
+				},
+
+				getLoadEndDate(activeView, maxDaysDisplayed) {
+					var date = activeView.getNextDate();
+
+					var viewName = activeView.get('name');
+
+					if (viewName === 'agenda') {
+						date = DateMath.add(
+							date,
+							DateMath.DAY,
+							maxDaysDisplayed
+						);
+
+						date = DateMath.subtract(date, DateMath.MINUTES, 1);
+					} else if (viewName === 'month') {
+						date = DateMath.add(date, DateMath.WEEK, 1);
+					}
+
+					return date;
+				},
+
+				getLoadStartDate(activeView) {
+					var scheduler = activeView.get('scheduler');
+					var viewName = activeView.get('name');
+
+					var date = scheduler.get('viewDate');
+
+					if (viewName === 'month') {
+						date = DateMath.subtract(date, DateMath.WEEK, 1);
+					}
+
+					return date;
 				}
 			},
 			{}

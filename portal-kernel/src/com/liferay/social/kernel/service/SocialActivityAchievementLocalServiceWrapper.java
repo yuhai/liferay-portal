@@ -16,8 +16,6 @@ package com.liferay.social.kernel.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SocialActivityAchievementLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SocialActivityAchievementLocalService
  * @generated
  */
-@ProviderType
 public class SocialActivityAchievementLocalServiceWrapper
 	implements SocialActivityAchievementLocalService,
 			   ServiceWrapper<SocialActivityAchievementLocalService> {
@@ -38,6 +35,11 @@ public class SocialActivityAchievementLocalServiceWrapper
 			socialActivityAchievementLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SocialActivityAchievementLocalServiceUtil} to access the social activity achievement local service. Add custom service methods to <code>com.liferay.portlet.social.service.impl.SocialActivityAchievementLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void addActivityAchievement(
 			long userId, long groupId,

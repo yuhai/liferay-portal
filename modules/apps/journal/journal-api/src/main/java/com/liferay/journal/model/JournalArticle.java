@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface JournalArticle
 	extends JournalArticleModel, PersistedModel, TreeModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.journal.model.impl.JournalArticleImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -104,7 +104,6 @@ public interface JournalArticle
 
 	public com.liferay.dynamic.data.mapping.model.DDMTemplate getDDMTemplate();
 
-	@com.liferay.portal.kernel.json.JSON
 	public String getDescription();
 
 	public String getDescription(java.util.Locale locale);
@@ -115,8 +114,12 @@ public interface JournalArticle
 
 	public String getDescription(String languageId, boolean useDefault);
 
+	@com.liferay.portal.kernel.json.JSON
+	public String getDescriptionCurrentValue();
+
 	public java.util.Map<java.util.Locale, String> getDescriptionMap();
 
+	@com.liferay.portal.kernel.json.JSON(name = "description")
 	public String getDescriptionMapAsXML();
 
 	public com.liferay.portal.kernel.xml.Document getDocument();
@@ -180,7 +183,6 @@ public interface JournalArticle
 	@Deprecated
 	public String getTemplateId();
 
-	@com.liferay.portal.kernel.json.JSON
 	public String getTitle();
 
 	public String getTitle(java.util.Locale locale);
@@ -196,6 +198,7 @@ public interface JournalArticle
 
 	public java.util.Map<java.util.Locale, String> getTitleMap();
 
+	@com.liferay.portal.kernel.json.JSON(name = "title")
 	public String getTitleMapAsXML();
 
 	public String getUrlTitle(java.util.Locale locale)

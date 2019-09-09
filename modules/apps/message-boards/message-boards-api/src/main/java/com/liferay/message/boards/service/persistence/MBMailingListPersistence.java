@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MBMailingListPersistence
 	extends BasePersistence<MBMailingList> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MBMailingListUtil} to access the message boards mailing list persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

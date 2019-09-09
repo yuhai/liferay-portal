@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SocialActivityCounterModel
 	extends AttachedModel, BaseModel<SocialActivityCounter>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a social activity counter model instance should use the {@link SocialActivityCounter} interface instead.

@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ServiceComponentModel
 	extends BaseModel<ServiceComponent>, MVCCModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a service component model instance should use the {@link ServiceComponent} interface instead.

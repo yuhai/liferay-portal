@@ -75,6 +75,15 @@ public class RenderFragmentEntryStrutsAction implements StrutsAction {
 			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
 			_fragmentRendererController);
 
+		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
+			groupId, false);
+
+		themeDisplay.setLayoutSet(layoutSet);
+		themeDisplay.setLookAndFeel(
+			layoutSet.getTheme(), layoutSet.getColorScheme());
+
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher("/render_fragment_entry.jsp");
 
@@ -84,9 +93,6 @@ public class RenderFragmentEntryStrutsAction implements StrutsAction {
 			httpServletResponse, unsyncStringWriter);
 
 		requestDispatcher.include(httpServletRequest, pipingServletResponse);
-
-		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
-			groupId, false);
 
 		Document document = Jsoup.parse(
 			ThemeUtil.include(

@@ -34,13 +34,13 @@ AUI.add(
 		};
 
 		A.mix(A.Node.prototype, {
-			allNS: function(ns, selector) {
+			allNS(ns, selector) {
 				var instance = this;
 
 				return instance.all(formatSelectorNS(ns, selector));
 			},
 
-			oneNS: function(ns, selector) {
+			oneNS(ns, selector) {
 				var instance = this;
 
 				return instance.one(formatSelectorNS(ns, selector));

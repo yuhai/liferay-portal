@@ -19,13 +19,7 @@
 <%
 EditSegmentsEntryDisplayContext editSegmentsEntryDisplayContext = (EditSegmentsEntryDisplayContext)request.getAttribute(SegmentsWebKeys.EDIT_SEGMENTS_ENTRY_DISPLAY_CONTEXT);
 
-String redirect = ParamUtil.getString(request, "redirect", editSegmentsEntryDisplayContext.getRedirect());
-
-String backURL = ParamUtil.getString(request, "backURL", redirect);
-
-SegmentsEntry segmentsEntry = editSegmentsEntryDisplayContext.getSegmentsEntry();
-
-long segmentsEntryId = editSegmentsEntryDisplayContext.getSegmentsEntryId();
+String backURL = editSegmentsEntryDisplayContext.getBackURL();
 
 if (Validator.isNotNull(backURL)) {
 	portletDisplay.setShowBackIcon(true);
@@ -42,8 +36,8 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 <portlet:actionURL name="updateSegmentsEntry" var="updateSegmentsEntryActionURL" />
 
 <aui:form action="<%= updateSegmentsEntryActionURL %>" method="post" name="editSegmentFm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveSegmentsEntry();" %>'>
-	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
-	<aui:input name="segmentsEntryId" type="hidden" value="<%= segmentsEntryId %>" />
+	<aui:input name="redirect" type="hidden" value="<%= editSegmentsEntryDisplayContext.getRedirect() %>" />
+	<aui:input name="segmentsEntryId" type="hidden" value="<%= editSegmentsEntryDisplayContext.getSegmentsEntryId() %>" />
 	<aui:input name="segmentsEntryKey" type="hidden" value="<%= editSegmentsEntryDisplayContext.getSegmentsEntryKey() %>" />
 	<aui:input name="type" type="hidden" value="<%= editSegmentsEntryDisplayContext.getType() %>" />
 	<aui:input name="dynamic" type="hidden" value="<%= true %>" />
@@ -56,73 +50,12 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 		<div class="inline-item my-5 p-5 w-100">
 			<span aria-hidden="true" class="loading-animation"></span>
 		</div>
+
+		<react:component
+			data="<%= editSegmentsEntryDisplayContext.getData() %>"
+			module="js/SegmentsApp.es"
+		/>
 	</div>
-
-	<portlet:renderURL var="previewMembersURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-		<portlet:param name="mvcRenderCommandName" value="previewSegmentsEntryUsers" />
-		<portlet:param name="segmentsEntryId" value="<%= String.valueOf(segmentsEntryId) %>" />
-	</portlet:renderURL>
-
-	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="getSegmentsEntryClassPKsCount" var="getSegmentsEntryClassPKsCountURL" />
-	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="getSegmentsFieldValueName" var="getSegmentsFieldValueNameURL" />
-
-	<aui:script require='<%= npmResolvedPackageName + "/js/index.es as SegmentEdit" %>'>
-		var availableLocales = {};
-
-		<%
-		for (Locale availableLocale : editSegmentsEntryDisplayContext.getAvailableLocales()) {
-			String availableLanguageId = LocaleUtil.toLanguageId(availableLocale);
-		%>
-
-			availableLocales['<%= availableLanguageId %>'] = '<%= availableLocale.getDisplayName(locale) %>';
-
-		<%
-		}
-		%>
-
-		SegmentEdit.default(
-			'<%= segmentEditRootElementId %>',
-			{
-				context: {
-					assetsPath: '<%= PortalUtil.getPathContext(request) + "/assets" %>',
-					namespace: '<portlet:namespace />',
-					requestFieldValueNameURL: '<%= getSegmentsFieldValueNameURL %>'
-				},
-				props: {
-					availableLocales: availableLocales,
-					contributors: <%= editSegmentsEntryDisplayContext.getContributorsJSONArray() %>,
-					defaultLanguageId: '<%= editSegmentsEntryDisplayContext.getDefaultLanguageId() %>',
-					formId: '<portlet:namespace />editSegmentFm',
-					hasUpdatePermission: <%= editSegmentsEntryDisplayContext.hasUpdatePermission() %>,
-					initialMembersCount: <%= editSegmentsEntryDisplayContext.getSegmentsEntryClassPKsCount() %>,
-					initialSegmentActive: <%= (segmentsEntry == null) ? false : segmentsEntry.isActive() %>,
-
-					<c:choose>
-						<c:when test="<%= segmentsEntry != null %>">
-
-							<%
-							JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
-							%>
-
-							initialSegmentName: <%= JSONFactoryUtil.createJSONObject(jsonSerializer.serializeDeep(segmentsEntry.getNameMap())) %>,
-						</c:when>
-						<c:otherwise>
-							initialSegmentName: null,
-						</c:otherwise>
-					</c:choose>
-
-					locale: '<%= locale %>',
-					portletNamespace: '<portlet:namespace />',
-					previewMembersURL: '<%= previewMembersURL %>',
-					propertyGroups: <%= editSegmentsEntryDisplayContext.getPropertyGroupsJSONArray(locale) %>,
-					redirect: '<%= HtmlUtil.escape(redirect) %>',
-					requestMembersCountURL: '<%= getSegmentsEntryClassPKsCountURL %>',
-					showInEditMode: <%= editSegmentsEntryDisplayContext.isShowInEditMode() %>,
-					source: '<%= editSegmentsEntryDisplayContext.getSource() %>'
-				}
-			}
-		);
-	</aui:script>
 </aui:form>
 
 <aui:script>

@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link AssetTagStats}.
@@ -34,7 +32,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class AssetTagStatsWrapper
 	extends BaseModelWrapper<AssetTagStats>
 	implements AssetTagStats, ModelWrapper<AssetTagStats> {
@@ -159,6 +156,11 @@ public class AssetTagStatsWrapper
 		return model.getTagStatsId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a asset tag stats model instance should use the <code>AssetTagStats</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

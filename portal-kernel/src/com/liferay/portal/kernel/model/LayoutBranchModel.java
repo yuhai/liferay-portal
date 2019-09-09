@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutBranchModel
 	extends BaseModel<LayoutBranch>, MVCCModel, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout branch model instance should use the {@link LayoutBranch} interface instead.

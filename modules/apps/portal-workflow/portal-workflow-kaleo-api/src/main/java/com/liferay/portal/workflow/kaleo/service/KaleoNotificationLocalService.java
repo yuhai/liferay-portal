@@ -57,7 +57,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoNotificationLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoNotificationLocalServiceUtil} to access the kaleo notification local service. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoNotificationLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

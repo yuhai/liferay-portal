@@ -18,7 +18,45 @@
 	var usedModules = {};
 
 	var Dependency = {
-		provide: function(obj, methodName, methodFn, modules, proto) {
+		_getAOP(obj, methodName) {
+			return obj._yuiaop && obj._yuiaop[methodName];
+		},
+
+		_proxy(obj, methodName, methodFn, context, guid, modules, _A) {
+			var args;
+
+			var queue = Dependency._proxyLoaders[guid];
+
+			Dependency._replaceMethod(obj, methodName, methodFn, context);
+
+			while ((args = queue.next())) {
+				methodFn.apply(context, args);
+			}
+
+			for (var i = modules.length - 1; i >= 0; i--) {
+				usedModules[modules[i]] = true;
+			}
+		},
+
+		_proxyLoaders: {},
+
+		_replaceMethod(obj, methodName, methodFn) {
+			var AOP = Dependency._getAOP(obj, methodName);
+
+			var proxy = obj[methodName];
+
+			if (AOP) {
+				proxy = AOP.method;
+
+				AOP.method = methodFn;
+			} else {
+				obj[methodName] = methodFn;
+			}
+
+			A.mix(methodFn, proxy);
+		},
+
+		provide(obj, methodName, methodFn, modules, proto) {
 			if (!Array.isArray(modules)) {
 				modules = [modules];
 			}
@@ -109,49 +147,7 @@
 			};
 
 			obj[methodName] = proxy;
-		},
-
-		_getAOP: function(obj, methodName) {
-			var instance = this;
-
-			return obj._yuiaop && obj._yuiaop[methodName];
-		},
-
-		_proxy: function(obj, methodName, methodFn, context, guid, modules, A) {
-			var args;
-
-			var queue = Dependency._proxyLoaders[guid];
-
-			Dependency._replaceMethod(obj, methodName, methodFn, context);
-
-			while ((args = queue.next())) {
-				methodFn.apply(context, args);
-			}
-
-			for (var i = modules.length - 1; i >= 0; i--) {
-				usedModules[modules[i]] = true;
-			}
-		},
-
-		_replaceMethod: function(obj, methodName, methodFn, context) {
-			var instance = this;
-
-			var AOP = Dependency._getAOP(obj, methodName);
-
-			var proxy = obj[methodName];
-
-			if (AOP) {
-				proxy = AOP.method;
-
-				AOP.method = methodFn;
-			} else {
-				obj[methodName] = methodFn;
-			}
-
-			A.mix(methodFn, proxy);
-		},
-
-		_proxyLoaders: {}
+		}
 	};
 
 	Liferay.Dependency = Dependency;

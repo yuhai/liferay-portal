@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KaleoTimerInstanceToken}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoTimerInstanceToken
  * @generated
  */
-@ProviderType
 public class KaleoTimerInstanceTokenWrapper
 	extends BaseModelWrapper<KaleoTimerInstanceToken>
 	implements KaleoTimerInstanceToken, ModelWrapper<KaleoTimerInstanceToken> {
@@ -487,6 +484,11 @@ public class KaleoTimerInstanceTokenWrapper
 		return model.isCompleted();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kaleo timer instance token model instance should use the <code>KaleoTimerInstanceToken</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

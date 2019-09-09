@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface JournalContentSearchLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link JournalContentSearchLocalServiceUtil} to access the journal content search local service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalContentSearchLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

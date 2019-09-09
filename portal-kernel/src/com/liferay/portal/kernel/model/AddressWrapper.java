@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link Address}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see Address
  * @generated
  */
-@ProviderType
 public class AddressWrapper
 	extends BaseModelWrapper<Address>
 	implements Address, ModelWrapper<Address> {
@@ -457,6 +454,11 @@ public class AddressWrapper
 		return model.isPrimary();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a address model instance should use the <code>Address</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

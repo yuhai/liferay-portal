@@ -47,7 +47,7 @@ public abstract class LayoutPageTemplateCollectionServiceBaseImpl
 	implements LayoutPageTemplateCollectionService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutPageTemplateCollectionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.layout.page.template.service.LayoutPageTemplateCollectionServiceUtil</code>.

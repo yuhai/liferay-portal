@@ -62,7 +62,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CalendarNotificationTemplateLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link CalendarNotificationTemplateLocalServiceUtil} to access the calendar notification template local service. Add custom service methods to <code>com.liferay.calendar.service.impl.CalendarNotificationTemplateLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

@@ -79,12 +79,12 @@
 
 			if (tab && tabSection) {
 				var details = {
-					id: id,
-					names: names,
-					namespace: namespace,
+					id,
+					names,
+					namespace,
 					selectedIndex: names.indexOf(id),
 					tabItem: tab,
-					tabSection: tabSection
+					tabSection
 				};
 
 				if (callback && A.Lang.isFunction(callback)) {
@@ -197,7 +197,7 @@
 
 			boundingBox.on(
 				'hover',
-				function(event) {
+				function() {
 					hideTooltipTask.cancel();
 
 					obj.once('mouseenter', hideTooltipTask.cancel);

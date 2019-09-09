@@ -16,8 +16,6 @@ package com.liferay.mobile.device.rules.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link MDRActionLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MDRActionLocalService
  * @generated
  */
-@ProviderType
 public class MDRActionLocalServiceWrapper
 	implements MDRActionLocalService, ServiceWrapper<MDRActionLocalService> {
 
@@ -35,6 +32,11 @@ public class MDRActionLocalServiceWrapper
 		_mdrActionLocalService = mdrActionLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link MDRActionLocalServiceUtil} to access the mdr action local service. Add custom service methods to <code>com.liferay.mobile.device.rules.service.impl.MDRActionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRAction addAction(
 			long ruleGroupInstanceId,

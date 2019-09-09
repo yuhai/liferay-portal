@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools.service.builder.test.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -35,7 +33,6 @@ import java.util.Objects;
  * @see UADPartialEntry
  * @generated
  */
-@ProviderType
 public class UADPartialEntryWrapper
 	implements UADPartialEntry, ModelWrapper<UADPartialEntry> {
 
@@ -193,6 +190,11 @@ public class UADPartialEntryWrapper
 		return _uadPartialEntry.isNew();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a uad partial entry model instance should use the <code>UADPartialEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		_uadPartialEntry.persist();

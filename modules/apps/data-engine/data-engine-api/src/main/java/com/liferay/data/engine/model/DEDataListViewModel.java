@@ -44,7 +44,7 @@ public interface DEDataListViewModel
 	extends BaseModel<DEDataListView>, GroupedModel, LocalizedModel,
 			ShardedModel, StagedAuditedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a de data list view model instance should use the {@link DEDataListView} interface instead.

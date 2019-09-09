@@ -40,7 +40,7 @@ public interface KaleoTaskInstanceTokenModel
 	extends BaseModel<KaleoTaskInstanceToken>, GroupedModel, MVCCModel,
 			ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kaleo task instance token model instance should use the {@link KaleoTaskInstanceToken} interface instead.

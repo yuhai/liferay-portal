@@ -33,6 +33,13 @@ task generatePom
 task generatePomCompileOnly
 task generatePomRelease
 task generatePomThirdParty
+task testPomCompileOnly
+task testPomRelease
+task testPomThirdParty
+
+String pomCompileOnlyArtifactId = "release." + (_isDigitalExperiencePlatform() ? "dxp" : "portal") + ".bom.compile.only"
+String pomReleaseArtifactId = "release." + (_isDigitalExperiencePlatform() ? "dxp" : "portal") + ".bom"
+String pomThirdPartyArtifactId = "release." + (_isDigitalExperiencePlatform() ? "dxp" : "portal") + ".bom.third.party"
 
 configurations {
 	pomProjectTemplates
@@ -90,7 +97,7 @@ generatePomCompileOnly {
 	}
 
 	doLast {
-		Model model = _getModel("release." + (_isDigitalExperiencePlatform() ? "dxp" : "portal") + ".compile.only")
+		Model model = _getModel(pomCompileOnlyArtifactId)
 
 		DependencyManagement dependencyManagement = new DependencyManagement()
 
@@ -134,7 +141,7 @@ generatePomCompileOnly {
 
 generatePomRelease {
 	doLast {
-		Model model = _getModel("release." + (_isDigitalExperiencePlatform() ? "dxp" : "portal") + ".bom")
+		Model model = _getModel(pomReleaseArtifactId)
 
 		DependencyManagement dependencyManagement = new DependencyManagement()
 
@@ -227,7 +234,7 @@ generatePomRelease {
 
 generatePomThirdParty {
 	doLast {
-		Model model = _getModel("release." + (_isDigitalExperiencePlatform() ? "dxp" : "portal") + ".third.party")
+		Model model = _getModel(pomThirdPartyArtifactId)
 
 		DependencyManagement dependencyManagement = new DependencyManagement()
 
@@ -270,6 +277,25 @@ generatePomThirdParty {
 		model.setDependencyManagement(dependencyManagement)
 
 		_write(model)
+	}
+}
+
+testPomCompileOnly {
+	doLast {
+		_testPom(pomCompileOnlyArtifactId, version, true)
+	}
+
+}
+
+testPomRelease {
+	doLast {
+		_testPom(pomReleaseArtifactId, version, true)
+	}
+}
+
+testPomThirdParty {
+	doLast {
+		_testPom(pomThirdPartyArtifactId, version, false)
 	}
 }
 
@@ -347,6 +373,46 @@ private String _isDigitalExperiencePlatform() {
 	}
 
 	return false
+}
+
+private void _testPom(String artifactId, String version, Boolean excludeLiferayDependencies) {
+	File pom = new File(buildDir, "${artifactId}-${version}.pom")
+
+	Node pomNode = new XmlParser().parseText(pom.text)
+
+	assert pomNode.artifactId.text() == artifactId
+	assert pomNode.dependencyManagement.dependencies.dependency.size() > 0
+	assert pomNode.developers.developer.size() > 0
+	assert pomNode.groupId.text() == "com.liferay.portal"
+	assert pomNode.licenses.license.name.text().matches(/LGPL 2\.\d+/)
+	assert pomNode.licenses.license.size() == 1
+	assert pomNode.licenses.license.url.text().matches(/http:\/\/www\.gnu\.org\/.*/)
+	assert pomNode.modelVersion.text() == "4.0.0"
+	assert pomNode.packaging.text() == "pom"
+	assert pomNode.repositories.repository.id.text() == "liferay-public-releases"
+	assert pomNode.repositories.repository.name.text() == "Liferay Public Releases"
+	assert pomNode.repositories.repository.size() == 1
+	assert pomNode.repositories.repository.url.text() == "https://repository-cdn.liferay.com/nexus/content/repositories/liferay-public-releases/"
+	assert pomNode.scm.connection.text() == "scm:git:git@github.com:liferay/liferay-portal.git"
+	assert pomNode.scm.developerConnection.text() == "scm:git:git@github.com:liferay/liferay-portal.git"
+	assert pomNode.scm.tag.text().matches(/[a-f\d]{40}/)
+	assert pomNode.scm.url.text() == "https://github.com/liferay/liferay-portal"
+	assert pomNode.version.text() == version
+
+	String dependencyArtifactIdPattern = excludeLiferayDependencies ? /^(?!com\.liferay)[a-z][a-z\d.-]*[a-z\d]/ : /[a-z][a-z\d.-]*[a-z\d]/
+	String dependencyGroupIdPattern = excludeLiferayDependencies ? /^(?!com\.liferay)[a-z][a-z\d.-]*[a-z\d]/ : /[a-z][a-z\d.-]*[a-z\d]/
+
+	pomNode.dependencyManagement.dependencies.dependency.each {
+		assert it.artifactId.text().matches(dependencyArtifactIdPattern)
+		assert it.groupId.text().matches(dependencyGroupIdPattern)
+		assert it.version.text().matches(/\d(?:[a-z\d.-]*[a-z\d])?/)
+	}
+
+	pomNode.developers.developer.each {
+		assert it.name.text().matches(/[A-Za-z]+(?: [A-Za-z]+)*/)
+		assert it.organization.text() == "Liferay, Inc."
+		assert it.organizationUrl.text() == "http://www.liferay.com"
+	}
 }
 
 private void _write(Model model) {

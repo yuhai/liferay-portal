@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface CalendarBookingPersistence
 	extends BasePersistence<CalendarBooking> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link CalendarBookingUtil} to access the calendar booking persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

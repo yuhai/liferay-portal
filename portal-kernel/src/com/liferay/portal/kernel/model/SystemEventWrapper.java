@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link SystemEvent}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SystemEvent
  * @generated
  */
-@ProviderType
 public class SystemEventWrapper
 	extends BaseModelWrapper<SystemEvent>
 	implements SystemEvent, ModelWrapper<SystemEvent> {
@@ -341,6 +338,11 @@ public class SystemEventWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a system event model instance should use the <code>SystemEvent</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -12,25 +12,37 @@
  * details.
  */
 
+import classNames from 'classnames';
 import React, {useEffect, useState} from 'react';
+import DropZone from './DropZone.es';
 import ControlMenu from '../../components/control-menu/ControlMenu.es';
+import DragLayer from '../../components/drag-and-drop/DragLayer.es';
 import FieldTypeList from '../../components/field-types/FieldTypeList.es';
 import {Loading} from '../../components/loading/Loading.es';
 import Sidebar from '../../components/sidebar/Sidebar.es';
 import UpperToolbar from '../../components/upper-toolbar/UpperToolbar.es';
 import {addItem, getItem, updateItem} from '../../utils/client.es';
 
-export default ({
+const EditTableView = ({
 	history,
 	match: {
 		params: {dataDefinitionId, dataListViewId}
 	}
 }) => {
 	const [state, setState] = useState({
-		dataDefinition: null,
-		dataListView: null
+		dataDefinition: {
+			dataDefinitionFields: []
+		},
+		dataListView: {
+			fieldNames: [],
+			name: {
+				en_US: ''
+			}
+		}
 	});
 
+	const [isSidebarClosed, setSidebarClosed] = useState(false);
+	const handleSidebarToggle = closed => setSidebarClosed(closed);
 	const [keywords, setKeywords] = useState('');
 
 	let title = Liferay.Language.get('new-table-view');
@@ -38,6 +50,18 @@ export default ({
 	if (dataListViewId) {
 		title = Liferay.Language.get('edit-table-view');
 	}
+
+	const onAddColumn = fieldName => {
+		setState(prevState => ({
+			...prevState,
+			dataListView: {
+				...prevState.dataListView,
+				fieldNames: prevState.dataListView.fieldNames
+					? prevState.dataListView.fieldNames.concat(fieldName)
+					: [fieldName]
+			}
+		}));
+	};
 
 	const onInput = event => {
 		const name = event.target.value;
@@ -53,16 +77,22 @@ export default ({
 		}));
 	};
 
+	const onRemoveColumn = column => {
+		setState(prevState => ({
+			...prevState,
+			dataListView: {
+				...prevState.dataListView,
+				fieldNames: prevState.dataListView.fieldNames.filter(
+					fieldName => fieldName != column
+				)
+			}
+		}));
+	};
+
 	const validate = () => {
-		const {dataListView} = state;
-
-		if (!dataListView) {
-			return null;
-		}
-
 		const name = dataListView.name.en_US.trim();
 
-		if (name === '') {
+		if (!name) {
 			return null;
 		}
 
@@ -106,31 +136,47 @@ export default ({
 
 			Promise.all([getDataDefinition, getDataListView]).then(
 				([dataDefinition, dataListView]) => {
-					setState({
-						dataDefinition,
-						dataListView
-					});
+					setState(prevState => ({
+						...prevState,
+						dataDefinition: {
+							...prevState.dataDefinition,
+							...dataDefinition
+						},
+						dataListView: {
+							...prevState.dataListView,
+							...dataListView
+						}
+					}));
 				}
 			);
 		} else {
 			getDataDefinition.then(dataDefinition => {
 				setState(prevState => ({
 					...prevState,
-					dataDefinition
+					dataDefinition: {
+						...prevState.dataDefinition,
+						...dataDefinition
+					}
 				}));
 			});
 		}
 	}, [dataDefinitionId, dataListViewId]);
 
 	const {dataDefinition, dataListView} = state;
-	const {dataDefinitionFields = []} = dataDefinition || {};
-	const {name: {en_US: dataListViewName = ''} = {}} = dataListView || {};
+	const {dataDefinitionFields: availableFields} = dataDefinition;
+
+	const {
+		name: {en_US: dataListViewName},
+		fieldNames: columns
+	} = dataListView;
 
 	return (
 		<>
 			<ControlMenu backURL="../" title={title} />
 
 			<Loading isLoading={dataDefinition === null}>
+				<DragLayer />
+
 				<form
 					onSubmit={event => {
 						event.preventDefault();
@@ -163,24 +209,45 @@ export default ({
 						</UpperToolbar.Group>
 					</UpperToolbar>
 				</form>
-				<Sidebar onSearch={setKeywords}>
+
+				<Sidebar onSearch={setKeywords} onToggle={handleSidebarToggle}>
 					<Sidebar.Body>
 						<Sidebar.Tab tabs={[Liferay.Language.get('columns')]} />
 
 						<Sidebar.TabContent>
 							<FieldTypeList
-								fieldTypes={dataDefinitionFields.map(field => ({
+								fieldTypes={availableFields.map(field => ({
 									description: field.fieldType,
+									disabled: columns.some(
+										column => column === field.name
+									),
 									icon: field.fieldType,
 									label: field.name,
 									name: field.fieldType
 								}))}
 								keywords={keywords}
+								onAddColumn={onAddColumn}
 							/>
 						</Sidebar.TabContent>
 					</Sidebar.Body>
 				</Sidebar>
+
+				<div
+					className={classNames('app-builder-sidebar-content', {
+						closed: isSidebarClosed
+					})}
+				>
+					<div className="container table-view-container">
+						<DropZone
+							columns={columns}
+							onAddColumn={onAddColumn}
+							onRemoveColumn={onRemoveColumn}
+						/>
+					</div>
+				</div>
 			</Loading>
 		</>
 	);
 };
+
+export default EditTableView;

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface MBStatsUserModel extends BaseModel<MBStatsUser>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a message boards stats user model instance should use the {@link MBStatsUser} interface instead.

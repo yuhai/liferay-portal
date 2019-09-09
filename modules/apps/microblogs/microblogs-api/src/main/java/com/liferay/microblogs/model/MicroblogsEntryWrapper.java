@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link MicroblogsEntry}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see MicroblogsEntry
  * @generated
  */
-@ProviderType
 public class MicroblogsEntryWrapper
 	extends BaseModelWrapper<MicroblogsEntry>
 	implements MicroblogsEntry, ModelWrapper<MicroblogsEntry> {
@@ -290,6 +287,11 @@ public class MicroblogsEntryWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a microblogs entry model instance should use the <code>MicroblogsEntry</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

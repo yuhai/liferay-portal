@@ -14,8 +14,6 @@
 
 package com.liferay.external.data.source.test.service.base;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.external.data.source.test.model.TestEntity;
 import com.liferay.external.data.source.test.service.TestEntityLocalService;
 import com.liferay.external.data.source.test.service.persistence.TestEntityPersistence;
@@ -60,12 +58,11 @@ import javax.sql.DataSource;
  * @see com.liferay.external.data.source.test.service.impl.TestEntityLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class TestEntityLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements TestEntityLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>TestEntityLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.external.data.source.test.service.TestEntityLocalServiceUtil</code>.

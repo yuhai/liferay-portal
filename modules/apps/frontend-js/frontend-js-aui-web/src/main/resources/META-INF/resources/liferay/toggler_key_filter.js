@@ -36,26 +36,12 @@ AUI.add(
 
 			EXTENDS: A.Plugin.Base,
 
-			NAME: NAME,
+			NAME,
 
 			NS: NAME,
 
 			prototype: {
-				initializer: function() {
-					var instance = this;
-
-					instance._toggleEvent = instance
-						.get('host')
-						.get('toggleEvent');
-
-					instance.beforeHostMethod(
-						'headerEventHandler',
-						instance._headerEventHandler,
-						instance
-					);
-				},
-
-				_headerEventHandler: function(event) {
+				_headerEventHandler(event) {
 					var instance = this;
 
 					var validAction = event.type === instance._toggleEvent;
@@ -72,6 +58,20 @@ AUI.add(
 					}
 
 					return retVal;
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._toggleEvent = instance
+						.get('host')
+						.get('toggleEvent');
+
+					instance.beforeHostMethod(
+						'headerEventHandler',
+						instance._headerEventHandler,
+						instance
+					);
 				}
 			}
 		});

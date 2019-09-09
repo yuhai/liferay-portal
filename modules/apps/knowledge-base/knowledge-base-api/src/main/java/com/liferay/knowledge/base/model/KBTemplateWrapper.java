@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KBTemplate}.
@@ -33,7 +31,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KBTemplate
  * @generated
  */
-@ProviderType
 public class KBTemplateWrapper
 	extends BaseModelWrapper<KBTemplate>
 	implements KBTemplate, ModelWrapper<KBTemplate> {
@@ -260,6 +257,11 @@ public class KBTemplateWrapper
 		return model.getUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kb template model instance should use the <code>KBTemplate</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

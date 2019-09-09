@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.annotations.DDMForm;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -274,12 +275,22 @@ public class DDMFormFieldFactoryHelper {
 	}
 
 	protected DDMFormFieldValidation getDDMFormFieldValidation() {
+		if (Validator.isNull(_ddmFormField.validationExpression()) &&
+			Validator.isNull(_ddmFormField.validationErrorMessage())) {
+
+			return null;
+		}
+
 		DDMFormFieldValidation ddmFormFieldValidation =
 			new DDMFormFieldValidation();
 
 		if (Validator.isNotNull(_ddmFormField.validationExpression())) {
-			ddmFormFieldValidation.setExpression(
-				_ddmFormField.validationExpression());
+			ddmFormFieldValidation.setDDMFormFieldValidationExpression(
+				new DDMFormFieldValidationExpression() {
+					{
+						setValue(_ddmFormField.validationExpression());
+					}
+				});
 		}
 
 		if (Validator.isNotNull(_ddmFormField.validationErrorMessage())) {

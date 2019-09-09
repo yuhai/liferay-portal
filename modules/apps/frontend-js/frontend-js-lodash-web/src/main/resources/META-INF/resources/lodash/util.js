@@ -13,7 +13,7 @@
  */
 
 _.mixin({
-	bindKeyRight: function(context, key) {
+	bindKeyRight(context, key) {
 		var args = _.toArray(arguments).slice(2);
 
 		args.unshift(_.bindKey(context, key));
@@ -21,7 +21,7 @@ _.mixin({
 		return _.partialRight.apply(_, args);
 	},
 
-	bindRight: function(fn, context) {
+	bindRight(fn, context) {
 		var args = _.toArray(arguments).slice(2);
 
 		args.unshift(_.bind(fn, context));
@@ -29,7 +29,7 @@ _.mixin({
 		return _.partialRight.apply(_, args);
 	},
 
-	cached: function(fn) {
+	cached(fn) {
 		return _.memoize(fn, function() {
 			return arguments.length > 1
 				? Array.prototype.join.call(arguments, '_')
@@ -40,7 +40,7 @@ _.mixin({
 
 _.mixin(
 	{
-		namespace: function(obj, path) {
+		namespace(obj, path) {
 			if (arguments.length === 1) {
 				path = obj;
 				obj = this;

@@ -16,8 +16,6 @@ package com.liferay.external.reference.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ERUserGroupLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ERUserGroupLocalService
  * @generated
  */
-@ProviderType
 public class ERUserGroupLocalServiceWrapper
 	implements ERUserGroupLocalService,
 			   ServiceWrapper<ERUserGroupLocalService> {
@@ -36,6 +33,11 @@ public class ERUserGroupLocalServiceWrapper
 		_erUserGroupLocalService = erUserGroupLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ERUserGroupLocalServiceUtil} to access the er user group local service. Add custom service methods to <code>com.liferay.external.reference.service.impl.ERUserGroupLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.UserGroup addOrUpdateUserGroup(
 			String externalReferenceCode, long userId, long companyId,

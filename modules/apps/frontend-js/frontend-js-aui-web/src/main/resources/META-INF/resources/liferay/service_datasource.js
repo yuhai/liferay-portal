@@ -19,7 +19,7 @@ AUI.add(
 			EXTENDS: A.DataSource.Local,
 			NAME: 'servicedatasource',
 			prototype: {
-				_defRequestFn: function(event) {
+				_defRequestFn(event) {
 					var instance = this;
 
 					var source = instance.get('source');
@@ -30,7 +30,7 @@ AUI.add(
 					);
 				},
 
-				_serviceCallbackFn: function(obj, xHR, event) {
+				_serviceCallbackFn(obj, xHR, event) {
 					var instance = this;
 
 					instance.fire(

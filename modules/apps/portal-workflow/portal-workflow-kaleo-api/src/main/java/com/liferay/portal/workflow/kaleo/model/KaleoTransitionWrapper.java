@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link KaleoTransition}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see KaleoTransition
  * @generated
  */
-@ProviderType
 public class KaleoTransitionWrapper
 	extends BaseModelWrapper<KaleoTransition>
 	implements KaleoTransition, ModelWrapper<KaleoTransition> {
@@ -390,6 +387,11 @@ public class KaleoTransitionWrapper
 		return model.isDefaultTransition();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a kaleo transition model instance should use the <code>KaleoTransition</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

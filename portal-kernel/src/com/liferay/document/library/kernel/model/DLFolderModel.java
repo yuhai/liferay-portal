@@ -44,7 +44,7 @@ public interface DLFolderModel
 	extends BaseModel<DLFolder>, ContainerModel, MVCCModel, ShardedModel,
 			StagedGroupedModel, TrashedModel, WorkflowedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a document library folder model instance should use the {@link DLFolder} interface instead.

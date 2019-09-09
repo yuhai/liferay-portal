@@ -13,7 +13,8 @@
  */
 
 (function() {
-	var REGEX_BBCODE = /(?:\[((?:[a-z]|\*){1,16})(?:[=\s]([^\x00-\x1F'<>\[\]]{1,2083}))?\])|(?:\[\/([a-z]{1,16})\])/gi;
+	// eslint-disable-next-line no-control-regex
+	var REGEX_BBCODE = /(?:\[((?:[a-z]|\*){1,16})(?:[=\s]([^\x00-\x1F'<>[\]]{1,2083}))?\])|(?:\[\/([a-z]{1,16})\])/gi;
 
 	var Lexer = function(data) {
 		var instance = this;
@@ -24,11 +25,11 @@
 	Lexer.prototype = {
 		constructor: Lexer,
 
-		getLastIndex: function() {
+		getLastIndex() {
 			return REGEX_BBCODE.lastIndex;
 		},
 
-		getNextToken: function() {
+		getNextToken() {
 			var instance = this;
 
 			return REGEX_BBCODE.exec(instance._data);

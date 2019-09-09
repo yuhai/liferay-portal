@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WeDeployAuthAppModel
 	extends AuditedModel, BaseModel<WeDeployAuthApp>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a we deploy auth app model instance should use the {@link WeDeployAuthApp} interface instead.

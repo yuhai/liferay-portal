@@ -53,8 +53,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides the base implementation for the expando column local service.
  *
@@ -66,12 +64,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.portlet.expando.service.impl.ExpandoColumnLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class ExpandoColumnLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements ExpandoColumnLocalService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ExpandoColumnLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil</code>.

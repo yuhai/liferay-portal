@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OAuth2ApplicationScopeAliasesModel
 	extends BaseModel<OAuth2ApplicationScopeAliases>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a o auth2 application scope aliases model instance should use the {@link OAuth2ApplicationScopeAliases} interface instead.

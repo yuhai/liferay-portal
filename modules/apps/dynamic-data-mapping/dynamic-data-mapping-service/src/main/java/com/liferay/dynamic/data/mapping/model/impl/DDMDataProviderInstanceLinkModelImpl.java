@@ -40,8 +40,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the DDMDataProviderInstanceLink service. Represents a row in the &quot;DDMDataProviderInstanceLink&quot; database table, with each column mapped to a property of this class.
  *
@@ -53,12 +51,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMDataProviderInstanceLinkImpl
  * @generated
  */
-@ProviderType
 public class DDMDataProviderInstanceLinkModelImpl
 	extends BaseModelImpl<DDMDataProviderInstanceLink>
 	implements DDMDataProviderInstanceLinkModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a ddm data provider instance link model instance should use the <code>DDMDataProviderInstanceLink</code> interface instead.

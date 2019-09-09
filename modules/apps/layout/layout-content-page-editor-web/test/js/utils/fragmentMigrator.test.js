@@ -12,7 +12,6 @@
  * details.
  */
 
-/* globals expect */
 import editableValuesMigrator from '../../../src/main/resources/META-INF/resources/js/utils/fragmentMigrator.es';
 
 describe('fragmentMigrator', () => {
@@ -62,12 +61,12 @@ const singleEditableFragmentInput = {
 const singleEditableFragmentExpected = {
 	'com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor': {
 		'editable-fragment-id': {
-			defaultValue: 'Livingstone Hotels and Resorts',
 			[DEFAULT_SEGMENTS_EXPERIENCE_ID]: {
 				en_US: 'English Variation',
 				es_ES: 'Spanish variation',
 				pt_BR: 'Portuguese variation'
-			}
+			},
+			defaultValue: 'Livingstone Hotels and Resorts'
 		}
 	}
 };
@@ -92,20 +91,20 @@ const doubleEditableFragmentInput = {
 const doubleEditableFragmentExpected = {
 	'com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor': {
 		'editable-fragment-id': {
-			defaultValue: 'Livingstone Hotels and Resorts',
 			[DEFAULT_SEGMENTS_EXPERIENCE_ID]: {
 				en_US: 'English Variation',
 				es_ES: 'Spanish variation',
 				pt_BR: 'Portuguese variation'
-			}
+			},
+			defaultValue: 'Livingstone Hotels and Resorts'
 		},
 		'editable-fragment-id-2': {
-			defaultValue: 'Livingstone Hotels and Resorts',
 			[DEFAULT_SEGMENTS_EXPERIENCE_ID]: {
 				en_US: 'Livingstone Hotels and Resorts English Variation',
 				es_ES: 'Livingstone Hotels and Resorts Spanish variation',
 				pt_BR: 'Livingstone Hotels and Resorts Portuguese variation'
-			}
+			},
+			defaultValue: 'Livingstone Hotels and Resorts'
 		}
 	}
 };

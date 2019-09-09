@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link CTProcess}.
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CTProcess
  * @generated
  */
-@ProviderType
 public class CTProcessWrapper
 	extends BaseModelWrapper<CTProcess>
 	implements CTProcess, ModelWrapper<CTProcess> {
@@ -196,6 +193,11 @@ public class CTProcessWrapper
 		return model.getUserUuid();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ct process model instance should use the <code>CTProcess</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -37,7 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OAuth2AuthorizationModel
 	extends BaseModel<OAuth2Authorization>, ShardedModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a o auth2 authorization model instance should use the {@link OAuth2Authorization} interface instead.

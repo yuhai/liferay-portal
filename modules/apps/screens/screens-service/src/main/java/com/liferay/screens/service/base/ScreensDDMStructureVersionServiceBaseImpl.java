@@ -46,7 +46,7 @@ public abstract class ScreensDDMStructureVersionServiceBaseImpl
 	implements ScreensDDMStructureVersionService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ScreensDDMStructureVersionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.screens.service.ScreensDDMStructureVersionServiceUtil</code>.

@@ -25,32 +25,28 @@
 
 	var MAP_HANDLERS = {
 		a: '_handleLink',
+		b: '_handleStrong',
 		blockquote: '_handleQuote',
 		br: '_handleBreak',
 		caption: '_handleTableCaption',
 		cite: '_handleCite',
+		code: '_handlePre',
+		em: '_handleEm',
 		font: '_handleFont',
+		i: '_handleEm',
 		img: '_handleImage',
 		li: '_handleListItem',
 		ol: '_handleOrderedList',
+		pre: '_handlePre',
+		s: '_handleLineThrough',
+		strike: '_handleLineThrough',
+		strong: '_handleStrong',
 		table: '_handleTable',
 		td: '_handleTableCell',
 		th: '_handleTableHeader',
 		tr: '_handleTableRow',
 		u: '_handleUnderline',
-		ul: '_handleUnorderedList',
-
-		em: '_handleEm',
-		i: '_handleEm',
-
-		s: '_handleLineThrough',
-		strike: '_handleLineThrough',
-
-		code: '_handlePre',
-		pre: '_handlePre',
-
-		b: '_handleStrong',
-		strong: '_handleStrong'
+		ul: '_handleUnorderedList'
 	};
 
 	var MAP_IMAGE_ATTRIBUTES = [
@@ -73,7 +69,7 @@
 
 	var NEW_LINE = '\n';
 
-	var REGEX_COLOR_RGB = /^rgb\s*\(\s*([01]?\d\d?|2[0-4]\d|25[0-5])\,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\,\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/;
+	var REGEX_COLOR_RGB = /^rgb\s*\(\s*([01]?\d\d?|2[0-4]\d|25[0-5]),\s*([01]?\d\d?|2[0-4]\d|25[0-5]),\s*([01]?\d\d?|2[0-4]\d|25[0-5])\s*\)$/;
 
 	var REGEX_EM = /em$/i;
 
@@ -132,53 +128,7 @@
 	};
 
 	BBCodeDataProcessor.prototype = {
-		constructor: BBCodeDataProcessor,
-
-		toDataFormat: function(html, fixForBody) {
-			var instance = this;
-
-			html = html.replace(REGEX_PRE, '$&\n');
-
-			var data = instance._convert(html);
-
-			return data;
-		},
-
-		toHtml: function(data, config) {
-			var instance = this;
-
-			if (!instance._bbcodeConverter) {
-				var editorConfig = this._editor.config;
-
-				var converterConfig = {
-					emoticonImages: editorConfig.smiley_images,
-					emoticonPath: editorConfig.smiley_path,
-					emoticonSymbols: editorConfig.smiley_symbols
-				};
-
-				instance._bbcodeConverter = new CKEDITOR.BBCode2HTML(
-					converterConfig
-				);
-			}
-
-			if (config) {
-				var fragment = CKEDITOR.htmlParser.fragment.fromHtml(data);
-
-				var writer = new CKEDITOR.htmlParser.basicWriter();
-
-				config.filter.applyTo(fragment);
-
-				fragment.writeHtml(writer);
-
-				data = writer.getHtml();
-			} else {
-				data = instance._bbcodeConverter.convert(data);
-			}
-
-			return data;
-		},
-
-		_allowNewLine: function(element) {
+		_allowNewLine(element) {
 			var instance = this;
 
 			var allowNewLine = true;
@@ -210,7 +160,7 @@
 			return allowNewLine;
 		},
 
-		_checkParentElement: function(element, tagName) {
+		_checkParentElement(element, tagName) {
 			var parentNode = element.parentNode;
 
 			return (
@@ -220,7 +170,7 @@
 			);
 		},
 
-		_convert: function(data) {
+		_convert(data) {
 			var instance = this;
 
 			var node = document.createElement(TAG_DIV);
@@ -236,14 +186,12 @@
 			return endResult;
 		},
 
-		_convertRGBToHex: function(color) {
+		_convertRGBToHex(color) {
 			color = color.replace(REGEX_COLOR_RGB, function(
-				match,
+				_match,
 				red,
 				green,
-				blue,
-				offset,
-				string
+				blue
 			) {
 				var b = toHex(blue);
 				var g = toHex(green);
@@ -257,7 +205,9 @@
 			return color;
 		},
 
-		_getBodySize: function() {
+		_endResult: null,
+
+		_getBodySize() {
 			var body = document.body;
 
 			var style;
@@ -271,7 +221,7 @@
 			return parseFloat(style.fontSize, 10);
 		},
 
-		_getEmoticonSymbol: function(element) {
+		_getEmoticonSymbol(element) {
 			var instance = this;
 
 			var emoticonSymbol = null;
@@ -296,7 +246,7 @@
 			return emoticonSymbol;
 		},
 
-		_getFontSize: function(fontSize) {
+		_getFontSize(fontSize) {
 			var instance = this;
 
 			var bodySize;
@@ -323,7 +273,7 @@
 			return fontSize;
 		},
 
-		_getFontSizePX: function(fontSize) {
+		_getFontSizePX(fontSize) {
 			var sizeValue = parseInt(fontSize, 10);
 
 			if (sizeValue <= 10) {
@@ -347,7 +297,7 @@
 			return sizeValue;
 		},
 
-		_getImageIndex: function(array, image) {
+		_getImageIndex(array, image) {
 			var index = -1;
 
 			if (array.lastIndexOf) {
@@ -367,7 +317,7 @@
 			return index;
 		},
 
-		_handle: function(node) {
+		_handle(node) {
 			var instance = this;
 
 			if (!instance._endResult) {
@@ -406,7 +356,7 @@
 			instance._handleData(node.data, node);
 		},
 
-		_handleBreak: function(element, listTagsIn, listTagsOut) {
+		_handleBreak(element, listTagsIn) {
 			var instance = this;
 
 			if (instance._inPRE) {
@@ -416,7 +366,7 @@
 			}
 		},
 
-		_handleCite: function(element, listTagsIn, listTagsOut) {
+		_handleCite(element, _listTagsIn, listTagsOut) {
 			var instance = this;
 
 			var parentNode = element.parentNode;
@@ -441,7 +391,7 @@
 			}
 		},
 
-		_handleData: function(data, element) {
+		_handleData(data, element) {
 			var instance = this;
 
 			if (data) {
@@ -460,7 +410,7 @@
 			}
 		},
 
-		_handleElementEnd: function(element, listTagsIn, listTagsOut) {
+		_handleElementEnd(element) {
 			var instance = this;
 
 			var tagName = element.tagName;
@@ -478,7 +428,7 @@
 			}
 		},
 
-		_handleElementStart: function(element, listTagsIn, listTagsOut) {
+		_handleElementStart(element, listTagsIn, listTagsOut) {
 			var instance = this;
 
 			var tagName = element.tagName;
@@ -494,13 +444,13 @@
 			}
 		},
 
-		_handleEm: function(element, listTagsIn, listTagsOut) {
+		_handleEm(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[i]');
 
 			listTagsOut.push('[/i]');
 		},
 
-		_handleFont: function(element, listTagsIn, listTagsOut) {
+		_handleFont(element, listTagsIn) {
 			var instance = this;
 
 			var size = element.size;
@@ -526,7 +476,7 @@
 			}
 		},
 
-		_handleImage: function(element, listTagsIn, listTagsOut) {
+		_handleImage(element, listTagsIn, listTagsOut) {
 			var instance = this;
 
 			var emoticonSymbol = instance._getEmoticonSymbol(element);
@@ -546,7 +496,7 @@
 			}
 		},
 
-		_handleImageAttributes: function(element) {
+		_handleImageAttributes(element) {
 			var attrs = '';
 
 			var length = MAP_IMAGE_ATTRIBUTES.length;
@@ -564,13 +514,13 @@
 			return attrs;
 		},
 
-		_handleLineThrough: function(element, listTagsIn, listTagsOut) {
+		_handleLineThrough(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[s]');
 
 			listTagsOut.push('[/s]');
 		},
 
-		_handleLink: function(element, listTagsIn, listTagsOut) {
+		_handleLink(element, listTagsIn, listTagsOut) {
 			var hrefAttribute = element.getAttribute('href');
 
 			if (hrefAttribute) {
@@ -590,7 +540,7 @@
 			}
 		},
 
-		_handleListItem: function(element, listTagsIn, listTagsOut) {
+		_handleListItem(_element, listTagsIn) {
 			var instance = this;
 
 			if (!instance._isLastItemNewLine()) {
@@ -600,7 +550,7 @@
 			listTagsIn.push('[*]');
 		},
 
-		_handleOrderedList: function(element, listTagsIn, listTagsOut) {
+		_handleOrderedList(element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[list');
 
 			var listStyleType = element.style.listStyleType;
@@ -628,7 +578,7 @@
 			listTagsOut.push('[/list]');
 		},
 
-		_handlePre: function(element, listTagsIn, listTagsOut) {
+		_handlePre(_element, listTagsIn, listTagsOut) {
 			var instance = this;
 
 			instance._inPRE = true;
@@ -638,7 +588,7 @@
 			listTagsOut.push('[/code]');
 		},
 
-		_handleQuote: function(element, listTagsIn, listTagsOut) {
+		_handleQuote(element, listTagsIn, listTagsOut) {
 			var cite = element.getAttribute(TAG_CITE);
 
 			var openTag = '[quote]';
@@ -652,17 +602,13 @@
 			listTagsOut.push('[/quote]');
 		},
 
-		_handleStrong: function(element, listTagsIn, listTagsOut) {
+		_handleStrong(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[b]');
 
 			listTagsOut.push('[/b]');
 		},
 
-		_handleStyleAlignCenter: function(
-			element,
-			stylesTagsIn,
-			stylesTagsOut
-		) {
+		_handleStyleAlignCenter(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var alignment = style.textAlign.toLowerCase();
@@ -674,11 +620,7 @@
 			}
 		},
 
-		_handleStyleAlignJustify: function(
-			element,
-			stylesTagsIn,
-			stylesTagsOut
-		) {
+		_handleStyleAlignJustify(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var alignment = style.textAlign.toLowerCase();
@@ -690,7 +632,7 @@
 			}
 		},
 
-		_handleStyleAlignLeft: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleAlignLeft(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var alignment = style.textAlign.toLowerCase();
@@ -702,7 +644,7 @@
 			}
 		},
 
-		_handleStyleAlignRight: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleAlignRight(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var alignment = style.textAlign.toLowerCase();
@@ -714,7 +656,7 @@
 			}
 		},
 
-		_handleStyleBold: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleBold(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var fontWeight = style.fontWeight;
@@ -726,7 +668,7 @@
 			}
 		},
 
-		_handleStyleColor: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleColor(element, stylesTagsIn, stylesTagsOut) {
 			var instance = this;
 
 			var style = element.style;
@@ -742,7 +684,7 @@
 			}
 		},
 
-		_handleStyleFontFamily: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleFontFamily(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var fontFamily = style.fontFamily;
@@ -758,7 +700,7 @@
 			}
 		},
 
-		_handleStyleFontSize: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleFontSize(element, stylesTagsIn, stylesTagsOut) {
 			var instance = this;
 
 			var style = element.style;
@@ -774,7 +716,7 @@
 			}
 		},
 
-		_handleStyleItalic: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleItalic(element, stylesTagsIn, stylesTagsOut) {
 			var style = element.style;
 
 			var fontStyle = style.fontStyle;
@@ -786,7 +728,23 @@
 			}
 		},
 
-		_handleStyles: function(element, stylesTagsIn, stylesTagsOut) {
+		_handleStyleTextDecoration(element, stylesTagsIn, stylesTagsOut) {
+			var style = element.style;
+
+			var textDecoration = style.textDecoration.toLowerCase();
+
+			if (textDecoration === 'line-through') {
+				stylesTagsIn.push('[s]');
+
+				stylesTagsOut.push('[/s]');
+			} else if (textDecoration === 'underline') {
+				stylesTagsIn.push('[u]');
+
+				stylesTagsOut.push('[/u]');
+			}
+		},
+
+		_handleStyles(element, stylesTagsIn, stylesTagsOut) {
 			var instance = this;
 
 			var tagName = element.tagName;
@@ -844,33 +802,13 @@
 			}
 		},
 
-		_handleStyleTextDecoration: function(
-			element,
-			stylesTagsIn,
-			stylesTagsOut
-		) {
-			var style = element.style;
-
-			var textDecoration = style.textDecoration.toLowerCase();
-
-			if (textDecoration === 'line-through') {
-				stylesTagsIn.push('[s]');
-
-				stylesTagsOut.push('[/s]');
-			} else if (textDecoration === 'underline') {
-				stylesTagsIn.push('[u]');
-
-				stylesTagsOut.push('[/u]');
-			}
-		},
-
-		_handleTable: function(element, listTagsIn, listTagsOut) {
+		_handleTable(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[table]', NEW_LINE);
 
 			listTagsOut.push('[/table]');
 		},
 
-		_handleTableCaption: function(element, listTagsIn, listTagsOut) {
+		_handleTableCaption(element, listTagsIn, listTagsOut) {
 			var instance = this;
 
 			if (instance._checkParentElement(element, TAG_TABLE)) {
@@ -880,31 +818,31 @@
 			}
 		},
 
-		_handleTableCell: function(element, listTagsIn, listTagsOut) {
+		_handleTableCell(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[td]');
 
 			listTagsOut.push('[/td]', NEW_LINE);
 		},
 
-		_handleTableHeader: function(element, listTagsIn, listTagsOut) {
+		_handleTableHeader(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[th]');
 
 			listTagsOut.push('[/th]', NEW_LINE);
 		},
 
-		_handleTableRow: function(element, listTagsIn, listTagsOut) {
+		_handleTableRow(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[tr]', NEW_LINE);
 
 			listTagsOut.push('[/tr]', NEW_LINE);
 		},
 
-		_handleUnderline: function(element, listTagsIn, listTagsOut) {
+		_handleUnderline(_element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[u]');
 
 			listTagsOut.push('[/u]');
 		},
 
-		_handleUnorderedList: function(element, listTagsIn, listTagsOut) {
+		_handleUnorderedList(element, listTagsIn, listTagsOut) {
 			listTagsIn.push('[list');
 
 			var listStyleType = element.style.listStyleType;
@@ -920,7 +858,9 @@
 			listTagsOut.push('[/list]');
 		},
 
-		_isLastItemNewLine: function() {
+		_inPRE: false,
+
+		_isLastItemNewLine() {
 			var instance = this;
 
 			var endResult = instance._endResult;
@@ -931,7 +871,7 @@
 			);
 		},
 
-		_pushTagList: function(tagsList) {
+		_pushTagList(tagsList) {
 			var instance = this;
 
 			var endResult = instance._endResult;
@@ -945,18 +885,60 @@
 			}
 		},
 
-		_endResult: null,
+		constructor: BBCodeDataProcessor,
 
-		_inPRE: false
+		toDataFormat(html) {
+			var instance = this;
+
+			html = html.replace(REGEX_PRE, '$&\n');
+
+			var data = instance._convert(html);
+
+			return data;
+		},
+
+		toHtml(data, config) {
+			var instance = this;
+
+			if (!instance._bbcodeConverter) {
+				var editorConfig = this._editor.config;
+
+				var converterConfig = {
+					emoticonImages: editorConfig.smiley_images,
+					emoticonPath: editorConfig.smiley_path,
+					emoticonSymbols: editorConfig.smiley_symbols
+				};
+
+				instance._bbcodeConverter = new CKEDITOR.BBCode2HTML(
+					converterConfig
+				);
+			}
+
+			if (config) {
+				var fragment = CKEDITOR.htmlParser.fragment.fromHtml(data);
+
+				var writer = new CKEDITOR.htmlParser.basicWriter();
+
+				config.filter.applyTo(fragment);
+
+				fragment.writeHtml(writer);
+
+				data = writer.getHtml();
+			} else {
+				data = instance._bbcodeConverter.convert(data);
+			}
+
+			return data;
+		}
 	};
 
 	CKEDITOR.plugins.add('bbcode_data_processor', {
-		requires: ['htmlwriter'],
-
-		init: function(editor) {
+		init(editor) {
 			editor.dataProcessor = new BBCodeDataProcessor(editor);
 
 			editor.fire('customDataProcessorLoaded');
-		}
+		},
+
+		requires: ['htmlwriter']
 	});
 })();

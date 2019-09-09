@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link SystemEventLocalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SystemEventLocalService
  * @generated
  */
-@ProviderType
 public class SystemEventLocalServiceWrapper
 	implements SystemEventLocalService,
 			   ServiceWrapper<SystemEventLocalService> {
@@ -34,11 +32,16 @@ public class SystemEventLocalServiceWrapper
 		_systemEventLocalService = systemEventLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SystemEventLocalServiceUtil} to access the system event local service. Add custom service methods to <code>com.liferay.portal.service.impl.SystemEventLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.SystemEvent addSystemEvent(
-			long userId, long groupId, String className, long classPK,
-			String classUuid, String referrerClassName, int type,
-			String extraData)
+			long userId, long groupId, java.lang.String className, long classPK,
+			java.lang.String classUuid, java.lang.String referrerClassName,
+			int type, java.lang.String extraData)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _systemEventLocalService.addSystemEvent(
@@ -48,8 +51,9 @@ public class SystemEventLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.SystemEvent addSystemEvent(
-			long companyId, String className, long classPK, String classUuid,
-			String referrerClassName, int type, String extraData)
+			long companyId, java.lang.String className, long classPK,
+			java.lang.String classUuid, java.lang.String referrerClassName,
+			int type, java.lang.String extraData)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _systemEventLocalService.addSystemEvent(
@@ -264,7 +268,7 @@ public class SystemEventLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _systemEventLocalService.getOSGiServiceIdentifier();
 	}
 

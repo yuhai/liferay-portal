@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the Release service. Represents a row in the &quot;Release_&quot; database table, with each column mapped to a property of this class.
  *
@@ -55,11 +53,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ReleaseImpl
  * @generated
  */
-@ProviderType
 public class ReleaseModelImpl
 	extends BaseModelImpl<Release> implements ReleaseModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a release model instance should use the <code>Release</code> interface instead.

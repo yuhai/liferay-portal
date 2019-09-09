@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMDataProviderInstanceLinkPersistence
 	extends BasePersistence<DDMDataProviderInstanceLink> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMDataProviderInstanceLinkUtil} to access the ddm data provider instance link persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

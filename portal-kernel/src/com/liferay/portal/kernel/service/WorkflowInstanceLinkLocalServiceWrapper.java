@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link WorkflowInstanceLinkLocalService}.
@@ -23,7 +22,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see WorkflowInstanceLinkLocalService
  * @generated
  */
-@ProviderType
 public class WorkflowInstanceLinkLocalServiceWrapper
 	implements WorkflowInstanceLinkLocalService,
 			   ServiceWrapper<WorkflowInstanceLinkLocalService> {
@@ -34,11 +32,17 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 		_workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link WorkflowInstanceLinkLocalServiceUtil} to access the workflow instance link local service. Add custom service methods to <code>com.liferay.portal.service.impl.WorkflowInstanceLinkLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.WorkflowInstanceLink
 			addWorkflowInstanceLink(
-				long userId, long companyId, long groupId, String className,
-				long classPK, long workflowInstanceId)
+				long userId, long companyId, long groupId,
+				java.lang.String className, long classPK,
+				long workflowInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _workflowInstanceLinkLocalService.addWorkflowInstanceLink(
@@ -106,7 +110,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.WorkflowInstanceLink
 			deleteWorkflowInstanceLink(
-				long companyId, long groupId, String className, long classPK)
+				long companyId, long groupId, java.lang.String className,
+				long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(
@@ -133,7 +138,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 
 	@Override
 	public void deleteWorkflowInstanceLinks(
-			long companyId, long groupId, String className, long classPK)
+			long companyId, long groupId, java.lang.String className,
+			long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
@@ -243,7 +249,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.WorkflowInstanceLink
 		fetchWorkflowInstanceLink(
-			long companyId, long groupId, String className, long classPK) {
+			long companyId, long groupId, java.lang.String className,
+			long classPK) {
 
 		return _workflowInstanceLinkLocalService.fetchWorkflowInstanceLink(
 			companyId, groupId, className, classPK);
@@ -270,7 +277,7 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _workflowInstanceLinkLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -284,8 +291,9 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	}
 
 	@Override
-	public String getState(
-			long companyId, long groupId, String className, long classPK)
+	public java.lang.String getState(
+			long companyId, long groupId, java.lang.String className,
+			long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _workflowInstanceLinkLocalService.getState(
@@ -311,7 +319,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.WorkflowInstanceLink
 			getWorkflowInstanceLink(
-				long companyId, long groupId, String className, long classPK)
+				long companyId, long groupId, java.lang.String className,
+				long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _workflowInstanceLinkLocalService.getWorkflowInstanceLink(
@@ -340,7 +349,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.WorkflowInstanceLink>
 		getWorkflowInstanceLinks(
-			long companyId, long groupId, String className, long classPK) {
+			long companyId, long groupId, java.lang.String className,
+			long classPK) {
 
 		return _workflowInstanceLinkLocalService.getWorkflowInstanceLinks(
 			companyId, groupId, className, classPK);
@@ -359,7 +369,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 
 	@Override
 	public boolean hasWorkflowInstanceLink(
-		long companyId, long groupId, String className, long classPK) {
+		long companyId, long groupId, java.lang.String className,
+		long classPK) {
 
 		return _workflowInstanceLinkLocalService.hasWorkflowInstanceLink(
 			companyId, groupId, className, classPK);
@@ -367,7 +378,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 
 	@Override
 	public boolean isEnded(
-			long companyId, long groupId, String className, long classPK)
+			long companyId, long groupId, java.lang.String className,
+			long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _workflowInstanceLinkLocalService.isEnded(
@@ -376,9 +388,10 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 
 	@Override
 	public void startWorkflowInstance(
-			long companyId, long groupId, long userId, String className,
-			long classPK,
-			java.util.Map<String, java.io.Serializable> workflowContext)
+			long companyId, long groupId, long userId,
+			java.lang.String className, long classPK,
+			java.util.Map<java.lang.String, java.io.Serializable>
+				workflowContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_workflowInstanceLinkLocalService.startWorkflowInstance(
@@ -387,8 +400,8 @@ public class WorkflowInstanceLinkLocalServiceWrapper
 
 	@Override
 	public void updateClassPK(
-			long companyId, long groupId, String className, long oldClassPK,
-			long newClassPK)
+			long companyId, long groupId, java.lang.String className,
+			long oldClassPK, long newClassPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_workflowInstanceLinkLocalService.updateClassPK(

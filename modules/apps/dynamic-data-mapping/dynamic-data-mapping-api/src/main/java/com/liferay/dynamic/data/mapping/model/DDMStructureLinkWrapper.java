@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link DDMStructureLink}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see DDMStructureLink
  * @generated
  */
-@ProviderType
 public class DDMStructureLinkWrapper
 	extends BaseModelWrapper<DDMStructureLink>
 	implements DDMStructureLink, ModelWrapper<DDMStructureLink> {
@@ -180,6 +177,11 @@ public class DDMStructureLinkWrapper
 		return model.getStructureLinkId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a ddm structure link model instance should use the <code>DDMStructureLink</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

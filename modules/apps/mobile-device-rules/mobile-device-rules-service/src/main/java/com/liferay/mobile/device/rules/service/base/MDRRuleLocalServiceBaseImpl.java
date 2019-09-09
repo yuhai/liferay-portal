@@ -54,7 +54,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -68,12 +67,11 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.mobile.device.rules.service.impl.MDRRuleLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class MDRRuleLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements MDRRuleLocalService, AopService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MDRRuleLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil</code>.

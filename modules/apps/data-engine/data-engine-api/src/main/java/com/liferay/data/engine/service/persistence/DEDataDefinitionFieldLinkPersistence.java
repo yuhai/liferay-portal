@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataDefinitionFieldLinkPersistence
 	extends BasePersistence<DEDataDefinitionFieldLink> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DEDataDefinitionFieldLinkUtil} to access the de data definition field link persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.

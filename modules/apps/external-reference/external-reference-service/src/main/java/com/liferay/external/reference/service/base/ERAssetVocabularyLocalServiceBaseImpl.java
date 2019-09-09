@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -42,13 +41,12 @@ import org.osgi.service.component.annotations.Reference;
  * @see com.liferay.external.reference.service.impl.ERAssetVocabularyLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class ERAssetVocabularyLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements ERAssetVocabularyLocalService, AopService,
 			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ERAssetVocabularyLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.external.reference.service.ERAssetVocabularyLocalServiceUtil</code>.

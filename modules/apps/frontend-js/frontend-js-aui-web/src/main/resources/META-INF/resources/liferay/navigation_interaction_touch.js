@@ -24,7 +24,7 @@ AUI.add(
 		A.mix(
 			Liferay.NavigationInteraction.prototype,
 			{
-				_handleShowNavigationMenu: function(menuNew, menuOld, event) {
+				_handleShowNavigationMenu(menuNew) {
 					var instance = this;
 
 					var mapHover = instance.MAP_HOVER;
@@ -68,7 +68,7 @@ AUI.add(
 					Liferay.Data[handleId] = handle;
 				},
 
-				_initChildMenuHandlers: function(navigation) {
+				_initChildMenuHandlers(navigation) {
 					var instance = this;
 
 					if (navigation) {
@@ -111,7 +111,7 @@ AUI.add(
 
 				_initNodeFocusManager: A.Lang.emptyFn,
 
-				_onTouchClick: function(event) {
+				_onTouchClick(event) {
 					var instance = this;
 
 					var menuNew = event.currentTarget.ancestor(

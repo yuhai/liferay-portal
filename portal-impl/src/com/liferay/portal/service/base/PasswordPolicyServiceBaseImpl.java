@@ -49,7 +49,7 @@ public abstract class PasswordPolicyServiceBaseImpl
 	extends BaseServiceImpl
 	implements PasswordPolicyService, IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PasswordPolicyService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.PasswordPolicyServiceUtil</code>.
