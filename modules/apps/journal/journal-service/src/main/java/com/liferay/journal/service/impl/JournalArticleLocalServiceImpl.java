@@ -723,6 +723,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Article
 
+
 		User user = userLocalService.getUser(userId);
 
 		byte[] smallImageBytes = null;

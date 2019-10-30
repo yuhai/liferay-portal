@@ -214,6 +214,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		long creatorUserId = 0;
 		boolean autoPassword = false;
 
+
 		String password1 = PropsValues.DEFAULT_ADMIN_PASSWORD;
 
 		String password2 = password1;

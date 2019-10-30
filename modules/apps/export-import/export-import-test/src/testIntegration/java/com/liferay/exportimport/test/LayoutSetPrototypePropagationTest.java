@@ -94,6 +94,7 @@ public class LayoutSetPrototypePropagationTest
 
 	@Test
 	public void testAddChildLayoutWithLinkDisabled() throws Exception {
+
 		testAddChildLayout(false);
 	}
 
