@@ -1291,13 +1291,6 @@ public interface PropsKeys {
 	public static final String INDEX_SEARCH_ENGINE_ID =
 		"index.search.engine.id";
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String INDEX_SEARCH_HIGHLIGHT_ENABLED =
-		"index.search.highlight.enabled";
-
 	public static final String INDEX_SEARCH_HIGHLIGHT_FRAGMENT_SIZE =
 		"index.search.highlight.fragment.size";
 
@@ -2711,27 +2704,6 @@ public interface PropsKeys {
 	public static final String SEARCH_CONTAINER_PAGE_ITERATOR_MAX_PAGES =
 		"search.container.page.iterator.max.pages";
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_BOTTOM =
-		"search.container.show.pagination.bottom";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP =
-		"search.container.show.pagination.top";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA =
-		"search.container.show.pagination.top.delta";
-
 	public static final String SERVLET_CONTEXT_CLASS_LOADER_POOL_FALLBACK =
 		"servlet.context.class.loader.pool.fallback";
 
@@ -2960,12 +2932,6 @@ public interface PropsKeys {
 
 	public static final String SOCIAL_ACTIVITY_SETS_SELECTOR =
 		"social.activity.sets.selector";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String SOCIAL_BOOKMARK_ICON = "social.bookmark.icon";
 
 	public static final String SOURCE_FORGE_MIRRORS = "source.forge.mirrors";
 

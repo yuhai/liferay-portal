@@ -62,8 +62,6 @@ import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
 import javax.portlet.ValidatorException;
 import javax.portlet.WindowState;
 
@@ -1831,19 +1829,6 @@ public class PortalUtil {
 		return getPortal().initUser(httpServletRequest);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void invokeTaglibDiscussionPagination(
-			PortletConfig portletConfig, ResourceRequest resourceRequest,
-			ResourceResponse resourceResponse)
-		throws IOException, PortletException {
-
-		getPortal().invokeTaglibDiscussionPagination(
-			portletConfig, resourceRequest, resourceResponse);
-	}
-
 	public static boolean isCDNDynamicResourcesEnabled(
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
@@ -1969,23 +1954,6 @@ public class PortalUtil {
 
 	public static boolean isSecure(HttpServletRequest httpServletRequest) {
 		return getPortal().isSecure(httpServletRequest);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #isSkipPortletContentRendering(Group, LayoutTypePortlet,
-	 *             PortletDisplay, String)}
-	 */
-	@Deprecated
-	public static boolean isSkipPortletContentProcesssing(
-			Group group, HttpServletRequest httpServletRequest,
-			LayoutTypePortlet layoutTypePortlet, PortletDisplay portletDisplay,
-			String portletName)
-		throws Exception {
-
-		return getPortal().isSkipPortletContentProcessing(
-			group, httpServletRequest, layoutTypePortlet, portletDisplay,
-			portletName);
 	}
 
 	public static boolean isSkipPortletContentRendering(
