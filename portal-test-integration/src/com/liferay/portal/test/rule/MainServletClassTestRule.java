@@ -14,9 +14,18 @@
 
 package com.liferay.portal.test.rule;
 
+import com.liferay.petra.executor.PortalExecutorManager;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.internal.servlet.MainServlet;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
+import com.liferay.portal.kernel.messaging.BaseDestination;
+import com.liferay.portal.kernel.messaging.Destination;
+import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.messaging.SynchronousDestination;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
@@ -28,10 +37,15 @@ import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.mock.AutoDeployMockServletContext;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 
 import javax.servlet.ServletException;
 
 import org.junit.runner.Description;
+
+import java.lang.reflect.Field;
+import java.util.concurrent.ExecutorService;
 
 import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.mock.web.MockServletConfig;
@@ -62,11 +76,62 @@ public class MainServletClassTestRule extends ClassTestRule<Void> {
 		SearchEngineHelperUtil.removeCompany(TestPropsValues.getCompanyId());
 	}
 
+	private void _replaceWithSynchronousDestination(String name) {
+		BaseDestination baseDestination = new SynchronousDestination();
+
+		baseDestination.setName(name);
+
+		MessageBus messageBus = MessageBusUtil.getMessageBus();
+
+		Destination oldDestination = messageBus.getDestination(name);
+
+		messageBus.replace(baseDestination, false);
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		ExecutorService executorService = registry.callService(
+			PortalExecutorManager.class,
+			portalExecutorManager -> portalExecutorManager.getPortalExecutor(
+				oldDestination.getName(), false));
+
+		try {
+			Class<?> clazz = oldDestination.getClass();
+
+			Field field = ReflectionUtil.getDeclaredField(
+				clazz.getSuperclass(), "_portalExecutorManager");
+
+			PortalExecutorManager portalExecutorManager =
+				(PortalExecutorManager)field.get(oldDestination);
+
+			executorService = portalExecutorManager.getPortalExecutor(
+				oldDestination.getName());
+		}
+		catch (Exception e) {
+			return;
+		}
+
+		executorService =
+			PortalExecutorManagerUtil.getPortalExecutor(
+				oldDestination.getName());
+	}
+
 	@Override
 	public Void beforeClass(Description description) {
-		if (ArquillianUtil.isArquillianTest(description)) {
-			return null;
-		}
+//		if (ArquillianUtil.isArquillianTest(description)) {
+//			return null;
+//		}
+
+		_replaceWithSynchronousDestination(
+			DestinationNames.DOCUMENT_LIBRARY_AUDIO_PROCESSOR);
+		_replaceWithSynchronousDestination(
+			DestinationNames.DOCUMENT_LIBRARY_IMAGE_PROCESSOR);
+		_replaceWithSynchronousDestination(
+			DestinationNames.DOCUMENT_LIBRARY_PDF_PROCESSOR);
+		_replaceWithSynchronousDestination(
+			DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR);
+		_replaceWithSynchronousDestination(
+			DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR);
+
 
 		if (_mainServlet == null) {
 			final MockServletContext mockServletContext =

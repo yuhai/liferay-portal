@@ -45,6 +45,7 @@ public class LiferayIntegrationTestRule extends AggregateTestRule {
 		testRules.add(SybaseDumpTransactionLogTestRule.INSTANCE);
 		testRules.add(ClearThreadLocalClassTestRule.INSTANCE);
 		testRules.add(UniqueStringRandomizerBumperClassTestRule.INSTANCE);
+		testRules.add(MainServletClassTestRule.INSTANCE);
 		testRules.add(DestinationAwaitClassTestRule.INSTANCE);
 		testRules.add(CompanyProviderClassTestRule.INSTANCE);
 		testRules.add(DeleteAfterTestRunMethodTestRule.INSTANCE);
