@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.log.Jdk14LogFactoryImpl;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.resiliency.mpi.MPIHelperUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
@@ -148,27 +147,15 @@ public class GlobalShutdownAction extends SimpleAction {
 		DB db = DBManagerUtil.getDB();
 
 		if (db.getDBType() == DBType.HYPERSONIC) {
-			Connection connection = null;
-			Statement statement = null;
-
-			try {
-				connection = DataAccess.getConnection();
-
-				statement = connection.createStatement();
+			try (Connection connection = DataAccess.getConnection();
+				Statement statement = connection.createStatement()) {
 
 				statement.executeUpdate("SHUTDOWN");
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);
 			}
-			finally {
-				DataAccess.cleanUp(connection, statement);
-			}
 		}
-
-		// Portal Resiliency
-
-		MPIHelperUtil.shutdown();
 	}
 
 	protected void shutdownLevel5() {

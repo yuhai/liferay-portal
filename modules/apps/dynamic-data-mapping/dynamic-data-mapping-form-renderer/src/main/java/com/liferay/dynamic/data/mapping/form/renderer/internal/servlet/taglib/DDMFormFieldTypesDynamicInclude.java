@@ -15,7 +15,6 @@
 package com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.taglib;
 
 import com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.taglib.helper.BaseDDMFormFieldTypesDynamicInclude;
-import com.liferay.dynamic.data.mapping.form.renderer.internal.util.DDMFormFieldTypesThreadLocal;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -34,6 +33,9 @@ import org.osgi.service.component.annotations.Component;
 public class DDMFormFieldTypesDynamicInclude
 	extends BaseDDMFormFieldTypesDynamicInclude {
 
+	public static final String LIFERAY_SHARED_DDM_FORM_FIELD_TYPES_INCLUDED =
+		"LIFERAY_SHARED_DDM_FORM_FIELD_TYPES_INCLUDED";
+
 	@Override
 	public void include(
 			HttpServletRequest httpServletRequest,
@@ -47,10 +49,12 @@ public class DDMFormFieldTypesDynamicInclude
 		if (themeDisplay.isAjax()) {
 			include(httpServletResponse);
 
-			DDMFormFieldTypesThreadLocal.removeAll();
+			httpServletRequest.removeAttribute(
+				LIFERAY_SHARED_DDM_FORM_FIELD_TYPES_INCLUDED);
 		}
 		else {
-			DDMFormFieldTypesThreadLocal.setFieldTypesRequested(true);
+			httpServletRequest.setAttribute(
+				LIFERAY_SHARED_DDM_FORM_FIELD_TYPES_INCLUDED, Boolean.TRUE);
 		}
 	}
 

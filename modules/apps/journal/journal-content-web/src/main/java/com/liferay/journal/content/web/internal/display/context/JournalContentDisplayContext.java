@@ -25,8 +25,8 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.item.selector.ItemSelector;
-import com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType;
-import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
+import com.liferay.item.selector.criteria.AssetEntryItemSelectorReturnType;
+import com.liferay.item.selector.criteria.asset.criterion.AssetEntryItemSelectorCriterion;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.content.asset.addon.entry.ContentMetadataAssetAddonEntry;
@@ -506,6 +506,9 @@ public class JournalContentDisplayContext {
 	}
 
 	public PortletURL getItemSelectorURL() throws PortalException {
+		ItemSelector itemSelector = (ItemSelector)_portletRequest.getAttribute(
+			JournalWebKeys.ITEM_SELECTOR);
+
 		LiferayRenderRequest liferayRenderRequest =
 			(LiferayRenderRequest)LiferayPortletUtil.getLiferayPortletRequest(
 				_portletRequest);
@@ -517,21 +520,29 @@ public class JournalContentDisplayContext {
 			(LiferayRenderResponse)LiferayPortletUtil.getLiferayPortletResponse(
 				_portletResponse);
 
-		InfoItemItemSelectorCriterion infoItemItemSelectorCriterion =
-			new InfoItemItemSelectorCriterion();
+		AssetEntryItemSelectorCriterion assetEntryItemSelectorCriterion =
+			new AssetEntryItemSelectorCriterion();
 
-		infoItemItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new JournalArticleItemSelectorReturnType());
-		infoItemItemSelectorCriterion.setStatus(
-			WorkflowConstants.STATUS_APPROVED);
+		assetEntryItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new AssetEntryItemSelectorReturnType());
+		assetEntryItemSelectorCriterion.setGroupId(
+			_themeDisplay.getScopeGroupId());
+		assetEntryItemSelectorCriterion.setSelectedGroupIds(
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(
+				_themeDisplay.getScopeGroupId()));
+		assetEntryItemSelectorCriterion.setShowNonindexable(true);
+		assetEntryItemSelectorCriterion.setShowScheduled(true);
+		assetEntryItemSelectorCriterion.setTypeSelection(
+			JournalArticle.class.getName());
 
-		ItemSelector itemSelector = (ItemSelector)_portletRequest.getAttribute(
-			JournalWebKeys.ITEM_SELECTOR);
-
-		return itemSelector.getItemSelectorURL(
+		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory,
 			liferayRenderResponse.getNamespace() + "selectedItem",
-			infoItemItemSelectorCriterion);
+			assetEntryItemSelectorCriterion);
+
+		itemSelectorURL.setParameter("singleSelect", Boolean.TRUE.toString());
+
+		return itemSelectorURL;
 	}
 
 	public JournalArticle getLatestArticle() throws PortalException {

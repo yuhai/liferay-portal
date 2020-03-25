@@ -20,12 +20,13 @@ import ClayNavigationBar from '@clayui/navigation-bar';
 import {ClayPaginationWithBasicItems} from '@clayui/pagination';
 import {Editor} from 'frontend-editor-ckeditor-web';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../../AppContext.es';
 import Answer from '../../components/Answer.es';
 import ArticleBodyRenderer from '../../components/ArticleBodyRenderer.es';
 import CreatorRow from '../../components/CreatorRow.es';
+import Link from '../../components/Link.es';
 import Rating from '../../components/Rating.es';
 import RelatedQuestions from '../../components/RelatedQuestions.es';
 import SectionLabel from '../../components/SectionLabel.es';
@@ -58,6 +59,7 @@ export default withRouter(
 		const [articleBody, setArticleBody] = useState();
 		const [page, setPage] = useState(1);
 		const [question, setQuestion] = useState();
+		const [sectionTitle, setSectionTitle] = useState('');
 		const [filter, setFilter] = useState('active');
 
 		useEffect(() => {
@@ -69,6 +71,7 @@ export default withRouter(
 				getThread(questionId, context.siteKey, page).then(data => {
 					setQuestion(data);
 					setAnswers(data.messageBoardMessages.items);
+					setSectionTitle(data.messageBoardSection.title);
 				}),
 			[context.siteKey, page, questionId]
 		);
@@ -179,9 +182,7 @@ export default withRouter(
 							<div className="col-md-10">
 								<div className="align-items-end flex-column-reverse flex-md-row row">
 									<div className="c-mt-4 c-mt-md-0 col-md-9">
-										<Link
-											to={`/questions/${question.messageBoardSection.title}`}
-										>
+										<Link to={`/questions/${sectionTitle}`}>
 											<SectionLabel
 												section={
 													question.messageBoardSection

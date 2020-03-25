@@ -15,9 +15,10 @@
 import ClayCard, {ClayCardWithNavigation} from '@clayui/card';
 import {ClayPaginationWithBasicItems} from '@clayui/pagination';
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../../AppContext.es';
+import Link from '../../components/Link.es';
 import {getTags} from '../../utils/client.es';
 import lang from '../../utils/lang.es';
 import {dateToInternationalHuman} from '../../utils/utils.es';

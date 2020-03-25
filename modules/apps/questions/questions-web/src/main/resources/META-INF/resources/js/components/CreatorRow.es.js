@@ -13,9 +13,10 @@
  */
 
 import React from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 import {timeDifference} from '../utils/utils.es';
+import Link from './Link.es';
 import UserIcon from './UserIcon.es';
 import UserPopover from './UserPopover.es';
 

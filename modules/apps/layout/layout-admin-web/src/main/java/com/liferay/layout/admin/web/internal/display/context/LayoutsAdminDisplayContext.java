@@ -701,8 +701,7 @@ public class LayoutsAdminDisplayContext {
 			layoutJSONObject.put(
 				"parentable", layoutType.isParentable()
 			).put(
-				"pending",
-				layout.getStatus() == WorkflowConstants.STATUS_PENDING
+				"pending", layout.isDenied() || layout.isPending()
 			).put(
 				"plid", layout.getPlid()
 			);
@@ -1804,6 +1803,11 @@ public class LayoutsAdminDisplayContext {
 			PortalUtil.getClassNameId(Layout.class), layout.getPlid());
 
 		if (draftLayout == null) {
+			UnicodeProperties unicodeProperties =
+				layout.getTypeSettingsProperties();
+
+			unicodeProperties.put("published", "true");
+
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				httpServletRequest);
 
@@ -1814,11 +1818,15 @@ public class LayoutsAdminDisplayContext {
 				layout.getNameMap(), layout.getTitleMap(),
 				layout.getDescriptionMap(), layout.getKeywordsMap(),
 				layout.getRobotsMap(), layout.getType(),
-				layout.getTypeSettings(), true, true,
+				unicodeProperties.toString(), true, true,
 				layout.getMasterLayoutPlid(), Collections.emptyMap(),
 				serviceContext);
 
-			_layoutCopyHelper.copyLayout(layout, draftLayout);
+			draftLayout = _layoutCopyHelper.copyLayout(layout, draftLayout);
+
+			LayoutLocalServiceUtil.updateStatus(
+				draftLayout.getUserId(), draftLayout.getPlid(),
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
 		}
 
 		String layoutFullURL = PortalUtil.getLayoutFullURL(

@@ -16,7 +16,9 @@ package com.liferay.document.library.web.internal.upload;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.util.DLValidator;
+import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UniqueFileNameProvider;
@@ -80,13 +83,10 @@ public class DLUploadFileEntryHandler implements UploadFileEntryHandler {
 				curFileName -> _exists(
 					themeDisplay.getScopeGroupId(), folderId, curFileName));
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				DLFileEntry.class.getName(), uploadPortletRequest);
-
 			return _dlAppService.addFileEntry(
 				themeDisplay.getScopeGroupId(), folderId, uniqueFileName,
 				contentType, uniqueFileName, description, StringPool.BLANK,
-				inputStream, size, serviceContext);
+				inputStream, size, _getServiceContext(uploadPortletRequest));
 		}
 	}
 
@@ -109,6 +109,37 @@ public class DLUploadFileEntryHandler implements UploadFileEntryHandler {
 		}
 	}
 
+	private ServiceContext _getServiceContext(
+			UploadPortletRequest uploadPortletRequest)
+		throws PortalException {
+
+		long fileEntryId = GetterUtil.getLong(
+			uploadPortletRequest.getParameter("fileEntryId"));
+
+		if (fileEntryId == 0) {
+			return ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), uploadPortletRequest);
+		}
+
+		DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
+			fileEntryId);
+
+		if (dlFileEntry == null) {
+			return ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), uploadPortletRequest);
+		}
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DLFileEntry.class.getName(), uploadPortletRequest);
+
+		ExpandoBridge expandoBridge = dlFileEntry.getExpandoBridge();
+
+		serviceContext.setExpandoBridgeAttributes(
+			expandoBridge.getAttributes());
+
+		return serviceContext;
+	}
+
 	private static final String _PARAMETER_NAME = "imageSelectorFileName";
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -116,6 +147,9 @@ public class DLUploadFileEntryHandler implements UploadFileEntryHandler {
 
 	@Reference
 	private DLAppService _dlAppService;
+
+	@Reference
+	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Reference
 	private DLValidator _dlValidator;

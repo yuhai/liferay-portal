@@ -138,9 +138,11 @@ public class AddFragmentCompositionMVCActionCommand
 				fragmentComposition.getFragmentCompositionId(), previewImageURL,
 				serviceContext, themeDisplay);
 
-			_fragmentCompositionService.updateFragmentComposition(
-				fragmentComposition.getFragmentCompositionId(),
-				previewFileEntry.getFileEntryId());
+			if (previewFileEntry != null) {
+				_fragmentCompositionService.updateFragmentComposition(
+					fragmentComposition.getFragmentCompositionId(),
+					previewFileEntry.getFileEntryId());
+			}
 		}
 
 		return JSONUtil.put(
@@ -183,6 +185,10 @@ public class AddFragmentCompositionMVCActionCommand
 				URL imageURL = new URL(url);
 
 				bytes = FileUtil.getBytes(imageURL.openStream());
+			}
+
+			if (bytes.length == 0) {
+				return null;
 			}
 
 			Repository repository =

@@ -35,7 +35,18 @@ public class SpiraReleaseBuild extends BaseSpiraArtifact {
 
 	public static SpiraReleaseBuild createSpiraReleaseBuild(
 		SpiraProject spiraProject, SpiraRelease spiraRelease,
-		String releaseBuildName) {
+		String releaseBuildName, String releaseBuildDescription,
+		Status releaseBuildStatus) {
+
+		List<SpiraReleaseBuild> spiraReleaseBuilds = getSpiraReleaseBuilds(
+			spiraProject, spiraRelease,
+			new SearchQuery.SearchParameter("ProjectId", spiraProject.getID()),
+			new SearchQuery.SearchParameter("ReleaseId", spiraRelease.getID()),
+			new SearchQuery.SearchParameter("Name", releaseBuildName));
+
+		if (!spiraReleaseBuilds.isEmpty()) {
+			return spiraReleaseBuilds.get(0);
+		}
 
 		Map<String, String> urlPathReplacements = new HashMap<>();
 
@@ -48,8 +59,12 @@ public class SpiraReleaseBuild extends BaseSpiraArtifact {
 
 		requestJSONObject.put(SpiraProject.ID_KEY, spiraProject.getID());
 		requestJSONObject.put(SpiraRelease.ID_KEY, spiraRelease.getID());
-		requestJSONObject.put("BuildStatusId", STATUS_SUCCEEDED);
+		requestJSONObject.put("BuildStatusId", releaseBuildStatus.getID());
 		requestJSONObject.put("Name", releaseBuildName);
+
+		if (releaseBuildDescription != null) {
+			requestJSONObject.put("Description", releaseBuildDescription);
+		}
 
 		try {
 			JSONObject responseJSONObject = SpiraRestAPIUtil.requestJSONObject(
@@ -63,6 +78,22 @@ public class SpiraReleaseBuild extends BaseSpiraArtifact {
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
 		}
+	}
+
+	public static enum Status {
+
+		ABORTED(4), FAILED(1), SUCCEEDED(2), UNSTABLE(3);
+
+		public Integer getID() {
+			return _id;
+		}
+
+		private Status(Integer id) {
+			_id = id;
+		}
+
+		private final Integer _id;
+
 	}
 
 	protected static List<SpiraReleaseBuild> getSpiraReleaseBuilds(
@@ -92,14 +123,6 @@ public class SpiraReleaseBuild extends BaseSpiraArtifact {
 	}
 
 	protected static final String ID_KEY = "BuildId";
-
-	protected static final int STATUS_ABORTED = 4;
-
-	protected static final int STATUS_FAILED = 1;
-
-	protected static final int STATUS_SUCCEEDED = 2;
-
-	protected static final int STATUS_UNSTABLED = 3;
 
 	private static List<JSONObject> _requestSpiraReleaseBuilds(
 		SpiraProject spiraProject, SpiraRelease spiraRelease,

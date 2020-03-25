@@ -516,6 +516,7 @@ definition {
 				locator1 = "FragmentEditor#FRAGMENTS_EDITOR_FLOATING_TOOLBAR_INPUT");
 
 			AssertElementPresent(
+				key_fragmentName = "${fragmentName}",
 				key_imageName = "${imageFileName}",
 				locator1 = "Fragment#FRAGMENT_CONTENT_BACKGROUND_IMAGE");
 		}
@@ -1214,6 +1215,41 @@ definition {
 			locator1 = "Fragment#FRAGMENT_HEADER");
 	}
 
+	macro viewRowStyle {
+		if (isSet(columnCount)) {
+			var i = "0";
+
+			while ("${i}" != "${columnCount}") {
+				var columnNumber = ${i} + 1;
+
+				AssertElementPresent(
+					key_columnNumber = "${columnNumber}",
+					key_position = "${position}",
+					locator1 = "PageEditor#ROW_COLUMN");
+			}
+
+			var columnNumber = ${columnCount} + 1;
+
+			AssertElementNotPresent(
+				key_columnNumber = "${columnNumber}",
+				key_position = "${position}",
+				locator1 = "PageEditor#ROW_COLUMN");
+		}
+
+		if (isSet(spaceBetweenColumns)) {
+			if ("spaceBetweenColumns" == "true") {
+				AssertElementNotPresent(
+					key_position = "${position}",
+					locator1 = "PageEditor#ROW_CONFIGURATION_COLUMNS_NO_GUTTER");
+			}
+			else if ("spaceBetweenColumns" == "false") {
+				AssertElementPresent(
+					key_position = "${position}",
+					locator1 = "PageEditor#ROW_CONFIGURATION_COLUMNS_NO_GUTTER");
+			}
+		}
+	}
+
 	macro viewSectionStyle {
 		if (isSet(backgroundColor)) {
 			AssertElementPresent(
@@ -1230,10 +1266,23 @@ definition {
 		}
 
 		if (isSet(container)) {
-			AssertElementPresent(
-				key_container = "${container}",
-				key_position = "${position}",
-				locator1 = "PageEditor#SECTION_CONFIGURATION_CONTAINER");
+			if ("${container}" == "Fixed Width") {
+				AssertElementNotPresent(
+					key_container = "fluid",
+					key_position = "${position}",
+					locator1 = "PageEditor#SECTION_CONFIGURATION_CONTAINER");
+
+				AssertElementNotPresent(
+					key_paddingHorizontal = "",
+					key_position = "${position}",
+					locator1 = "PageEditor#SECTION_CONFIGURATION_PADDING_HORIZONTAL");
+			}
+			else if ("${container}" == "Fluid") {
+				AssertElementPresent(
+					key_container = "fluid",
+					key_position = "${position}",
+					locator1 = "PageEditor#SECTION_CONFIGURATION_CONTAINER");
+			}
 		}
 
 		if (isSet(paddingBottom)) {

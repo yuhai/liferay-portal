@@ -15,7 +15,6 @@
 package com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.taglib;
 
 import com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.taglib.helper.BaseDDMFormFieldTypesDynamicInclude;
-import com.liferay.dynamic.data.mapping.form.renderer.internal.util.DDMFormFieldTypesThreadLocal;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 
 import java.io.IOException;
@@ -38,11 +37,17 @@ public class DDMFormRendererBottomDynamicInclude
 			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
 
-		if (DDMFormFieldTypesThreadLocal.isFieldTypesRequested()) {
+		Object value = httpServletRequest.getAttribute(
+			DDMFormFieldTypesDynamicInclude.
+				LIFERAY_SHARED_DDM_FORM_FIELD_TYPES_INCLUDED);
+
+		if (value != null) {
 			include(httpServletResponse);
 		}
 
-		DDMFormFieldTypesThreadLocal.removeAll();
+		httpServletRequest.removeAttribute(
+			DDMFormFieldTypesDynamicInclude.
+				LIFERAY_SHARED_DDM_FORM_FIELD_TYPES_INCLUDED);
 	}
 
 	@Override

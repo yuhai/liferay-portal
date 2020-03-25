@@ -110,9 +110,11 @@
 							</h6>
 						</c:if>
 
-						<h6 class="text-default">
-							<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>
-						</h6>
+						<c:if test="<%= assetBrowserDisplayContext.isShowAssetEntryStatus() %>">
+							<span class="text-default">
+								<aui:workflow-status markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= assetRenderer.getStatus() %>" />
+							</span>
+						</c:if>
 					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= Objects.equals(assetBrowserDisplayContext.getDisplayStyle(), "icon") %>'>
@@ -168,6 +170,13 @@
 						value="<%= assetEntry.getModifiedDate() %>"
 					/>
 
+					<c:if test="<%= assetBrowserDisplayContext.isShowAssetEntryStatus() %>">
+						<liferay-ui:search-container-column-status
+							name="status"
+							status="<%= assetRenderer.getStatus() %>"
+						/>
+					</c:if>
+
 					<liferay-ui:search-container-column-text
 						name="<%= assetBrowserDisplayContext.getGroupTypeTitle() %>"
 						value="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
@@ -218,12 +227,39 @@
 			});
 		</aui:script>
 	</c:when>
-	<c:otherwise>
+	<c:when test="<%= assetBrowserDisplayContext.isLegacySingleSelection() %>">
 		<aui:script>
 			Liferay.Util.selectEntityHandler(
 				'#<portlet:namespace />selectAssetFm',
 				'<%= HtmlUtil.escapeJS(assetBrowserDisplayContext.getEventName()) %>'
 			);
+		</aui:script>
+	</c:when>
+	<c:otherwise>
+		<aui:script require="metal-dom/src/all/dom as dom">
+			var delegateHandler = dom.delegate(
+				document.querySelector('#<portlet:namespace/>selectAssetFm'),
+				'click',
+				'.selector-button',
+				function(event) {
+					event.preventDefault();
+
+					Liferay.Util.getOpener().Liferay.fire(
+						'<%= HtmlUtil.escapeJS(assetBrowserDisplayContext.getEventName()) %>',
+						{
+							data: event.delegateTarget.dataset,
+						}
+					);
+				}
+			);
+
+			var onDestroyPortlet = function() {
+				delegateHandler.removeListener();
+
+				Liferay.detach('destroyPortlet', onDestroyPortlet);
+			};
+
+			Liferay.on('destroyPortlet', onDestroyPortlet);
 		</aui:script>
 	</c:otherwise>
 </c:choose>

@@ -316,8 +316,8 @@ public class ContentPageEditorDisplayContext {
 				() -> {
 					Layout publishedLayout = _getPublishedLayout();
 
-					if (publishedLayout.getStatus() ==
-							WorkflowConstants.STATUS_PENDING) {
+					if (publishedLayout.isDenied() ||
+						publishedLayout.isPending()) {
 
 						return true;
 					}

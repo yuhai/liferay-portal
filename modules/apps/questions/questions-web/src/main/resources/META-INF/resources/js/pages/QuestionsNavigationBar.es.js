@@ -17,12 +17,17 @@ import ClayDropDown from '@clayui/drop-down';
 import {ClayInput, ClaySelect} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../AppContext.es';
+import Link from '../components/Link.es';
 import SectionSubscription from '../components/SectionSubscription.es';
 import useSection from '../hooks/useSection.es';
-import {useDebounceCallback} from '../utils/utils.es';
+import {
+	historyPushWithSlug,
+	slugToText,
+	useDebounceCallback,
+} from '../utils/utils.es';
 
 function getFilterOptions() {
 	return [
@@ -57,13 +62,15 @@ export default withRouter(
 	}) => {
 		const context = useContext(AppContext);
 
+		const historyPushParser = historyPushWithSlug(history.push);
+
 		const [active, setActive] = useState(false);
 
 		const [debounceCallback] = useDebounceCallback(value => {
 			searchChange(value);
 		}, 500);
 
-		const section = useSection(sectionTitle, context.siteKey);
+		const section = useSection(slugToText(sectionTitle), context.siteKey);
 
 		useEffect(() => {
 			sectionChange(section);
@@ -199,7 +206,7 @@ export default withRouter(
 									className="c-ml-3 d-none d-sm-block text-nowrap"
 									displayType="primary"
 									onClick={() =>
-										history.push(
+										historyPushParser(
 											`/questions/${sectionTitle}/new`
 										)
 									}
@@ -211,7 +218,7 @@ export default withRouter(
 									className="btn-monospaced d-block d-sm-none position-fixed questions-button shadow"
 									displayType="primary"
 									onClick={() =>
-										history.push(
+										historyPushParser(
 											`/questions/${sectionTitle}/new`
 										)
 									}

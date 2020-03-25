@@ -111,8 +111,11 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public Dictionary<String, Object> getAnalyticsConfigurationProperties(
-			long companyId)
-		throws Exception {
+		long companyId) {
+
+		if (!isActive()) {
+			return null;
+		}
 
 		Set<Map.Entry<String, Long>> entries = _pidCompanyIdMapping.entrySet();
 
@@ -127,10 +130,25 @@ public class AnalyticsConfigurationTrackerImpl
 			null
 		);
 
-		Configuration configuration = _configurationAdmin.getConfiguration(
-			pid, StringPool.QUESTION);
+		if (pid == null) {
+			return null;
+		}
 
-		return configuration.getProperties();
+		try {
+			Configuration configuration = _configurationAdmin.getConfiguration(
+				pid, StringPool.QUESTION);
+
+			return configuration.getProperties();
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get configuration for company " + companyId,
+					exception);
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -151,17 +169,11 @@ public class AnalyticsConfigurationTrackerImpl
 
 	@Override
 	public boolean isActive() {
-		try {
-			if (!_active && _hasConfiguration()) {
-				_active = true;
-			}
+		if (!_active && _hasConfiguration()) {
+			_active = true;
 		}
-		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info("Unable to check analytics configurations");
-			}
-
-			return false;
+		else if (_active && !_hasConfiguration()) {
+			_active = false;
 		}
 
 		return _active;
@@ -344,7 +356,7 @@ public class AnalyticsConfigurationTrackerImpl
 		_addAnalyticsMessages(contacts);
 	}
 
-	private void _deactivate() throws Exception {
+	private void _deactivate() {
 		if (_active && !_hasConfiguration()) {
 			_active = false;
 		}
@@ -403,9 +415,19 @@ public class AnalyticsConfigurationTrackerImpl
 		}
 	}
 
-	private boolean _hasConfiguration() throws Exception {
-		Configuration[] configurations = _configurationAdmin.listConfigurations(
-			"(service.pid=" + AnalyticsConfiguration.class.getName() + "*)");
+	private boolean _hasConfiguration() {
+		Configuration[] configurations = null;
+
+		try {
+			configurations = _configurationAdmin.listConfigurations(
+				"(service.pid=" + AnalyticsConfiguration.class.getName() +
+					"*)");
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to list analytics configurations", exception);
+			}
+		}
 
 		if (configurations == null) {
 			return false;
@@ -520,10 +542,11 @@ public class AnalyticsConfigurationTrackerImpl
 					_addUsersAnalyticsMessages(users);
 				}
 				catch (Exception exception) {
-					if (_log.isInfoEnabled()) {
-						_log.info(
+					if (_log.isWarnEnabled()) {
+						_log.warn(
 							"Unable to get organization users for " +
-								"organization " + organizationId);
+								"organization " + organizationId,
+							exception);
 					}
 				}
 			}

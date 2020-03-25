@@ -115,9 +115,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
 		}
 		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to add analytics message " + jsonObject.toString());
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to add analytics message " + jsonObject.toString(),
+					exception);
 			}
 		}
 	}
@@ -251,8 +252,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			}
 		}
 		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info("Unable to get expando table " + tableId);
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get expando table " + tableId, exception);
 			}
 		}
 
@@ -262,17 +263,11 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	protected boolean isExcluded(T model) {
 		ShardedModel shardedModel = (ShardedModel)model;
 
-		try {
+		Dictionary<String, Object> analyticsConfigurationProperties =
 			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
 				shardedModel.getCompanyId());
-		}
-		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to get configuration for company " +
-						shardedModel.getCompanyId());
-			}
 
+		if (analyticsConfigurationProperties == null) {
 			return true;
 		}
 
@@ -391,21 +386,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		long companyId, String configurationPropertyName, String modelId,
 		String preferencePropertyName) {
 
-		Dictionary<String, Object> configurationProperties = null;
-
-		try {
-			configurationProperties =
-				analyticsConfigurationTracker.
-					getAnalyticsConfigurationProperties(companyId);
-		}
-		catch (Exception exception) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					"Unable to get configuration for company " + companyId);
-			}
-
-			return;
-		}
+		Dictionary<String, Object> configurationProperties =
+			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
+				companyId);
 
 		if (configurationProperties == null) {
 			return;
@@ -433,8 +416,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Unable to update preferences for company " +
-							companyId);
+						"Unable to update preferences for company " + companyId,
+						exception);
 				}
 			}
 		}
@@ -449,7 +432,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to update configuration for company " + companyId);
+					"Unable to update configuration for company " + companyId,
+					exception);
 			}
 		}
 	}
@@ -599,9 +583,9 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					StringBundler.concat(
-						"Unable to get ", modelClassName, StringPool.SPACE,
-						classPK));
+					String.format(
+						"Unable to get %s %s", modelClassName, classPK),
+					exception);
 			}
 		}
 	}

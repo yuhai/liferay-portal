@@ -13,11 +13,12 @@
  */
 
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../AppContext.es';
 import {getRelatedThreads} from '../utils/client.es';
 import {dateToInternationalHuman, normalizeRating} from '../utils/utils.es';
+import Link from './Link.es';
 import QuestionBadge from './QuestionsBadge.es';
 import SectionLabel from './SectionLabel.es';
 import UserIcon from './UserIcon.es';

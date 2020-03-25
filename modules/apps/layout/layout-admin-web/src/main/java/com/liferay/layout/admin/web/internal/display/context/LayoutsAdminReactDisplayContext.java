@@ -514,7 +514,7 @@ public class LayoutsAdminReactDisplayContext
 			}
 		}
 
-		if (layout.getStatus() == WorkflowConstants.STATUS_PENDING) {
+		if (layout.isDenied() || layout.isPending()) {
 			jsonArray.put(
 				JSONUtil.put(
 					"id", "pending"

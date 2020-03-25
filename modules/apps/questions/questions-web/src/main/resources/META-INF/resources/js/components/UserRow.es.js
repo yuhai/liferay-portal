@@ -13,8 +13,9 @@
  */
 
 import React from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
+import Link from '../components/Link.es';
 import UserPopover from './UserPopover.es';
 
 export default withRouter(

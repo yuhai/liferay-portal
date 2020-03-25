@@ -295,13 +295,14 @@ public class FragmentCompositionServiceSoap {
 	}
 
 	public static com.liferay.fragment.model.FragmentCompositionSoap
-			updateFragmentComposition(long fragmentCompositionId, String name)
+			updateFragmentComposition(
+				long fragmentCompositionId, long previewFileEntryId)
 		throws RemoteException {
 
 		try {
 			com.liferay.fragment.model.FragmentComposition returnValue =
 				FragmentCompositionServiceUtil.updateFragmentComposition(
-					fragmentCompositionId, name);
+					fragmentCompositionId, previewFileEntryId);
 
 			return com.liferay.fragment.model.FragmentCompositionSoap.
 				toSoapModel(returnValue);
@@ -314,14 +315,13 @@ public class FragmentCompositionServiceSoap {
 	}
 
 	public static com.liferay.fragment.model.FragmentCompositionSoap
-			updateFragmentComposition(
-				long fragmentCompositionId, long previewFileEntryId)
+			updateFragmentComposition(long fragmentCompositionId, String name)
 		throws RemoteException {
 
 		try {
 			com.liferay.fragment.model.FragmentComposition returnValue =
 				FragmentCompositionServiceUtil.updateFragmentComposition(
-					fragmentCompositionId, previewFileEntryId);
+					fragmentCompositionId, name);
 
 			return com.liferay.fragment.model.FragmentCompositionSoap.
 				toSoapModel(returnValue);

@@ -235,7 +235,7 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 			"fragmentEntryId",
 			String.valueOf(_fragmentEntry.getFragmentEntryId()));
 		exportFragmentEntryURL.setResourceID(
-			"/fragment/export_fragment_entries");
+			"/fragment/export_fragment_compositions_and_fragment_entries");
 
 		return dropdownItem -> {
 			dropdownItem.setHref(exportFragmentEntryURL);
@@ -288,7 +288,8 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 		PortletURL moveFragmentEntryURL = _renderResponse.createActionURL();
 
 		moveFragmentEntryURL.setParameter(
-			ActionRequest.ACTION_NAME, "/fragment/move_fragment_entry");
+			ActionRequest.ACTION_NAME,
+			"/fragment/move_fragment_compositions_and_fragment_entries");
 		moveFragmentEntryURL.setParameter(
 			"redirect", _themeDisplay.getURLCurrent());
 

@@ -876,6 +876,16 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	public static long getCacheFileSize(String key) {
+		File cacheFile = _getCacheFile(key);
+
+		if ((cacheFile == null) || !cacheFile.exists()) {
+			return 0;
+		}
+
+		return cacheFile.length();
+	}
+
 	public static String getCanonicalPath(File file) {
 		File canonicalFile = null;
 
@@ -1135,6 +1145,24 @@ public class JenkinsResultsParserUtil {
 		catch (UnknownHostException unknownHostException) {
 			return defaultHostName;
 		}
+	}
+
+	public static List<File> getIncludedFiles(
+		File basedir, String[] excludes, String[] includes) {
+
+		if (includes == null) {
+			return new ArrayList<>();
+		}
+
+		List<PathMatcher> excludePathMatchers = null;
+
+		if ((excludes != null) && (excludes.length > 0)) {
+			excludePathMatchers = toPathMatchers(null, excludes);
+		}
+
+		return getIncludedFiles(
+			excludePathMatchers, toPathMatchers(null, includes),
+			findFiles(basedir, ".*"));
 	}
 
 	public static List<File> getIncludedFiles(

@@ -114,7 +114,7 @@ public class InheritedFragmentEntryActionDropdownItemsProvider {
 			"fragmentEntryId",
 			String.valueOf(_fragmentEntry.getFragmentEntryId()));
 		exportFragmentEntryURL.setResourceID(
-			"/fragment/export_fragment_entries");
+			"/fragment/export_fragment_compositions_and_fragment_entries");
 
 		return dropdownItem -> {
 			dropdownItem.setHref(exportFragmentEntryURL);

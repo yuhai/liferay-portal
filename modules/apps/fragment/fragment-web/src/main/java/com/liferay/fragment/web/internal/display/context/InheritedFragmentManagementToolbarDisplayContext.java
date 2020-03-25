@@ -64,7 +64,8 @@ public class InheritedFragmentManagementToolbarDisplayContext
 				add(
 					dropdownItem -> {
 						dropdownItem.putData(
-							"action", "exportSelectedFragmentEntries");
+							"action",
+							"exportFragmentCompositionsAndFragmentEntries");
 						dropdownItem.setIcon("import-export");
 						dropdownItem.setLabel(
 							LanguageUtil.get(request, "export"));
@@ -115,7 +116,8 @@ public class InheritedFragmentManagementToolbarDisplayContext
 					liferayPortletResponse.createResourceURL();
 
 				exportFragmentEntriesURL.setResourceID(
-					"/fragment/export_fragment_entries");
+					"/fragment/export_fragment_compositions_and_fragment_" +
+						"entries");
 
 				return exportFragmentEntriesURL.toString();
 			}

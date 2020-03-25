@@ -79,17 +79,17 @@ definition {
 				elasticsearchTasks = JSONCurlUtil.get("${curl}");
 			}
 
-			if ("${reindexStartTime}" == "10") {
-				echo("Elasticsearch failed to receive reindex request after 10 seconds.");
+			if ("${reindexStartTime}" == "60") {
+				echo("Elasticsearch failed to receive reindex request after 60 seconds.");
 			}
 			else {
 				echo("Started reindexing ${reindexStartTime} second(s) after clicking 'Execute'.");
 			}
 
-			while ((contains("${elasticsearchTasks}", "indices:data/write/bulk") || IsElementPresent(locator1 = "ControlMenu#RELOAD_TOOLTIP")) && ("${reindexElapsedTime}" != "120")) {
-				Pause.pauseNoSPARefresh(locator1 = "5000");
+			while (((contains("${elasticsearchTasks}", "indices:data/write/bulk")) || IsElementPresent(locator1 = "ControlMenu#RELOAD_TOOLTIP")) && ("${reindexElapsedTime}" != "120")) {
+				Pause.pauseNoSPARefresh(locator1 = "10000");
 
-				var reindexElapsedTime = ${reindexElapsedTime} + 5;
+				var reindexElapsedTime = ${reindexElapsedTime} + 10;
 
 				echo("Current Elasticsearch Tasks:");
 
@@ -97,10 +97,23 @@ definition {
 			}
 		}
 		else if (contains("${searchEngineVendor}", "Solr")) {
-			while (IsElementPresent(locator1 = "ControlMenu#RELOAD_TOOLTIP")&& ("${reindexElapsedTime}" != "120")) {
+			while ((IsElementNotPresent(locator1 = "ControlMenu#RELOAD_TOOLTIP")) && ("${reindexStartTime}" != "60")) {
 				Pause.pauseNoSPARefresh(locator1 = "5000");
 
-				var reindexElapsedTime = ${reindexElapsedTime} + 5;
+				var reindexStartTime = ${reindexStartTime} + 5;
+			}
+
+			if ("${reindexStartTime}" == "60") {
+				echo("Solr failed to receive reindex request after 60 seconds.");
+			}
+			else {
+				echo("Started reindexing ${reindexStartTime} second(s) after clicking 'Execute'.");
+			}
+
+			while ((IsElementPresent(locator1 = "ControlMenu#RELOAD_TOOLTIP")) && ("${reindexElapsedTime}" != "120")) {
+				Pause.pauseNoSPARefresh(locator1 = "10000");
+
+				var reindexElapsedTime = ${reindexElapsedTime} + 10;
 			}
 		}
 

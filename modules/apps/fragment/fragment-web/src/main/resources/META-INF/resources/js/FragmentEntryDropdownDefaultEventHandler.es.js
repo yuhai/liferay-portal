@@ -143,13 +143,17 @@ class FragmentEntryDropdownDefaultEventHandler extends DefaultEventHandler {
 			},
 			selectedItem => {
 				if (selectedItem) {
-					this.one('#fragmentCollectionId').value = selectedItem.id;
-					this.one('#fragmentEntryIds').value = fragmentEntryId;
+					const form = this.one('#fragmentEntryFm');
 
-					submitForm(
-						this.one('#fragmentEntryFm'),
-						targetFragmentEntryURL
-					);
+					form.querySelector(
+						`#${this.ns('fragmentCollectionId')}`
+					).value = selectedItem.id;
+
+					form.querySelector(
+						`#${this.ns('fragmentEntryIds')}`
+					).value = fragmentEntryId;
+
+					submitForm(form, targetFragmentEntryURL);
 				}
 			}
 		);

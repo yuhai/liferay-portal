@@ -8,9 +8,20 @@ create table RedirectEntry (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
-	destinationURL TEXT null,
+	destinationURL STRING null,
 	expirationDate DATE null,
 	lastOccurrenceDate DATE null,
-	permanent BOOLEAN,
-	sourceURL TEXT null
+	permanent_ BOOLEAN,
+	sourceURL STRING null
+);
+
+create table RedirectNotFoundEntry (
+	mvccVersion LONG default 0 not null,
+	redirectNotFoundEntryId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	createDate DATE null,
+	modifiedDate DATE null,
+	hits LONG,
+	url VARCHAR(75) null
 );

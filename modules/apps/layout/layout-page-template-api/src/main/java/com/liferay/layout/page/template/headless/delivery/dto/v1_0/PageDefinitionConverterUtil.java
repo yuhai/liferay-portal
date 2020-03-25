@@ -15,7 +15,10 @@
 package com.liferay.layout.page.template.headless.delivery.dto.v1_0;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.headless.delivery.dto.v1_0.ColumnDefinition;
 import com.liferay.headless.delivery.dto.v1_0.DropZoneDefinition;
@@ -112,6 +115,14 @@ public class PageDefinitionConverterUtil {
 		};
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #toPageElement(FragmentCollectionContributorTracker,
+	 *             FragmentEntryConfigurationParser, FragmentRendererTracker,
+	 *             long, LayoutStructure,  LayoutStructureItem, boolean,
+	 *             boolean, long)}
+	 */
+	@Deprecated
 	public static PageElement toPageElement(
 		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
@@ -121,18 +132,34 @@ public class PageDefinitionConverterUtil {
 		LayoutStructureItem layoutStructureItem, boolean saveInlineContent,
 		boolean saveMappingConfiguration) {
 
-		return toPageElement(
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #toPageElement(FragmentCollectionContributorTracker,
+	 *             FragmentEntryConfigurationParser, FragmentRendererTracker,
+	 *             long, LayoutStructure,  LayoutStructureItem, boolean,
+	 *             boolean, long)}
+	 */
+	@Deprecated
+	public static PageElement toPageElement(
+		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
-			fragmentEntryConfigurationParser, fragmentRendererTracker,
-			layoutStructure, layoutStructureItem, saveInlineContent,
-			saveMappingConfiguration, 0);
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
+		FragmentRendererTracker fragmentRendererTracker,
+		LayoutStructure layoutStructure,
+		LayoutStructureItem layoutStructureItem, boolean saveInlineContent,
+		boolean saveMappingConfiguration, long segmentsExperienceId) {
+
+		throw new UnsupportedOperationException();
 	}
 
 	public static PageElement toPageElement(
 		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
 		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
-		FragmentRendererTracker fragmentRendererTracker,
+		FragmentRendererTracker fragmentRendererTracker, long groupId,
 		LayoutStructure layoutStructure,
 		LayoutStructureItem layoutStructureItem, boolean saveInlineContent,
 		boolean saveMappingConfiguration, long segmentsExperienceId) {
@@ -153,24 +180,24 @@ public class PageDefinitionConverterUtil {
 					_toPageElement(
 						fragmentCollectionContributorTracker,
 						fragmentEntryConfigurationParser,
-						fragmentRendererTracker, childLayoutStructureItem,
-						saveInlineContent, saveMappingConfiguration,
-						segmentsExperienceId));
+						fragmentRendererTracker, groupId,
+						childLayoutStructureItem, saveInlineContent,
+						saveMappingConfiguration, segmentsExperienceId));
 			}
 			else {
 				pageElements.add(
 					toPageElement(
 						fragmentCollectionContributorTracker,
 						fragmentEntryConfigurationParser,
-						fragmentRendererTracker, layoutStructure,
+						fragmentRendererTracker, groupId, layoutStructure,
 						childLayoutStructureItem, saveInlineContent,
-						saveMappingConfiguration));
+						saveMappingConfiguration, segmentsExperienceId));
 			}
 		}
 
 		PageElement pageElement = _toPageElement(
 			fragmentCollectionContributorTracker,
-			fragmentEntryConfigurationParser, fragmentRendererTracker,
+			fragmentEntryConfigurationParser, fragmentRendererTracker, groupId,
 			layoutStructureItem, saveInlineContent, saveMappingConfiguration,
 			segmentsExperienceId);
 
@@ -182,34 +209,86 @@ public class PageDefinitionConverterUtil {
 		return pageElement;
 	}
 
-	private static Fragment[] _toFragments(List<String> fragmentEntryKeys) {
+	private static boolean _isFragmentEntryKey(
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		String fragmentEntryKey,
+		FragmentRendererTracker fragmentRendererTracker, long groupId) {
+
+		FragmentEntry fragmentEntry =
+			FragmentEntryLocalServiceUtil.fetchFragmentEntry(
+				groupId, fragmentEntryKey);
+
+		if (fragmentEntry != null) {
+			return true;
+		}
+
+		Map<String, FragmentEntry> fragmentEntries =
+			fragmentCollectionContributorTracker.getFragmentEntries();
+
+		fragmentEntry = fragmentEntries.get(fragmentEntryKey);
+
+		if (fragmentEntry != null) {
+			return true;
+		}
+
+		FragmentRenderer fragmentRenderer =
+			fragmentRendererTracker.getFragmentRenderer(fragmentEntryKey);
+
+		if (fragmentRenderer != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private static Fragment[] _toFragments(
+		List<String> fragmentEntryKeys,
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		FragmentRendererTracker fragmentRendererTracker, long groupId) {
+
 		List<Fragment> fragments = new ArrayList<>();
 
 		for (String fragmentEntryKey : fragmentEntryKeys) {
-			fragments.add(
-				new Fragment() {
-					{
-						key = fragmentEntryKey;
-					}
-				});
+			if (_isFragmentEntryKey(
+					fragmentCollectionContributorTracker, fragmentEntryKey,
+					fragmentRendererTracker, groupId)) {
+
+				fragments.add(
+					new Fragment() {
+						{
+							key = fragmentEntryKey;
+						}
+					});
+			}
 		}
 
 		return fragments.toArray(new Fragment[0]);
 	}
 
 	private static Map<String, Fragment[]> _toFragmentSettingsMap(
-		DropZoneLayoutStructureItem dropZoneLayoutStructureItem) {
+		DropZoneLayoutStructureItem dropZoneLayoutStructureItem,
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		FragmentRendererTracker fragmentRendererTracker, long groupId) {
 
 		if (dropZoneLayoutStructureItem.isAllowNewFragmentEntries()) {
 			return HashMapBuilder.put(
 				"unallowedFragments",
-				_toFragments(dropZoneLayoutStructureItem.getFragmentEntryKeys())
+				_toFragments(
+					dropZoneLayoutStructureItem.getFragmentEntryKeys(),
+					fragmentCollectionContributorTracker,
+					fragmentRendererTracker, groupId)
 			).build();
 		}
 
 		return HashMapBuilder.put(
 			"allowedFragments",
-			_toFragments(dropZoneLayoutStructureItem.getFragmentEntryKeys())
+			_toFragments(
+				dropZoneLayoutStructureItem.getFragmentEntryKeys(),
+				fragmentCollectionContributorTracker, fragmentRendererTracker,
+				groupId)
 		).build();
 	}
 
@@ -245,15 +324,15 @@ public class PageDefinitionConverterUtil {
 				toPageElement(
 					fragmentCollectionContributorTracker,
 					fragmentEntryConfigurationParser, fragmentRendererTracker,
-					layoutStructure,
+					layout.getGroupId(), layoutStructure,
 					layoutStructure.getLayoutStructureItem(childItemId),
-					saveInlineContent, saveMappingConfiguration));
+					saveInlineContent, saveMappingConfiguration, 0));
 		}
 
 		PageElement pageElement = _toPageElement(
 			fragmentCollectionContributorTracker,
 			fragmentEntryConfigurationParser, fragmentRendererTracker,
-			mainLayoutStructureItem, saveInlineContent,
+			layout.getGroupId(), mainLayoutStructureItem, saveInlineContent,
 			saveMappingConfiguration, segmentsExperienceId);
 
 		if (!mainPageElements.isEmpty()) {
@@ -268,7 +347,7 @@ public class PageDefinitionConverterUtil {
 		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
 		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
-		FragmentRendererTracker fragmentRendererTracker,
+		FragmentRendererTracker fragmentRendererTracker, long groupId,
 		LayoutStructureItem layoutStructureItem, boolean saveInlineContent,
 		boolean saveMappingConfiguration, long segmentsExperienceId) {
 
@@ -379,7 +458,9 @@ public class PageDefinitionConverterUtil {
 					definition = new DropZoneDefinition() {
 						{
 							fragmentSettings = _toFragmentSettingsMap(
-								dropZoneLayoutStructureItem);
+								dropZoneLayoutStructureItem,
+								fragmentCollectionContributorTracker,
+								fragmentRendererTracker, groupId);
 						}
 					};
 					type = PageElement.Type.DROP_ZONE;

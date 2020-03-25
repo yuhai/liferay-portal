@@ -14,9 +14,9 @@
 
 import ClayCard from '@clayui/card';
 import React, {useContext, useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
 
 import {AppContext} from '../../AppContext.es';
+import Link from '../../components/Link.es';
 import {getSections} from '../../utils/client.es';
 import lang from '../../utils/lang.es';
 
@@ -43,7 +43,7 @@ export default () => {
 				<div className="row">
 					{sections.map(section => (
 						<div
-							className="col-lg-4 col-md-6 col-xl-3"
+							className="c-mb-4 col-lg-4 col-md-6 col-xl-3"
 							key={section.id}
 						>
 							<Link

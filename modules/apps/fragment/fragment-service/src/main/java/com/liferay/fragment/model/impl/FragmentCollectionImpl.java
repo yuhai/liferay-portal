@@ -16,7 +16,9 @@ package com.liferay.fragment.model.impl;
 
 import com.liferay.fragment.constants.FragmentExportImportConstants;
 import com.liferay.fragment.constants.FragmentPortletKeys;
+import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.service.FragmentCompositionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -148,6 +150,15 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 			path + StringPool.SLASH +
 				FragmentExportImportConstants.FILE_NAME_COLLECTION,
 			jsonObject.toString());
+
+		List<FragmentComposition> fragmentCompositions =
+			FragmentCompositionLocalServiceUtil.getFragmentCompositions(
+				getFragmentCollectionId());
+
+		for (FragmentComposition fragmentComposition : fragmentCompositions) {
+			fragmentComposition.populateZipWriter(
+				zipWriter, path + "/fragments");
+		}
 
 		List<FragmentEntry> fragmentEntries =
 			FragmentEntryLocalServiceUtil.getFragmentEntries(

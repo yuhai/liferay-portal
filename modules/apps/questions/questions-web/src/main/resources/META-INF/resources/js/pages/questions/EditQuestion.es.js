@@ -17,9 +17,10 @@ import ClayForm, {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {Editor} from 'frontend-editor-ckeditor-web';
 import React, {useContext, useState} from 'react';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../../AppContext.es';
+import Link from '../../components/Link.es';
 import TagSelector from '../../components/TagSelector.es';
 import {getThreadContent, updateThread} from '../../utils/client.es';
 import {getCKEditorConfig, onBeforeLoadCKEditor} from '../../utils/utils.es';

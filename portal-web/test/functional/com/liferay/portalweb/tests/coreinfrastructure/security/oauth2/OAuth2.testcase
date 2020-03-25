@@ -154,7 +154,7 @@ definition {
 
 		var portalVersionOutput = JSONCurlUtil.post("${portalVersionCurl}");
 
-		if (!(contains("${portalVersionOutput}", "7.3.10"))) {
+		if (!(contains("${portalVersionOutput}", "7.3"))) {
 			fail("JSON-WS call failed to return Portal version");
 		}
 
@@ -194,7 +194,7 @@ definition {
 
 		var portalVersionOutput = JSONCurlUtil.post("${portalVersionCurl}");
 
-		if (!(contains("${portalVersionOutput}", "7.3.10"))) {
+		if (!(contains("${portalVersionOutput}", "7.3"))) {
 			fail("JSON-WS call failed to return Portal version");
 		}
 
@@ -230,7 +230,7 @@ definition {
 
 		var buildNumberOutput = JSONCurlUtil.post("${buildNumberCurl}");
 
-		if (!(contains("${buildNumberOutput}", "7310"))) {
+		if (!(contains("${buildNumberOutput}", "73"))) {
 			fail("JSON-WS call failed to return build number");
 		}
 	}

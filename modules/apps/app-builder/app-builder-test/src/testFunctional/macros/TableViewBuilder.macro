@@ -13,9 +13,9 @@ definition {
 	}
 
 	macro addColumnByDoubleClick {
-		var key_fieldType = "${fieldType}";
+		var key_fieldLabel = "${fieldType}";
 
-		DoubleClick(locator1 = "FormViewBuilder#ADD_FIELD_TYPE");
+		DoubleClick(locator1 = "FormViewBuilder#SIDEBAR_FIELD_LABEL");
 
 		TableViewBuilder.validateColumnLabel(columnLabel = "${fieldType}");
 
@@ -96,6 +96,18 @@ definition {
 			key_columnLabel = "${columnLabel}",
 			locator1 = "TableViewBuilder#FILTER_DROPDOWN",
 			value1 = "${itemList}");
+	}
+
+	macro validateNoColumnLabel {
+		AssertElementNotPresent(
+			locator1 = "TableViewBuilder#COLUMN_LABEL",
+			value1 = "${columnLabel}");
+	}
+
+	macro validateNoColumnLabelAtSidebar {
+		AssertElementNotPresent(
+			locator1 = "TableViewBuilder#COLUMN_LABEL_AT_SIDEBAR",
+			value1 = "${columnLabel}");
 	}
 
 	macro validatePortletFieldTypeInTV {

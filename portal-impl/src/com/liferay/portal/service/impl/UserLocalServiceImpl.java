@@ -5651,6 +5651,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		if (params != null) {
 			attributes.put(
 				Field.GROUP_ID, (Long)params.getOrDefault(Field.GROUP_ID, 0L));
+
+			if (params.containsKey("accountEntryIds")) {
+				attributes.put(
+					"accountEntryIds",
+					GetterUtil.getLongValues(params.get("accountEntryIds")));
+			}
 		}
 
 		attributes.put("city", city);
@@ -5930,6 +5936,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				}
 			}
 			else if (!key.equals(Field.GROUP_ID) &&
+					 !key.equals("accountEntryIds") &&
 					 !key.equals("usersGroups") && !key.equals("usersOrgs") &&
 					 !key.equals("usersOrgsCount") &&
 					 !key.equals("usersRoles") && !key.equals("usersTeams") &&

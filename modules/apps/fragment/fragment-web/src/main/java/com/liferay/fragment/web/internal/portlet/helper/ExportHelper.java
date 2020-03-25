@@ -15,6 +15,7 @@
 package com.liferay.fragment.web.internal.portlet.helper;
 
 import com.liferay.fragment.model.FragmentCollection;
+import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.zip.ZipWriter;
@@ -54,12 +55,21 @@ public class ExportHelper {
 		}
 	}
 
-	public File exportFragmentEntries(List<FragmentEntry> fragmentEntries)
+	public File exportFragmentCompositionsAndFragmentEntries(
+			List<FragmentComposition> fragmentCompositions,
+			List<FragmentEntry> fragmentEntries)
 		throws PortletException {
 
 		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
 		try {
+			for (FragmentComposition fragmentComposition :
+					fragmentCompositions) {
+
+				fragmentComposition.populateZipWriter(
+					zipWriter, StringPool.BLANK);
+			}
+
 			for (FragmentEntry fragmentEntry : fragmentEntries) {
 				fragmentEntry.populateZipWriter(zipWriter, StringPool.BLANK);
 			}

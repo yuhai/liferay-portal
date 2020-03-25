@@ -27,12 +27,8 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98303. Assert that a page that uses a default layout template, does not have a 'Nested Application' Widget, and is not set as customizable can be converted to a Content Page by default."
-	@ignore = "true"
 	@priority = "5"
 	test ConvertBasicWidgetPageToContentPage {
-
-		// Ignore test until LRQA-56443 is resolved
-
 		property portal.acceptance = "true";
 
 		JSONLayout.addPublicLayout(
@@ -50,9 +46,7 @@ definition {
 			menuItem = "Convert to content page...",
 			pageName = "Test Page Name");
 
-		WaitForElementNotPresent(
-			key_text = "Publish",
-			locator1 = "Button#ANY_DISABLED");
+		Pause(locator1 = "3000");
 
 		Button.clickPublish();
 
@@ -187,12 +181,8 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98589. Multiple widgets with different application decorators survive content page conversion."
-	@ignore = "true"
 	@priority = "5"
 	test ConvertWidgetPageDecoratorsToContentPage {
-
-		// Ignore test until LRQA-56443 is resolved
-
 		property portal.acceptance = "true";
 
 		JSONLayout.addPublicLayout(
@@ -262,6 +252,8 @@ definition {
 			menuItem = "Convert to content page...",
 			pageName = "Test Page Name");
 
+		Pause(locator1 = "3000");
+
 		Button.clickPublish();
 
 		AssertElementPresent(
@@ -315,11 +307,10 @@ definition {
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name 3");
 
-		Navigator.gotoSitePage(
-			pageName = "Test Page Name 3",
-			siteName = "Test Site Name");
-
-		Portlet.addPG(portletName = "Nested Applications");
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Page Name 3",
+			widgetName = "Nested Applications");
 
 		ServerAdministration.openServerAdmin();
 
@@ -352,13 +343,10 @@ definition {
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
-
-		SitePages.configurePage(
-			columnName = "1 Column",
-			pageName = "Test Page Name",
-			privacy = "Public Pages",
-			sitePageType = "Widget Page");
+		JSONLayout.updateLayoutTemplateOfPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Page Name",
+			layoutTemplate = "1 Column");
 
 		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
 
@@ -415,29 +403,33 @@ definition {
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Test Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Nested Applications");
 
-		SitePages.configurePage(
-			columnName = "1 Column",
-			pageName = "Test Page Name",
-			privacy = "Public Pages",
-			sitePageType = "Widget Page");
-
-		Navigator.gotoSitePage(
-			pageName = "Test Page Name",
-			siteName = "Test Site Name");
-
-		Portlet.addPG(portletName = "Nested Applications");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "2",
+			groupName = "Test Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Asset Publisher");
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page Name",
 			siteName = "Test Site Name");
 
-		Portlet.addPG(portletName = "Asset Publisher");
+		NestedPortlets.viewConfigurationDefaultLayoutTemplate(
+			defaultColumnName = "2 Columns (50/50)",
+			portletName = "Nested Applications");
+
+		Click(locator1 = "Icon#CLOSE");
+
+		WaitForElementNotPresent(locator1 = "IFrame#DIALOG");
 
 		DragAndDrop.dragAndDropPortletToObject(
 			key_portletTitleName = "Asset Publisher",
-			locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_1_PORTLET_HEADER",
+			locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_2_PORTLET_HEADER",
 			locator2 = "Home#PORTLET_COLUMN_1",
 			value1 = "Asset Publisher");
 
@@ -499,30 +491,22 @@ definition {
 			groupName = "Test Westeros Site",
 			layoutName = "Test Page Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Test Westeros Site");
+		JSONLayout.updateLayoutTemplateOfPublicLayout(
+			groupName = "Test Westeros Site",
+			layoutName = "Test Page Name",
+			layoutTemplate = "Westeros 2 columns");
 
-		SitePages.configurePage(
-			columnName = "Westeros 2 columns",
-			pageName = "Test Page Name",
-			privacy = "Public Pages",
-			sitePageType = "Widget Page");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Test Westeros Site",
+			layoutName = "Test Page Name",
+			widgetName = "Asset Publisher");
 
-		Navigator.gotoSitePage(
-			pageName = "Test Page Name",
-			siteName = "Test Westeros Site");
-
-		Portlet.addPG(portletName = "Profile");
-
-		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "2",
-			portletName = "Profile");
-
-		Navigator.gotoSitePage(
-			pageName = "Test Page Name",
-			siteName = "Test Westeros Site");
-
-		Portlet.addPG(portletName = "Asset Publisher");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "2",
+			groupName = "Test Westeros Site",
+			layoutName = "Test Page Name",
+			widgetName = "Profile");
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page Name",
@@ -595,13 +579,10 @@ definition {
 			groupName = "Test Westeros Site",
 			layoutName = "Test Page Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Test Westeros Site");
-
-		SitePages.configurePage(
-			columnName = "Westeros 2 columns",
-			pageName = "Test Page Name",
-			privacy = "Public Pages",
-			sitePageType = "Widget Page");
+		JSONLayout.updateLayoutTemplateOfPublicLayout(
+			groupName = "Test Westeros Site",
+			layoutName = "Test Page Name",
+			layoutTemplate = "Westeros 2 columns");
 
 		SitePages.openPagesAdmin(siteURLKey = "Test Westeros Site");
 
@@ -696,42 +677,48 @@ definition {
 			groupName = "Test Site Name",
 			layoutName = "Test Page Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
+		JSONLayout.updateLayoutTemplateOfPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Page Name",
+			layoutTemplate = "Westeros 2 columns");
 
-		SitePages.configurePage(
-			columnName = "Westeros 2 columns",
-			pageName = "Test Page Name",
-			privacy = "Public Pages",
-			sitePageType = "Widget Page");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Test Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Nested Applications");
 
-		SitePages.openPagesAdmin(siteURLKey = "Test Site Name");
-
-		Navigator.gotoSitePage(
-			pageName = "Test Page Name",
-			siteName = "Test Site Name");
-
-		Portlet.addPG(portletName = "Profile");
-
-		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "2",
-			portletName = "Profile");
+		for (var portletName : list "Asset Publisher,Profile") {
+			JSONLayout.addWidgetToPublicLayout(
+				column = "2",
+				groupName = "Test Site Name",
+				layoutName = "Test Page Name",
+				widgetName = "${portletName}");
+		}
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page Name",
 			siteName = "Test Site Name");
 
-		Portlet.addPG(portletName = "Nested Applications");
+		ProductMenuHelper.closeProductMenu();
 
-		Navigator.gotoSitePage(
-			pageName = "Test Page Name",
-			siteName = "Test Site Name");
+		AssetPublisherPortlet.gotoConfigurationPG(portletName = "Asset Publisher");
 
-		Portlet.addPG(portletName = "Asset Publisher");
+		Navigator.gotoNavTab(navTab = "Asset Selection");
+
+		Click(locator1 = "APConfiguration#ASSET_SELECTION_MANUAL");
+
+		PortletEntry.save();
+
+		SelectFrame(value1 = "relative=top");
+
+		Click(locator1 = "Icon#CLOSE");
+
+		WaitForElementNotPresent(locator1 = "IFrame#DIALOG");
 
 		DragAndDrop.dragAndDropPortletToObject(
 			key_portletTitleName = "Asset Publisher",
-			locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_1_PORTLET_HEADER",
+			locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_2_PORTLET_HEADER",
 			locator2 = "Home#PORTLET_COLUMN_1",
 			value1 = "Asset Publisher");
 
@@ -798,8 +785,12 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98589. Can edit the title of the widgets with "borderless" and "decorate" decorators in content page with correct permissions."
+	@ignore = "true"
 	@priority = "5"
 	test EditConvertedContentPageWithDecorator {
+
+		// Ignore test until LRQA-56526 is resolved
+
 		property portal.acceptance = "true";
 
 		JSONLayout.addPublicLayout(

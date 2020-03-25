@@ -469,7 +469,7 @@ public class FragmentCompositionServiceHttp {
 	public static com.liferay.fragment.model.FragmentComposition
 			updateFragmentComposition(
 				HttpPrincipal httpPrincipal, long fragmentCompositionId,
-				String name)
+				long previewFileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -479,7 +479,7 @@ public class FragmentCompositionServiceHttp {
 				_updateFragmentCompositionParameterTypes11);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fragmentCompositionId, name);
+				methodKey, fragmentCompositionId, previewFileEntryId);
 
 			Object returnObj = null;
 
@@ -512,7 +512,7 @@ public class FragmentCompositionServiceHttp {
 	public static com.liferay.fragment.model.FragmentComposition
 			updateFragmentComposition(
 				HttpPrincipal httpPrincipal, long fragmentCompositionId,
-				long previewFileEntryId)
+				String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -522,7 +522,7 @@ public class FragmentCompositionServiceHttp {
 				_updateFragmentCompositionParameterTypes12);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, fragmentCompositionId, previewFileEntryId);
+				methodKey, fragmentCompositionId, name);
 
 			Object returnObj = null;
 
@@ -633,9 +633,9 @@ public class FragmentCompositionServiceHttp {
 	private static final Class<?>[] _moveFragmentCompositionParameterTypes10 =
 		new Class[] {long.class, long.class};
 	private static final Class<?>[] _updateFragmentCompositionParameterTypes11 =
-		new Class[] {long.class, String.class};
-	private static final Class<?>[] _updateFragmentCompositionParameterTypes12 =
 		new Class[] {long.class, long.class};
+	private static final Class<?>[] _updateFragmentCompositionParameterTypes12 =
+		new Class[] {long.class, String.class};
 	private static final Class<?>[] _updateFragmentCompositionParameterTypes13 =
 		new Class[] {
 			long.class, String.class, String.class, String.class, long.class,

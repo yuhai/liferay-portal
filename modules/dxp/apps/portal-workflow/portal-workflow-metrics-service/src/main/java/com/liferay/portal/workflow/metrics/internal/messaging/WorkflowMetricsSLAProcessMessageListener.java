@@ -55,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
-	configurationPid = "com.liferay.portal.workflow.metrics.configuration.WorkflowMetricsConfiguration",
+	configurationPid = "com.liferay.portal.workflow.metrics.internal.configuration.WorkflowMetricsConfiguration",
 	immediate = true,
 	service = {
 		MessageListener.class, WorkflowMetricsSLAProcessMessageListener.class
@@ -65,7 +65,6 @@ public class WorkflowMetricsSLAProcessMessageListener
 	extends BaseMessageListener {
 
 	@Activate
-	@Modified
 	protected void activate(Map<String, Object> properties) {
 		_workflowMetricsConfiguration = ConfigurableUtil.createConfigurable(
 			WorkflowMetricsConfiguration.class, properties);
@@ -138,6 +137,13 @@ public class WorkflowMetricsSLAProcessMessageListener
 			});
 
 		actionableDynamicQuery.performActions();
+	}
+
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		deactivate();
+
+		activate(properties);
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
