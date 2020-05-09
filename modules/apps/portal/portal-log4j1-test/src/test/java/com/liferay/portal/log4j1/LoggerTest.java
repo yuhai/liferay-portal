@@ -145,6 +145,29 @@ public class LoggerTest {
 		}
 	}
 
+	@Test
+	public void testSetLevel() {
+		Logger logger = LogManager.getLogger(_NAMES[4]);
+
+		Level level = logger.getLevel();
+
+		Assert.assertEquals(
+			"Logger level should be WARN", level.toString(), "WARN");
+		Assert.assertTrue(
+			"Warn level should be enabled", logger.isEnabledFor(level));
+
+		logger.setLevel(Level.toLevel("DEBUG"));
+
+		level = logger.getLevel();
+
+		Assert.assertEquals(
+			"Logger level should be DEBUG", level.toString(), "DEBUG");
+		Assert.assertTrue(
+			"DEBUG level should be enabled", logger.isEnabledFor(level));
+
+		logger.setLevel(Level.toLevel("WARN"));
+	}
+
 	private static byte[] _getBytes(InputStream inputStream)
 		throws IOException {
 
