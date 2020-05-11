@@ -14,21 +14,32 @@
 
 package com.liferay.portal.log4j1;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 
 import java.net.URL;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LocationInfo;
+import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.xml.DOMConfigurator;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,6 +51,10 @@ public class LoggerTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
+		_printStream = new PrintStream(_baos);
+
+		System.setOut(_printStream);
+
 		Thread currentThread = Thread.currentThread();
 
 		ClassLoader classLoader = currentThread.getContextClassLoader();
@@ -63,6 +78,58 @@ public class LoggerTest {
 		domConfigurator.doConfigure(
 			new UnsyncStringReader(urlContent),
 			LogManager.getLoggerRepository());
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		_printStream.flush();
+
+		_printStream.close();
+	}
+
+	@Test
+	public void testConsoleAppender() {
+		CustomAppender customAppender = new CustomAppender();
+
+		Logger logger = Logger.getLogger(LoggerTest.class.getName());
+
+		LoggerWrapper loggerWrapper = new LoggerWrapper(logger);
+
+		logger.addAppender(customAppender);
+
+		loggerWrapper.info("Test Message");
+
+		String[] logMessages = StringUtil.splitLines(_baos.toString());
+
+		String expectedOutput = logMessages[logMessages.length - 1];
+
+		try {
+			Matcher matcher = _pattern.matcher(expectedOutput.substring(0, 23));
+
+			Assert.assertTrue(
+				"Output date format should be yyyy-MM-dd HH:mm:ss.SSS",
+				matcher.matches());
+
+			LoggingEvent loggingEvent = customAppender.getLoggingEvent();
+
+			LocationInfo locationInfo = loggingEvent.getLocationInformation();
+
+			String debugContent = expectedOutput.substring(23);
+
+			Assert.assertTrue(
+				"output content should be " + debugContent,
+				debugContent.equals(
+					StringBundler.concat(
+						" ", loggingEvent.getLevel(), "  [",
+						loggingEvent.getThreadName(), "][LoggerTest:",
+						locationInfo.getLineNumber(), "] ",
+						loggingEvent.getRenderedMessage())));
+		}
+		finally {
+			_baos.reset();
+
+			logger.removeAppender(customAppender);
+		}
 	}
 
 	@Test
@@ -183,5 +250,35 @@ public class LoggerTest {
 		"level", "level.off", "level.fatal", "level.error", "level.warn",
 		"level.info", "level.debug", "level.trace"
 	};
+
+	private static final ByteArrayOutputStream _baos =
+		new ByteArrayOutputStream();
+	private static final Pattern _pattern = Pattern.compile(
+		"\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d");
+	private static PrintStream _printStream;
+
+	private class CustomAppender extends AppenderSkeleton {
+
+		@Override
+		public void close() {
+		}
+
+		public LoggingEvent getLoggingEvent() {
+			return _loggingEvent;
+		}
+
+		@Override
+		public boolean requiresLayout() {
+			return false;
+		}
+
+		@Override
+		protected void append(LoggingEvent event) {
+			_loggingEvent = event;
+		}
+
+		private LoggingEvent _loggingEvent;
+
+	}
 
 }
