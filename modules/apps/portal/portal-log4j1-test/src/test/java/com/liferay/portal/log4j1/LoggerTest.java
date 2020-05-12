@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.StringWriter;
 
 import java.net.URL;
 
@@ -35,6 +36,8 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LocationInfo;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -233,6 +236,35 @@ public class LoggerTest {
 			"DEBUG level should be enabled", logger.isEnabledFor(level));
 
 		logger.setLevel(Level.toLevel("WARN"));
+	}
+
+	@Test
+	public void testWriteAppender() {
+		StringWriter stringWrite = new StringWriter();
+
+		WriterAppender writerAppender = new WriterAppender(
+			new SimpleLayout(), stringWrite);
+
+		Logger logger = Logger.getLogger(LoggerTest.class.getName());
+
+		logger.addAppender(writerAppender);
+
+		LoggerWrapper loggerWrapper = new LoggerWrapper(logger);
+
+		loggerWrapper.info("Test message");
+
+		String logMessage = stringWrite.toString();
+
+		try {
+			Assert.assertTrue(
+				"Log message should be " + logMessage,
+				logMessage.equals(
+					Level.INFO + " - Test message" +
+						System.getProperty("line.separator")));
+		}
+		finally {
+			logger.removeAppender(writerAppender);
+		}
 	}
 
 	private static byte[] _getBytes(InputStream inputStream)
