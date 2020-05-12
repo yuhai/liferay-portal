@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<category name="level">
+		<priority value="ALL" />
+	</category>
+
+	<category name="level.off">
+		<priority value="OFF" />
+	</category>
+
+	<category name="level.fatal">
+		<priority value="FATAL" />
+	</category>
+
+	<category name="level.error">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="level.warn">
+		<priority value="WARN" />
+	</category>
+
+	<category name="level.info">
+		<priority value="INFO" />
+	</category>
+
+	<category name="level.debug">
+		<priority value="DEBUG" />
+	</category>
+
+	<category name="level.trace">
+		<priority value="TRACE" />
+	</category>
+
+	<root>
+		<priority value="INFO" />
+	</root>
+</log4j:configuration>

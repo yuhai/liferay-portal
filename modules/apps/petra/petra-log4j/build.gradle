@@ -4,4 +4,7 @@ dependencies {
 	compileOnly group: "org.dom4j", name: "dom4j", version: "2.1.1"
 	compileOnly project(":core:petra:petra-reflect")
 	compileOnly project(":core:petra:petra-string")
+
+	testCompile group: "junit", name: "junit", version: "4.12"
+	testCompile group: "log4j", name: "log4j", version: "1.2.17"
 }
