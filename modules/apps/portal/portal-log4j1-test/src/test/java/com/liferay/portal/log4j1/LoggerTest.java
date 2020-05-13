@@ -22,11 +22,13 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
 
+import java.net.URI;
 import java.net.URL;
 
 import java.util.regex.Matcher;
@@ -76,6 +78,11 @@ public class LoggerTest {
 			throw ioException;
 		}
 
+		String dir = StringUtil.replace(
+			System.getProperty("user.dir"), '\\', '/');
+
+		urlContent = StringUtil.replace(urlContent, "@user_dir@", dir);
+
 		DOMConfigurator domConfigurator = new DOMConfigurator();
 
 		domConfigurator.doConfigure(
@@ -88,6 +95,18 @@ public class LoggerTest {
 		_printStream.flush();
 
 		_printStream.close();
+
+		LogManager.shutdown();
+
+		File logDir = new File(
+			StringUtil.replace(System.getProperty("user.dir"), '\\', '/'),
+			"logs");
+
+		for (File file : logDir.listFiles()) {
+			file.delete();
+		}
+
+		logDir.delete();
 	}
 
 	@Test
@@ -107,26 +126,7 @@ public class LoggerTest {
 		String expectedOutput = logMessages[logMessages.length - 1];
 
 		try {
-			Matcher matcher = _pattern.matcher(expectedOutput.substring(0, 23));
-
-			Assert.assertTrue(
-				"Output date format should be yyyy-MM-dd HH:mm:ss.SSS",
-				matcher.matches());
-
-			LoggingEvent loggingEvent = customAppender.getLoggingEvent();
-
-			LocationInfo locationInfo = loggingEvent.getLocationInformation();
-
-			String debugContent = expectedOutput.substring(23);
-
-			Assert.assertTrue(
-				"output content should be " + debugContent,
-				debugContent.equals(
-					StringBundler.concat(
-						" ", loggingEvent.getLevel(), "  [",
-						loggingEvent.getThreadName(), "][LoggerTest:",
-						locationInfo.getLineNumber(), "] ",
-						loggingEvent.getRenderedMessage())));
+			_assert(expectedOutput, customAppender);
 		}
 		finally {
 			_baos.reset();
@@ -216,6 +216,82 @@ public class LoggerTest {
 	}
 
 	@Test
+	public void testRollingFileAppender() throws IOException {
+		CustomAppender customAppender = new CustomAppender();
+
+		Logger logger = Logger.getLogger(LoggerTest.class.getName());
+
+		LoggerWrapper loggerWrapper = new LoggerWrapper(logger);
+
+		logger.addAppender(customAppender);
+
+		loggerWrapper.info("Test Message");
+
+		File logDir = new File(
+			StringUtil.replace(System.getProperty("user.dir"), '\\', '/'),
+			"logs");
+
+		try {
+			for (File file : logDir.listFiles()) {
+				String fileName = file.getName();
+
+				URI uri = file.toURI();
+
+				URL url = uri.toURL();
+
+				String content = "";
+
+				if (fileName.endsWith(".log")) {
+					Matcher matcher = _textFileNamePattern.matcher(fileName);
+
+					Assert.assertTrue(
+						"test file name should be " + fileName,
+						matcher.matches());
+
+					try (InputStream inputStream = url.openStream()) {
+						byte[] bytes = _getBytes(inputStream);
+
+						content = new String(bytes, StringPool.UTF8);
+
+						String[] logMessages = StringUtil.splitLines(content);
+
+						_assert(
+							logMessages[logMessages.length - 1],
+							customAppender);
+					}
+				}
+				else {
+					Matcher matcher = _xmlFileNamePattern.matcher(fileName);
+
+					Assert.assertTrue(
+						"xml file name should be " + fileName,
+						matcher.matches());
+
+					try (InputStream inputStream = url.openStream()) {
+						byte[] bytes = _getBytes(inputStream);
+
+						content = new String(bytes, StringPool.UTF8);
+
+						int index = content.lastIndexOf("<log4j:event");
+
+						if (index < 0) {
+							Assert.fail("There is no log meesage output");
+						}
+
+						_assertXmlLog(content.substring(index), customAppender);
+					}
+				}
+			}
+		}
+		catch (IOException ioException) {
+			throw ioException;
+		}
+		finally {
+			logger.removeAppender(customAppender);
+		}
+	}
+
+	@Test
 	public void testSetLevel() {
 		Logger logger = LogManager.getLogger(_NAMES[4]);
 
@@ -278,6 +354,66 @@ public class LoggerTest {
 		return unsyncByteArrayOutputStream.toByteArray();
 	}
 
+	private void _assert(String expectedOutput, CustomAppender customAppender) {
+		Matcher matcher = _pattern.matcher(expectedOutput.substring(0, 23));
+
+		Assert.assertTrue(
+			"Output date format should be yyyy-MM-dd HH:mm:ss.SSS",
+			matcher.matches());
+
+		LoggingEvent loggingEvent = customAppender.getLoggingEvent();
+
+		LocationInfo locationInfo = loggingEvent.getLocationInformation();
+
+		String debugContent = expectedOutput.substring(23);
+
+		Assert.assertTrue(
+			"output content should be " + debugContent,
+			debugContent.equals(
+				StringBundler.concat(
+					" ", loggingEvent.getLevel(), "  [",
+					loggingEvent.getThreadName(), "][LoggerTest:",
+					locationInfo.getLineNumber(), "] ",
+					loggingEvent.getRenderedMessage())));
+	}
+
+	private void _assertXmlLog(
+		String expectedOutput, CustomAppender customAppender) {
+
+		LoggingEvent loggingEvent = customAppender.getLoggingEvent();
+
+		LocationInfo locationInfo = loggingEvent.getLocationInformation();
+
+		StringBundler sb = new StringBundler(22);
+
+		sb.append("<log4j:event logger=\"");
+		sb.append(loggingEvent.getLoggerName());
+		sb.append("\" timestamp=\"");
+		sb.append(loggingEvent.getTimeStamp());
+		sb.append("\" level=\"");
+		sb.append(loggingEvent.getLevel());
+		sb.append("\" thread=\"");
+		sb.append(loggingEvent.getThreadName());
+		sb.append("\">\r\n");
+		sb.append("<log4j:message><![CDATA[");
+		sb.append(loggingEvent.getRenderedMessage());
+		sb.append("]]></log4j:message>\r\n");
+		sb.append("<log4j:locationInfo class=\"");
+		sb.append(locationInfo.getClassName());
+		sb.append("\" method=\"");
+		sb.append(locationInfo.getMethodName());
+		sb.append("\" file=\"");
+		sb.append(locationInfo.getFileName());
+		sb.append("\" line=\"");
+		sb.append(locationInfo.getLineNumber());
+		sb.append("\"/>\r\n");
+		sb.append("</log4j:event>\r\n\r\n");
+
+		Assert.assertTrue(
+			"logMessage should be " + expectedOutput,
+			expectedOutput.equals(sb.toString()));
+	}
+
 	private static final String[] _NAMES = {
 		"level", "level.off", "level.fatal", "level.error", "level.warn",
 		"level.info", "level.debug", "level.trace"
@@ -288,6 +424,10 @@ public class LoggerTest {
 	private static final Pattern _pattern = Pattern.compile(
 		"\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d");
 	private static PrintStream _printStream;
+	private static final Pattern _textFileNamePattern = Pattern.compile(
+		"liferay.\\d\\d\\d\\d-\\d\\d-\\d\\d.log");
+	private static final Pattern _xmlFileNamePattern = Pattern.compile(
+		"liferay.\\d\\d\\d\\d-\\d\\d-\\d\\d.xml");
 
 	private class CustomAppender extends AppenderSkeleton {
 
