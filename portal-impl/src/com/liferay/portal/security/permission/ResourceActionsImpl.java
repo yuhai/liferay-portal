@@ -58,7 +58,6 @@ import com.liferay.registry.collections.ServiceTrackerList;
 import com.liferay.util.JS;
 
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -810,9 +809,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	private void _checkPortletActions(Portlet portlet, Set<String> actions) {
 		_checkPortletLayoutManagerActions(actions);
 
-		if ((portlet != null) &&
-			(portlet.getControlPanelEntryCategory() != null)) {
-
+		if (portlet != null) {
 			actions.add(ActionKeys.ACCESS_IN_CONTROL_PANEL);
 		}
 	}
