@@ -146,6 +146,8 @@ public class Log4JUtil {
 
 			_rootLogger = loggerContext.getRootLogger();
 
+			_loggerContexts.put(PORTAT_SYMBOLICNAME, loggerContext);
+
 			SAXReader saxReader = new SAXReader();
 
 			Document document = saxReader.read(
@@ -375,6 +377,8 @@ public class Log4JUtil {
 	private static CompositeConfiguration _compositeConfiguration;
 	private static final Map<String, LoggerContext> _loggerContexts =
 		new ConcurrentHashMap<>();
+
+	public static final String PORTAT_SYMBOLICNAME = "portal.symbolicname";
 
 	private static class LoggerNameComparator
 		implements Comparator<org.apache.logging.log4j.core.Logger> {
