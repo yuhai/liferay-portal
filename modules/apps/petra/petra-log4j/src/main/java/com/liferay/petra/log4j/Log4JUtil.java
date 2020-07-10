@@ -273,7 +273,15 @@ public class Log4JUtil {
 	}
 
 	public static void shutdownLog4J() {
-		LogManager.shutdown();
+		Collection<LoggerContext> loggerContexts = _loggerContexts.values();
+
+		Iterator<LoggerContext> iterator = loggerContexts.iterator();
+
+		while (iterator.hasNext()) {
+			LoggerContext loggerContext = iterator.next();
+
+			LogManager.shutdown(loggerContext);
+		}
 	}
 
 	public static void setLoggerContexts(
