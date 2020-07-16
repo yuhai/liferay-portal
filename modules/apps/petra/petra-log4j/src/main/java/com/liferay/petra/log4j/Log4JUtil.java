@@ -147,7 +147,7 @@ public class Log4JUtil {
 
 			_rootLogger = loggerContext.getRootLogger();
 
-			_loggerContexts.put(PORTAT_SYMBOLICNAME, loggerContext);
+			_loggerContexts.put(_PORTAT_SYMBOLICNAME, loggerContext);
 
 			SAXReader saxReader = new SAXReader();
 
@@ -170,11 +170,27 @@ public class Log4JUtil {
 
 				jdkLogger.setLevel(_getJdkLevel(priority));
 			}
-
 		}
 		catch (Exception exception) {
 			_rootLogger.error(exception, exception);
 		}
+	}
+
+	public static List<org.apache.logging.log4j.core.Logger> getAllLoggers() {
+		List<org.apache.logging.log4j.core.Logger> allLoggers =
+			new ArrayList<>();
+
+		Collection<LoggerContext> loggerContexts = _loggerContexts.values();
+
+		Iterator<LoggerContext> iterator = loggerContexts.iterator();
+
+		while (iterator.hasNext()) {
+			LoggerContext loggerContext = iterator.next();
+
+			allLoggers.addAll(loggerContext.getLoggers());
+		}
+
+		return ListUtil.sort(allLoggers, new LoggerNameComparator());
 	}
 
 	public static Map<String, String> getCustomLogSettings() {
@@ -189,7 +205,7 @@ public class Log4JUtil {
 		while (iterator.hasNext()) {
 			String symbolicName = iterator.next();
 
-			if (symbolicName.equals(PORTAT_SYMBOLICNAME)) {
+			if (symbolicName.equals(_PORTAT_SYMBOLICNAME)) {
 				continue;
 			}
 
@@ -198,7 +214,7 @@ public class Log4JUtil {
 			}
 		}
 
-		return _getLog4jLevel(className, PORTAT_SYMBOLICNAME);
+		return _getLog4jLevel(className, _PORTAT_SYMBOLICNAME);
 	}
 
 	public static LoggerConfig getRootLogger() {
@@ -241,7 +257,7 @@ public class Log4JUtil {
 		while (iterator.hasNext()) {
 			String symbolicName = iterator.next();
 
-			if (symbolicName.equals(PORTAT_SYMBOLICNAME)) {
+			if (symbolicName.equals(_PORTAT_SYMBOLICNAME)) {
 				continue;
 			}
 
@@ -255,7 +271,7 @@ public class Log4JUtil {
 		}
 
 		if (logger == null) {
-			loggerContext = _loggerContexts.get(PORTAT_SYMBOLICNAME);
+			loggerContext = _loggerContexts.get(_PORTAT_SYMBOLICNAME);
 
 			logger = loggerContext.getLogger(name);
 		}
@@ -272,6 +288,12 @@ public class Log4JUtil {
 		}
 	}
 
+	public static void setLoggerContexts(
+		String symbolicName, LoggerContext loggerContext) {
+
+		_loggerContexts.put(symbolicName, loggerContext);
+	}
+
 	public static void shutdownLog4J() {
 		Collection<LoggerContext> loggerContexts = _loggerContexts.values();
 
@@ -282,29 +304,6 @@ public class Log4JUtil {
 
 			LogManager.shutdown(loggerContext);
 		}
-	}
-
-	public static void setLoggerContexts(
-		String symbolicName, LoggerContext loggerContext) {
-
-		_loggerContexts.put(symbolicName, loggerContext);
-	}
-
-	public static List<org.apache.logging.log4j.core.Logger> getAllLoggers() {
-		List<org.apache.logging.log4j.core.Logger> allLoggers =
-			new ArrayList<>();
-
-		Collection<LoggerContext> loggerContexts = _loggerContexts.values();
-
-		Iterator<LoggerContext> iterator = loggerContexts.iterator();
-
-		while (iterator.hasNext()) {
-			LoggerContext loggerContext = iterator.next();
-
-			allLoggers.addAll(loggerContext.getLoggers());
-		}
-
-		return ListUtil.sort(allLoggers, new LoggerNameComparator());
 	}
 
 	private static String _escapeXMLAttribute(String s) {
@@ -426,18 +425,18 @@ public class Log4JUtil {
 			content, "<appender-ref ref=\"" + appenderName + "\" />");
 	}
 
-	private static Logger _rootLogger;
-	private static LoggerConfig _rootLoggerConfig;
+	private static final String _PORTAT_SYMBOLICNAME = "portal.symbolicname";
+
+	private static CompositeConfiguration _compositeConfiguration;
+	private static final List<XmlConfiguration> _configurations =
+		new ArrayList<>();
 	private static final Map<String, String> _customLogSettings =
 		new ConcurrentHashMap<>();
 	private static String _liferayHome;
-	private static final List<XmlConfiguration> _configurations =
-		new ArrayList<>();
-	private static CompositeConfiguration _compositeConfiguration;
 	private static final Map<String, LoggerContext> _loggerContexts =
 		new ConcurrentHashMap<>();
-
-	public static final String PORTAT_SYMBOLICNAME = "portal.symbolicname";
+	private static Logger _rootLogger;
+	private static LoggerConfig _rootLoggerConfig;
 
 	private static class LoggerNameComparator
 		implements Comparator<org.apache.logging.log4j.core.Logger> {
