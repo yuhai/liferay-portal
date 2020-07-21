@@ -16,6 +16,8 @@ package com.liferay.portal.output.stream.container.internal;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.osgi.util.ServiceTrackerFactory;
+import com.liferay.petra.log4j.Log4JUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
@@ -37,12 +39,13 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.WriterAppender;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -51,6 +54,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Carlos Sierra Andrés
@@ -168,8 +173,6 @@ public class OutputStreamContainerFactoryTrackerImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		Logger rootLogger = (Logger)LogManager.getRootLogger();
-
 		PatternLayout.Builder build = PatternLayout.newBuilder();
 
 		build.withPattern("%level - %m%n");
@@ -182,7 +185,13 @@ public class OutputStreamContainerFactoryTrackerImpl
 
 		_writerAppender.start();
 
-		rootLogger.addAppender(_writerAppender);
+		_portalRootLoggerConfig = Log4JUtil.getRootLogger();
+
+		_portalRootLoggerConfig.addAppender(_writerAppender, null, null);
+
+		_serviceTracker = ServiceTrackerFactory.open(
+			bundleContext, LoggerConfig.class,
+			new LoggerConfigServiceTrackerCustomizer());
 
 		Dictionary<String, Object> dictionary = new HashMapDictionary<>();
 
@@ -230,11 +239,11 @@ public class OutputStreamContainerFactoryTrackerImpl
 
 		_serviceRegistrations.clear();
 
-		Logger rootLogger = (Logger)LogManager.getRootLogger();
-
-		if (rootLogger != null) {
-			rootLogger.removeAppender(_writerAppender);
+		if (_serviceTracker != null) {
+			_serviceTracker.close();
 		}
+
+		_portalRootLoggerConfig.removeAppender(_writerAppender.getName());
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
@@ -255,10 +264,47 @@ public class OutputStreamContainerFactoryTrackerImpl
 	)
 	private volatile OutputStreamContainerFactory _outputStreamContainerFactory;
 
+	private LoggerConfig _portalRootLoggerConfig;
 	private final List<ServiceRegistration<?>> _serviceRegistrations =
 		new ArrayList<>();
+	private volatile ServiceTracker<LoggerConfig, LoggerConfig> _serviceTracker;
 	private WriterAppender _writerAppender;
 	private final ThreadLocal<Writer> _writerThreadLocal = new ThreadLocal<>();
+
+	private class LoggerConfigServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<LoggerConfig, LoggerConfig> {
+
+		@Override
+		public LoggerConfig addingService(
+			ServiceReference<LoggerConfig> serviceReference) {
+
+			Bundle bundle = serviceReference.getBundle();
+
+			BundleContext bundleContext = bundle.getBundleContext();
+
+			LoggerConfig loggerConfig = bundleContext.getService(
+				serviceReference);
+
+			loggerConfig.addAppender(_writerAppender, null, null);
+
+			return loggerConfig;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<LoggerConfig> serviceReference,
+			LoggerConfig loggerContext) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<LoggerConfig> reference,
+			LoggerConfig loggerConfig) {
+
+			loggerConfig.removeAppender(_writerAppender.getName());
+		}
+
+	}
 
 	private class ThreadLocalWriter extends Writer {
 
