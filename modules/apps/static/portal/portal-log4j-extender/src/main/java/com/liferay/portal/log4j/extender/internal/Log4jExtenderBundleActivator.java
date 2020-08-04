@@ -268,8 +268,18 @@ public class Log4jExtenderBundleActivator implements BundleActivator {
 				appender, appenderRef.getLevel(), appenderRef.getFilter());
 		}
 
-		_registerLoggerConfigService(
-			currentBundleRootLogger, bundleClassLoader);
+		ServiceRegistration<LoggerConfig> serviceRegistration =
+			_serviceRegistrations.get(bundleClassLoader);
+
+		if (serviceRegistration != null) {
+			serviceRegistration.unregister();
+		}
+
+		serviceRegistration = _bundleContext.registerService(
+			LoggerConfig.class, currentBundleRootLogger,
+			new HashMapDictionary<>());
+
+		_serviceRegistrations.put(bundleClassLoader, serviceRegistration);
 
 		return loggerContext;
 	}
@@ -334,23 +344,6 @@ public class Log4jExtenderBundleActivator implements BundleActivator {
 		}
 
 		return urlContent;
-	}
-
-	private void _registerLoggerConfigService(
-		LoggerConfig currentBundleRootLogger, ClassLoader bundleClassLoader) {
-
-		ServiceRegistration<LoggerConfig> serviceRegistration =
-			_serviceRegistrations.get(bundleClassLoader);
-
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-		}
-
-		serviceRegistration = _bundleContext.registerService(
-			LoggerConfig.class, currentBundleRootLogger,
-			new HashMapDictionary<>());
-
-		_serviceRegistrations.put(bundleClassLoader, serviceRegistration);
 	}
 
 	private static final Logger _logger = LogManager.getLogger(
