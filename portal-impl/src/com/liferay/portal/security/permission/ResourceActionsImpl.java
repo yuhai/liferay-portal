@@ -133,6 +133,14 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
+	public void checkResourceActions(Set<String> resourceNames) {
+		for (String resourceName : resourceNames) {
+			resourceActionLocalService.checkResourceActions(
+				resourceName, getResourceActions(resourceName));
+		}
+	}
+
+	@Override
 	public String getAction(
 		HttpServletRequest httpServletRequest, String action) {
 
@@ -680,7 +688,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
-	public void readModelResource(
+	public Set<String> readModelResource(
 			String servletContextName, ClassLoader classLoader,
 			String... sources)
 		throws ResourceActionsException {
@@ -694,10 +702,7 @@ public class ResourceActionsImpl implements ResourceActions {
 					servletContextName, rootElement, resourceNames));
 		}
 
-		for (String resourceName : resourceNames) {
-			resourceActionLocalService.checkResourceActions(
-				resourceName, getResourceActions(resourceName));
-		}
+		return resourceNames;
 	}
 
 	@Override
