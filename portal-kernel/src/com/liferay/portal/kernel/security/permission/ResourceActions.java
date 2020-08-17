@@ -191,6 +191,11 @@ public interface ResourceActions {
 			String... sources)
 		throws ResourceActionsException;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #readModelResource(String, Document)}
+	 */
+	@Deprecated
 	public void read(
 			String servletContextName, Document document,
 			Set<String> resourceNames)

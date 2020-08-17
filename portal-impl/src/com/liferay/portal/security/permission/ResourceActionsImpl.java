@@ -653,6 +653,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #readModelResource(String, Document)}
+	 */
+	@Deprecated
 	@Override
 	public void read(
 			String servletContextName, Document document,
