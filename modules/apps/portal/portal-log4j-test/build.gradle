@@ -5,4 +5,7 @@ dependencies {
 	testCompile project(":apps:petra:petra-log4j")
 	testCompile project(":core:petra:petra-io")
 	testCompile project(":core:petra:petra-string")
+
+	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
+	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
 }
