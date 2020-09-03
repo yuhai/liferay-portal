@@ -14,6 +14,7 @@
 
 package com.liferay.portal.store.file.system;
 
+import com.liferay.document.library.content.service.DLContentLocalService;
 import com.liferay.document.library.kernel.store.Store;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.convert.documentlibrary.FileSystemStoreRootDirException;
@@ -30,6 +31,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Shuyang Zhou
@@ -68,6 +70,9 @@ public class AdvancedFileSystemStoreRegister {
 	protected void deactivate() {
 		_serviceRegistration.unregister();
 	}
+
+	@Reference
+	private DLContentLocalService _dlContentLocalService;
 
 	private ServiceRegistration<Store> _serviceRegistration;
 

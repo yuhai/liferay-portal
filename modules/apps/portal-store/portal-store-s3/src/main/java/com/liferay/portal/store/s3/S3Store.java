@@ -43,6 +43,7 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerConfiguration;
 import com.amazonaws.services.s3.transfer.Upload;
 
+import com.liferay.document.library.content.service.DLContentLocalService;
 import com.liferay.document.library.kernel.exception.AccessDeniedException;
 import com.liferay.document.library.kernel.exception.NoSuchFileException;
 import com.liferay.document.library.kernel.store.Store;
@@ -746,6 +747,10 @@ public class S3Store implements Store {
 	private AmazonS3 _amazonS3;
 	private AWSCredentialsProvider _awsCredentialsProvider;
 	private String _bucketName;
+
+	@Reference
+	private DLContentLocalService _dlContentLocalService;
+
 	private S3FileCache _s3FileCache;
 	private S3KeyTransformer _s3KeyTransformer;
 	private StorageClass _storageClass;
