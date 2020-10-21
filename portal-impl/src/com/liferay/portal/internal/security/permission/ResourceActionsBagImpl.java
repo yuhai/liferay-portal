@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +94,7 @@ public class ResourceActionsBagImpl implements ResourceActionsBag {
 
 		portletActions.addAll(_getPortletMimeTypeActions(name, portlet));
 
-		_checkPortletLayoutManagerActions(portletActions);
+		_addPortletLayoutManagerActions(portletActions);
 
 		portletActions.add(ActionKeys.ACCESS_IN_CONTROL_PANEL);
 
@@ -103,12 +102,11 @@ public class ResourceActionsBagImpl implements ResourceActionsBag {
 
 		guestDefaultActions.add(ActionKeys.VIEW);
 
-		_checkPortletLayoutManagerActions(layoutManagerActions);
+		_addPortletLayoutManagerActions(layoutManagerActions);
 
-		guestUnsupportedActions.addAll(_defaultPortletGuestUnsupportedActions);
-
-		_checkGuestUnsupportedActions(
-			guestUnsupportedActions, guestDefaultActions);
+		Collections.addAll(
+			guestUnsupportedActions,
+			new String[] {ActionKeys.CONFIGURATION, ActionKeys.PERMISSIONS});
 
 		resourceActionsBag = new ResourceActionsBagImpl(
 			groupDefaultActions, guestDefaultActions, guestUnsupportedActions,
@@ -122,29 +120,7 @@ public class ResourceActionsBagImpl implements ResourceActionsBag {
 		return _supportsActions;
 	}
 
-	private void _checkGuestUnsupportedActions(
-		Set<String> guestUnsupportedActions, Set<String> guestDefaultActions) {
-
-		// Guest default actions cannot reference guest unsupported actions
-
-		Iterator<String> iterator = guestDefaultActions.iterator();
-
-		while (iterator.hasNext()) {
-			String actionId = iterator.next();
-
-			if (guestUnsupportedActions.contains(actionId)) {
-				iterator.remove();
-			}
-		}
-	}
-
-	private void _checkPortletLayoutManagerActions(Set<String> actions) {
-		if (!actions.contains(ActionKeys.ACCESS_IN_CONTROL_PANEL) &&
-			!actions.contains(ActionKeys.ADD_TO_PAGE)) {
-
-			actions.add(ActionKeys.ADD_TO_PAGE);
-		}
-
+	private void _addPortletLayoutManagerActions(Set<String> actions) {
 		actions.add(ActionKeys.CONFIGURATION);
 		actions.add(ActionKeys.PERMISSIONS);
 		actions.add(ActionKeys.PREFERENCES);
@@ -191,14 +167,6 @@ public class ResourceActionsBagImpl implements ResourceActionsBag {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ResourceActionsBagImpl.class);
-
-	private static final Set<String> _defaultPortletGuestUnsupportedActions =
-		new HashSet<String>() {
-			{
-				add(ActionKeys.CONFIGURATION);
-				add(ActionKeys.PERMISSIONS);
-			}
-		};
 
 	private final Set<String> _groupDefaultActions;
 	private final Set<String> _guestDefaultActions;
