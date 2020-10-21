@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.security.permission;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -148,6 +149,29 @@ public class ResourceActionsBagUtil {
 
 		return new ArrayList<>(
 			portletResourceActionsBag.getLayoutManagerActions());
+	}
+
+	public static List<String> getResourceActions(String name) {
+		if (name.indexOf(CharPool.PERIOD) != -1) {
+			return getModelResourceActions(name);
+		}
+
+		return getPortletResourceActions(name);
+	}
+
+	public static List<String> getResourceActions(
+		String portletResource, String modelResource) {
+
+		List<String> actions = null;
+
+		if (Validator.isNull(modelResource)) {
+			actions = getPortletResourceActions(portletResource);
+		}
+		else {
+			actions = getModelResourceActions(modelResource);
+		}
+
+		return actions;
 	}
 
 	public static List<String> getResourceGuestUnsupportedActions(
