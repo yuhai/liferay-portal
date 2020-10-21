@@ -278,7 +278,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			name);
 
 		if (modelResourceActionsBag == null) {
-			return new ArrayList<>();
+			return Collections.emptyList();
 		}
 
 		return new ArrayList<>(modelResourceActionsBag.getSupportsActions());
@@ -290,7 +290,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			name);
 
 		if (modelResourceActionsBag == null) {
-			return new ArrayList<>();
+			return Collections.emptyList();
 		}
 
 		return new ArrayList<>(
@@ -303,7 +303,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			name);
 
 		if (modelResourceActionsBag == null) {
-			return new ArrayList<>();
+			return Collections.emptyList();
 		}
 
 		return new ArrayList<>(
@@ -316,7 +316,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			name);
 
 		if (modelResourceActionsBag == null) {
-			return new ArrayList<>();
+			return Collections.emptyList();
 		}
 
 		return new ArrayList<>(
@@ -334,7 +334,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			name);
 
 		if (modelResourceActionsBag == null) {
-			return new ArrayList<>();
+			return Collections.emptyList();
 		}
 
 		return new ArrayList<>(
