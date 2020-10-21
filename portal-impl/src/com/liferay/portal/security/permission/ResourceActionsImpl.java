@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.security.permission.ResourceActionsBag;
 import com.liferay.portal.kernel.security.permission.ResourceActionsBagPool;
+import com.liferay.portal.kernel.security.permission.ResourceActionsBagUtil;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -121,7 +122,9 @@ public class ResourceActionsImpl implements ResourceActions {
 
 	@Override
 	public void check(String portletName) {
-		_check(portletName, getPortletResourceActions(portletName));
+		_check(
+			portletName,
+			ResourceActionsBagUtil.getPortletResourceActions(portletName));
 	}
 
 	/**
