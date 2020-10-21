@@ -275,6 +275,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		return value;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             ResourceActionsBagUtil#getModelResourceActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getModelResourceActions(String name) {
 		ResourceActionsBag modelResourceActionsBag = _getResourceActionsBag(
@@ -287,6 +292,12 @@ public class ResourceActionsImpl implements ResourceActions {
 		return new ArrayList<>(modelResourceActionsBag.getSupportsActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             ResourceActionsBagUtil#getModelResourceGroupDefaultActions(
+	 *             String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getModelResourceGroupDefaultActions(String name) {
 		ResourceActionsBag modelResourceActionsBag = _getResourceActionsBag(
@@ -300,6 +311,12 @@ public class ResourceActionsImpl implements ResourceActions {
 			modelResourceActionsBag.getGroupDefaultActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             ResourceActionsBagUtil#getModelResourceGuestDefaultActions(
+	 *             String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getModelResourceGuestDefaultActions(String name) {
 		ResourceActionsBag modelResourceActionsBag = _getResourceActionsBag(
@@ -313,6 +330,12 @@ public class ResourceActionsImpl implements ResourceActions {
 			modelResourceActionsBag.getGuestDefaultActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             ResourceActionsBagUtil
+	 *             #getModelResourceGuestUnsupportedActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getModelResourceGuestUnsupportedActions(String name) {
 		ResourceActionsBag modelResourceActionsBag = _getResourceActionsBag(
@@ -331,6 +354,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		return _MODEL_RESOURCE_NAME_PREFIX;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 ResourceActionsBagUtil#getModelResourceOwnerDefaultActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getModelResourceOwnerDefaultActions(String name) {
 		ResourceActionsBag modelResourceActionsBag = _getResourceActionsBag(
@@ -430,6 +458,12 @@ public class ResourceActionsImpl implements ResourceActions {
 		return new ArrayList<>(actions);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *                   ResourceActionsBagUtil#getPortletResourceActions(
+	 *                   String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getPortletResourceActions(String name) {
 		name = PortletIdCodec.decodePortletName(name);
@@ -440,6 +474,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		return new ArrayList<>(portletResourceActionsBag.getSupportsActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 ResourceActionsBagUtil#getPortletResourceGroupDefaultActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getPortletResourceGroupDefaultActions(String name) {
 		name = PortletIdCodec.decodePortletName(name);
@@ -451,6 +490,11 @@ public class ResourceActionsImpl implements ResourceActions {
 			portletResourceActionsBag.getGroupDefaultActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 ResourceActionsBagUtil#getPortletResourceGuestDefaultActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getPortletResourceGuestDefaultActions(String name) {
 		name = PortletIdCodec.decodePortletName(name);
@@ -462,6 +506,11 @@ public class ResourceActionsImpl implements ResourceActions {
 			portletResourceActionsBag.getGuestDefaultActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 ResourceActionsBagUtil#getPortletResourceGuestUnsupportedActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getPortletResourceGuestUnsupportedActions(String name) {
 		name = PortletIdCodec.decodePortletName(name);
@@ -473,6 +522,11 @@ public class ResourceActionsImpl implements ResourceActions {
 			portletResourceActionsBag.getGuestUnsupportedActions());
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 ResourceActionsBagUtil#getPortletResourceLayoutManagerActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getPortletResourceLayoutManagerActions(String name) {
 		name = PortletIdCodec.decodePortletName(name);
@@ -490,6 +544,11 @@ public class ResourceActionsImpl implements ResourceActions {
 			PortletIdCodec.decodePortletName(portletName));
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             ResourceActionsBagUtil#getResourceActions(String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getResourceActions(String name) {
 		if (name.indexOf(CharPool.PERIOD) != -1) {
@@ -499,6 +558,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		return getPortletResourceActions(name);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             ResourceActionsBagUtil#getResourceActions(String, String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getResourceActions(
 		String portletResource, String modelResource) {
@@ -528,6 +592,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		return getPortletResourceGroupDefaultActions(name);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 ResourceActionsBagUtil#getResourceGuestUnsupportedActions(String, String)}
+	 */
+	@Deprecated
 	@Override
 	public List<String> getResourceGuestUnsupportedActions(
 		String portletResource, String modelResource) {
