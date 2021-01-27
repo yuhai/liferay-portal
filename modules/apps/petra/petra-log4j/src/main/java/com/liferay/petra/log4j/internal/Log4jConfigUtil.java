@@ -14,22 +14,26 @@
 
 package com.liferay.petra.log4j.internal;
 
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerRepository;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.AbstractConfiguration;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -43,42 +47,56 @@ public class Log4jConfigUtil {
 	public static Map<String, String> configureLog4J(
 		String xmlContent, String... removedAppenderNames) {
 
+		Map<String, String> priorities = new HashMap<>();
+
 		Document document = null;
+
+		LoggerContext loggerContext =
+			_centralizedConfiguration.getLoggerContext();
+
+		AbstractConfiguration abstractConfiguration = null;
 
 		try {
 			SAXReader saxReader = new SAXReader();
 
 			document = saxReader.read(new UnsyncStringReader(xmlContent));
+
+			Element rootElement = document.getRootElement();
+
+			if (Objects.equals("Configuration", rootElement.getName())) {
+				if (!Objects.equals(
+						rootElement.attributeValue("strict"), "true")) {
+
+					_log.error(
+						"<Configuration> strict attribute requires true");
+
+					return Collections.emptyMap();
+				}
+
+				for (Element element : rootElement.elements()) {
+					_setPrioritiesAndRemoveAppender(
+						element, priorities, removedAppenderNames);
+				}
+
+				abstractConfiguration = new XmlConfiguration(
+					loggerContext, _getConfigurationSource(document));
+			}
+			else {
+				_setPrioritiesAndRemoveAppender(
+					rootElement, priorities, removedAppenderNames);
+
+				abstractConfiguration =
+					new org.apache.log4j.xml.XmlConfiguration(
+						loggerContext, _getConfigurationSource(document), 0);
+			}
+
+			_centralizedConfiguration.addConfiguration(abstractConfiguration);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
 
-			return Collections.emptyMap();
+			priorities.clear();
 		}
-
-		Map<String, String> priorities = new HashMap<>();
-
-		Element rootElement = document.getRootElement();
-
-		for (Element element : rootElement.elements()) {
-			for (String appenderName : removedAppenderNames) {
-				_removeAppender(rootElement, element, appenderName);
-			}
-
-			if (Objects.equals("category", element.getName())) {
-				Element priorityElement = element.element("priority");
-
-				priorities.put(
-					element.attributeValue("name"),
-					priorityElement.attributeValue("value"));
-			}
-		}
-
-		DOMConfigurator domConfigurator = new DOMConfigurator();
-
-		domConfigurator.doConfigure(
-			new UnsyncStringReader(document.asXML()),
-			LogManager.getLoggerRepository());
 
 		return priorities;
 	}
@@ -104,15 +122,18 @@ public class Log4jConfigUtil {
 	public static Map<String, String> getPriorities() {
 		Map<String, String> priorities = new HashMap<>();
 
-		Enumeration<Logger> enumeration = LogManager.getCurrentLoggers();
+		Map<String, LoggerConfig> loggerConfigs =
+			_centralizedConfiguration.getLoggers();
 
-		while (enumeration.hasMoreElements()) {
-			Logger logger = enumeration.nextElement();
+		for (Map.Entry<String, LoggerConfig> loggerConfigEntry :
+				loggerConfigs.entrySet()) {
 
-			Level level = logger.getLevel();
+			LoggerConfig loggerConfig = loggerConfigEntry.getValue();
 
-			if (level != null) {
-				priorities.put(logger.getName(), level.toString());
+			if (!_isRootLoggerConfig(loggerConfig)) {
+				priorities.put(
+					loggerConfigEntry.getKey(),
+					String.valueOf(loggerConfig.getLevel()));
 			}
 		}
 
@@ -120,28 +141,60 @@ public class Log4jConfigUtil {
 	}
 
 	public static void setLevel(String name, String priority) {
-		Logger logger = Logger.getLogger(name);
+		Level level = Level.toLevel(priority);
 
-		logger.setLevel(Level.toLevel(priority));
+		LoggerConfig loggerConfig = _centralizedConfiguration.getLogger(name);
+
+		if (loggerConfig != null) {
+			loggerConfig.setLevel(level);
+		}
+		else {
+			loggerConfig = new LoggerConfig(name, level, true);
+
+			_centralizedConfiguration.addLogger(name, loggerConfig);
+		}
+
+		LoggerContext loggerContext =
+			_centralizedConfiguration.getLoggerContext();
+
+		loggerContext.updateLoggers();
 	}
 
 	public static void shutdownLog4J() {
-		LoggerRepository loggerRepository = LogManager.getLoggerRepository();
+		LogManager.shutdown();
+	}
 
-		loggerRepository.shutdown();
+	private static ConfigurationSource _getConfigurationSource(
+			Document document)
+		throws Exception {
+
+		String xmlContent = document.asXML();
+
+		return new ConfigurationSource(
+			new UnsyncByteArrayInputStream(
+				xmlContent.getBytes(StringPool.UTF8)));
+	}
+
+	private static boolean _isRootLoggerConfig(LoggerConfig loggerConfig) {
+		if (Validator.isBlank(loggerConfig.getName())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static void _removeAppender(
-		Element rootElement, Element element, String appenderName) {
+		Element parentElement, Element element, String appenderName,
+		String appenderRefTagName, String appenderTagName) {
 
-		if (Objects.equals("appender", element.getName()) &&
+		if (Objects.equals(appenderTagName, element.getName()) &&
 			Objects.equals(appenderName, element.attributeValue("name"))) {
 
-			rootElement.remove(element);
+			parentElement.remove(element);
 		}
 
 		for (Element childElement : element.elements()) {
-			if (Objects.equals("appender-ref", childElement.getName()) &&
+			if (Objects.equals(appenderRefTagName, childElement.getName()) &&
 				Objects.equals(
 					appenderName, childElement.attributeValue("ref"))) {
 
@@ -150,7 +203,49 @@ public class Log4jConfigUtil {
 		}
 	}
 
+	private static void _setPrioritiesAndRemoveAppender(
+		Element element, Map<String, String> priorities,
+		String... removedAppenderNames) {
+
+		boolean log4j1config = false;
+
+		if (Objects.equals("log4j:configuration", element.getName())) {
+			log4j1config = true;
+		}
+
+		for (Element childElement : element.elements()) {
+			for (String appenderName : removedAppenderNames) {
+				if (log4j1config) {
+					_removeAppender(
+						element, childElement, appenderName, "appender-ref",
+						"appender");
+				}
+				else {
+					_removeAppender(
+						element, childElement, appenderName, "AppenderRef",
+						"Appender");
+				}
+			}
+
+			if (Objects.equals("Logger", childElement.getName())) {
+				priorities.put(
+					childElement.attributeValue("name"),
+					childElement.attributeValue("level"));
+			}
+			else if (Objects.equals("category", childElement.getName())) {
+				Element priorityElement = childElement.element("priority");
+
+				priorities.put(
+					childElement.attributeValue("name"),
+					priorityElement.attributeValue("value"));
+			}
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		Log4jConfigUtil.class);
+
+	private static final CentralizedConfiguration _centralizedConfiguration =
+		new CentralizedConfiguration();
 
 }
