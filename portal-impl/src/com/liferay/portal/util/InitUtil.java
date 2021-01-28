@@ -66,7 +66,9 @@ import java.util.List;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.lang.time.StopWatch;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.impl.Log4jContextFactory;
+import org.apache.logging.log4j.core.selector.BasicContextSelector;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -135,6 +137,9 @@ public class InitUtil {
 		// Shared log
 
 		try {
+			LogManager.setFactory(
+				new Log4jContextFactory(new BasicContextSelector()));
+
 			LogFactoryUtil.setLogFactory(new Log4jLogFactoryImpl());
 		}
 		catch (Exception exception) {
