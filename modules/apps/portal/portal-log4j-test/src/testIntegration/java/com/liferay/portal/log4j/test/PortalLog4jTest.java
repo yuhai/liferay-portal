@@ -20,28 +20,35 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.log.SanitizerLogWrapper;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
-
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.rolling.RollingFileAppender;
-import org.apache.log4j.rolling.TimeBasedRollingPolicy;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.OutputStreamManager;
+import org.apache.logging.log4j.core.appender.rolling.RollingFileManager;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.util.CloseShieldOutputStream;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -59,34 +66,39 @@ public class PortalLog4jTest {
 		_tempLogFileDirPath = Files.createTempDirectory(
 			PortalLog4jTest.class.getName());
 
-		Logger logger = Logger.getLogger(PortalLog4jTest.class);
+		Logger logger = (Logger)LogManager.getLogger(PortalLog4jTest.class);
 
-		logger.setAdditivity(false);
+		logger.setAdditive(false);
 		logger.setLevel(Level.TRACE);
 
-		Logger rootLogger = Logger.getRootLogger();
+		Logger rootLogger = (Logger)LogManager.getRootLogger();
 
-		Enumeration<Appender> enumeration = rootLogger.getAllAppenders();
+		Map<String, Appender> appendersMap= rootLogger.getAppenders();
 
-		while (enumeration.hasMoreElements()) {
-			Appender appender = enumeration.nextElement();
-
+		for (Appender appender : appendersMap.values()) {
 			if ((appender instanceof ConsoleAppender) &&
 				Objects.equals("CONSOLE", appender.getName())) {
 
-				ConsoleAppender consoleAppender = new ConsoleAppender();
+				ConsoleAppender consoleAppender =
+					ConsoleAppender.createDefaultAppenderForLayout(
+						appender.getLayout());
 
-				consoleAppender.setLayout(appender.getLayout());
+				OutputStreamManager outputStreamManager =
+					consoleAppender.getManager();
 
-				consoleAppender.activateOptions();
+				_testOutputStream =
+					new TestOutputStream(
+						(OutputStream)ReflectionTestUtil.getFieldValue(
+							outputStreamManager, "outputStream"));
 
-				_unsyncStringWriter = new UnsyncStringWriter();
+				ReflectionTestUtil.getAndSetFieldValue(
+					outputStreamManager, "outputStream", _testOutputStream);
 
-				consoleAppender.setWriter(_unsyncStringWriter);
+				consoleAppender.start();
 
 				logger.addAppender(consoleAppender);
 			}
-			else if (appender instanceof FileAppender) {
+			else if (appender instanceof RollingFileAppender) {
 				if (Objects.equals("TEXT_FILE", appender.getName())) {
 					_textLogFilePath = _initFileAppender(
 						logger, appender, _tempLogFileDirPath.toString());
@@ -101,9 +113,13 @@ public class PortalLog4jTest {
 
 	@AfterClass
 	public static void tearDownClass() throws IOException {
-		Logger logger = Logger.getLogger(PortalLog4jTest.class);
+		Logger logger = (Logger)LogManager.getLogger(PortalLog4jTest.class);
 
-		logger.removeAllAppenders();
+		Map<String, Appender> appendersMap = logger.getAppenders();
+
+		for (Appender appender : appendersMap.values()) {
+			logger.removeAppender(appender);
+		}
 
 		Files.deleteIfExists(_textLogFilePath);
 		Files.deleteIfExists(_xmlLogFilePath);
@@ -113,7 +129,7 @@ public class PortalLog4jTest {
 
 	@Test
 	public void testDefaultLevel() {
-		Logger logger = Logger.getLogger("test.logger");
+		Logger logger = (Logger)LogManager.getLogger("test.logger");
 
 		Assert.assertFalse(logger.isDebugEnabled());
 		Assert.assertTrue(logger.isInfoEnabled());
@@ -135,31 +151,31 @@ public class PortalLog4jTest {
 		RollingFileAppender portalRollingFileAppender =
 			(RollingFileAppender)appender;
 
-		TimeBasedRollingPolicy portalTimeBasedRollingPolicy =
-			(TimeBasedRollingPolicy)
-				portalRollingFileAppender.getRollingPolicy();
-
-		TimeBasedRollingPolicy testTimeBasedRollingPolicy =
-			new TimeBasedRollingPolicy();
-
-		testTimeBasedRollingPolicy.setFileNamePattern(
+		String testFilePattern = 
 			StringBundler.concat(
 				StringUtil.replace(tempLogDir, '\\', '/'), StringPool.SLASH,
-				StringUtil.extractLast(
-					portalTimeBasedRollingPolicy.getFileNamePattern(),
-					StringPool.SLASH)));
+					StringUtil.extractLast(
+						portalRollingFileAppender.getFilePattern(),
+						StringPool.SLASH));
 
-		RollingFileAppender testRollingFileAppender = new RollingFileAppender();
+		LoggerContext loggerContext = (LoggerContext)LogManager.getContext();
 
-		testRollingFileAppender.setLayout(
-			portalRollingFileAppender.getLayout());
-		testRollingFileAppender.setRollingPolicy(testTimeBasedRollingPolicy);
+		RollingFileAppender testRollingFileAppender =
+			RollingFileAppender.createAppender(
+				null, testFilePattern, "true",
+				portalRollingFileAppender.getName(), "true", "8192", "true",
+				portalRollingFileAppender.getTriggeringPolicy(), null,
+				portalRollingFileAppender.getLayout(), null, "false", null,
+				null, loggerContext.getConfiguration());
 
-		testRollingFileAppender.activateOptions();
+		testRollingFileAppender.start();
 
 		logger.addAppender(testRollingFileAppender);
 
-		return Paths.get(testRollingFileAppender.getFile());
+		RollingFileManager testRollingFileManager =
+			testRollingFileAppender.getManager();
+
+		return Paths.get(testRollingFileManager.getFileName());
 	}
 
 	private void _assertTextLog(
@@ -262,62 +278,129 @@ public class PortalLog4jTest {
 			"The log output should have at least 1 line",
 			outputLines.length > 0);
 
-		// log4j:event
+		// Event
 
-		String log4JEventLine = outputLines[0];
+		String eventLine = outputLines[0];
 
-		String log4JEvent = log4JEventLine.substring(
-			log4JEventLine.indexOf(StringPool.SPACE),
-			log4JEventLine.indexOf(StringPool.GREATER_THAN));
+		String event = eventLine.substring(
+			eventLine.indexOf(StringPool.SPACE),
+			eventLine.indexOf(StringPool.GREATER_THAN));
 
-		// log4j:event logger
+		// Event xmlns
 
-		String expectedLog4JEventLogger = StringBundler.concat(
-			StringPool.SPACE, "logger=", StringPool.QUOTE,
+		String expectedEventXmlns = StringBundler.concat(
+			StringPool.SPACE, "xmlns=", StringPool.QUOTE,
+			"http://logging.apache.org/log4j/2.0/events", StringPool.QUOTE,
+			StringPool.SPACE);
+
+		Assert.assertEquals(
+			expectedEventXmlns,
+			event.substring(0, expectedEventXmlns.length()));
+
+		// Event timeMillis
+
+		event = event.substring(expectedEventXmlns.length());
+
+		String actualEventtimeMillis = event.substring(
+			event.indexOf(StringPool.QUOTE) + 1,
+			event.indexOf(StringPool.SPACE) - 1);
+
+		Long.valueOf(actualEventtimeMillis);
+
+		// Event thread
+
+		event = event.substring(
+			"timeMillis=".length() + actualEventtimeMillis.length() + 2);
+
+		Thread currentThread = Thread.currentThread();
+
+		String expectedEventThread = StringBundler.concat(
+			StringPool.SPACE, "thread=", StringPool.QUOTE,
+			currentThread.getName(), StringPool.QUOTE,
+			StringPool.SPACE);
+
+		Assert.assertEquals(
+			expectedEventThread,
+			event.substring(0, expectedEventThread.length()));
+
+		// Event level
+
+		event = event.substring(expectedEventThread.length());
+
+		String expectedEventLevel = StringBundler.concat(
+			"level=", StringPool.QUOTE, expectedLevel,
+			StringPool.QUOTE, StringPool.SPACE);
+
+		Assert.assertEquals(
+			expectedEventLevel,
+			event.substring(0, expectedEventLevel.length()));
+
+		// Event loggerName
+
+		event = event.substring(expectedEventLevel.length());
+
+		String expectedEventLoggerName = StringBundler.concat(
+			"loggerName=", StringPool.QUOTE,
 			PortalLog4jTest.class.getName(), StringPool.QUOTE,
 			StringPool.SPACE);
 
 		Assert.assertEquals(
-			expectedLog4JEventLogger,
-			log4JEvent.substring(0, expectedLog4JEventLogger.length()));
+			expectedEventLoggerName,
+			event.substring(0, expectedEventLoggerName.length()));
 
-		// log4j:event timestamp
+		// Event endOfBatch
 
-		log4JEvent = log4JEvent.substring(expectedLog4JEventLogger.length());
+		event = event.substring(expectedEventLoggerName.length());
 
-		String actualLog4JEventTimestamp = log4JEvent.substring(
-			log4JEvent.indexOf(StringPool.QUOTE) + 1,
-			log4JEvent.indexOf(StringPool.SPACE) - 1);
-
-		Long.valueOf(actualLog4JEventTimestamp);
-
-		// log4j:event level
-
-		log4JEvent = log4JEvent.substring(
-			"timestamp=".length() + actualLog4JEventTimestamp.length() + 2);
-
-		String expectedLog4JEventLevel = StringBundler.concat(
-			StringPool.SPACE, "level=", StringPool.QUOTE, expectedLevel,
-			StringPool.QUOTE, StringPool.SPACE);
+		String expectedEventEndOfBatch = StringBundler.concat(
+			"endOfBatch=", StringPool.QUOTE,
+			String.valueOf(false), StringPool.QUOTE, StringPool.SPACE);
 
 		Assert.assertEquals(
-			expectedLog4JEventLevel,
-			log4JEvent.substring(0, expectedLog4JEventLevel.length()));
+			expectedEventEndOfBatch,
+			event.substring(0, expectedEventEndOfBatch.length()));
 
-		// log4j:event thread
+		// Event loggerFqcn
 
-		log4JEvent = log4JEvent.substring(expectedLog4JEventLevel.length());
+		event = event.substring(expectedEventEndOfBatch.length());
 
-		Thread currentThread = Thread.currentThread();
-
-		String expectedLog4JEventThread = StringBundler.concat(
-			"thread=", StringPool.QUOTE, currentThread.getName(),
-			StringPool.QUOTE);
+		String expectedEventLoggerFqcn = StringBundler.concat(
+			"loggerFqcn=", StringPool.QUOTE,
+			SanitizerLogWrapper.class.getName(), StringPool.QUOTE,
+			StringPool.SPACE);
 
 		Assert.assertEquals(
-			expectedLog4JEventThread,
-			log4JEvent.substring(0, expectedLog4JEventThread.length()));
+			expectedEventLoggerFqcn,
+			event.substring(0, expectedEventLoggerFqcn.length()));
 
+		// Event threadId
+
+		event = event.substring(expectedEventLoggerFqcn.length());
+
+		String expectedEventThreadId = StringBundler.concat(
+			"threadId=", StringPool.QUOTE,
+			currentThread.getId(), StringPool.QUOTE,
+			StringPool.SPACE);
+
+		Assert.assertEquals(
+			expectedEventThreadId,
+			event.substring(0, expectedEventThreadId.length()));
+
+		// Event threadPriority
+
+		event = event.substring(expectedEventThreadId.length());
+
+		String expectedEventThreadPriority = StringBundler.concat(
+			"threadPriority=", StringPool.QUOTE,
+			currentThread.getPriority(), StringPool.QUOTE);
+
+		Assert.assertEquals(
+			expectedEventThreadPriority,
+			event.substring(0, expectedEventThreadPriority.length()));
+
+		// Instant
+
+		
 		// log4j:message
 
 		if (expectedThrowable != null) {
@@ -509,10 +592,36 @@ public class PortalLog4jTest {
 		"\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d");
 	private static Path _tempLogFileDirPath;
 	private static Path _textLogFilePath;
-	private static UnsyncStringWriter _unsyncStringWriter;
+	private final static UnsyncStringWriter _unsyncStringWriter = new UnsyncStringWriter();
 	private static Path _xmlLogFilePath;
+	private static TestOutputStream _testOutputStream;
 
 	private class TestException extends Exception {
+	}
+
+	private static class TestOutputStream extends CloseShieldOutputStream {
+		public TestOutputStream(OutputStream originalOutputStream) {
+			super(originalOutputStream);
+		}
+
+		@Override
+		public void write(byte[] b) throws IOException {
+			String content = new String(b);
+
+			_unsyncStringWriter.write(content.toCharArray());
+		}
+
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+			String content = new String(b);
+
+			_unsyncStringWriter.write(content.toCharArray(), off, len);
+		}
+
+		@Override
+		public void write(int b) throws IOException {
+			_unsyncStringWriter.write(b);
+		}
 	}
 
 }
