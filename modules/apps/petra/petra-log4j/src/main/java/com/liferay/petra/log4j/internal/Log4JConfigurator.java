@@ -50,10 +50,10 @@ public class Log4JConfigurator {
 			new UnsyncStringReader(xml), LogManager.getLoggerRepository());
 	}
 
-	public static Map<String, String> getLoggerNamesMap(String xml)
+	public static Map<String, String> getLoggersNameMap(String xml)
 		throws Exception {
 
-		Map<String, String> loggerNamesMap = new HashMap<>();
+		Map<String, String> loggersNameMap = new HashMap<>();
 
 		SAXReader saxReader = new SAXReader();
 
@@ -83,12 +83,12 @@ public class Log4JConfigurator {
 		for (Element categoryElement : categoryElements) {
 			Element priorityElement = categoryElement.element("priority");
 
-			loggerNamesMap.put(
+			loggersNameMap.put(
 				categoryElement.attributeValue("name"),
 				priorityElement.attributeValue("value"));
 		}
 
-		return loggerNamesMap;
+		return loggersNameMap;
 	}
 
 	public static String getOriginalPriority(String className) {

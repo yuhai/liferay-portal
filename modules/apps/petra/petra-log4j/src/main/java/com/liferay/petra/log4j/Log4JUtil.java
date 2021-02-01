@@ -80,11 +80,11 @@ public class Log4JUtil {
 		Log4JConfigurator.configureLog4JXml(urlContent);
 
 		try {
-			Map<String, String> loggerNamesMap =
-				Log4JConfigurator.getLoggerNamesMap(urlContent);
+			Map<String, String> loggersNameMap =
+				Log4JConfigurator.getLoggersNameMap(urlContent);
 
 			for (Map.Entry<String, String> loggerNameEntry :
-					loggerNamesMap.entrySet()) {
+					loggersNameMap.entrySet()) {
 
 				Logger jdkLogger = Logger.getLogger(loggerNameEntry.getKey());
 
