@@ -18,7 +18,6 @@ import com.liferay.petra.log4j.internal.Log4JConfigurator;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactory;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -27,7 +26,6 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.util.xml.XMLSafeReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,19 +34,11 @@ import java.net.URL;
 
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.apache.log4j.Level;
-
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 
 /**
  * @author Brian Wing Shun Chan
@@ -90,41 +80,15 @@ public class Log4JUtil {
 		Log4JConfigurator.configureLog4JXml(urlContent);
 
 		try {
-			SAXReader saxReader = new SAXReader();
+			Map<String, String> loggerNamesMap =
+				Log4JConfigurator.getLoggerNamesMap(urlContent);
 
-			saxReader.setEntityResolver(
-				new EntityResolver() {
+			for (Map.Entry<String, String> loggerNameEntry :
+					loggerNamesMap.entrySet()) {
 
-					@Override
-					public InputSource resolveEntity(
-						String publicId, String systemId) {
+				Logger jdkLogger = Logger.getLogger(loggerNameEntry.getKey());
 
-						if (systemId.endsWith("log4j.dtd")) {
-							return new InputSource(
-								Level.class.getResourceAsStream(
-									"xml/log4j.dtd"));
-						}
-
-						return null;
-					}
-
-				});
-
-			Document document = saxReader.read(
-				new UnsyncStringReader(urlContent), url.toExternalForm());
-
-			Element rootElement = document.getRootElement();
-
-			List<Element> categoryElements = rootElement.elements("category");
-
-			for (Element categoryElement : categoryElements) {
-				String name = categoryElement.attributeValue("name");
-
-				Element priorityElement = categoryElement.element("priority");
-
-				String priority = priorityElement.attributeValue("value");
-
-				Logger jdkLogger = Logger.getLogger(name);
+				String priority = loggerNameEntry.getValue();
 
 				jdkLogger.setLevel(_getJdkLevel(priority));
 			}
@@ -252,60 +216,9 @@ public class Log4JUtil {
 			return urlContent;
 		}
 
-		urlContent = _removeAppender(urlContent, "TEXT_FILE");
+		urlContent = Log4JConfigurator.removeAppender(urlContent, "TEXT_FILE");
 
-		return _removeAppender(urlContent, "XML_FILE");
-	}
-
-	private static String _removeAppender(String content, String appenderName) {
-		try {
-			SAXReader saxReader = new SAXReader();
-
-			saxReader.setEntityResolver(
-				new EntityResolver() {
-
-					@Override
-					public InputSource resolveEntity(
-						String publicId, String systemId) {
-
-						if (systemId.endsWith("log4j.dtd")) {
-							return new InputSource(
-								Level.class.getResourceAsStream(
-									"xml/log4j.dtd"));
-						}
-
-						return null;
-					}
-
-				});
-
-			Document document = saxReader.read(new XMLSafeReader(content));
-
-			Element rootElement = document.getRootElement();
-
-			List<Element> appenderElements = rootElement.elements("appender");
-
-			for (Element appenderElement : appenderElements) {
-				String name = appenderElement.attributeValue("name");
-
-				if (name.equals(appenderName)) {
-					rootElement.remove(appenderElement);
-
-					break;
-				}
-			}
-
-			content = document.asXML();
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			return StringUtil.removeSubstring(
-				content, "<appender-ref ref=\"" + appenderName + "\" />");
-		}
-
-		return StringUtil.removeSubstring(
-			content, "<appender-ref ref=\"" + appenderName + "\"/>");
+		return Log4JConfigurator.removeAppender(urlContent, "XML_FILE");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(Log4JUtil.class);
