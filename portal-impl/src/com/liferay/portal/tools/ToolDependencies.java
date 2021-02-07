@@ -78,8 +78,6 @@ import java.util.concurrent.ConcurrentMap;
 public class ToolDependencies {
 
 	public static void wireBasic() {
-		System.setProperty("log4j2.disable.jmx", "true");
-
 		InitUtil.init();
 
 		wireCaches();
