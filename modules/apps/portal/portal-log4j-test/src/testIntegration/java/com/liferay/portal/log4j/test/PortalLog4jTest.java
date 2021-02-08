@@ -69,6 +69,8 @@ public class PortalLog4jTest {
 		logger.setAdditive(false);
 		logger.setLevel(Level.TRACE);
 
+		System.out.println("_textLogFilePath is ");
+
 		Logger rootLogger = (Logger)LogManager.getRootLogger();
 
 		Map<String, Appender> appendersMap = rootLogger.getAppenders();
@@ -106,6 +108,9 @@ public class PortalLog4jTest {
 				}
 			}
 		}
+
+		System.out.println("_textLogFilePath is " + _textLogFilePath.toString());
+		System.out.println("_textLogFilePath is " + _xmlLogFilePath.toString());
 	}
 
 	@AfterClass
@@ -113,6 +118,9 @@ public class PortalLog4jTest {
 		Logger logger = (Logger)LogManager.getLogger(PortalLog4jTest.class);
 
 		Map<String, Appender> appendersMap = logger.getAppenders();
+
+		System.out.println("_textLogFilePath is " + _textLogFilePath.toString());
+		System.out.println("_textLogFilePath is " + _xmlLogFilePath.toString());
 
 		for (Appender appender : appendersMap.values()) {
 			logger.removeAppender(appender);
