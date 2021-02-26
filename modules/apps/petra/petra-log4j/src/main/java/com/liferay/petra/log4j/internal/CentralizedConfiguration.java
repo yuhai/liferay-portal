@@ -32,6 +32,7 @@ import org.apache.logging.log4j.core.filter.AbstractFilterable;
 
 /**
  * @author Dante Wang
+ * @see org.apache.logging.log4j.core.config.composite.DefaultMergeStrategy
  */
 public class CentralizedConfiguration extends AbstractConfiguration {
 
@@ -53,10 +54,6 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 		}
 
 		abstractConfiguration.initialize();
-
-		// DefaultMergeStrategy:
-		// Properties from all configurations are aggregated.
-		// Duplicate properties replace those in previous configurations.
 
 		Map<String, String> properties = getProperties();
 
@@ -86,11 +83,6 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 
 	private void _aggregateAppenders(
 		AbstractConfiguration abstractConfiguration) {
-
-		// DefaultMergeStrategy:
-		// Appenders are aggregated.
-		// Appenders with the same name are replaced by those in later
-		// configurations, including all of the Appender's subcomponents.
 
 		Map<String, Appender> currentAppenders = getAppenders();
 
@@ -136,11 +128,6 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 	private void _aggregateFilter(
 		AbstractFilterable currentAbstractFilterable,
 		AbstractFilterable newAbstractFilterable) {
-
-		// DefaultMergeStrategy:
-		// Filters are aggregated under a CompositeFilter if more than one
-		// Filter is defined. Since Filters are not named duplicates may be
-		// present.
 
 		Filter newFilter = newAbstractFilterable.getFilter();
 
@@ -193,23 +180,10 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 			return;
 		}
 
-		// Logger attributes are individually merged with duplicates being
-		// replaced by those in later configurations.
-
 		currentLoggerConfig.setLevel(newLoggerConfig.getLevel());
 		currentLoggerConfig.setAdditive(newLoggerConfig.isAdditive());
 
-
-		// Filters on a Logger are aggregated under a CompositeFilter if more
-		// than one Filter is defined. Since Filters are not named duplicates
-		// may be present.
-
 		_aggregateFilter(currentLoggerConfig, newLoggerConfig);
-
-		// Appender references on a Logger are aggregated with duplicates being
-		// replaced by those in later configurations.
-		// Filters under Appender references included or discarded depending on
-		// whether their parent Appender reference is kept or discarded.
 
 		Map<String, Appender> currentLoggerConfigAppenders =
 			currentLoggerConfig.getAppenders();
@@ -223,10 +197,6 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 		for (AppenderRef newAppenderRef : newLoggerConfig.getAppenderRefs()) {
 			if (currentLoggerConfigAppenders.containsKey(
 					newAppenderRef.getRef())) {
-
-			// Existing appender must be removed first as the internal data
-			// structure holding appenders does not allow replacing an existing
-			// appender
 
 				currentLoggerConfig.removeAppender(newAppenderRef.getRef());
 
