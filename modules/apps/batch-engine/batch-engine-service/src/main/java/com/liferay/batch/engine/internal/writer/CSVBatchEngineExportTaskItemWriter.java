@@ -62,7 +62,7 @@ public class CSVBatchEngineExportTaskItemWriter
 	@Override
 	public void write(Collection<?> items) throws Exception {
 		DateFormat dateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			"yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 		for (Object item : items) {
 			_write(dateFormat, _columnValuesExtractor.extractValues(item));
