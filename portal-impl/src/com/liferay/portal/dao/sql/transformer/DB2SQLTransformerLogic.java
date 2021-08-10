@@ -58,7 +58,7 @@ public class DB2SQLTransformerLogic extends BaseSQLTransformerLogic {
 
 	@Override
 	protected String replaceCastText(Matcher matcher) {
-		return matcher.replaceAll("CAST($1 AS VARCHAR(32672))");
+		return matcher.replaceAll("CAST($1 AS VARCHAR(254))");
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class DB2SQLTransformerLogic extends BaseSQLTransformerLogic {
 	}
 
 	private static final String _QUESTION_PARAMETER_MARKER_REPLACEMENT =
-		"COALESCE(CAST(? AS VARCHAR(32672)),'')";
+		"COALESCE(CAST(? AS VARCHAR(254)),'')";
 
 	private static final Pattern _caseWhenThenPattern = Pattern.compile(
 		"\\bcase when.+?end\\b", Pattern.CASE_INSENSITIVE);
