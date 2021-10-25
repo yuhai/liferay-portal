@@ -19,6 +19,8 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
@@ -642,10 +644,17 @@ public class PortalImplLocalizedFriendlyURLTest {
 		sb.append(group.getFriendlyURL());
 		sb.append(expectedLayoutFriendlyURL);
 
-		Assert.assertEquals(
-			sb.toString(),
-			_portal.getLocalizedFriendlyURL(
-				mockHttpServletRequest, layout, locale, originalLocale));
+		String expected = sb.toString();
+		String actual = _portal.getLocalizedFriendlyURL(
+			mockHttpServletRequest, layout, locale, originalLocale);
+
+		if (!expected.equals(actual)) {
+			_log.error(
+				"PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE = " +
+					PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
+		}
+
+		Assert.assertEquals(expected, actual);
 	}
 
 	private void _assertLocalizedVirtualLayoutFriendlyURL(
@@ -872,6 +881,9 @@ public class PortalImplLocalizedFriendlyURLTest {
 		PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING;
 
 	private static final String _VIRTUAL_HOSTNAME = "test.com";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortalImplLocalizedFriendlyURLTest.class);
 
 	private static Set<Locale> _availableLocales;
 	private static Locale _defaultLocale;
