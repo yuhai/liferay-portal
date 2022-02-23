@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBContext;
+import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBManager;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.log.Log;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.internal.configuration.ConfigurationUtil;
 import com.liferay.portal.spring.extender.internal.upgrade.InitialUpgradeExtender.InitialUpgradeExtension;
 import com.liferay.portal.spring.hibernate.DialectDetector;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -307,6 +309,32 @@ public class InitialUpgradeExtender
 						_db.runSQLTemplateString(connection, indexesSQL, true);
 					}
 					catch (Exception exception) {
+						String message = exception.getMessage();
+
+						String text = "SQLERRMC=" + StringUtil.toUpperCase(PropsValues.JDBC_DEFAULT_USERNAME) + ".";
+
+						int index = message.indexOf(text);
+
+						if (index > 0) {
+							String tableName = message.substring(index + text.length(), message.length());
+
+							tableName = tableName.substring(0, tableName.indexOf(","));
+
+							DBInspector dbInspector = new DBInspector(connection);
+
+							try {
+								if (_log.isWarnEnabled()) {
+									_log.warn("Has table " + tableName +  " " + Boolean.toString(dbInspector.hasTable(tableName)));
+								}
+							}
+							catch (Exception e){
+								_log.error(e, e);
+							}
+						}
+						else {
+							_log.error("Can't find table");
+						}
+
 						throw new UpgradeException(
 							StringBundler.concat(
 								"Bundle ", _bundle,

@@ -477,6 +477,27 @@ public abstract class BaseDB implements DB {
 					_log.debug(sql);
 				}
 
+				if (_log.isInfoEnabled()) {
+					String text = sql.toLowerCase();
+
+					if (text.contains("drop table")) {
+						Thread thread = Thread.currentThread();
+
+						_log.info(
+							"The drop sql is : " + text + "; The thread name is " + thread.getName());
+
+						String stackTraceElements = "";
+
+						for (StackTraceElement stackTraceElement :
+								thread.getStackTrace()) {
+
+							stackTraceElements += stackTraceElement + "\n";
+						}
+
+						_log.info(stackTraceElements);
+					}
+				}
+
 				try {
 					s.executeUpdate(sql);
 				}
@@ -719,6 +740,8 @@ public abstract class BaseDB implements DB {
 				StringUtil.trim(sqlTypeStringAndText[i]),
 				getSQLVarcharSizes()[i]);
 		}
+
+		_log.info("INFO level is enabled");
 	}
 
 	protected void addPrimaryKey(
