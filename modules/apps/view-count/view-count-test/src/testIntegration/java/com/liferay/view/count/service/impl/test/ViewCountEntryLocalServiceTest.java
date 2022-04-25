@@ -41,6 +41,8 @@ import com.liferay.view.count.service.persistence.ViewCountEntryPK;
 
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.FutureTask;
@@ -71,6 +73,71 @@ public class ViewCountEntryLocalServiceTest {
 	public void setUp() {
 		_className = _classNameLocalService.getClassName(
 			ViewCountEntryLocalServiceTest.class.getName());
+	}
+
+	@Test
+	public void testCreationWithHoldLock() throws Throwable {
+		DB db = DBManagerUtil.getDB();
+
+		Assume.assumeTrue(db.getDBType() == DBType.SQLSERVER);
+
+		long classPK = 0;
+		int viewCount = 100;
+
+		ViewCountEntryPK viewCountEntryPK = new ViewCountEntryPK(
+			TestPropsValues.getCompanyId(), _className.getClassNameId(),
+			classPK);
+
+		Assert.assertNull(
+			_viewCountEntryLocalService.fetchViewCountEntry(viewCountEntryPK));
+
+		SessionFactory sessionFactory = ReflectionTestUtil.getFieldValue(
+			_viewCountEntryFinder, "_sessionFactory");
+
+		CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
+
+		ReflectionTestUtil.setFieldValue(
+			_viewCountEntryFinder, "_sessionFactory",
+			_createSessionFactoryProxy(sessionFactory, cyclicBarrier));
+
+		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
+				SqlExceptionHelper.class.getName(), LoggerTestUtil.OFF);
+			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
+				BatchingBatch.class.getName(), LoggerTestUtil.OFF)) {
+
+			FutureTask<Void> futureTask1 = _createFutureTask(
+				classPK, viewCount);
+
+			_startThread(futureTask1, "Inner View Count Incrementer Thread1");
+
+			FutureTask<Void> futureTask2 = _createFutureTask(
+				classPK, viewCount);
+
+			_startThread(futureTask2, "Inner View Count Incrementer Thread2");
+
+			while (cyclicBarrier.getNumberWaiting() != 1) {
+			}
+
+			Thread.sleep(2000);
+
+			cyclicBarrier.await();
+
+			futureTask1.get();
+			futureTask2.get();
+		}
+		finally {
+			ReflectionTestUtil.setFieldValue(
+				_viewCountEntryFinder, "_sessionFactory", sessionFactory);
+		}
+
+		Assert.assertTrue(_viewCountEntries.size() == 2);
+		Assert.assertNull(_viewCountEntries.get(0));
+		Assert.assertNotNull(_viewCountEntries.get(1));
+
+		_viewCountEntry = _viewCountEntryLocalService.getViewCountEntry(
+			viewCountEntryPK);
+
+		Assert.assertEquals(viewCount * 2, _viewCountEntry.getViewCount());
 	}
 
 	@Test
@@ -128,6 +195,10 @@ public class ViewCountEntryLocalServiceTest {
 				_viewCountEntryFinder, "_sessionFactory", sessionFactory);
 		}
 
+		Assert.assertTrue(_viewCountEntries.size() > 2);
+		Assert.assertNull(_viewCountEntries.get(0));
+		Assert.assertNull(_viewCountEntries.get(1));
+
 		_viewCountEntry = _viewCountEntryLocalService.getViewCountEntry(
 			viewCountEntryPK);
 
@@ -177,6 +248,15 @@ public class ViewCountEntryLocalServiceTest {
 					cyclicBarrier.await();
 				}
 
+				if (Objects.equals("get", method.getName())) {
+					ViewCountEntry viewCountEntry =
+						(ViewCountEntry)method.invoke(session, args);
+
+					_viewCountEntries.add(viewCountEntry);
+
+					return viewCountEntry;
+				}
+
 				try {
 					return method.invoke(session, args);
 				}
@@ -203,6 +283,8 @@ public class ViewCountEntryLocalServiceTest {
 
 	@Inject
 	private static ViewCountEntryLocalService _viewCountEntryLocalService;
+
+	private final List<ViewCountEntry> _viewCountEntries = new ArrayList<>();
 
 	@DeleteAfterTestRun
 	private ViewCountEntry _viewCountEntry;
