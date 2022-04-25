@@ -81,12 +81,9 @@ public class ViewCountEntryLocalServiceTest {
 
 		Assume.assumeTrue(db.getDBType() == DBType.SQLSERVER);
 
-		long classPK = 0;
-		int viewCount = 100;
-
 		ViewCountEntryPK viewCountEntryPK = new ViewCountEntryPK(
 			TestPropsValues.getCompanyId(), _className.getClassNameId(),
-			classPK);
+			_CLASS_PK);
 
 		SessionFactory sessionFactory = ReflectionTestUtil.getFieldValue(
 			_viewCountEntryFinder, "_sessionFactory");
@@ -102,15 +99,13 @@ public class ViewCountEntryLocalServiceTest {
 			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
 				BatchingBatch.class.getName(), LoggerTestUtil.OFF)) {
 
-			FutureTask<Void> futureTask1 = _createFutureTask(
-				classPK, viewCount);
+			FutureTask<Void> futureTask1 = _createFutureTask();
 
-			_startThread(futureTask1, "Inner View Count Incrementer Thread1");
+			_startThread(futureTask1, _THREAD1_NAME);
 
-			FutureTask<Void> futureTask2 = _createFutureTask(
-				classPK, viewCount);
+			FutureTask<Void> futureTask2 = _createFutureTask();
 
-			_startThread(futureTask2, "Inner View Count Incrementer Thread2");
+			_startThread(futureTask2, _THREAD2_NAME);
 
 			while (cyclicBarrier.getNumberWaiting() != 1) {
 			}
@@ -134,7 +129,7 @@ public class ViewCountEntryLocalServiceTest {
 		_viewCountEntry = _viewCountEntryLocalService.getViewCountEntry(
 			viewCountEntryPK);
 
-		Assert.assertEquals(viewCount * 2, _viewCountEntry.getViewCount());
+		Assert.assertEquals(_VIEW_COUNT * 2, _viewCountEntry.getViewCount());
 	}
 
 	@Test
@@ -150,12 +145,9 @@ public class ViewCountEntryLocalServiceTest {
 				"SQLSERVER database, skip test.",
 			db.getDBType() == DBType.SQLSERVER);
 
-		long classPK = 0;
-		int viewCount = 100;
-
 		ViewCountEntryPK viewCountEntryPK = new ViewCountEntryPK(
 			TestPropsValues.getCompanyId(), _className.getClassNameId(),
-			classPK);
+			_CLASS_PK);
 
 		SessionFactory sessionFactory = ReflectionTestUtil.getFieldValue(
 			_viewCountEntryFinder, "_sessionFactory");
@@ -171,15 +163,13 @@ public class ViewCountEntryLocalServiceTest {
 			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
 				BatchingBatch.class.getName(), LoggerTestUtil.OFF)) {
 
-			FutureTask<Void> futureTask1 = _createFutureTask(
-				classPK, viewCount);
+			FutureTask<Void> futureTask1 = _createFutureTask();
 
-			_startThread(futureTask1, "Inner View Count Incrementer Thread1");
+			_startThread(futureTask1, _THREAD1_NAME);
 
-			FutureTask<Void> futureTask2 = _createFutureTask(
-				classPK, viewCount);
+			FutureTask<Void> futureTask2 = _createFutureTask();
 
-			_startThread(futureTask2, "Inner View Count Incrementer Thread2");
+			_startThread(futureTask2, _THREAD2_NAME);
 
 			futureTask1.get();
 			futureTask2.get();
@@ -196,10 +186,10 @@ public class ViewCountEntryLocalServiceTest {
 		_viewCountEntry = _viewCountEntryLocalService.getViewCountEntry(
 			viewCountEntryPK);
 
-		Assert.assertEquals(viewCount * 2, _viewCountEntry.getViewCount());
+		Assert.assertEquals(_VIEW_COUNT * 2, _viewCountEntry.getViewCount());
 	}
 
-	private FutureTask<Void> _createFutureTask(long classPK, int viewCount) {
+	private FutureTask<Void> _createFutureTask() {
 		return new FutureTask<>(
 			() -> {
 				try (SafeCloseable safeCloseable1 =
@@ -209,7 +199,7 @@ public class ViewCountEntryLocalServiceTest {
 
 					_viewCountEntryLocalService.incrementViewCount(
 						TestPropsValues.getCompanyId(),
-						_className.getClassNameId(), classPK, viewCount);
+						_className.getClassNameId(), _CLASS_PK, _VIEW_COUNT);
 				}
 
 				return null;
@@ -265,6 +255,16 @@ public class ViewCountEntryLocalServiceTest {
 
 		thread.start();
 	}
+
+	private static final long _CLASS_PK = 0;
+
+	private static final String _THREAD1_NAME =
+		"Inner View Count Incrementer Thread1";
+
+	private static final String _THREAD2_NAME =
+		"Inner View Count Incrementer Thread2";
+
+	private static final int _VIEW_COUNT = 100;
 
 	@DeleteAfterTestRun
 	private static ClassName _className;
