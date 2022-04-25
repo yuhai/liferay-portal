@@ -41,6 +41,8 @@ import com.liferay.view.count.service.persistence.ViewCountEntryPK;
 
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.FutureTask;
@@ -48,6 +50,7 @@ import java.util.concurrent.FutureTask;
 import org.hibernate.engine.jdbc.batch.internal.BatchingBatch;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -68,79 +71,121 @@ public class ViewCountEntryLocalServiceTest {
 		new LiferayIntegrationTestRule();
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Throwable {
 		_className = _classNameLocalService.getClassName(
 			ViewCountEntryLocalServiceTest.class.getName());
-	}
 
-	@Test
-	public void testLazyCreationWithRaceCondition() throws Throwable {
-		DB db = DBManagerUtil.getDB();
+		_db = DBManagerUtil.getDB();
 
-		Assume.assumeFalse(
-			"HSQL does not allow concurrent Session assess, skip test.",
-			db.getDBType() == DBType.HYPERSONIC);
-
-		long classPK = 0;
-		int viewCount = 100;
-
-		ViewCountEntryPK viewCountEntryPK = new ViewCountEntryPK(
+		_viewCountEntryPK = new ViewCountEntryPK(
 			TestPropsValues.getCompanyId(), _className.getClassNameId(),
-			classPK);
+			_CLASS_PK);
 
-		Assert.assertNull(
-			_viewCountEntryLocalService.fetchViewCountEntry(viewCountEntryPK));
-
-		SessionFactory sessionFactory = ReflectionTestUtil.getFieldValue(
+		_sessionFactory = ReflectionTestUtil.getFieldValue(
 			_viewCountEntryFinder, "_sessionFactory");
-
-		CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
 
 		ReflectionTestUtil.setFieldValue(
 			_viewCountEntryFinder, "_sessionFactory",
-			_createSessionFactoryProxy(sessionFactory, cyclicBarrier));
+			_createSessionFactoryProxy(_sessionFactory, _cyclicBarrier));
+	}
+
+	@After
+	public void tearDown() {
+		ReflectionTestUtil.setFieldValue(
+			_viewCountEntryFinder, "_sessionFactory", _sessionFactory);
+	}
+
+	@Test
+	public void testCreationWithHoldLock() throws Throwable {
+		Assume.assumeTrue(_db.getDBType() == DBType.SQLSERVER);
 
 		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
 				SqlExceptionHelper.class.getName(), LoggerTestUtil.OFF);
 			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
 				BatchingBatch.class.getName(), LoggerTestUtil.OFF)) {
 
-			FutureTask<Void> futureTask = new FutureTask<>(
-				() -> {
-					try (SafeCloseable safeCloseable1 =
-							BufferedIncrementThreadLocal.setWithSafeCloseable(
-								true);
-						SafeCloseable safeCloseable2 =
-							ProxyModeThreadLocal.setWithSafeCloseable(true)) {
+			FutureTask<Void> futureTask1 = _createFutureTask();
 
-						_viewCountEntryLocalService.incrementViewCount(
-							TestPropsValues.getCompanyId(),
-							_className.getClassNameId(), classPK, viewCount);
-					}
+			_startThread(futureTask1, _THREAD1_NAME);
 
-					return null;
-				});
+			FutureTask<Void> futureTask2 = _createFutureTask();
 
-			Thread thread = new Thread(
-				futureTask, "Inner View Count Incrementer");
+			_startThread(futureTask2, _THREAD2_NAME);
 
-			thread.start();
+			while (_cyclicBarrier.getNumberWaiting() != 1) {
+			}
 
-			_viewCountEntryLocalService.incrementViewCount(
-				TestPropsValues.getCompanyId(), _className.getClassNameId(),
-				classPK, viewCount);
+			Thread.sleep(2000);
 
-			futureTask.get();
+			_cyclicBarrier.await();
+
+			futureTask1.get();
+			futureTask2.get();
 		}
-		finally {
-			ReflectionTestUtil.setFieldValue(
-				_viewCountEntryFinder, "_sessionFactory", sessionFactory);
-		}
+
+		Assert.assertTrue(_viewCountEntries.size() == 2);
+		Assert.assertNull(_viewCountEntries.get(0));
+		Assert.assertNotNull(_viewCountEntries.get(1));
 
 		_viewCountEntry = _viewCountEntryLocalService.getViewCountEntry(
-			viewCountEntryPK);
+			_viewCountEntryPK);
 
-		Assert.assertEquals(viewCount * 2, _viewCountEntry.getViewCount());
+		Assert.assertEquals(_VIEW_COUNT * 2, _viewCountEntry.getViewCount());
+	}
+
+	@Test
+	public void testLazyCreationWithRaceCondition() throws Throwable {
+		Assume.assumeFalse(
+			"HSQL does not allow concurrent Session assess, skip test.",
+			_db.getDBType() == DBType.HYPERSONIC);
+
+		Assume.assumeFalse(
+			"Due to HHH-10654 changed, the test is not suitable for " +
+				"SQLSERVER database, skip test.",
+			_db.getDBType() == DBType.SQLSERVER);
+
+		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
+				SqlExceptionHelper.class.getName(), LoggerTestUtil.OFF);
+			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
+				BatchingBatch.class.getName(), LoggerTestUtil.OFF)) {
+
+			FutureTask<Void> futureTask1 = _createFutureTask();
+
+			_startThread(futureTask1, _THREAD1_NAME);
+
+			FutureTask<Void> futureTask2 = _createFutureTask();
+
+			_startThread(futureTask2, _THREAD2_NAME);
+
+			futureTask1.get();
+			futureTask2.get();
+		}
+
+		Assert.assertTrue(_viewCountEntries.size() > 2);
+		Assert.assertNull(_viewCountEntries.get(0));
+		Assert.assertNull(_viewCountEntries.get(1));
+
+		_viewCountEntry = _viewCountEntryLocalService.getViewCountEntry(
+			_viewCountEntryPK);
+
+		Assert.assertEquals(_VIEW_COUNT * 2, _viewCountEntry.getViewCount());
+	}
+
+	private FutureTask<Void> _createFutureTask() {
+		return new FutureTask<>(
+			() -> {
+				try (SafeCloseable safeCloseable1 =
+						BufferedIncrementThreadLocal.setWithSafeCloseable(true);
+					SafeCloseable safeCloseable2 =
+						ProxyModeThreadLocal.setWithSafeCloseable(true)) {
+
+					_viewCountEntryLocalService.incrementViewCount(
+						TestPropsValues.getCompanyId(),
+						_className.getClassNameId(), _CLASS_PK, _VIEW_COUNT);
+				}
+
+				return null;
+			});
 	}
 
 	private Object _createSessionFactoryProxy(
@@ -169,6 +214,15 @@ public class ViewCountEntryLocalServiceTest {
 					cyclicBarrier.await();
 				}
 
+				if (Objects.equals("get", method.getName())) {
+					ViewCountEntry viewCountEntry =
+						(ViewCountEntry)method.invoke(session, args);
+
+					_viewCountEntries.add(viewCountEntry);
+
+					return viewCountEntry;
+				}
+
 				try {
 					return method.invoke(session, args);
 				}
@@ -177,6 +231,22 @@ public class ViewCountEntryLocalServiceTest {
 				}
 			});
 	}
+
+	private void _startThread(FutureTask<Void> futureTask, String threadName) {
+		Thread thread = new Thread(futureTask, threadName);
+
+		thread.start();
+	}
+
+	private static final long _CLASS_PK = 0;
+
+	private static final String _THREAD1_NAME =
+		"Inner View Count Incrementer Thread1";
+
+	private static final String _THREAD2_NAME =
+		"Inner View Count Incrementer Thread2";
+
+	private static final int _VIEW_COUNT = 100;
 
 	@DeleteAfterTestRun
 	private static ClassName _className;
@@ -190,7 +260,14 @@ public class ViewCountEntryLocalServiceTest {
 	@Inject
 	private static ViewCountEntryLocalService _viewCountEntryLocalService;
 
+	private final CyclicBarrier _cyclicBarrier = new CyclicBarrier(2);
+	private DB _db;
+	private SessionFactory _sessionFactory;
+	private final List<ViewCountEntry> _viewCountEntries = new ArrayList<>();
+
 	@DeleteAfterTestRun
 	private ViewCountEntry _viewCountEntry;
+
+	private ViewCountEntryPK _viewCountEntryPK;
 
 }
