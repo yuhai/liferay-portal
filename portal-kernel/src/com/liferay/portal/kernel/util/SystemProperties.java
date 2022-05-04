@@ -283,9 +283,10 @@ public class SystemProperties {
 					if (placeholderValue == null) {
 						placeholderValue = StringPool.BLANK;
 					}
-
-					placeholderValue = _replacePlaceholders(
-						placeholderValue, placeholderProperties);
+					else {
+						placeholderValue = _replacePlaceholders(
+							placeholderValue, placeholderProperties);
+					}
 
 					if (placeholderProperties != null) {
 						placeholderProperties.put(
