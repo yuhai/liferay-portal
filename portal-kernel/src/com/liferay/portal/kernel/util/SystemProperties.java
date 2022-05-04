@@ -260,7 +260,7 @@ public class SystemProperties {
 		int startIndex = propertiesValue.indexOf(
 			StringPool.DOLLAR_AND_OPEN_CURLY_BRACE);
 
-		while (startIndex != -1) {
+		if (startIndex != -1) {
 			int endIndex = propertiesValue.indexOf(
 				StringPool.CLOSE_CURLY_BRACE, startIndex);
 
@@ -300,11 +300,8 @@ public class SystemProperties {
 						StringPool.CLOSE_CURLY_BRACE,
 					placeholderValue, startIndex);
 
-				startIndex = propertiesValue.indexOf(
-					StringPool.DOLLAR_AND_OPEN_CURLY_BRACE);
-			}
-			else {
-				break;
+				propertiesValue = _replacePlaceholders(
+					propertiesValue, placeholderProperties);
 			}
 		}
 
