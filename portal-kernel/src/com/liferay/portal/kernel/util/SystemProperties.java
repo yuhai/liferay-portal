@@ -238,34 +238,33 @@ public class SystemProperties {
 	private static void _parseProperties(Map<String, String> properties) {
 		Map<String, String> placeholderProperties = new ConcurrentHashMap<>();
 
-		for (Map.Entry<String, String> propertyEntry : properties.entrySet()) {
-			String entryValue = propertyEntry.getValue();
+		for (Map.Entry<String, String> entry : properties.entrySet()) {
+			String oldValue = entry.getValue();
 
-			String value = _replacePlaceholders(
-				entryValue, placeholderProperties);
+			String newValue = _replacePlaceholders(
+				oldValue, placeholderProperties);
 
-			if (!entryValue.equals(value)) {
-				placeholderProperties.put(propertyEntry.getKey(), value);
+			if (!oldValue.equals(newValue)) {
+				placeholderProperties.put(entry.getKey(), newValue);
 
-				propertyEntry.setValue(value);
+				entry.setValue(newValue);
 
-				System.setProperty(propertyEntry.getKey(), value);
+				System.setProperty(entry.getKey(), newValue);
 			}
 		}
 	}
 
 	private static String _replacePlaceholders(
-		String propertiesValue, Map<String, String> placeholderProperties) {
+		String value, Map<String, String> placeholderProperties) {
 
-		int startIndex = propertiesValue.indexOf(
-			StringPool.DOLLAR_AND_OPEN_CURLY_BRACE);
+		int startIndex = value.indexOf(StringPool.DOLLAR_AND_OPEN_CURLY_BRACE);
 
 		if (startIndex != -1) {
-			int endIndex = propertiesValue.indexOf(
+			int endIndex = value.indexOf(
 				StringPool.CLOSE_CURLY_BRACE, startIndex);
 
 			if (endIndex != -1) {
-				String placeholderKey = propertiesValue.substring(
+				String placeholderKey = value.substring(
 					startIndex +
 						StringPool.DOLLAR_AND_OPEN_CURLY_BRACE.length(),
 					endIndex);
@@ -294,18 +293,17 @@ public class SystemProperties {
 					}
 				}
 
-				propertiesValue = StringUtil.replace(
-					propertiesValue,
+				value = StringUtil.replace(
+					value,
 					StringPool.DOLLAR_AND_OPEN_CURLY_BRACE + placeholderKey +
 						StringPool.CLOSE_CURLY_BRACE,
 					placeholderValue, startIndex);
 
-				propertiesValue = _replacePlaceholders(
-					propertiesValue, placeholderProperties);
+				value = _replacePlaceholders(value, placeholderProperties);
 			}
 		}
 
-		return propertiesValue;
+		return value;
 	}
 
 	private static final Map<String, String[]> _arrayValues =
