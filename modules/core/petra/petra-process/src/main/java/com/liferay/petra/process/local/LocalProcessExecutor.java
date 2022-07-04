@@ -26,6 +26,7 @@ import com.liferay.petra.process.ProcessConfig;
 import com.liferay.petra.process.ProcessException;
 import com.liferay.petra.process.ProcessExecutor;
 import com.liferay.petra.process.ProcessLog;
+import com.liferay.petra.process.ProcessLog4jLog;
 import com.liferay.petra.process.TerminationProcessException;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -37,12 +38,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.io.WriteAbortedException;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -102,6 +102,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 			SubprocessReactor<T> subprocessReactor = new SubprocessReactor<>(
 				process, processConfig.getProcessLogConsumer(),
+				processConfig.getProcessLog4jLogConsumer(),
 				processConfig.getReactClassLoader(), asyncBroker);
 
 			NoticeableFuture<T> noticeableFuture = _submit(
@@ -253,6 +254,18 @@ public class LocalProcessExecutor implements ProcessExecutor {
 					try {
 						Serializable returnValue = processCallable.call();
 
+						if (returnValue instanceof Map) {
+							Map<String, Object> log4jInfo =
+								(Map<String, Object>)returnValue;
+
+							if (log4jInfo.containsKey("loggerName")) {
+								_processLog4jLogConsumer.accept(
+									new LocalProcessLog4jLog(log4jInfo));
+
+								continue;
+							}
+						}
+
 						_processLogConsumer.accept(
 							new LocalProcessLog(
 								ProcessLog.Level.DEBUG,
@@ -330,11 +343,13 @@ public class LocalProcessExecutor implements ProcessExecutor {
 
 		private SubprocessReactor(
 			Process process, Consumer<ProcessLog> processLogConsumer,
+			Consumer<ProcessLog4jLog> processLog4jLogConsumer,
 			ClassLoader reactClassLoader,
 			AsyncBroker<Long, Serializable> asyncBroker) {
 
 			_process = process;
 			_processLogConsumer = processLogConsumer;
+			_processLog4jLogConsumer = processLog4jLogConsumer;
 			_reactClassLoader = reactClassLoader;
 			_asyncBroker = asyncBroker;
 		}
@@ -342,6 +357,7 @@ public class LocalProcessExecutor implements ProcessExecutor {
 		private final AsyncBroker<Long, Serializable> _asyncBroker;
 		private final Process _process;
 		private final Consumer<ProcessLog> _processLogConsumer;
+		private final Consumer<ProcessLog4jLog> _processLog4jLogConsumer;
 		private final ClassLoader _reactClassLoader;
 
 	}

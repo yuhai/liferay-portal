@@ -16,9 +16,10 @@ package com.liferay.document.library.preview.pdf.internal;
 
 import com.liferay.portal.image.ImageToolImpl;
 import com.liferay.portal.kernel.image.ImageTool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.awt.image.RenderedImage;
-
 import java.io.File;
 
 import javax.imageio.ImageIO;
@@ -38,6 +39,10 @@ public class LiferayPDFBoxUtil {
 			String extension, String thumbnailExtension, int dpi, int height,
 			int width, boolean generatePreview, boolean generateThumbnail)
 		throws Exception {
+
+		if(_log.isDebugEnabled()) {
+			_log.debug("message");
+		}
 
 		PDFRenderer pdfRenderer = new PDFRenderer(pdDocument);
 
@@ -78,4 +83,6 @@ public class LiferayPDFBoxUtil {
 		return imageTool.scale(renderedImage, height, width);
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		LiferayPDFBoxUtil.class);
 }

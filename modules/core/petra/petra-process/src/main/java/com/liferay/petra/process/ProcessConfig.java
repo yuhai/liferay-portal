@@ -56,6 +56,9 @@ public class ProcessConfig implements Serializable {
 		return _processLogConsumer;
 	}
 
+	public Consumer<ProcessLog4jLog> getProcessLog4jLogConsumer() {
+		return _processLog4jLogConsumer;
+	}
 	public ClassLoader getReactClassLoader() {
 		return _reactClassLoader;
 	}
@@ -91,6 +94,9 @@ public class ProcessConfig implements Serializable {
 			_javaExecutable = processConfig.getJavaExecutable();
 
 			_processLogConsumer = processConfig.getProcessLogConsumer();
+
+			_processLog4jLogConsumer =
+				processConfig.getProcessLog4jLogConsumer();
 
 			_reactClassLoader = processConfig.getReactClassLoader();
 
@@ -141,6 +147,14 @@ public class ProcessConfig implements Serializable {
 			return this;
 		}
 
+		public Builder setProcessLog4jLogConsumer(
+			Consumer<ProcessLog4jLog> processLog4jLogConsumer) {
+
+			_processLog4jLogConsumer = processLog4jLogConsumer;
+
+			return this;
+		}
+
 		public Builder setReactClassLoader(ClassLoader reactClassLoader) {
 			_reactClassLoader = reactClassLoader;
 
@@ -160,6 +174,8 @@ public class ProcessConfig implements Serializable {
 		private String _javaExecutable = "java";
 		private Consumer<ProcessLog> _processLogConsumer = processLog -> {
 		};
+		private Consumer<ProcessLog4jLog> _processLog4jLogConsumer = processLog4jLog -> {
+		};
 		private ClassLoader _reactClassLoader =
 			ProcessConfig.class.getClassLoader();
 		private String _runtimeClassPath = _bootstrapClassPath;
@@ -173,6 +189,7 @@ public class ProcessConfig implements Serializable {
 		_environment = builder._environment;
 		_javaExecutable = builder._javaExecutable;
 		_processLogConsumer = builder._processLogConsumer;
+		_processLog4jLogConsumer = builder._processLog4jLogConsumer;
 		_reactClassLoader = builder._reactClassLoader;
 
 		_runtimeClassPathHolders = _toPathHolders(builder._runtimeClassPath);
@@ -213,6 +230,7 @@ public class ProcessConfig implements Serializable {
 	private final Map<String, String> _environment;
 	private final String _javaExecutable;
 	private final transient Consumer<ProcessLog> _processLogConsumer;
+	private final transient Consumer<ProcessLog4jLog> _processLog4jLogConsumer;
 	private final transient ClassLoader _reactClassLoader;
 	private final PathHolder[] _runtimeClassPathHolders;
 

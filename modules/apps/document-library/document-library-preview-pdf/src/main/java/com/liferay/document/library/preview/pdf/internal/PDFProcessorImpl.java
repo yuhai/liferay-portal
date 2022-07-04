@@ -26,6 +26,7 @@ import com.liferay.document.library.preview.pdf.internal.util.ProcessConfigUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.process.ProcessCallable;
 import com.liferay.petra.process.ProcessChannel;
+import com.liferay.petra.process.ProcessConfig;
 import com.liferay.petra.process.ProcessException;
 import com.liferay.petra.process.ProcessExecutor;
 import com.liferay.petra.string.StringBundler;
@@ -45,13 +46,13 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.SystemEnv;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.log.Log4jLogFactoryBridgeImpl;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,7 +73,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -716,10 +716,15 @@ public class PDFProcessorImpl
 								DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH,
 							generatePreview, generateThumbnail);
 
+					ProcessConfig processConfig = ProcessConfigUtil.getProcessConfig();
+
+					List<String> arguments = processConfig.getArguments();
+
+					arguments.add("-agentlib:jdwp=transport=dt_socket,address=5005,server=y,suspend=y");
+
 					ProcessChannel<String> processChannel =
 						_processExecutor.execute(
-							ProcessConfigUtil.getProcessConfig(),
-							processCallable);
+							processConfig, processCallable);
 
 					Future<String> future =
 						processChannel.getProcessNoticeableFuture();
@@ -1066,13 +1071,15 @@ public class PDFProcessorImpl
 
 			SystemEnv.setProperties(systemProperties);
 
-			Logger logger = Logger.getLogger("org.apache.pdfbox");
+//			Logger logger = Logger.getLogger("org.apache.pdfbox");
+//
+//			logger.setLevel(Level.SEVERE);
+//
+//			logger = Logger.getLogger(PropsUtil.class.getName());
+//
+//			logger.setLevel(Level.WARNING);
 
-			logger.setLevel(Level.SEVERE);
-
-			logger = Logger.getLogger(PropsUtil.class.getName());
-
-			logger.setLevel(Level.WARNING);
+			LogFactoryUtil.setLogFactory(new Log4jLogFactoryBridgeImpl());
 
 			try (PDDocument pdDocument = PDDocument.load(_inputFile)) {
 				LiferayPDFBoxUtil.generateImagesPB(
