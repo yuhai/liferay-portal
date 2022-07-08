@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -93,6 +94,15 @@ public class CompanyLogServlet extends HttpServlet {
 				_sendFile(
 					permissionChecker, httpServletRequest, httpServletResponse,
 					pathArray);
+			}
+			else if ((pathArray.length == 3) &&
+					 pathArray[2].equals("view-file-content")) {
+
+				_sendFile(
+					permissionChecker, httpServletRequest, httpServletResponse,
+					pathArray,
+					ParamUtil.getInteger(httpServletRequest, "startIndex"),
+					ParamUtil.getInteger(httpServletRequest, "endIndex"));
 			}
 		}
 		catch (FileNotFoundException fileNotFoundException) {
@@ -308,6 +318,59 @@ public class CompanyLogServlet extends HttpServlet {
 			sb.append("</body></html>");
 
 			printWriter.println(sb.toString());
+		}
+	}
+
+	private void _sendFile(
+			PermissionChecker permissionChecker,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String[] pathArray,
+			int startIndex, int endIndex)
+		throws Exception {
+
+		if (((startIndex == 0) && (endIndex == 0)) ||
+			((endIndex != 0) && (startIndex >= endIndex))) {
+
+			throw new PrincipalException(
+				"startIndex and endIndex can not both be 0, or startIndex " +
+					"can not be greater than or equal endIndex");
+		}
+
+		File logFile = _getLogFile(permissionChecker, pathArray);
+
+		File downloadFileDir = new File(logFile.getParent() + "/download");
+
+		File downloadFile = new File(
+			downloadFileDir.getPath(), logFile.getName());
+
+		int logFileLength = (int)logFile.length();
+
+		if ((endIndex == 0) || (endIndex > logFileLength)) {
+			endIndex = logFileLength;
+		}
+
+		int downloadFileLength = endIndex;
+
+		if (startIndex != 0) {
+			downloadFileLength = endIndex - startIndex + 1;
+
+			--startIndex;
+		}
+
+		try {
+			FileUtil.write(
+				downloadFile, Files.readAllBytes(logFile.toPath()), startIndex,
+				downloadFileLength);
+
+			ServletResponseUtil.sendFile(
+				httpServletRequest, httpServletResponse, logFile.getName(),
+				new FileInputStream(downloadFile), downloadFile.length(),
+				MimeTypesUtil.getContentType(logFile.getName()),
+				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
+		}
+		finally {
+			downloadFile.delete();
+			downloadFileDir.delete();
 		}
 	}
 
