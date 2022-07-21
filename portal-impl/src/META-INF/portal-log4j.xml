@@ -186,6 +186,7 @@
 		<Logger level="INFO" name="com.liferay.portal.setup.SetupWizardSampleDataUtil" />
 		<Logger level="ERROR" name="com.liferay.portal.sharepoint" />
 		<Logger level="ERROR" name="com.liferay.portal.spring" />
+		<Logger level="INFO" name="com.liferay.portal.spring.extender.internal.upgrade" />
 		<Logger level="ERROR" name="com.liferay.portal.spring.context.ArrayApplicationContext" />
 		<Logger level="ERROR" name="com.liferay.portal.spring.context.PortalApplicationContext" />
 		<Logger level="INFO" name="com.liferay.portal.spring.context.PortalContextLoaderListener" />

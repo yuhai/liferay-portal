@@ -19,8 +19,10 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBContext;
+import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBManager;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
@@ -35,19 +37,15 @@ import com.liferay.portal.spring.hibernate.DialectDetector;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URL;
-
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import java.util.Dictionary;
 
 import javax.sql.DataSource;
 
 import org.apache.felix.dm.DependencyManager;
 import org.apache.felix.dm.ServiceDependency;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -304,6 +302,18 @@ public class InitialUpgradeExtender
 
 				if (indexesSQL != null) {
 					try {
+						DBInspector dbInspector = new DBInspector(connection);
+
+						String schema = dbInspector.getSchema();
+
+						if(!flag) {
+							_log.info("#############schema is " + schema);
+
+							flag = true;
+						}
+
+						indexesSQL = StringUtil.replace(indexesSQL, " on ", " on " + schema + ".");
+
 						_db.runSQLTemplateString(connection, indexesSQL, true);
 					}
 					catch (Exception exception) {
@@ -325,6 +335,7 @@ public class InitialUpgradeExtender
 		private DataSource _dataSource;
 		private DB _db;
 
+		private static boolean flag;
 	}
 
 }
