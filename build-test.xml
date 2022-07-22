@@ -5151,6 +5151,8 @@ upgrade.report.enabled=true</echo>
 											su - db2inst1 -c '/database/config/db2inst1/sqllib/bin/db2 drop db lportal'
 
 											su - db2inst1 -c '/database/config/db2inst1/sqllib/bin/db2 -f/tmp/create.sql -st'
+
+											su - db2inst1 -c '/database/config/db2inst1/sqllib/bin/db2 connect to lportal; /database/config/db2inst1/sqllib/bin/db2 get database configuration; /database/config/db2inst1/sqllib/bin/db2 disconnect lportal'
 										]]>
 									</echo>
 
@@ -5271,6 +5273,8 @@ upgrade.report.enabled=true</echo>
 									docker exec ${database.host} /bin/bash /tmp/create.sh
 								]]>
 							</execute>
+
+							<print-file file.name="${create.sql.file.path}" />
 
 							<delete file="${create.sh.file.path}" />
 						</then>
