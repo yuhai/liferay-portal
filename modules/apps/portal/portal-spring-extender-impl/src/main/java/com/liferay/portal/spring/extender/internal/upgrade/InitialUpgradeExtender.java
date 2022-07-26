@@ -16,6 +16,7 @@ package com.liferay.portal.spring.extender.internal.upgrade;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.dao.init.DBInitUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBContext;
@@ -200,10 +201,6 @@ public class InitialUpgradeExtender
 
 	private static class InitialUpgradeStep implements UpgradeStep {
 
-		public void setDataSource(DataSource dataSource) {
-			_dataSource = dataSource;
-		}
-
 		@Override
 		public String toString() {
 			return "Initial Database Creation";
@@ -322,7 +319,7 @@ public class InitialUpgradeExtender
 		}
 
 		private final Bundle _bundle;
-		private DataSource _dataSource;
+		private final DataSource _dataSource = DBInitUtil.getDataSource();
 		private DB _db;
 
 	}
