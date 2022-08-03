@@ -61,6 +61,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -88,7 +89,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.math.BigDecimal;
 
@@ -101,12 +101,20 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  * @author Ethan Bustad
  * @author Igor Beslic
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceOrderItem",
+	service = AopService.class
+)
 public class CommerceOrderItemLocalServiceImpl
 	extends CommerceOrderItemLocalServiceBaseImpl {
 
@@ -2021,55 +2029,55 @@ public class CommerceOrderItemLocalServiceImpl
 		Field.ENTRY_CLASS_PK, Field.COMPANY_ID, Field.UID
 	};
 
-	@ServiceReference(type = CommerceInventoryBookedQuantityLocalService.class)
+	@Reference
 	private CommerceInventoryBookedQuantityLocalService
 		_commerceInventoryBookedQuantityLocalService;
 
-	@ServiceReference(type = CommerceInventoryWarehouseItemLocalService.class)
+	@Reference
 	private CommerceInventoryWarehouseItemLocalService
 		_commerceInventoryWarehouseItemLocalService;
 
-	@ServiceReference(type = CommerceMoneyFactory.class)
+	@Reference
 	private CommerceMoneyFactory _commerceMoneyFactory;
 
-	@ServiceReference(type = CommerceOptionValueHelper.class)
+	@Reference
 	private CommerceOptionValueHelper _commerceOptionValueHelper;
 
-	@ServiceReference(type = CommerceOrderConfiguration.class)
+	@Reference
 	private CommerceOrderConfiguration _commerceOrderConfiguration;
 
-	@ServiceReference(type = CommerceOrderValidatorRegistry.class)
+	@Reference
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
 
-	@ServiceReference(type = CommerceProductPriceCalculation.class)
+	@Reference
 	private CommerceProductPriceCalculation _commerceProductPriceCalculation;
 
-	@ServiceReference(type = CommerceShippingHelper.class)
+	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
 
-	@ServiceReference(type = CommerceTaxCalculation.class)
+	@Reference
 	private CommerceTaxCalculation _commerceTaxCalculation;
 
-	@ServiceReference(type = CPDefinitionLocalService.class)
+	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
-	@ServiceReference(type = CPDefinitionOptionRelLocalService.class)
+	@Reference
 	private CPDefinitionOptionRelLocalService
 		_cpDefinitionOptionRelLocalService;
 
-	@ServiceReference(type = CPInstanceLocalService.class)
+	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
 
-	@ServiceReference(type = CPMeasurementUnitLocalService.class)
+	@Reference
 	private CPMeasurementUnitLocalService _cpMeasurementUnitLocalService;
 
-	@ServiceReference(type = ExpandoRowLocalService.class)
+	@Reference
 	private ExpandoRowLocalService _expandoRowLocalService;
 
-	@ServiceReference(type = JsonHelper.class)
+	@Reference
 	private JsonHelper _jsonHelper;
 
-	@ServiceReference(type = WorkflowDefinitionLinkLocalService.class)
+	@Reference
 	private WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
 

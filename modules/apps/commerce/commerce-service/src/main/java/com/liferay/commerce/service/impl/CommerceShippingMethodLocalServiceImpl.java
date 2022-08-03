@@ -19,6 +19,7 @@ import com.liferay.commerce.exception.CommerceShippingMethodNameException;
 import com.liferay.commerce.model.CommerceAddressRestriction;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.service.base.CommerceShippingMethodLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
@@ -28,7 +29,6 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.File;
 
@@ -37,10 +37,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceShippingMethod",
+	service = AopService.class
+)
 public class CommerceShippingMethodLocalServiceImpl
 	extends CommerceShippingMethodLocalServiceBaseImpl {
 
@@ -342,7 +350,7 @@ public class CommerceShippingMethodLocalServiceImpl
 		}
 	}
 
-	@ServiceReference(type = ImageLocalService.class)
+	@Reference
 	private ImageLocalService _imageLocalService;
 
 }
