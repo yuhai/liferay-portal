@@ -21,6 +21,7 @@ import com.liferay.commerce.exception.CommerceOrderTypeNameException;
 import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.model.CommerceOrderTypeRelTable;
 import com.liferay.commerce.model.CommerceOrderTypeTable;
+import com.liferay.commerce.service.CommerceOrderTypeRelLocalService;
 import com.liferay.commerce.service.base.CommerceOrderTypeLocalServiceBaseImpl;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
@@ -169,7 +170,7 @@ public class CommerceOrderTypeLocalServiceImpl
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			commerceOrderType.getCommerceOrderTypeId());
 
-		commerceOrderTypeRelLocalService.deleteCommerceOrderTypeRels(
+		_commerceOrderTypeRelLocalService.deleteCommerceOrderTypeRels(
 			commerceOrderType.getCommerceOrderTypeId());
 
 		_expandoRowLocalService.deleteRows(
@@ -501,6 +502,9 @@ public class CommerceOrderTypeLocalServiceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceOrderTypeLocalServiceImpl.class);
+
+	@Reference
+	private CommerceOrderTypeRelLocalService _commerceOrderTypeRelLocalService;
 
 	@Reference
 	private ExpandoRowLocalService _expandoRowLocalService;

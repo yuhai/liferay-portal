@@ -19,6 +19,7 @@ import com.liferay.commerce.constants.CommerceConstants;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceShipmentItem;
+import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.commerce.service.base.CommerceShipmentItemServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -201,7 +202,7 @@ public class CommerceShipmentItemServiceImpl
 		throws PortalException {
 
 		CommerceOrderItem commerceOrderItem =
-			commerceOrderItemLocalService.getCommerceOrderItem(
+			_commerceOrderItemLocalService.getCommerceOrderItem(
 				commerceOrderItemId);
 
 		_commerceOrderModelResourcePermission.check(
@@ -279,6 +280,9 @@ public class CommerceShipmentItemServiceImpl
 		return commerceShipmentItemLocalService.updateExternalReferenceCode(
 			commerceShipmentItemId, externalReferenceCode);
 	}
+
+	@Reference
+	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

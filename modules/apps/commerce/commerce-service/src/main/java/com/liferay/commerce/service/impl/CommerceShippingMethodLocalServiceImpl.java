@@ -18,6 +18,7 @@ import com.liferay.commerce.exception.CommerceShippingMethodEngineKeyException;
 import com.liferay.commerce.exception.CommerceShippingMethodNameException;
 import com.liferay.commerce.model.CommerceAddressRestriction;
 import com.liferay.commerce.model.CommerceShippingMethod;
+import com.liferay.commerce.service.CommerceAddressRestrictionLocalService;
 import com.liferay.commerce.service.base.CommerceShippingMethodLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -58,7 +59,7 @@ public class CommerceShippingMethodLocalServiceImpl
 			long countryId)
 		throws PortalException {
 
-		return commerceAddressRestrictionLocalService.
+		return _commerceAddressRestrictionLocalService.
 			addCommerceAddressRestriction(
 				userId, groupId, CommerceShippingMethod.class.getName(),
 				commerceShippingMethodId, countryId);
@@ -137,8 +138,8 @@ public class CommerceShippingMethodLocalServiceImpl
 			long commerceAddressRestrictionId)
 		throws PortalException {
 
-		commerceAddressRestrictionLocalService.deleteCommerceAddressRestriction(
-			commerceAddressRestrictionId);
+		_commerceAddressRestrictionLocalService.
+			deleteCommerceAddressRestriction(commerceAddressRestrictionId);
 	}
 
 	@Override
@@ -159,7 +160,7 @@ public class CommerceShippingMethodLocalServiceImpl
 
 		// Commerce address restrictions
 
-		commerceAddressRestrictionLocalService.
+		_commerceAddressRestrictionLocalService.
 			deleteCommerceAddressRestrictions(
 				CommerceShippingMethod.class.getName(),
 				commerceShippingMethod.getCommerceShippingMethodId());
@@ -207,7 +208,7 @@ public class CommerceShippingMethodLocalServiceImpl
 		long commerceShippingMethodId, int start, int end,
 		OrderByComparator<CommerceAddressRestriction> orderByComparator) {
 
-		return commerceAddressRestrictionLocalService.
+		return _commerceAddressRestrictionLocalService.
 			getCommerceAddressRestrictions(
 				CommerceShippingMethod.class.getName(),
 				commerceShippingMethodId, start, end, orderByComparator);
@@ -217,7 +218,7 @@ public class CommerceShippingMethodLocalServiceImpl
 	public int getCommerceAddressRestrictionsCount(
 		long commerceShippingMethodId) {
 
-		return commerceAddressRestrictionLocalService.
+		return _commerceAddressRestrictionLocalService.
 			getCommerceAddressRestrictionsCount(
 				CommerceShippingMethod.class.getName(),
 				commerceShippingMethodId);
@@ -255,7 +256,7 @@ public class CommerceShippingMethodLocalServiceImpl
 				commerceShippingMethods) {
 
 			boolean restricted =
-				commerceAddressRestrictionLocalService.
+				_commerceAddressRestrictionLocalService.
 					isCommerceAddressRestricted(
 						CommerceShippingMethod.class.getName(),
 						commerceShippingMethod.getCommerceShippingMethodId(),
@@ -349,6 +350,10 @@ public class CommerceShippingMethodLocalServiceImpl
 			throw new CommerceShippingMethodEngineKeyException();
 		}
 	}
+
+	@Reference
+	private CommerceAddressRestrictionLocalService
+		_commerceAddressRestrictionLocalService;
 
 	@Reference
 	private ImageLocalService _imageLocalService;

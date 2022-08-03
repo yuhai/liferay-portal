@@ -27,6 +27,11 @@ import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.model.CommerceShipmentItem;
 import com.liferay.commerce.model.CommerceShippingMethod;
+import com.liferay.commerce.service.CommerceAddressLocalService;
+import com.liferay.commerce.service.CommerceOrderItemLocalService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
+import com.liferay.commerce.service.CommerceShipmentItemLocalService;
+import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.service.base.CommerceShipmentLocalServiceBaseImpl;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.portal.aop.AopService;
@@ -100,7 +105,7 @@ public class CommerceShipmentLocalServiceImpl
 		User user = userLocalService.getUser(userId);
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 
 		long commerceShipmentId = counterLocalService.increment();
 
@@ -138,7 +143,7 @@ public class CommerceShipmentLocalServiceImpl
 		throws PortalException {
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 
 		return commerceShipmentLocalService.addCommerceShipment(
 			null, commerceOrder.getGroupId(),
@@ -179,7 +184,7 @@ public class CommerceShipmentLocalServiceImpl
 		commerceShipment.setCommerceAddressId(commerceAddressId);
 
 		CommerceShippingMethod commerceShippingMethod =
-			commerceShippingMethodLocalService.fetchCommerceShippingMethod(
+			_commerceShippingMethodLocalService.fetchCommerceShippingMethod(
 				commerceShippingMethodId);
 
 		if (commerceShippingMethod != null) {
@@ -211,7 +216,7 @@ public class CommerceShipmentLocalServiceImpl
 		User user = userLocalService.getUser(userId);
 
 		CommerceOrderItem commerceOrderItem =
-			commerceOrderItemLocalService.getCommerceOrderItem(
+			_commerceOrderItemLocalService.getCommerceOrderItem(
 				commerceOrderItemId);
 
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
@@ -234,7 +239,7 @@ public class CommerceShipmentLocalServiceImpl
 
 		commerceShipment = commerceShipmentPersistence.update(commerceShipment);
 
-		commerceShipmentItemLocalService.
+		_commerceShipmentItemLocalService.
 			addDeliverySubscriptionCommerceShipmentItem(
 				commerceOrder.getScopeGroupId(), userId, commerceShipmentId,
 				commerceOrderItemId);
@@ -251,7 +256,7 @@ public class CommerceShipmentLocalServiceImpl
 
 		commerceShipment = commerceShipmentPersistence.remove(commerceShipment);
 
-		commerceShipmentItemLocalService.deleteCommerceShipmentItems(
+		_commerceShipmentItemLocalService.deleteCommerceShipmentItems(
 			commerceShipment.getCommerceShipmentId(), restoreStockQuantity);
 
 		_expandoRowLocalService.deleteRows(
@@ -692,7 +697,7 @@ public class CommerceShipmentLocalServiceImpl
 			commerceShipmentPersistence.findByPrimaryKey(commerceShipmentId);
 
 		List<CommerceShipmentItem> commerceShipmentItems =
-			commerceShipmentItemLocalService.getCommerceShipmentItems(
+			_commerceShipmentItemLocalService.getCommerceShipmentItems(
 				commerceShipmentId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		if (commerceShipmentItems.isEmpty()) {
@@ -847,7 +852,7 @@ public class CommerceShipmentLocalServiceImpl
 			return commerceAddress;
 		}
 
-		return commerceAddressLocalService.addCommerceAddress(
+		return _commerceAddressLocalService.addCommerceAddress(
 			commerceShipment.getModelClassName(),
 			commerceShipment.getCommerceShipmentId(), name, description,
 			street1, street2, street3, city, zip, regionId, countryId,
@@ -909,6 +914,22 @@ public class CommerceShipmentLocalServiceImpl
 			throw new CommerceShipmentStatusException();
 		}
 	}
+
+	@Reference
+	private CommerceAddressLocalService _commerceAddressLocalService;
+
+	@Reference
+	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
+
+	@Reference
+	private CommerceShipmentItemLocalService _commerceShipmentItemLocalService;
+
+	@Reference
+	private CommerceShippingMethodLocalService
+		_commerceShippingMethodLocalService;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

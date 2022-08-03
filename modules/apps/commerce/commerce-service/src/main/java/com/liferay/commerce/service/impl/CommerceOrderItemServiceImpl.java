@@ -24,6 +24,8 @@ import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.permission.CommerceProductViewPermission;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
+import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.base.CommerceOrderItemServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -736,6 +738,12 @@ public class CommerceOrderItemServiceImpl
 
 	@Reference
 	protected CommerceAccountPermission commerceAccountPermission;
+
+	@Reference
+	protected CommerceOrderLocalService commerceOrderLocalService;
+
+	@Reference
+	protected CommerceOrderService commerceOrderService;
 
 	@Reference
 	protected CommerceProductViewPermission commerceProductViewPermission;

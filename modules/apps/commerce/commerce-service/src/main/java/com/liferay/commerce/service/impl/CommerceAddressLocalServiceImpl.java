@@ -25,6 +25,7 @@ import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceGeocoder;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.impl.CommerceAddressImpl;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceAddressLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -177,14 +178,14 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByBillingAddress(
+			_commerceOrderLocalService.getCommerceOrdersByBillingAddress(
 				commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
 
 		commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByShippingAddress(
+			_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
 				commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
@@ -587,11 +588,11 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByShippingAddress(
+			_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
 				commerceAddressId);
 
 		for (CommerceOrder commerceOrder : commerceOrders) {
-			commerceOrderLocalService.resetCommerceOrderShipping(
+			_commerceOrderLocalService.resetCommerceOrderShipping(
 				commerceOrder.getCommerceOrderId());
 		}
 
@@ -623,7 +624,7 @@ public class CommerceAddressLocalServiceImpl
 				shippingPrice = BigDecimal.ZERO;
 			}
 
-			commerceOrderLocalService.updateCommerceOrder(
+			_commerceOrderLocalService.updateCommerceOrder(
 				null, commerceOrder.getCommerceOrderId(), billingAddressId,
 				commerceShippingMethodId, shippingAddressId,
 				commerceOrder.getAdvanceStatus(),
@@ -688,6 +689,9 @@ public class CommerceAddressLocalServiceImpl
 
 	@Reference
 	private CommerceGeocoder _commerceGeocoder;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

@@ -29,6 +29,8 @@ import com.liferay.commerce.inventory.type.constants.CommerceInventoryAuditTypeC
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.model.CommerceShipmentItem;
+import com.liferay.commerce.service.CommerceOrderItemLocalService;
+import com.liferay.commerce.service.CommerceShipmentLocalService;
 import com.liferay.commerce.service.base.CommerceShipmentItemLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -83,13 +85,13 @@ public class CommerceShipmentItemLocalServiceImpl
 			0, serviceContext.getCompanyId(), externalReferenceCode);
 
 		CommerceOrderItem commerceOrderItem =
-			commerceOrderItemLocalService.getCommerceOrderItem(
+			_commerceOrderItemLocalService.getCommerceOrderItem(
 				commerceOrderItemId);
 
 		if (validateInventory) {
 			validate(
 				commerceOrderItem,
-				commerceShipmentLocalService.getCommerceShipment(
+				_commerceShipmentLocalService.getCommerceShipment(
 					commerceShipmentId),
 				commerceInventoryWarehouseId, quantity, quantity);
 		}
@@ -121,7 +123,7 @@ public class CommerceShipmentItemLocalServiceImpl
 
 		// Commerce Order Item
 
-		commerceOrderItemLocalService.incrementShippedQuantity(
+		_commerceOrderItemLocalService.incrementShippedQuantity(
 			commerceShipmentItem.getCommerceOrderItemId(), quantity);
 
 		return commerceShipmentItem;
@@ -197,12 +199,12 @@ public class CommerceShipmentItemLocalServiceImpl
 		// Commerce order item
 
 		CommerceOrderItem commerceOrderItem =
-			commerceOrderItemLocalService.fetchCommerceOrderItem(
+			_commerceOrderItemLocalService.fetchCommerceOrderItem(
 				commerceShipmentItem.getCommerceOrderItemId());
 
 		if (!restoreStockQuantity) {
 			if (commerceOrderItem != null) {
-				commerceOrderItemLocalService.updateCommerceOrderItem(
+				_commerceOrderItemLocalService.updateCommerceOrderItem(
 					commerceShipmentItem.getCommerceOrderItemId(), 0);
 			}
 
@@ -216,7 +218,7 @@ public class CommerceShipmentItemLocalServiceImpl
 
 		try {
 			commerceOrderItem =
-				commerceOrderItemLocalService.incrementShippedQuantity(
+				_commerceOrderItemLocalService.incrementShippedQuantity(
 					commerceShipmentItem.getCommerceOrderItemId(),
 					shippedQuantity);
 
@@ -353,7 +355,7 @@ public class CommerceShipmentItemLocalServiceImpl
 				commerceShipmentItemId);
 
 		CommerceOrderItem commerceOrderItem =
-			commerceOrderItemLocalService.getCommerceOrderItem(
+			_commerceOrderItemLocalService.getCommerceOrderItem(
 				commerceShipmentItem.getCommerceOrderItemId());
 
 		int originalQuantity = commerceShipmentItem.getQuantity();
@@ -391,7 +393,7 @@ public class CommerceShipmentItemLocalServiceImpl
 
 		// Commerce order item
 
-		commerceOrderItemLocalService.incrementShippedQuantity(
+		_commerceOrderItemLocalService.incrementShippedQuantity(
 			commerceShipmentItem.getCommerceOrderItemId(), quantityDelta);
 
 		return commerceShipmentItem;
@@ -464,7 +466,7 @@ public class CommerceShipmentItemLocalServiceImpl
 		}
 
 		int commerceInventoryWarehouseQuantity =
-			commerceOrderItemLocalService.
+			_commerceOrderItemLocalService.
 				getCommerceInventoryWarehouseItemQuantity(
 					commerceOrderItem.getCommerceOrderItemId(),
 					commerceInventoryWarehouseId);
@@ -600,5 +602,11 @@ public class CommerceShipmentItemLocalServiceImpl
 	@Reference
 	private CommerceInventoryWarehouseLocalService
 		_commerceInventoryWarehouseLocalService;
+
+	@Reference
+	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
+
+	@Reference
+	private CommerceShipmentLocalService _commerceShipmentLocalService;
 
 }

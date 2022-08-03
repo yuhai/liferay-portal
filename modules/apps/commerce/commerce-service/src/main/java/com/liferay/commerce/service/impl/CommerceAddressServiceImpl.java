@@ -19,6 +19,7 @@ import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
+import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.base.CommerceAddressServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -404,7 +405,7 @@ public class CommerceAddressServiceImpl extends CommerceAddressServiceBaseImpl {
 		throws PortalException {
 
 		if (className.equals(CommerceOrder.class.getName())) {
-			commerceOrderService.getCommerceOrder(classPK);
+			_commerceOrderService.getCommerceOrder(classPK);
 		}
 		else if (className.equals(AccountEntry.class.getName()) ||
 				 className.equals(CommerceAccount.class.getName())) {
@@ -415,5 +416,8 @@ public class CommerceAddressServiceImpl extends CommerceAddressServiceBaseImpl {
 
 	@Reference
 	private CommerceAccountService _commerceAccountService;
+
+	@Reference
+	private CommerceOrderService _commerceOrderService;
 
 }

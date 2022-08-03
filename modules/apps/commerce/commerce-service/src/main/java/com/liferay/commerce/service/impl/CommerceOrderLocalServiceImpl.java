@@ -55,6 +55,12 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.JsonHelper;
 import com.liferay.commerce.search.facet.NegatableMultiValueFacet;
+import com.liferay.commerce.service.CommerceAddressLocalService;
+import com.liferay.commerce.service.CommerceOrderItemLocalService;
+import com.liferay.commerce.service.CommerceOrderNoteLocalService;
+import com.liferay.commerce.service.CommerceOrderPaymentLocalService;
+import com.liferay.commerce.service.CommerceOrderTypeLocalService;
+import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.service.base.CommerceOrderLocalServiceBaseImpl;
 import com.liferay.commerce.term.model.CommerceTermEntry;
 import com.liferay.commerce.term.service.CommerceTermEntryLocalService;
@@ -239,7 +245,7 @@ public class CommerceOrderLocalServiceImpl
 					groupId);
 
 			List<CommerceOrderType> commerceOrderTypes =
-				commerceOrderTypeLocalService.getCommerceOrderTypes(
+				_commerceOrderTypeLocalService.getCommerceOrderTypes(
 					user.getCompanyId(), CommerceChannel.class.getName(),
 					commerceChannel.getCommerceChannelId(), true, 0, 1);
 
@@ -476,22 +482,22 @@ public class CommerceOrderLocalServiceImpl
 
 		// Commerce order items
 
-		commerceOrderItemLocalService.deleteCommerceOrderItems(
+		_commerceOrderItemLocalService.deleteCommerceOrderItems(
 			commerceOrder.getCommerceOrderId());
 
 		// Commerce order notes
 
-		commerceOrderNoteLocalService.deleteCommerceOrderNotes(
+		_commerceOrderNoteLocalService.deleteCommerceOrderNotes(
 			commerceOrder.getCommerceOrderId());
 
 		// Commerce order payments
 
-		commerceOrderPaymentLocalService.deleteCommerceOrderPayments(
+		_commerceOrderPaymentLocalService.deleteCommerceOrderPayments(
 			commerceOrder.getCommerceOrderId());
 
 		// Commerce addresses
 
-		commerceAddressLocalService.deleteCommerceAddresses(
+		_commerceAddressLocalService.deleteCommerceAddresses(
 			commerceOrder.getModelClassName(),
 			commerceOrder.getCommerceOrderId());
 
@@ -820,7 +826,7 @@ public class CommerceOrderLocalServiceImpl
 				}
 			}
 
-			commerceOrderItemLocalService.addCommerceOrderItem(
+			_commerceOrderItemLocalService.addCommerceOrderItem(
 				userCommerceOrderId, guestCommerceOrderItem.getCPInstanceId(),
 				guestCommerceOrderItem.getJson(),
 				guestCommerceOrderItem.getQuantity(),
@@ -850,7 +856,7 @@ public class CommerceOrderLocalServiceImpl
 		for (CommerceOrderItem commerceOrderItem :
 				commerceOrder.getCommerceOrderItems()) {
 
-			commerceOrderItemLocalService.updateCommerceOrderItemPrice(
+			_commerceOrderItemLocalService.updateCommerceOrderItemPrice(
 				commerceOrderItem.getCommerceOrderItemId(), commerceContext);
 		}
 
@@ -974,7 +980,7 @@ public class CommerceOrderLocalServiceImpl
 		// Commerce order items
 
 		List<CommerceOrderItem> commerceOrderItems =
-			commerceOrderItemLocalService.getCommerceOrderItems(
+			_commerceOrderItemLocalService.getCommerceOrderItems(
 				commerceOrder.getCommerceOrderId(), QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS);
 
@@ -983,7 +989,7 @@ public class CommerceOrderLocalServiceImpl
 				continue;
 			}
 
-			commerceOrderItemLocalService.addCommerceOrderItem(
+			_commerceOrderItemLocalService.addCommerceOrderItem(
 				newCommerceOrder.getCommerceOrderId(),
 				commerceOrderItem.getCPInstanceId(),
 				commerceOrderItem.getJson(), commerceOrderItem.getQuantity(), 0,
@@ -1404,7 +1410,7 @@ public class CommerceOrderLocalServiceImpl
 			commerceOrderId);
 
 		CommerceShippingMethod commerceShippingMethod =
-			commerceShippingMethodLocalService.getCommerceShippingMethod(
+			_commerceShippingMethodLocalService.getCommerceShippingMethod(
 				commerceShippingMethodId);
 
 		commerceOrder.setCommerceShippingMethodId(
@@ -1816,7 +1822,7 @@ public class CommerceOrderLocalServiceImpl
 		}
 
 		List<CommerceAddress> commerceAddresses =
-			commerceAddressLocalService.getCommerceAddressesByCompanyId(
+			_commerceAddressLocalService.getCommerceAddressesByCompanyId(
 				serviceContext.getCompanyId(), AccountEntry.class.getName(),
 				commerceOrder.getCommerceAccountId());
 
@@ -1826,7 +1832,7 @@ public class CommerceOrderLocalServiceImpl
 			}
 		}
 
-		return commerceAddressLocalService.copyCommerceAddress(
+		return _commerceAddressLocalService.copyCommerceAddress(
 			commerceAddress.getCommerceAddressId(),
 			CommerceOrder.class.getName(), commerceOrder.getCommerceOrderId(),
 			serviceContext);
@@ -1902,13 +1908,14 @@ public class CommerceOrderLocalServiceImpl
 		long commerceAddressId = commerceAddressIdGetter.apply(commerceOrder);
 
 		if (commerceAddressId > 0) {
-			commerceAddress = commerceAddressLocalService.updateCommerceAddress(
-				commerceAddressId, name, description, street1, street2, street3,
-				city, zip, regionId, countryId, phoneNumber, false, false,
-				serviceContext);
+			commerceAddress =
+				_commerceAddressLocalService.updateCommerceAddress(
+					commerceAddressId, name, description, street1, street2,
+					street3, city, zip, regionId, countryId, phoneNumber, false,
+					false, serviceContext);
 		}
 		else {
-			commerceAddress = commerceAddressLocalService.addCommerceAddress(
+			commerceAddress = _commerceAddressLocalService.addCommerceAddress(
 				commerceOrder.getModelClassName(),
 				commerceOrder.getCommerceOrderId(), name, description, street1,
 				street2, street3, city, zip, regionId, countryId, phoneNumber,
@@ -1971,7 +1978,7 @@ public class CommerceOrderLocalServiceImpl
 
 		if (commerceShippingMethodId > 0) {
 			commerceShippingMethod =
-				commerceShippingMethodLocalService.getCommerceShippingMethod(
+				_commerceShippingMethodLocalService.getCommerceShippingMethod(
 					commerceShippingMethodId);
 
 			if (!commerceShippingMethod.isActive()) {
@@ -1983,7 +1990,7 @@ public class CommerceOrderLocalServiceImpl
 		}
 
 		int count =
-			commerceShippingMethodLocalService.getCommerceShippingMethodsCount(
+			_commerceShippingMethodLocalService.getCommerceShippingMethodsCount(
 				commerceOrder.getGroupId(), true);
 
 		if ((commerceShippingMethod == null) && (count > 0) &&
@@ -2243,6 +2250,9 @@ public class CommerceOrderLocalServiceImpl
 		CommerceOrderLocalServiceImpl.class);
 
 	@Reference
+	private CommerceAddressLocalService _commerceAddressLocalService;
+
+	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
@@ -2262,13 +2272,29 @@ public class CommerceOrderLocalServiceImpl
 	private CommerceOrderConfiguration _commerceOrderConfiguration;
 
 	@Reference
+	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
+
+	@Reference
+	private CommerceOrderNoteLocalService _commerceOrderNoteLocalService;
+
+	@Reference
+	private CommerceOrderPaymentLocalService _commerceOrderPaymentLocalService;
+
+	@Reference
 	private CommerceOrderPriceCalculation _commerceOrderPriceCalculation;
+
+	@Reference
+	private CommerceOrderTypeLocalService _commerceOrderTypeLocalService;
 
 	@Reference
 	private CommerceShippingEngineRegistry _commerceShippingEngineRegistry;
 
 	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
+
+	@Reference
+	private CommerceShippingMethodLocalService
+		_commerceShippingMethodLocalService;
 
 	@Reference
 	private CommerceTermEntryLocalService _commerceTermEntryLocalService;

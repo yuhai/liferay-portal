@@ -18,6 +18,7 @@ import com.liferay.commerce.exception.CommerceOrderNoteContentException;
 import com.liferay.commerce.exception.DuplicateCommerceOrderNoteException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderNote;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceOrderNoteLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Di Giorgi
@@ -57,7 +59,7 @@ public class CommerceOrderNoteLocalServiceImpl
 		throws PortalException {
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 		User user = userLocalService.getUser(serviceContext.getUserId());
 
 		validate(content);
@@ -225,5 +227,8 @@ public class CommerceOrderNoteLocalServiceImpl
 					"reference code " + externalReferenceCode);
 		}
 	}
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 }
