@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.kernel.uuid.PortalUUID;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -99,7 +99,7 @@ public class CPDefinitionInventoryLocalServiceImpl
 			CPDefinitionInventory newCPDefinitionInventory =
 				(CPDefinitionInventory)cpDefinitionInventory.clone();
 
-			newCPDefinitionInventory.setUuid(PortalUUIDUtil.generate());
+			newCPDefinitionInventory.setUuid(_portalUUID.generate());
 			newCPDefinitionInventory.setCPDefinitionInventoryId(
 				counterLocalService.increment());
 			newCPDefinitionInventory.setCPDefinitionId(newCPDefinitionId);
@@ -211,5 +211,8 @@ public class CPDefinitionInventoryLocalServiceImpl
 
 	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;
+
+	@Reference
+	private PortalUUID _portalUUID;
 
 }

@@ -46,7 +46,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
@@ -111,7 +111,7 @@ public class CommerceOrderTypeLocalServiceImpl
 
 		Date date = new Date();
 
-		Date displayDate = PortalUtil.getDate(
+		Date displayDate = _portal.getDate(
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, user.getTimeZone(),
 			CommerceOrderTypeDisplayDateException.class);
@@ -119,7 +119,7 @@ public class CommerceOrderTypeLocalServiceImpl
 		Date expirationDate = null;
 
 		if (!neverExpire) {
-			expirationDate = PortalUtil.getDate(
+			expirationDate = _portal.getDate(
 				expirationDateMonth, expirationDateDay, expirationDateYear,
 				expirationDateHour, expirationDateMinute, user.getTimeZone(),
 				CommerceOrderTypeExpirationDateException.class);
@@ -270,7 +270,7 @@ public class CommerceOrderTypeLocalServiceImpl
 		User user = userLocalService.getUser(userId);
 
 		commerceOrderType.setDisplayDate(
-			PortalUtil.getDate(
+			_portal.getDate(
 				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, user.getTimeZone(),
 				CommerceOrderTypeDisplayDateException.class));
@@ -280,7 +280,7 @@ public class CommerceOrderTypeLocalServiceImpl
 		Date expirationDate = null;
 
 		if (!neverExpire) {
-			expirationDate = PortalUtil.getDate(
+			expirationDate = _portal.getDate(
 				expirationDateMonth, expirationDateDay, expirationDateYear,
 				expirationDateHour, expirationDateMinute, user.getTimeZone(),
 				CommerceOrderTypeExpirationDateException.class);
@@ -382,7 +382,7 @@ public class CommerceOrderTypeLocalServiceImpl
 				new Date(), WorkflowConstants.STATUS_SCHEDULED);
 
 		for (CommerceOrderType commerceOrderType : commerceOrderTypes) {
-			long userId = PortalUtil.getValidUserId(
+			long userId = _portal.getValidUserId(
 				commerceOrderType.getCompanyId(),
 				commerceOrderType.getUserId());
 
@@ -411,7 +411,7 @@ public class CommerceOrderTypeLocalServiceImpl
 		}
 
 		for (CommerceOrderType commerceOrderType : commerceOrderTypes) {
-			long userId = PortalUtil.getValidUserId(
+			long userId = _portal.getValidUserId(
 				commerceOrderType.getCompanyId(),
 				commerceOrderType.getUserId());
 
@@ -511,6 +511,9 @@ public class CommerceOrderTypeLocalServiceImpl
 
 	@Reference
 	private InlineSQLHelper _inlineSQLHelper;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
