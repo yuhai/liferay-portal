@@ -16,7 +16,6 @@ package com.liferay.commerce.service.impl;
 
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderPayment;
-import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceOrderPaymentLocalServiceBaseImpl;
 import com.liferay.commerce.util.comparator.CommerceOrderPaymentCreateDateComparator;
 import com.liferay.portal.aop.AopService;
@@ -28,7 +27,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Di Giorgi
@@ -48,8 +46,8 @@ public class CommerceOrderPaymentLocalServiceImpl
 			long commerceOrderId, int status, String result)
 		throws PortalException {
 
-		CommerceOrder commerceOrder =
-			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
+			commerceOrderId);
 
 		User user = userLocalService.getUser(commerceOrder.getUserId());
 
@@ -64,7 +62,7 @@ public class CommerceOrderPaymentLocalServiceImpl
 
 		return _getCommerceOrderPayment(
 			status, content,
-			_commerceOrderLocalService.getCommerceOrder(commerceOrderId),
+			commerceOrderPersistence.findByPrimaryKey(commerceOrderId),
 			userLocalService.getUser(serviceContext.getUserId()));
 	}
 
@@ -119,8 +117,5 @@ public class CommerceOrderPaymentLocalServiceImpl
 
 		return commerceOrderPaymentPersistence.update(commerceOrderPayment);
 	}
-
-	@Reference
-	private CommerceOrderLocalService _commerceOrderLocalService;
 
 }
