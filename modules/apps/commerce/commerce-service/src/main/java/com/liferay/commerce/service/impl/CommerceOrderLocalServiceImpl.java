@@ -42,6 +42,7 @@ import com.liferay.commerce.exception.CommerceOrderStatusException;
 import com.liferay.commerce.exception.CommercePaymentEngineException;
 import com.liferay.commerce.exception.GuestCartMaxAllowedException;
 import com.liferay.commerce.internal.order.comparator.CommerceOrderModifiedDateComparator;
+import com.liferay.commerce.internal.util.CommerceOrderUtil;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
@@ -1005,14 +1006,8 @@ public class CommerceOrderLocalServiceImpl
 	public CommerceOrder resetCommerceOrderShipping(long commerceOrderId)
 		throws PortalException {
 
-		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
-			commerceOrderId);
-
-		commerceOrder.setCommerceShippingMethodId(0);
-		commerceOrder.setShippingAmount(BigDecimal.ZERO);
-		commerceOrder.setShippingOptionName(null);
-
-		return commerceOrderPersistence.update(commerceOrder);
+		return CommerceOrderUtil.resetCommerceOrderShipping(
+			commerceOrderId, commerceOrderPersistence);
 	}
 
 	@Override
