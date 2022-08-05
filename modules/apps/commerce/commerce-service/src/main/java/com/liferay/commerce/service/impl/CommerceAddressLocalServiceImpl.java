@@ -178,15 +178,14 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			_commerceOrderLocalService.getCommerceOrdersByBillingAddress(
+			commerceOrderPersistence.findByBillingAddressId(
 				commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
 
-		commerceOrders =
-			_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddress.getCommerceAddressId());
+		commerceOrders = commerceOrderPersistence.findByShippingAddressId(
+			commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
@@ -588,8 +587,7 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddressId);
+			commerceOrderPersistence.findByShippingAddressId(commerceAddressId);
 
 		for (CommerceOrder commerceOrder : commerceOrders) {
 			_commerceOrderLocalService.resetCommerceOrderShipping(
