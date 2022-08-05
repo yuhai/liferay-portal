@@ -27,6 +27,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.impl.CommerceAddressImpl;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceAddressLocalServiceBaseImpl;
+import com.liferay.commerce.service.persistence.CommerceOrderPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Address;
@@ -179,15 +180,14 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			_commerceOrderLocalService.getCommerceOrdersByBillingAddress(
+			_commerceOrderPersistence.findByBillingAddressId(
 				commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
 
-		commerceOrders =
-			_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddress.getCommerceAddressId());
+		commerceOrders = _commerceOrderPersistence.findByShippingAddressId(
+			commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
@@ -589,7 +589,7 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
+			_commerceOrderPersistence.findByShippingAddressId(
 				commerceAddressId);
 
 		for (CommerceOrder commerceOrder : commerceOrders) {
@@ -693,6 +693,9 @@ public class CommerceAddressLocalServiceImpl
 
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;
+
+	@Reference
+	private CommerceOrderPersistence _commerceOrderPersistence;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
