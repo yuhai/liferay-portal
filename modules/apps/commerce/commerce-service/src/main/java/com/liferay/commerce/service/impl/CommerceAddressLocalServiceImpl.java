@@ -631,8 +631,12 @@ public class CommerceAddressLocalServiceImpl
 				commerceOrder.getAdvanceStatus(),
 				commerceOrder.getCommercePaymentMethodKey(),
 				commerceOrder.getPurchaseOrderNumber(), shippingPrice,
-				shippingOptionName, commerceOrder.getSubtotal(),
-				commerceOrder.getTotal(), null);
+				shippingOptionName, commerceOrder.getShippingWithTaxAmount(),
+				commerceOrder.getSubtotal(),
+				commerceOrder.getSubtotalWithTaxAmount(),
+				commerceOrder.getTaxAmount(), commerceOrder.getTotal(),
+				commerceOrder.getTotalDiscountAmount(),
+				commerceOrder.getTotalWithTaxAmount(), null);
 		}
 	}
 
