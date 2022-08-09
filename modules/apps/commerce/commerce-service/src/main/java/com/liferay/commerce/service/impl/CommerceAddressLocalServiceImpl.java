@@ -27,7 +27,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.impl.CommerceAddressImpl;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceAddressLocalServiceBaseImpl;
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Group;
@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.math.BigDecimal;
@@ -54,10 +53,18 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  * @author Alec Sloan
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceAddress",
+	service = AopService.class
+)
 public class CommerceAddressLocalServiceImpl
 	extends CommerceAddressLocalServiceBaseImpl {
 
@@ -678,19 +685,19 @@ public class CommerceAddressLocalServiceImpl
 		};
 	}
 
-	@ServiceReference(type = AddressLocalService.class)
+	@Reference
 	private AddressLocalService _addressLocalService;
 
-	@ServiceReference(type = CommerceGeocoder.class)
+	@Reference
 	private CommerceGeocoder _commerceGeocoder;
 
-	@BeanReference(type = CommerceOrderLocalService.class)
+	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;
 
-	@ServiceReference(type = GroupLocalService.class)
+	@Reference
 	private GroupLocalService _groupLocalService;
 
-	@ServiceReference(type = UserLocalService.class)
+	@Reference
 	private UserLocalService _userLocalService;
 
 }
