@@ -283,9 +283,18 @@ public class CommerceOrderItemLocalServiceImpl
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
 
 		if (_commerceShippingHelper.isFreeShipping(commerceOrder)) {
-			_commerceOrderLocalService.updateCommerceShippingMethod(
-				commerceOrder.getCommerceOrderId(), 0, null, BigDecimal.ZERO,
-				commerceContext);
+			commerceOrder.setCommerceShippingMethodId(0);
+			commerceOrder.setShippingAmount(BigDecimal.ZERO);
+			commerceOrder.setShippingOptionName(null);
+
+			commerceOrder = _commerceOrderPersistence.update(commerceOrder);
+
+			Indexer<CommerceOrder> indexer =
+				_indexerRegistry.nullSafeGetIndexer(CommerceOrder.class);
+
+			indexer.reindex(
+				CommerceOrder.class.getName(),
+				commerceOrder.getCommerceOrderId());
 		}
 
 		_commerceOrderLocalService.recalculatePrice(
