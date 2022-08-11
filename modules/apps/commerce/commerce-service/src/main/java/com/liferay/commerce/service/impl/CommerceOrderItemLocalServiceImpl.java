@@ -26,6 +26,7 @@ import com.liferay.commerce.exception.GuestCartItemMaxAllowedException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.exception.ProductBundleException;
 import com.liferay.commerce.internal.helper.CommerceOrderHelper;
+import com.liferay.commerce.internal.helper.CommerceOrderItemHelper;
 import com.liferay.commerce.internal.search.CommerceOrderItemIndexer;
 import com.liferay.commerce.internal.util.CommercePriceConverterUtil;
 import com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity;
@@ -900,57 +901,8 @@ public class CommerceOrderItemLocalServiceImpl
 			long commerceOrderItemId, CommerceContext commerceContext)
 		throws PortalException {
 
-		CommerceOrderItem commerceOrderItem =
-			commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
-
-		if (commerceOrderItem.isManuallyAdjusted() ||
-			(commerceOrderItem.getParentCommerceOrderItemId() != 0)) {
-
-			return commerceOrderItem;
-		}
-
-		CPInstance cpInstance = commerceOrderItem.fetchCPInstance();
-
-		if (cpInstance == null) {
-			return commerceOrderItem;
-		}
-
-		List<CommerceOrderItem> childCommerceOrderItems =
-			commerceOrderItemPersistence.findByParentCommerceOrderItemId(
-				commerceOrderItemId);
-
-		for (CommerceOrderItem childCommerceOrderItem :
-				childCommerceOrderItems) {
-
-			CommerceOptionValue commerceOptionValue =
-				_commerceOptionValueHelper.toCommerceOptionValue(
-					childCommerceOrderItem.getJson());
-
-			if (!_isStaticPriceType(commerceOptionValue.getPriceType())) {
-				_setCommerceOrderItemPrice(
-					childCommerceOrderItem, null, commerceContext);
-			}
-			else {
-				_setCommerceOrderItemPrice(
-					childCommerceOrderItem,
-					_getStaticCommerceProductPrice(
-						commerceOptionValue.getCPInstanceId(),
-						childCommerceOrderItem.getQuantity(),
-						commerceOptionValue.getPrice(),
-						childCommerceOrderItem.getCommerceOrder(),
-						commerceContext.getCommerceCurrency()),
-					commerceContext);
-			}
-
-			commerceOrderItemPersistence.update(childCommerceOrderItem);
-		}
-
-		commerceOrderItem = commerceOrderItemPersistence.findByPrimaryKey(
-			commerceOrderItemId);
-
-		_setCommerceOrderItemPrice(commerceOrderItem, null, commerceContext);
-
-		return commerceOrderItemPersistence.update(commerceOrderItem);
+		return _commerceOrderItemHelper.updateCommerceOrderItemPrice(
+			commerceOrderItemId, commerceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -1759,36 +1711,6 @@ public class CommerceOrderItemLocalServiceImpl
 			commerceProductPrice.getCommercePriceListId());
 	}
 
-	private void _setCommerceOrderItemPrice(
-			CommerceOrderItem commerceOrderItem,
-			CommerceProductPrice commerceProductPrice,
-			CommerceContext commerceContext)
-		throws PortalException {
-
-		CPInstance cpInstance = commerceOrderItem.fetchCPInstance();
-
-		if ((cpInstance == null) || commerceOrderItem.isManuallyAdjusted()) {
-			return;
-		}
-
-		if (commerceProductPrice == null) {
-			commerceProductPrice = _getCommerceProductPrice(
-				commerceOrderItem.getCPDefinitionId(),
-				commerceOrderItem.getCPInstanceId(),
-				commerceOrderItem.getJson(), commerceOrderItem.getQuantity(),
-				commerceContext);
-		}
-
-		_setCommerceOrderItemPrice(commerceOrderItem, commerceProductPrice);
-
-		_setCommerceOrderItemDiscountValue(
-			commerceOrderItem, commerceProductPrice.getDiscountValue(), false);
-
-		_setCommerceOrderItemDiscountValue(
-			commerceOrderItem,
-			commerceProductPrice.getDiscountValueWithTaxAmount(), true);
-	}
-
 	private void _setDimensions(
 			CommerceOrderItem commerceOrderItem, CPInstance cpInstance)
 		throws PortalException {
@@ -2082,6 +2004,9 @@ public class CommerceOrderItemLocalServiceImpl
 
 	@Reference
 	private CommerceOrderHelper _commerceOrderHelper;
+
+	@Reference
+	private CommerceOrderItemHelper _commerceOrderItemHelper;
 
 	@Reference
 	private CommerceOrderPersistence _commerceOrderPersistence;
