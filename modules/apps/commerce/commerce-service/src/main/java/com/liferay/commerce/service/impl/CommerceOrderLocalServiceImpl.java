@@ -50,8 +50,6 @@ import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.model.CommerceShippingEngine;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.model.CommerceShippingOption;
-import com.liferay.commerce.price.CommerceOrderPrice;
-import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.JsonHelper;
@@ -845,81 +843,8 @@ public class CommerceOrderLocalServiceImpl
 			long commerceOrderId, CommerceContext commerceContext)
 		throws PortalException {
 
-		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
-			commerceOrderId);
-
-		if ((commerceOrder.getOrderStatus() !=
-				CommerceOrderConstants.ORDER_STATUS_OPEN) ||
-			commerceOrder.isManuallyAdjusted()) {
-
-			return commerceOrder;
-		}
-
-		for (CommerceOrderItem commerceOrderItem :
-				commerceOrder.getCommerceOrderItems()) {
-
-			_commerceOrderItemLocalService.updateCommerceOrderItemPrice(
-				commerceOrderItem.getCommerceOrderItemId(), commerceContext);
-		}
-
-		commerceOrder = commerceOrderPersistence.findByPrimaryKey(
-			commerceOrderId);
-
-		CommerceOrderPrice commerceOrderPrice =
-			_commerceOrderPriceCalculation.getCommerceOrderPrice(
-				commerceOrder, false, commerceContext);
-
-		CommerceMoney subtotalCommerceMoney = commerceOrderPrice.getSubtotal();
-		CommerceMoney shippingValueCommerceMoney =
-			commerceOrderPrice.getShippingValue();
-		CommerceMoney taxValueCommerceMoney = commerceOrderPrice.getTaxValue();
-		CommerceMoney totalCommerceMoney = commerceOrderPrice.getTotal();
-		CommerceMoney subtotalWithTaxAmountCommerceMoney =
-			commerceOrderPrice.getSubtotalWithTaxAmount();
-		CommerceMoney shippingValueWithTaxAmountCommerceMoney =
-			commerceOrderPrice.getShippingValueWithTaxAmount();
-		CommerceMoney totalWithTaxAmountCommerceMoney =
-			commerceOrderPrice.getTotalWithTaxAmount();
-
-		commerceOrder.setShippingAmount(shippingValueCommerceMoney.getPrice());
-		commerceOrder.setSubtotal(subtotalCommerceMoney.getPrice());
-		commerceOrder.setTaxAmount(taxValueCommerceMoney.getPrice());
-		commerceOrder.setTotal(totalCommerceMoney.getPrice());
-
-		if (subtotalWithTaxAmountCommerceMoney != null) {
-			commerceOrder.setSubtotalWithTaxAmount(
-				subtotalWithTaxAmountCommerceMoney.getPrice());
-		}
-
-		if (shippingValueWithTaxAmountCommerceMoney != null) {
-			commerceOrder.setShippingWithTaxAmount(
-				shippingValueWithTaxAmountCommerceMoney.getPrice());
-		}
-
-		if (totalWithTaxAmountCommerceMoney != null) {
-			commerceOrder.setTotalWithTaxAmount(
-				totalWithTaxAmountCommerceMoney.getPrice());
-		}
-
-		_setCommerceOrderSubtotalDiscountValue(
-			commerceOrder, commerceOrderPrice.getSubtotalDiscountValue(),
-			false);
-		_setCommerceOrderShippingDiscountValue(
-			commerceOrder, commerceOrderPrice.getShippingDiscountValue(),
-			false);
-		_setCommerceOrderTotalDiscountValue(
-			commerceOrder, commerceOrderPrice.getTotalDiscountValue(), false);
-		_setCommerceOrderSubtotalDiscountValue(
-			commerceOrder,
-			commerceOrderPrice.getSubtotalDiscountValueWithTaxAmount(), true);
-		_setCommerceOrderShippingDiscountValue(
-			commerceOrder,
-			commerceOrderPrice.getShippingDiscountValueWithTaxAmount(), true);
-		_setCommerceOrderTotalDiscountValue(
-			commerceOrder,
-			commerceOrderPrice.getTotalDiscountValueWithTaxAmount(), true);
-
-		return commerceOrderPersistence.update(commerceOrder);
+		return _commerceOrderHelper.recalculatePrice(
+			commerceOrderId, commerceContext);
 	}
 
 	@Override
@@ -2268,9 +2193,6 @@ public class CommerceOrderLocalServiceImpl
 
 	@Reference
 	private CommerceOrderPaymentLocalService _commerceOrderPaymentLocalService;
-
-	@Reference
-	private CommerceOrderPriceCalculation _commerceOrderPriceCalculation;
 
 	@Reference
 	private CommerceOrderTypeLocalService _commerceOrderTypeLocalService;
