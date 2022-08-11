@@ -54,7 +54,6 @@ import com.liferay.commerce.product.service.CPDefinitionOptionRelLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.commerce.product.util.JsonHelper;
-import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceOrderItemLocalServiceBaseImpl;
 import com.liferay.commerce.service.persistence.CommerceOrderPersistence;
 import com.liferay.commerce.tax.CommerceTaxCalculation;
@@ -204,8 +203,10 @@ public class CommerceOrderItemLocalServiceImpl
 			commerceOrderItemPersistence.update(childCommerceOrderItem);
 		}
 
-		_commerceOrderLocalService.recalculatePrice(
+		commerceOrder = _commerceOrderHelper.recalculatePrice(
 			commerceOrderItem.getCommerceOrderId(), commerceContext);
+
+		_reindexCommerceOrder(commerceOrder.getCommerceOrderId());
 
 		return commerceOrderItem;
 	}
@@ -298,8 +299,10 @@ public class CommerceOrderItemLocalServiceImpl
 				commerceOrder.getCommerceOrderId());
 		}
 
-		_commerceOrderLocalService.recalculatePrice(
-			commerceOrder.getCommerceOrderId(), commerceContext);
+		commerceOrder = _commerceOrderHelper.recalculatePrice(
+			commerceOrderItem.getCommerceOrderId(), commerceContext);
+
+		_reindexCommerceOrder(commerceOrder.getCommerceOrderId());
 
 		return commerceOrderItem;
 	}
@@ -1633,6 +1636,15 @@ public class CommerceOrderItemLocalServiceImpl
 		return false;
 	}
 
+	private void _reindexCommerceOrder(long commerceOrderId)
+		throws PortalException {
+
+		Indexer<CommerceOrder> indexer = _indexerRegistry.nullSafeGetIndexer(
+			CommerceOrder.class);
+
+		indexer.reindex(CommerceOrder.class.getName(), commerceOrderId);
+	}
+
 	private void _setCommerceOrderItemDiscountValue(
 		CommerceOrderItem commerceOrderItem,
 		CommerceDiscountValue commerceDiscountValue, boolean includeTax) {
@@ -2009,8 +2021,10 @@ public class CommerceOrderItemLocalServiceImpl
 			commerceOrderItem);
 
 		if (commerceOrder.isOpen()) {
-			_commerceOrderLocalService.recalculatePrice(
+			commerceOrder = _commerceOrderHelper.recalculatePrice(
 				commerceOrderItem.getCommerceOrderId(), commerceContext);
+
+			_reindexCommerceOrder(commerceOrder.getCommerceOrderId());
 		}
 
 		return commerceOrderItem;
@@ -2068,9 +2082,6 @@ public class CommerceOrderItemLocalServiceImpl
 
 	@Reference
 	private CommerceOrderHelper _commerceOrderHelper;
-
-	@Reference
-	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Reference
 	private CommerceOrderPersistence _commerceOrderPersistence;
