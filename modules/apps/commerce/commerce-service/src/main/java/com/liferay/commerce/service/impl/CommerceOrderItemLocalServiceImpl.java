@@ -25,6 +25,7 @@ import com.liferay.commerce.exception.CommerceOrderValidatorException;
 import com.liferay.commerce.exception.GuestCartItemMaxAllowedException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.exception.ProductBundleException;
+import com.liferay.commerce.internal.helper.CommerceOrderHelper;
 import com.liferay.commerce.internal.search.CommerceOrderItemIndexer;
 import com.liferay.commerce.internal.util.CommercePriceConverterUtil;
 import com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity;
@@ -1245,10 +1246,17 @@ public class CommerceOrderItemLocalServiceImpl
 				CommerceOrderConstants.TYPE_PK_APPROVAL, true);
 
 		if ((workflowDefinitionLink != null) && commerceOrder.isApproved()) {
-			return _commerceOrderLocalService.updateStatus(
+			commerceOrder = _commerceOrderHelper.updateStatus(
 				serviceContext.getUserId(), commerceOrder.getCommerceOrderId(),
 				WorkflowConstants.STATUS_DRAFT, serviceContext,
 				Collections.emptyMap());
+
+			Indexer<CommerceOrder> indexer =
+				_indexerRegistry.nullSafeGetIndexer(CommerceOrder.class);
+
+			indexer.reindex(
+				CommerceOrder.class.getName(),
+				commerceOrder.getCommerceOrderId());
 		}
 
 		return commerceOrder;
@@ -2050,6 +2058,9 @@ public class CommerceOrderItemLocalServiceImpl
 
 	@Reference
 	private CommerceOrderConfiguration _commerceOrderConfiguration;
+
+	@Reference
+	private CommerceOrderHelper _commerceOrderHelper;
 
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;

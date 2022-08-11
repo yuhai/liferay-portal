@@ -41,6 +41,7 @@ import com.liferay.commerce.exception.CommerceOrderShippingMethodException;
 import com.liferay.commerce.exception.CommerceOrderStatusException;
 import com.liferay.commerce.exception.CommercePaymentEngineException;
 import com.liferay.commerce.exception.GuestCartMaxAllowedException;
+import com.liferay.commerce.internal.helper.CommerceOrderHelper;
 import com.liferay.commerce.internal.order.comparator.CommerceOrderModifiedDateComparator;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
@@ -1598,22 +1599,8 @@ public class CommerceOrderLocalServiceImpl
 			Map<String, Serializable> workflowContext)
 		throws PortalException {
 
-		if (userId == 0) {
-			userId = serviceContext.getUserId();
-		}
-
-		User user = _userLocalService.getUser(userId);
-		Date date = new Date();
-
-		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
-			commerceOrderId);
-
-		commerceOrder.setStatus(status);
-		commerceOrder.setStatusByUserId(user.getUserId());
-		commerceOrder.setStatusByUserName(user.getFullName());
-		commerceOrder.setStatusDate(serviceContext.getModifiedDate(date));
-
-		return commerceOrderPersistence.update(commerceOrder);
+		return _commerceOrderHelper.updateStatus(
+			userId, commerceOrderId, status, serviceContext, workflowContext);
 	}
 
 	@Override
@@ -2271,6 +2258,9 @@ public class CommerceOrderLocalServiceImpl
 
 	@Reference
 	private CommerceOrderConfiguration _commerceOrderConfiguration;
+
+	@Reference
+	private CommerceOrderHelper _commerceOrderHelper;
 
 	@Reference
 	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
