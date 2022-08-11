@@ -286,12 +286,7 @@ public class CommerceOrderItemLocalServiceImpl
 
 			commerceOrder = _commerceOrderPersistence.update(commerceOrder);
 
-			Indexer<CommerceOrder> indexer =
-				_indexerRegistry.nullSafeGetIndexer(CommerceOrder.class);
-
-			indexer.reindex(
-				CommerceOrder.class.getName(),
-				commerceOrder.getCommerceOrderId());
+			_reindexCommerceOrder(commerceOrder.getCommerceOrderId());
 		}
 
 		commerceOrder = _commerceOrderHelper.recalculatePrice(
@@ -1210,12 +1205,7 @@ public class CommerceOrderItemLocalServiceImpl
 				WorkflowConstants.STATUS_DRAFT, serviceContext,
 				Collections.emptyMap());
 
-			Indexer<CommerceOrder> indexer =
-				_indexerRegistry.nullSafeGetIndexer(CommerceOrder.class);
-
-			indexer.reindex(
-				CommerceOrder.class.getName(),
-				commerceOrder.getCommerceOrderId());
+			_reindexCommerceOrder(commerceOrder.getCommerceOrderId());
 		}
 
 		return commerceOrder;
