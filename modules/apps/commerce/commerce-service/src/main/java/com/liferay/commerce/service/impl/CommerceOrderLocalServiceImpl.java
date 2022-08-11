@@ -21,9 +21,7 @@ import com.liferay.commerce.constants.CommerceConstants;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
-import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
-import com.liferay.commerce.discount.CommerceDiscountValue;
 import com.liferay.commerce.discount.exception.CommerceDiscountCouponCodeException;
 import com.liferay.commerce.discount.exception.CommerceDiscountLimitationTimesException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
@@ -281,12 +279,18 @@ public class CommerceOrderLocalServiceImpl
 			commerceOrder, shippingAmount, shippingWithTaxAmount, subtotal,
 			subtotalWithTaxAmount, taxAmount, total, totalWithTaxAmount);
 
-		_setCommerceOrderShippingDiscountValue(commerceOrder, null, true);
-		_setCommerceOrderShippingDiscountValue(commerceOrder, null, false);
-		_setCommerceOrderSubtotalDiscountValue(commerceOrder, null, true);
-		_setCommerceOrderSubtotalDiscountValue(commerceOrder, null, false);
-		_setCommerceOrderTotalDiscountValue(commerceOrder, null, true);
-		_setCommerceOrderTotalDiscountValue(commerceOrder, null, false);
+		_commerceOrderHelper.setCommerceOrderShippingDiscountValue(
+			commerceOrder, null, true);
+		_commerceOrderHelper.setCommerceOrderShippingDiscountValue(
+			commerceOrder, null, false);
+		_commerceOrderHelper.setCommerceOrderSubtotalDiscountValue(
+			commerceOrder, null, true);
+		_commerceOrderHelper.setCommerceOrderSubtotalDiscountValue(
+			commerceOrder, null, false);
+		_commerceOrderHelper.setCommerceOrderTotalDiscountValue(
+			commerceOrder, null, true);
+		_commerceOrderHelper.setCommerceOrderTotalDiscountValue(
+			commerceOrder, null, false);
 
 		commerceOrder.setManuallyAdjusted(false);
 
@@ -1975,183 +1979,6 @@ public class CommerceOrderLocalServiceImpl
 		commerceOrder.setTaxAmount(taxAmount);
 		commerceOrder.setTotal(total);
 		commerceOrder.setTotalWithTaxAmount(totalWithTaxAmount);
-	}
-
-	private void _setCommerceOrderShippingDiscountValue(
-		CommerceOrder commerceOrder,
-		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
-
-		BigDecimal discountAmount = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel1 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel2 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel3 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel4 = BigDecimal.ZERO;
-
-		if (commerceDiscountValue != null) {
-			CommerceMoney discountAmountCommerceMoney =
-				commerceDiscountValue.getDiscountAmount();
-
-			discountAmount = discountAmountCommerceMoney.getPrice();
-
-			BigDecimal[] percentages = commerceDiscountValue.getPercentages();
-
-			if (percentages.length >= 1) {
-				discountPercentageLevel1 = percentages[0];
-			}
-
-			if (percentages.length >= 2) {
-				discountPercentageLevel2 = percentages[1];
-			}
-
-			if (percentages.length >= 3) {
-				discountPercentageLevel3 = percentages[2];
-			}
-
-			if (percentages.length >= 4) {
-				discountPercentageLevel4 = percentages[3];
-			}
-		}
-
-		if (withTaxAmount) {
-			commerceOrder.setShippingDiscountPercentageLevel1WithTaxAmount(
-				discountPercentageLevel1);
-			commerceOrder.setShippingDiscountPercentageLevel2WithTaxAmount(
-				discountPercentageLevel2);
-			commerceOrder.setShippingDiscountPercentageLevel3WithTaxAmount(
-				discountPercentageLevel3);
-			commerceOrder.setShippingDiscountPercentageLevel4WithTaxAmount(
-				discountPercentageLevel4);
-			commerceOrder.setShippingDiscountWithTaxAmount(discountAmount);
-		}
-		else {
-			commerceOrder.setShippingDiscountAmount(discountAmount);
-			commerceOrder.setShippingDiscountPercentageLevel1(
-				discountPercentageLevel1);
-			commerceOrder.setShippingDiscountPercentageLevel2(
-				discountPercentageLevel2);
-			commerceOrder.setShippingDiscountPercentageLevel3(
-				discountPercentageLevel3);
-			commerceOrder.setShippingDiscountPercentageLevel4(
-				discountPercentageLevel4);
-		}
-	}
-
-	private void _setCommerceOrderSubtotalDiscountValue(
-		CommerceOrder commerceOrder,
-		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
-
-		BigDecimal discountAmount = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel1 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel2 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel3 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel4 = BigDecimal.ZERO;
-
-		if (commerceDiscountValue != null) {
-			CommerceMoney discountAmountCommerceMoney =
-				commerceDiscountValue.getDiscountAmount();
-
-			discountAmount = discountAmountCommerceMoney.getPrice();
-
-			BigDecimal[] percentages = commerceDiscountValue.getPercentages();
-
-			if ((percentages.length >= 1) && (percentages[0] != null)) {
-				discountPercentageLevel1 = percentages[0];
-			}
-
-			if ((percentages.length >= 2) && (percentages[1] != null)) {
-				discountPercentageLevel2 = percentages[1];
-			}
-
-			if ((percentages.length >= 3) && (percentages[2] != null)) {
-				discountPercentageLevel3 = percentages[2];
-			}
-
-			if ((percentages.length >= 4) && (percentages[3] != null)) {
-				discountPercentageLevel4 = percentages[3];
-			}
-		}
-
-		if (withTaxAmount) {
-			commerceOrder.setSubtotalDiscountPercentageLevel1WithTaxAmount(
-				discountPercentageLevel1);
-			commerceOrder.setSubtotalDiscountPercentageLevel2WithTaxAmount(
-				discountPercentageLevel2);
-			commerceOrder.setSubtotalDiscountPercentageLevel3WithTaxAmount(
-				discountPercentageLevel3);
-			commerceOrder.setSubtotalDiscountPercentageLevel4WithTaxAmount(
-				discountPercentageLevel4);
-			commerceOrder.setSubtotalDiscountWithTaxAmount(discountAmount);
-		}
-		else {
-			commerceOrder.setSubtotalDiscountAmount(discountAmount);
-			commerceOrder.setSubtotalDiscountPercentageLevel1(
-				discountPercentageLevel1);
-			commerceOrder.setSubtotalDiscountPercentageLevel2(
-				discountPercentageLevel2);
-			commerceOrder.setSubtotalDiscountPercentageLevel3(
-				discountPercentageLevel3);
-			commerceOrder.setSubtotalDiscountPercentageLevel4(
-				discountPercentageLevel4);
-		}
-	}
-
-	private void _setCommerceOrderTotalDiscountValue(
-		CommerceOrder commerceOrder,
-		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
-
-		BigDecimal discountAmount = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel1 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel2 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel3 = BigDecimal.ZERO;
-		BigDecimal discountPercentageLevel4 = BigDecimal.ZERO;
-
-		if (commerceDiscountValue != null) {
-			CommerceMoney discountAmountCommerceMoney =
-				commerceDiscountValue.getDiscountAmount();
-
-			discountAmount = discountAmountCommerceMoney.getPrice();
-
-			BigDecimal[] percentages = commerceDiscountValue.getPercentages();
-
-			if (percentages.length >= 1) {
-				discountPercentageLevel1 = percentages[0];
-			}
-
-			if (percentages.length >= 2) {
-				discountPercentageLevel2 = percentages[1];
-			}
-
-			if (percentages.length >= 3) {
-				discountPercentageLevel3 = percentages[2];
-			}
-
-			if (percentages.length >= 4) {
-				discountPercentageLevel4 = percentages[3];
-			}
-		}
-
-		if (withTaxAmount) {
-			commerceOrder.setTotalDiscountPercentageLevel1WithTaxAmount(
-				discountPercentageLevel1);
-			commerceOrder.setTotalDiscountPercentageLevel2WithTaxAmount(
-				discountPercentageLevel2);
-			commerceOrder.setTotalDiscountPercentageLevel3WithTaxAmount(
-				discountPercentageLevel3);
-			commerceOrder.setTotalDiscountPercentageLevel4WithTaxAmount(
-				discountPercentageLevel4);
-			commerceOrder.setTotalDiscountWithTaxAmount(discountAmount);
-		}
-		else {
-			commerceOrder.setTotalDiscountAmount(discountAmount);
-			commerceOrder.setTotalDiscountPercentageLevel1(
-				discountPercentageLevel1);
-			commerceOrder.setTotalDiscountPercentageLevel2(
-				discountPercentageLevel2);
-			commerceOrder.setTotalDiscountPercentageLevel3(
-				discountPercentageLevel3);
-			commerceOrder.setTotalDiscountPercentageLevel4(
-				discountPercentageLevel4);
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

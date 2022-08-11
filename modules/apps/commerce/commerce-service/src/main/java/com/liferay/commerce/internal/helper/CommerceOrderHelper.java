@@ -115,52 +115,28 @@ public class CommerceOrderHelper {
 				totalWithTaxAmountCommerceMoney.getPrice());
 		}
 
-		_setCommerceOrderSubtotalDiscountValue(
+		setCommerceOrderSubtotalDiscountValue(
 			commerceOrder, commerceOrderPrice.getSubtotalDiscountValue(),
 			false);
-		_setCommerceOrderShippingDiscountValue(
+		setCommerceOrderShippingDiscountValue(
 			commerceOrder, commerceOrderPrice.getShippingDiscountValue(),
 			false);
-		_setCommerceOrderTotalDiscountValue(
+		setCommerceOrderTotalDiscountValue(
 			commerceOrder, commerceOrderPrice.getTotalDiscountValue(), false);
-		_setCommerceOrderSubtotalDiscountValue(
+		setCommerceOrderSubtotalDiscountValue(
 			commerceOrder,
 			commerceOrderPrice.getSubtotalDiscountValueWithTaxAmount(), true);
-		_setCommerceOrderShippingDiscountValue(
+		setCommerceOrderShippingDiscountValue(
 			commerceOrder,
 			commerceOrderPrice.getShippingDiscountValueWithTaxAmount(), true);
-		_setCommerceOrderTotalDiscountValue(
+		setCommerceOrderTotalDiscountValue(
 			commerceOrder,
 			commerceOrderPrice.getTotalDiscountValueWithTaxAmount(), true);
 
 		return _commerceOrderPersistence.update(commerceOrder);
 	}
 
-	public CommerceOrder updateStatus(
-			long userId, long commerceOrderId, int status,
-			ServiceContext serviceContext,
-			Map<String, Serializable> workflowContext)
-		throws PortalException {
-
-		if (userId == 0) {
-			userId = serviceContext.getUserId();
-		}
-
-		User user = _userLocalService.getUser(userId);
-		Date date = new Date();
-
-		CommerceOrder commerceOrder =
-			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
-
-		commerceOrder.setStatus(status);
-		commerceOrder.setStatusByUserId(user.getUserId());
-		commerceOrder.setStatusByUserName(user.getFullName());
-		commerceOrder.setStatusDate(serviceContext.getModifiedDate(date));
-
-		return _commerceOrderPersistence.update(commerceOrder);
-	}
-
-	private void _setCommerceOrderShippingDiscountValue(
+	public void setCommerceOrderShippingDiscountValue(
 		CommerceOrder commerceOrder,
 		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
 
@@ -219,7 +195,7 @@ public class CommerceOrderHelper {
 		}
 	}
 
-	private void _setCommerceOrderSubtotalDiscountValue(
+	public void setCommerceOrderSubtotalDiscountValue(
 		CommerceOrder commerceOrder,
 		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
 
@@ -278,7 +254,7 @@ public class CommerceOrderHelper {
 		}
 	}
 
-	private void _setCommerceOrderTotalDiscountValue(
+	public void setCommerceOrderTotalDiscountValue(
 		CommerceOrder commerceOrder,
 		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
 
@@ -335,6 +311,30 @@ public class CommerceOrderHelper {
 			commerceOrder.setTotalDiscountPercentageLevel4(
 				discountPercentageLevel4);
 		}
+	}
+
+	public CommerceOrder updateStatus(
+			long userId, long commerceOrderId, int status,
+			ServiceContext serviceContext,
+			Map<String, Serializable> workflowContext)
+		throws PortalException {
+
+		if (userId == 0) {
+			userId = serviceContext.getUserId();
+		}
+
+		User user = _userLocalService.getUser(userId);
+		Date date = new Date();
+
+		CommerceOrder commerceOrder =
+			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
+
+		commerceOrder.setStatus(status);
+		commerceOrder.setStatusByUserId(user.getUserId());
+		commerceOrder.setStatusByUserName(user.getFullName());
+		commerceOrder.setStatusDate(serviceContext.getModifiedDate(date));
+
+		return _commerceOrderPersistence.update(commerceOrder);
 	}
 
 	@Reference

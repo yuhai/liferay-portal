@@ -50,64 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(enabled = false, service = CommerceOrderItemHelper.class)
 public class CommerceOrderItemHelper {
 
-	public CommerceOrderItem updateCommerceOrderItemPrice(
-			long commerceOrderItemId, CommerceContext commerceContext)
-		throws PortalException {
-
-		CommerceOrderItem commerceOrderItem =
-			_commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
-
-		if (commerceOrderItem.isManuallyAdjusted() ||
-			(commerceOrderItem.getParentCommerceOrderItemId() != 0)) {
-
-			return commerceOrderItem;
-		}
-
-		CPInstance cpInstance = commerceOrderItem.fetchCPInstance();
-
-		if (cpInstance == null) {
-			return commerceOrderItem;
-		}
-
-		List<CommerceOrderItem> childCommerceOrderItems =
-			_commerceOrderItemPersistence.findByParentCommerceOrderItemId(
-				commerceOrderItemId);
-
-		for (CommerceOrderItem childCommerceOrderItem :
-				childCommerceOrderItems) {
-
-			CommerceOptionValue commerceOptionValue =
-				_commerceOptionValueHelper.toCommerceOptionValue(
-					childCommerceOrderItem.getJson());
-
-			if (!_isStaticPriceType(commerceOptionValue.getPriceType())) {
-				_setCommerceOrderItemPrice(
-					childCommerceOrderItem, null, commerceContext);
-			}
-			else {
-				_setCommerceOrderItemPrice(
-					childCommerceOrderItem,
-					_getStaticCommerceProductPrice(
-						commerceOptionValue.getCPInstanceId(),
-						childCommerceOrderItem.getQuantity(),
-						commerceOptionValue.getPrice(),
-						childCommerceOrderItem.getCommerceOrder(),
-						commerceContext.getCommerceCurrency()),
-					commerceContext);
-			}
-
-			_commerceOrderItemPersistence.update(childCommerceOrderItem);
-		}
-
-		commerceOrderItem = _commerceOrderItemPersistence.findByPrimaryKey(
-			commerceOrderItemId);
-
-		_setCommerceOrderItemPrice(commerceOrderItem, null, commerceContext);
-
-		return _commerceOrderItemPersistence.update(commerceOrderItem);
-	}
-
-	private CommerceProductPrice _getCommerceProductPrice(
+	public CommerceProductPrice getCommerceProductPrice(
 			long cpDefinitionId, long cpInstanceId, String json, int quantity,
 			CommerceContext commerceContext)
 		throws PortalException {
@@ -127,7 +70,7 @@ public class CommerceOrderItemHelper {
 			commerceProductPriceRequest);
 	}
 
-	private BigDecimal _getConvertedPrice(
+	public BigDecimal getConvertedPrice(
 			long cpInstanceId, BigDecimal price, CommerceOrder commerceOrder)
 		throws PortalException {
 
@@ -138,7 +81,7 @@ public class CommerceOrderItemHelper {
 			_commerceTaxCalculation);
 	}
 
-	private CommerceProductPrice _getStaticCommerceProductPrice(
+	public CommerceProductPrice getStaticCommerceProductPrice(
 			long cpInstanceId, int quantity, BigDecimal optionValuePrice,
 			CommerceOrder commerceOrder, CommerceCurrency commerceCurrency)
 		throws PortalException {
@@ -162,13 +105,13 @@ public class CommerceOrderItemHelper {
 		BigDecimal finalPriceWithTaxAmount = optionValuePrice;
 
 		if (cpInstanceId > 0) {
-			unitPriceWithTaxAmount = _getConvertedPrice(
+			unitPriceWithTaxAmount = getConvertedPrice(
 				cpInstanceId, optionValuePrice, commerceOrder);
 
 			optionValuePrice = optionValuePrice.multiply(
 				BigDecimal.valueOf(quantity));
 
-			finalPriceWithTaxAmount = _getConvertedPrice(
+			finalPriceWithTaxAmount = getConvertedPrice(
 				cpInstanceId, optionValuePrice, commerceOrder);
 		}
 
@@ -186,27 +129,7 @@ public class CommerceOrderItemHelper {
 		return commerceProductPriceImpl;
 	}
 
-	private List<CommerceOptionValue> _getStaticOptionValuesNotLinkedToSku(
-			long cpDefinitionId, String jsonArrayString)
-		throws PortalException {
-
-		List<CommerceOptionValue> commerceOptionValues =
-			_commerceOptionValueHelper.getCPDefinitionCommerceOptionValues(
-				cpDefinitionId, jsonArrayString);
-
-		Stream<CommerceOptionValue> commerceOptionValuesStream =
-			commerceOptionValues.stream();
-
-		Stream<CommerceOptionValue> commerceOptionValuesFiltered =
-			commerceOptionValuesStream.filter(
-				commerceOptionValue ->
-					_isStaticPriceType(commerceOptionValue.getPriceType()) &&
-					(commerceOptionValue.getCPInstanceId() == 0));
-
-		return commerceOptionValuesFiltered.collect(Collectors.toList());
-	}
-
-	private boolean _isStaticPriceType(Object value) {
+	public boolean isStaticPriceType(Object value) {
 		if (Objects.equals(
 				value, CPConstants.PRODUCT_OPTION_PRICE_TYPE_STATIC)) {
 
@@ -216,7 +139,7 @@ public class CommerceOrderItemHelper {
 		return false;
 	}
 
-	private void _setCommerceOrderItemDiscountValue(
+	public void setCommerceOrderItemDiscountValue(
 		CommerceOrderItem commerceOrderItem,
 		CommerceDiscountValue commerceDiscountValue, boolean includeTax) {
 
@@ -275,7 +198,7 @@ public class CommerceOrderItemHelper {
 		}
 	}
 
-	private void _setCommerceOrderItemPrice(
+	public void setCommerceOrderItemPrice(
 		CommerceOrderItem commerceOrderItem,
 		CommerceProductPrice commerceProductPrice) {
 
@@ -330,6 +253,83 @@ public class CommerceOrderItemHelper {
 			commerceProductPrice.getCommercePriceListId());
 	}
 
+	public CommerceOrderItem updateCommerceOrderItemPrice(
+			long commerceOrderItemId, CommerceContext commerceContext)
+		throws PortalException {
+
+		CommerceOrderItem commerceOrderItem =
+			_commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
+
+		if (commerceOrderItem.isManuallyAdjusted() ||
+			(commerceOrderItem.getParentCommerceOrderItemId() != 0)) {
+
+			return commerceOrderItem;
+		}
+
+		CPInstance cpInstance = commerceOrderItem.fetchCPInstance();
+
+		if (cpInstance == null) {
+			return commerceOrderItem;
+		}
+
+		List<CommerceOrderItem> childCommerceOrderItems =
+			_commerceOrderItemPersistence.findByParentCommerceOrderItemId(
+				commerceOrderItemId);
+
+		for (CommerceOrderItem childCommerceOrderItem :
+				childCommerceOrderItems) {
+
+			CommerceOptionValue commerceOptionValue =
+				_commerceOptionValueHelper.toCommerceOptionValue(
+					childCommerceOrderItem.getJson());
+
+			if (!isStaticPriceType(commerceOptionValue.getPriceType())) {
+				_setCommerceOrderItemPrice(
+					childCommerceOrderItem, null, commerceContext);
+			}
+			else {
+				_setCommerceOrderItemPrice(
+					childCommerceOrderItem,
+					getStaticCommerceProductPrice(
+						commerceOptionValue.getCPInstanceId(),
+						childCommerceOrderItem.getQuantity(),
+						commerceOptionValue.getPrice(),
+						childCommerceOrderItem.getCommerceOrder(),
+						commerceContext.getCommerceCurrency()),
+					commerceContext);
+			}
+
+			_commerceOrderItemPersistence.update(childCommerceOrderItem);
+		}
+
+		commerceOrderItem = _commerceOrderItemPersistence.findByPrimaryKey(
+			commerceOrderItemId);
+
+		_setCommerceOrderItemPrice(commerceOrderItem, null, commerceContext);
+
+		return _commerceOrderItemPersistence.update(commerceOrderItem);
+	}
+
+	private List<CommerceOptionValue> _getStaticOptionValuesNotLinkedToSku(
+			long cpDefinitionId, String jsonArrayString)
+		throws PortalException {
+
+		List<CommerceOptionValue> commerceOptionValues =
+			_commerceOptionValueHelper.getCPDefinitionCommerceOptionValues(
+				cpDefinitionId, jsonArrayString);
+
+		Stream<CommerceOptionValue> commerceOptionValuesStream =
+			commerceOptionValues.stream();
+
+		Stream<CommerceOptionValue> commerceOptionValuesFiltered =
+			commerceOptionValuesStream.filter(
+				commerceOptionValue ->
+					isStaticPriceType(commerceOptionValue.getPriceType()) &&
+					(commerceOptionValue.getCPInstanceId() == 0));
+
+		return commerceOptionValuesFiltered.collect(Collectors.toList());
+	}
+
 	private void _setCommerceOrderItemPrice(
 			CommerceOrderItem commerceOrderItem,
 			CommerceProductPrice commerceProductPrice,
@@ -343,19 +343,19 @@ public class CommerceOrderItemHelper {
 		}
 
 		if (commerceProductPrice == null) {
-			commerceProductPrice = _getCommerceProductPrice(
+			commerceProductPrice = getCommerceProductPrice(
 				commerceOrderItem.getCPDefinitionId(),
 				commerceOrderItem.getCPInstanceId(),
 				commerceOrderItem.getJson(), commerceOrderItem.getQuantity(),
 				commerceContext);
 		}
 
-		_setCommerceOrderItemPrice(commerceOrderItem, commerceProductPrice);
+		setCommerceOrderItemPrice(commerceOrderItem, commerceProductPrice);
 
-		_setCommerceOrderItemDiscountValue(
+		setCommerceOrderItemDiscountValue(
 			commerceOrderItem, commerceProductPrice.getDiscountValue(), false);
 
-		_setCommerceOrderItemDiscountValue(
+		setCommerceOrderItemDiscountValue(
 			commerceOrderItem,
 			commerceProductPrice.getDiscountValueWithTaxAmount(), true);
 	}
