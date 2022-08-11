@@ -21,7 +21,7 @@ import com.liferay.commerce.exception.CommerceAddressNameException;
 import com.liferay.commerce.exception.CommerceAddressStreetException;
 import com.liferay.commerce.exception.CommerceAddressTypeException;
 import com.liferay.commerce.exception.CommerceAddressZipException;
-import com.liferay.commerce.internal.util.CommerceOrderUtil;
+import com.liferay.commerce.internal.helper.CommerceOrderHelper;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceGeocoder;
 import com.liferay.commerce.model.CommerceOrder;
@@ -598,8 +598,8 @@ public class CommerceAddressLocalServiceImpl
 			CommerceOrder.class);
 
 		for (CommerceOrder commerceOrder : commerceOrders) {
-			commerceOrder = CommerceOrderUtil.resetCommerceOrderShipping(
-				commerceOrder.getCommerceOrderId(), _commerceOrderPersistence);
+			commerceOrder = _commerceOrderHelper.resetCommerceOrderShipping(
+				commerceOrder.getCommerceOrderId());
 
 			indexer.reindex(
 				CommerceOrder.class.getName(),
@@ -706,6 +706,9 @@ public class CommerceAddressLocalServiceImpl
 
 	@Reference
 	private CommerceGeocoder _commerceGeocoder;
+
+	@Reference
+	private CommerceOrderHelper _commerceOrderHelper;
 
 	@Reference
 	private CommerceOrderPersistence _commerceOrderPersistence;

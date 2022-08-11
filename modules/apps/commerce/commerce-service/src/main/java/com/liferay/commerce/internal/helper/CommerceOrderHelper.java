@@ -136,6 +136,19 @@ public class CommerceOrderHelper {
 		return _commerceOrderPersistence.update(commerceOrder);
 	}
 
+	public CommerceOrder resetCommerceOrderShipping(long commerceOrderId)
+		throws PortalException {
+
+		CommerceOrder commerceOrder =
+			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
+
+		commerceOrder.setCommerceShippingMethodId(0);
+		commerceOrder.setShippingAmount(BigDecimal.ZERO);
+		commerceOrder.setShippingOptionName(null);
+
+		return _commerceOrderPersistence.update(commerceOrder);
+	}
+
 	public void setCommerceOrderShippingDiscountValue(
 		CommerceOrder commerceOrder,
 		CommerceDiscountValue commerceDiscountValue, boolean withTaxAmount) {
