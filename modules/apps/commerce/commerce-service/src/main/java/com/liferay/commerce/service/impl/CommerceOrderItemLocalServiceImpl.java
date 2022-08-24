@@ -53,6 +53,7 @@ import com.liferay.commerce.product.service.CPDefinitionOptionRelLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.commerce.product.util.JsonHelper;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.base.CommerceOrderItemLocalServiceBaseImpl;
 import com.liferay.commerce.tax.CommerceTaxCalculation;
 import com.liferay.commerce.util.CommerceShippingHelper;
@@ -61,6 +62,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -73,7 +75,7 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
@@ -85,10 +87,9 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.math.BigDecimal;
 
@@ -101,12 +102,20 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  * @author Ethan Bustad
  * @author Igor Beslic
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceOrderItem",
+	service = AopService.class
+)
 public class CommerceOrderItemLocalServiceImpl
 	extends CommerceOrderItemLocalServiceBaseImpl {
 
@@ -123,7 +132,7 @@ public class CommerceOrderItemLocalServiceImpl
 		}
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 
 		CPInstance cpInstance = _cpInstanceLocalService.getCPInstance(
 			cpInstanceId);
@@ -192,7 +201,7 @@ public class CommerceOrderItemLocalServiceImpl
 			commerceOrderItemPersistence.update(childCommerceOrderItem);
 		}
 
-		commerceOrderLocalService.recalculatePrice(
+		_commerceOrderLocalService.recalculatePrice(
 			commerceOrderItem.getCommerceOrderId(), commerceContext);
 
 		return commerceOrderItem;
@@ -272,12 +281,12 @@ public class CommerceOrderItemLocalServiceImpl
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
 
 		if (_commerceShippingHelper.isFreeShipping(commerceOrder)) {
-			commerceOrderLocalService.updateCommerceShippingMethod(
+			_commerceOrderLocalService.updateCommerceShippingMethod(
 				commerceOrder.getCommerceOrderId(), 0, null, BigDecimal.ZERO,
 				commerceContext);
 		}
 
-		commerceOrderLocalService.recalculatePrice(
+		_commerceOrderLocalService.recalculatePrice(
 			commerceOrder.getCommerceOrderId(), commerceContext);
 
 		return commerceOrderItem;
@@ -501,7 +510,7 @@ public class CommerceOrderItemLocalServiceImpl
 		throws PortalException {
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 
 		CPInstance cpInstance = _cpInstanceLocalService.getCPInstance(
 			cpInstanceId);
@@ -836,7 +845,7 @@ public class CommerceOrderItemLocalServiceImpl
 			int requestedDeliveryDateYear)
 		throws PortalException {
 
-		Date requestedDeliveryDate = PortalUtil.getDate(
+		Date requestedDeliveryDate = _portal.getDate(
 			requestedDeliveryDateMonth, requestedDeliveryDateDay,
 			requestedDeliveryDateYear);
 
@@ -1145,7 +1154,7 @@ public class CommerceOrderItemLocalServiceImpl
 		SearchContext searchContext = new SearchContext();
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 
 		searchContext.setAttribute(
 			CommerceOrderItemIndexer.FIELD_COMMERCE_ORDER_ID, commerceOrderId);
@@ -1204,7 +1213,7 @@ public class CommerceOrderItemLocalServiceImpl
 		throws PortalException {
 
 		Indexer<CommerceOrderItem> indexer =
-			IndexerRegistryUtil.nullSafeGetIndexer(CommerceOrderItem.class);
+			_indexerRegistry.nullSafeGetIndexer(CommerceOrderItem.class);
 
 		for (int i = 0; i < 10; i++) {
 			Hits hits = indexer.search(searchContext, _SELECTED_FIELD_NAMES);
@@ -1233,7 +1242,7 @@ public class CommerceOrderItemLocalServiceImpl
 				CommerceOrderConstants.TYPE_PK_APPROVAL, true);
 
 		if ((workflowDefinitionLink != null) && commerceOrder.isApproved()) {
-			return commerceOrderLocalService.updateStatus(
+			return _commerceOrderLocalService.updateStatus(
 				serviceContext.getUserId(), commerceOrder.getCommerceOrderId(),
 				WorkflowConstants.STATUS_DRAFT, serviceContext,
 				Collections.emptyMap());
@@ -1981,7 +1990,7 @@ public class CommerceOrderItemLocalServiceImpl
 			commerceOrderItem);
 
 		if (commerceOrder.isOpen()) {
-			commerceOrderLocalService.recalculatePrice(
+			_commerceOrderLocalService.recalculatePrice(
 				commerceOrderItem.getCommerceOrderId(), commerceContext);
 		}
 
@@ -2021,55 +2030,64 @@ public class CommerceOrderItemLocalServiceImpl
 		Field.ENTRY_CLASS_PK, Field.COMPANY_ID, Field.UID
 	};
 
-	@ServiceReference(type = CommerceInventoryBookedQuantityLocalService.class)
+	@Reference
 	private CommerceInventoryBookedQuantityLocalService
 		_commerceInventoryBookedQuantityLocalService;
 
-	@ServiceReference(type = CommerceInventoryWarehouseItemLocalService.class)
+	@Reference
 	private CommerceInventoryWarehouseItemLocalService
 		_commerceInventoryWarehouseItemLocalService;
 
-	@ServiceReference(type = CommerceMoneyFactory.class)
+	@Reference
 	private CommerceMoneyFactory _commerceMoneyFactory;
 
-	@ServiceReference(type = CommerceOptionValueHelper.class)
+	@Reference
 	private CommerceOptionValueHelper _commerceOptionValueHelper;
 
-	@ServiceReference(type = CommerceOrderConfiguration.class)
+	@Reference
 	private CommerceOrderConfiguration _commerceOrderConfiguration;
 
-	@ServiceReference(type = CommerceOrderValidatorRegistry.class)
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
+
+	@Reference
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
 
-	@ServiceReference(type = CommerceProductPriceCalculation.class)
+	@Reference
 	private CommerceProductPriceCalculation _commerceProductPriceCalculation;
 
-	@ServiceReference(type = CommerceShippingHelper.class)
+	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
 
-	@ServiceReference(type = CommerceTaxCalculation.class)
+	@Reference
 	private CommerceTaxCalculation _commerceTaxCalculation;
 
-	@ServiceReference(type = CPDefinitionLocalService.class)
+	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
-	@ServiceReference(type = CPDefinitionOptionRelLocalService.class)
+	@Reference
 	private CPDefinitionOptionRelLocalService
 		_cpDefinitionOptionRelLocalService;
 
-	@ServiceReference(type = CPInstanceLocalService.class)
+	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
 
-	@ServiceReference(type = CPMeasurementUnitLocalService.class)
+	@Reference
 	private CPMeasurementUnitLocalService _cpMeasurementUnitLocalService;
 
-	@ServiceReference(type = ExpandoRowLocalService.class)
+	@Reference
 	private ExpandoRowLocalService _expandoRowLocalService;
 
-	@ServiceReference(type = JsonHelper.class)
+	@Reference
+	private IndexerRegistry _indexerRegistry;
+
+	@Reference
 	private JsonHelper _jsonHelper;
 
-	@ServiceReference(type = WorkflowDefinitionLinkLocalService.class)
+	@Reference
+	private Portal _portal;
+
+	@Reference
 	private WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
 

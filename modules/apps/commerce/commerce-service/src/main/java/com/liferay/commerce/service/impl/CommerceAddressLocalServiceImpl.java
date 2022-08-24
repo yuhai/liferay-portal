@@ -21,11 +21,13 @@ import com.liferay.commerce.exception.CommerceAddressNameException;
 import com.liferay.commerce.exception.CommerceAddressStreetException;
 import com.liferay.commerce.exception.CommerceAddressTypeException;
 import com.liferay.commerce.exception.CommerceAddressZipException;
+import com.liferay.commerce.internal.util.CommerceOrderUtil;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceGeocoder;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.impl.CommerceAddressImpl;
 import com.liferay.commerce.service.base.CommerceAddressLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Group;
@@ -33,6 +35,8 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.AddressLocalService;
@@ -42,7 +46,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.math.BigDecimal;
@@ -51,10 +54,18 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  * @author Alec Sloan
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceAddress",
+	service = AopService.class
+)
 public class CommerceAddressLocalServiceImpl
 	extends CommerceAddressLocalServiceBaseImpl {
 
@@ -169,15 +180,14 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByBillingAddress(
+			commerceOrderPersistence.findByBillingAddressId(
 				commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
 
-		commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddress.getCommerceAddressId());
+		commerceOrders = commerceOrderPersistence.findByShippingAddressId(
+			commerceAddress.getCommerceAddressId());
 
 		removeCommerceOrderAddresses(
 			commerceOrders, commerceAddress.getCommerceAddressId());
@@ -579,11 +589,17 @@ public class CommerceAddressLocalServiceImpl
 		// Commerce orders
 
 		List<CommerceOrder> commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddressId);
+			commerceOrderPersistence.findByShippingAddressId(commerceAddressId);
+
+		Indexer<CommerceOrder> indexer = _indexerRegistry.nullSafeGetIndexer(
+			CommerceOrder.class);
 
 		for (CommerceOrder commerceOrder : commerceOrders) {
-			commerceOrderLocalService.resetCommerceOrderShipping(
+			commerceOrder = CommerceOrderUtil.resetCommerceOrderShipping(
+				commerceOrder.getCommerceOrderId(), commerceOrderPersistence);
+
+			indexer.reindex(
+				CommerceOrder.class.getName(),
 				commerceOrder.getCommerceOrderId());
 		}
 
@@ -615,14 +631,21 @@ public class CommerceAddressLocalServiceImpl
 				shippingPrice = BigDecimal.ZERO;
 			}
 
-			commerceOrderLocalService.updateCommerceOrder(
-				null, commerceOrder.getCommerceOrderId(), billingAddressId,
-				commerceShippingMethodId, shippingAddressId,
-				commerceOrder.getAdvanceStatus(),
-				commerceOrder.getCommercePaymentMethodKey(),
-				commerceOrder.getPurchaseOrderNumber(), shippingPrice,
-				shippingOptionName, commerceOrder.getSubtotal(),
-				commerceOrder.getTotal(), null);
+			commerceOrder.setExternalReferenceCode(null);
+			commerceOrder.setBillingAddressId(billingAddressId);
+			commerceOrder.setShippingAddressId(shippingAddressId);
+			commerceOrder.setCommerceShippingMethodId(commerceShippingMethodId);
+			commerceOrder.setShippingOptionName(shippingOptionName);
+			commerceOrder.setShippingAmount(shippingPrice);
+
+			commerceOrder = commerceOrderPersistence.update(commerceOrder);
+
+			Indexer<CommerceOrder> indexer =
+				_indexerRegistry.nullSafeGetIndexer(CommerceOrder.class);
+
+			indexer.reindex(
+				CommerceOrder.class.getName(),
+				commerceOrder.getCommerceOrderId());
 		}
 	}
 
@@ -675,13 +698,16 @@ public class CommerceAddressLocalServiceImpl
 		};
 	}
 
-	@ServiceReference(type = AddressLocalService.class)
+	@Reference
 	private AddressLocalService _addressLocalService;
 
-	@ServiceReference(type = CommerceGeocoder.class)
+	@Reference
 	private CommerceGeocoder _commerceGeocoder;
 
-	@ServiceReference(type = GroupLocalService.class)
+	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
 
 }

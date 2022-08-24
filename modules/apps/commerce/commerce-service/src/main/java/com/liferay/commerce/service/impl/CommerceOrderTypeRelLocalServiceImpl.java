@@ -30,21 +30,29 @@ import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.query.FromStep;
 import com.liferay.petra.sql.dsl.query.GroupByStep;
 import com.liferay.petra.sql.dsl.query.JoinStep;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceOrderTypeRel",
+	service = AopService.class
+)
 public class CommerceOrderTypeRelLocalServiceImpl
 	extends CommerceOrderTypeRelLocalServiceBaseImpl {
 
@@ -235,7 +243,7 @@ public class CommerceOrderTypeRelLocalServiceImpl
 		throws PortalException {
 
 		Indexer<CommerceOrderType> indexer =
-			IndexerRegistryUtil.nullSafeGetIndexer(CommerceOrderType.class);
+			_indexerRegistry.nullSafeGetIndexer(CommerceOrderType.class);
 
 		indexer.reindex(CommerceOrderType.class.getName(), commerceOrderTypeId);
 	}
@@ -254,7 +262,10 @@ public class CommerceOrderTypeRelLocalServiceImpl
 		}
 	}
 
-	@ServiceReference(type = CustomSQL.class)
+	@Reference
 	private CustomSQL _customSQL;
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
 
 }
