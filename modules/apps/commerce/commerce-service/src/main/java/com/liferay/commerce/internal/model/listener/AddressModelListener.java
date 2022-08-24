@@ -37,6 +37,10 @@ public class AddressModelListener extends BaseModelListener<Address> {
 
 	@Override
 	public void onAfterRemove(Address address) throws ModelListenerException {
+		if (!_isCommerceModel(address)) {
+			return;
+		}
+
 		try {
 			List<CommerceOrder> commerceOrders =
 				_commerceOrderLocalService.getCommerceOrdersByBillingAddress(
@@ -61,6 +65,10 @@ public class AddressModelListener extends BaseModelListener<Address> {
 	public void onAfterUpdate(Address originalAddress, Address address)
 		throws ModelListenerException {
 
+		if (!_isCommerceModel(address)) {
+			return;
+		}
+
 		try {
 			List<CommerceOrder> commerceOrders =
 				_commerceOrderLocalService.getCommerceOrdersByShippingAddress(
@@ -74,6 +82,12 @@ public class AddressModelListener extends BaseModelListener<Address> {
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
 		}
+	}
+
+	private boolean _isCommerceModel(Address address) {
+		String className = address.getClassName();
+
+		return className.startsWith("com.liferay.commerce");
 	}
 
 	private void _removeCommerceOrderAddresses(
