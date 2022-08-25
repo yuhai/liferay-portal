@@ -283,8 +283,6 @@ public class CommerceOrderItemLocalServiceImpl
 			commerceOrder = _commerceOrderHelper.updateCommerceShippingMethod(
 				commerceOrder.getCommerceOrderId(), 0, null, BigDecimal.ZERO,
 				commerceContext);
-
-			_reindexCommerceOrder(commerceOrder.getCommerceOrderId());
 		}
 
 		commerceOrder = _commerceOrderHelper.recalculatePrice(
