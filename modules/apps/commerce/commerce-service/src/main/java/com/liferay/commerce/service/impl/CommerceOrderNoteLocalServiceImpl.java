@@ -19,16 +19,27 @@ import com.liferay.commerce.exception.DuplicateCommerceOrderNoteException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderNote;
 import com.liferay.commerce.service.base.CommerceOrderNoteLocalServiceBaseImpl;
+import com.liferay.commerce.service.persistence.CommerceOrderPersistence;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceOrderNote",
+	service = AopService.class
+)
 public class CommerceOrderNoteLocalServiceImpl
 	extends CommerceOrderNoteLocalServiceBaseImpl {
 
@@ -49,8 +60,8 @@ public class CommerceOrderNoteLocalServiceImpl
 		throws PortalException {
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
-		User user = userLocalService.getUser(serviceContext.getUserId());
+			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
+		User user = _userLocalService.getUser(serviceContext.getUserId());
 
 		validate(content);
 
@@ -217,5 +228,11 @@ public class CommerceOrderNoteLocalServiceImpl
 					"reference code " + externalReferenceCode);
 		}
 	}
+
+	@Reference
+	private CommerceOrderPersistence _commerceOrderPersistence;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

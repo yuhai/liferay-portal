@@ -17,12 +17,22 @@ package com.liferay.commerce.service.impl;
 import com.liferay.commerce.exception.DuplicateCommerceShippingOptionAccountEntryRelException;
 import com.liferay.commerce.model.CommerceShippingOptionAccountEntryRel;
 import com.liferay.commerce.service.base.CommerceShippingOptionAccountEntryRelLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.UserLocalService;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceShippingOptionAccountEntryRel",
+	service = AopService.class
+)
 public class CommerceShippingOptionAccountEntryRelLocalServiceImpl
 	extends CommerceShippingOptionAccountEntryRelLocalServiceBaseImpl {
 
@@ -44,7 +54,7 @@ public class CommerceShippingOptionAccountEntryRelLocalServiceImpl
 				commerceShippingOptionAccountEntryRelPersistence.create(
 					commerceShippingOptionAccountEntryRelId);
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		commerceShippingOptionAccountEntryRel.setCompanyId(user.getCompanyId());
 		commerceShippingOptionAccountEntryRel.setUserId(user.getUserId());
@@ -129,5 +139,8 @@ public class CommerceShippingOptionAccountEntryRelLocalServiceImpl
 			throw new DuplicateCommerceShippingOptionAccountEntryRelException();
 		}
 	}
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

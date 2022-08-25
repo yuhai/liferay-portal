@@ -15,11 +15,14 @@
 package com.liferay.commerce.service.impl;
 
 import com.liferay.commerce.model.CommerceAvailabilityEstimate;
+import com.liferay.commerce.service.CPDAvailabilityEstimateLocalService;
 import com.liferay.commerce.service.base.CommerceAvailabilityEstimateLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
@@ -27,9 +30,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Alessio Antonio Rendina
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceAvailabilityEstimate",
+	service = AopService.class
+)
 public class CommerceAvailabilityEstimateLocalServiceImpl
 	extends CommerceAvailabilityEstimateLocalServiceBaseImpl {
 
@@ -39,7 +50,7 @@ public class CommerceAvailabilityEstimateLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userLocalService.getUser(serviceContext.getUserId());
+		User user = _userLocalService.getUser(serviceContext.getUserId());
 
 		long commerceAvailabilityEstimateId = counterLocalService.increment();
 
@@ -70,7 +81,7 @@ public class CommerceAvailabilityEstimateLocalServiceImpl
 
 		// Commerce product definition availability ranges
 
-		cpdAvailabilityEstimateLocalService.deleteCPDAvailabilityEstimates(
+		_cpdAvailabilityEstimateLocalService.deleteCPDAvailabilityEstimates(
 			commerceAvailabilityEstimate.getCommerceAvailabilityEstimateId());
 
 		return commerceAvailabilityEstimate;
@@ -136,5 +147,12 @@ public class CommerceAvailabilityEstimateLocalServiceImpl
 		return commerceAvailabilityEstimatePersistence.update(
 			commerceAvailabilityEstimate);
 	}
+
+	@Reference
+	private CPDAvailabilityEstimateLocalService
+		_cpdAvailabilityEstimateLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

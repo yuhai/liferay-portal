@@ -29,6 +29,7 @@ import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.CPSubscriptionType;
 import com.liferay.commerce.product.util.CPSubscriptionTypeRegistry;
 import com.liferay.commerce.service.base.CommerceSubscriptionEntryLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -44,21 +45,21 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.kernel.uuid.PortalUUID;
 
 import java.io.Serializable;
 
@@ -66,10 +67,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Alessio Antonio Rendina
  * @author Luca Pellizzon
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceSubscriptionEntry",
+	service = AopService.class
+)
 public class CommerceSubscriptionEntryLocalServiceImpl
 	extends CommerceSubscriptionEntryLocalServiceBaseImpl {
 
@@ -104,7 +113,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 			UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties)
 		throws PortalException {
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		CPSubscriptionType cpSubscriptionType =
 			_cpSubscriptionTypeRegistry.getCPSubscriptionType(subscriptionType);
@@ -119,7 +128,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 			commerceSubscriptionEntryPersistence.create(
 				commerceSubscriptionEntryId);
 
-		commerceSubscriptionEntry.setUuid(PortalUUIDUtil.generate());
+		commerceSubscriptionEntry.setUuid(_portalUUID.generate());
 		commerceSubscriptionEntry.setGroupId(groupId);
 		commerceSubscriptionEntry.setCompanyId(user.getCompanyId());
 		commerceSubscriptionEntry.setUserId(user.getUserId());
@@ -311,7 +320,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 		commerceSubscriptionEntry.setDeliveryCurrentCycle(
 			currentSubscriptionCycle + 1);
 
-		User user = userLocalService.getUser(
+		User user = _userLocalService.getUser(
 			commerceSubscriptionEntry.getUserId());
 
 		commerceSubscriptionEntry.setDeliveryLastIterationDate(
@@ -377,7 +386,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 
 		commerceSubscriptionEntry.setCurrentCycle(currentSubscriptionCycle + 1);
 
-		User user = userLocalService.getUser(
+		User user = _userLocalService.getUser(
 			commerceSubscriptionEntry.getUserId());
 
 		commerceSubscriptionEntry.setLastIterationDate(
@@ -499,7 +508,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 			commerceSubscriptionEntryPersistence.findByPrimaryKey(
 				commerceSubscriptionEntryId);
 
-		User user = userLocalService.getUser(
+		User user = _userLocalService.getUser(
 			commerceSubscriptionEntry.getUserId());
 
 		validateSubscriptionStatus(
@@ -523,7 +532,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 					SUBSCRIPTION_STATUS_INACTIVE) {
 
 			commerceSubscriptionEntry.setNextIterationDate(
-				PortalUtil.getDate(
+				_portal.getDate(
 					nextIterationDateMonth, nextIterationDateDay,
 					nextIterationDateYear, nextIterationDateHour,
 					nextIterationDateMinute, user.getTimeZone(),
@@ -546,7 +555,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 					SUBSCRIPTION_STATUS_INACTIVE) {
 
 			commerceSubscriptionEntry.setDeliveryNextIterationDate(
-				PortalUtil.getDate(
+				_portal.getDate(
 					deliveryNextIterationDateMonth,
 					deliveryNextIterationDateDay, deliveryNextIterationDateYear,
 					deliveryNextIterationDateHour,
@@ -576,7 +585,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 			_cpSubscriptionTypeRegistry.getCPSubscriptionType(
 				commerceSubscriptionEntry.getSubscriptionType());
 
-		User user = userLocalService.getUser(
+		User user = _userLocalService.getUser(
 			commerceSubscriptionEntry.getUserId());
 
 		commerceSubscriptionEntry.setLastIterationDate(lastIterationDate);
@@ -718,7 +727,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 				commerceSubscriptionEntries = null;
 
 				Indexer<CommerceSubscriptionEntry> indexer =
-					IndexerRegistryUtil.getIndexer(
+					_indexerRegistry.getIndexer(
 						CommerceSubscriptionEntry.class);
 
 				long companyId = GetterUtil.getLong(
@@ -739,7 +748,7 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 		throws PortalException {
 
 		Indexer<CommerceSubscriptionEntry> indexer =
-			IndexerRegistryUtil.nullSafeGetIndexer(
+			_indexerRegistry.nullSafeGetIndexer(
 				CommerceSubscriptionEntry.class);
 
 		for (int i = 0; i < 10; i++) {
@@ -809,19 +818,31 @@ public class CommerceSubscriptionEntryLocalServiceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceSubscriptionEntryLocalServiceImpl.class);
 
-	@ServiceReference(type = CommerceChannelLocalService.class)
+	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
-	@ServiceReference(type = CommerceNotificationHelper.class)
+	@Reference
 	private CommerceNotificationHelper _commerceNotificationHelper;
 
-	@ServiceReference(type = CPDefinitionLocalService.class)
+	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
-	@ServiceReference(type = CPInstanceLocalService.class)
+	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
 
-	@ServiceReference(type = CPSubscriptionTypeRegistry.class)
+	@Reference
 	private CPSubscriptionTypeRegistry _cpSubscriptionTypeRegistry;
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private PortalUUID _portalUUID;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

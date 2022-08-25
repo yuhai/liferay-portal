@@ -17,19 +17,30 @@ package com.liferay.commerce.service.impl;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderPayment;
 import com.liferay.commerce.service.base.CommerceOrderPaymentLocalServiceBaseImpl;
+import com.liferay.commerce.service.persistence.CommerceOrderPersistence;
 import com.liferay.commerce.util.comparator.CommerceOrderPaymentCreateDateComparator;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Di Giorgi
  * @author Luca Pellizzon
  * @author Alessio Antonio Rendina
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceOrderPayment",
+	service = AopService.class
+)
 public class CommerceOrderPaymentLocalServiceImpl
 	extends CommerceOrderPaymentLocalServiceBaseImpl {
 
@@ -39,9 +50,9 @@ public class CommerceOrderPaymentLocalServiceImpl
 		throws PortalException {
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId);
+			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
 
-		User user = userLocalService.getUser(commerceOrder.getUserId());
+		User user = _userLocalService.getUser(commerceOrder.getUserId());
 
 		return _getCommerceOrderPayment(status, result, commerceOrder, user);
 	}
@@ -54,8 +65,8 @@ public class CommerceOrderPaymentLocalServiceImpl
 
 		return _getCommerceOrderPayment(
 			status, content,
-			commerceOrderLocalService.getCommerceOrder(commerceOrderId),
-			userLocalService.getUser(serviceContext.getUserId()));
+			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId),
+			_userLocalService.getUser(serviceContext.getUserId()));
 	}
 
 	@Override
@@ -109,5 +120,11 @@ public class CommerceOrderPaymentLocalServiceImpl
 
 		return commerceOrderPaymentPersistence.update(commerceOrderPayment);
 	}
+
+	@Reference
+	private CommerceOrderPersistence _commerceOrderPersistence;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

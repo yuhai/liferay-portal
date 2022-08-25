@@ -23,9 +23,9 @@ import com.liferay.commerce.exception.CommerceAddressTypeException;
 import com.liferay.commerce.exception.CommerceAddressZipException;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceGeocoder;
-import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.impl.CommerceAddressImpl;
 import com.liferay.commerce.service.base.CommerceAddressLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Group;
@@ -38,23 +38,29 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.AddressLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.vulcan.util.TransformUtil;
-
-import java.math.BigDecimal;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Andrea Di Giorgi
  * @author Alec Sloan
  */
+@Component(
+	enabled = false,
+	property = "model.class.name=com.liferay.commerce.model.CommerceAddress",
+	service = AopService.class
+)
 public class CommerceAddressLocalServiceImpl
 	extends CommerceAddressLocalServiceBaseImpl {
 
@@ -112,7 +118,7 @@ public class CommerceAddressLocalServiceImpl
 
 		validate(name, street1, city, zip, countryId, type);
 
-		User user = userLocalService.getUser(serviceContext.getUserId());
+		User user = _userLocalService.getUser(serviceContext.getUserId());
 
 		return CommerceAddressImpl.fromAddress(
 			_addressLocalService.addAddress(
@@ -165,22 +171,6 @@ public class CommerceAddressLocalServiceImpl
 
 		_addressLocalService.deleteAddress(
 			commerceAddress.getCommerceAddressId());
-
-		// Commerce orders
-
-		List<CommerceOrder> commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByBillingAddress(
-				commerceAddress.getCommerceAddressId());
-
-		removeCommerceOrderAddresses(
-			commerceOrders, commerceAddress.getCommerceAddressId());
-
-		commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddress.getCommerceAddressId());
-
-		removeCommerceOrderAddresses(
-			commerceOrders, commerceAddress.getCommerceAddressId());
 
 		return commerceAddress;
 	}
@@ -576,54 +566,7 @@ public class CommerceAddressLocalServiceImpl
 			CommerceAddressImpl.toAddressTypeId(type), address.isMailing(),
 			address.isPrimary(), phoneNumber);
 
-		// Commerce orders
-
-		List<CommerceOrder> commerceOrders =
-			commerceOrderLocalService.getCommerceOrdersByShippingAddress(
-				commerceAddressId);
-
-		for (CommerceOrder commerceOrder : commerceOrders) {
-			commerceOrderLocalService.resetCommerceOrderShipping(
-				commerceOrder.getCommerceOrderId());
-		}
-
 		return CommerceAddressImpl.fromAddress(address);
-	}
-
-	protected void removeCommerceOrderAddresses(
-			List<CommerceOrder> commerceOrders, long commerceAddressId)
-		throws PortalException {
-
-		for (CommerceOrder commerceOrder : commerceOrders) {
-			long billingAddressId = commerceOrder.getBillingAddressId();
-			long shippingAddressId = commerceOrder.getShippingAddressId();
-
-			long commerceShippingMethodId =
-				commerceOrder.getCommerceShippingMethodId();
-			String shippingOptionName = commerceOrder.getShippingOptionName();
-			BigDecimal shippingPrice = commerceOrder.getShippingAmount();
-
-			if (billingAddressId == commerceAddressId) {
-				billingAddressId = 0;
-			}
-
-			if (shippingAddressId == commerceAddressId) {
-				shippingAddressId = 0;
-
-				commerceShippingMethodId = 0;
-				shippingOptionName = null;
-				shippingPrice = BigDecimal.ZERO;
-			}
-
-			commerceOrderLocalService.updateCommerceOrder(
-				null, commerceOrder.getCommerceOrderId(), billingAddressId,
-				commerceShippingMethodId, shippingAddressId,
-				commerceOrder.getAdvanceStatus(),
-				commerceOrder.getCommercePaymentMethodKey(),
-				commerceOrder.getPurchaseOrderNumber(), shippingPrice,
-				shippingOptionName, commerceOrder.getSubtotal(),
-				commerceOrder.getTotal(), null);
-		}
 	}
 
 	protected void validate(
@@ -675,13 +618,16 @@ public class CommerceAddressLocalServiceImpl
 		};
 	}
 
-	@ServiceReference(type = AddressLocalService.class)
+	@Reference
 	private AddressLocalService _addressLocalService;
 
-	@ServiceReference(type = CommerceGeocoder.class)
+	@Reference
 	private CommerceGeocoder _commerceGeocoder;
 
-	@ServiceReference(type = GroupLocalService.class)
+	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
