@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.internal.helper;
 
+import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.persistence.CommerceOrderPersistence;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -22,6 +23,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 
 import java.io.Serializable;
+
+import java.math.BigDecimal;
 
 import java.util.Date;
 import java.util.Map;
@@ -34,6 +37,22 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(enabled = false, service = CommerceOrderHelper.class)
 public class CommerceOrderHelper {
+
+	public CommerceOrder updateCommerceShippingMethod(
+			long commerceOrderId, long commerceShippingMethodId,
+			String commerceShippingOptionName, BigDecimal shippingAmount,
+			CommerceContext commerceContext)
+		throws PortalException {
+
+		CommerceOrder commerceOrder =
+			_commerceOrderPersistence.findByPrimaryKey(commerceOrderId);
+
+		commerceOrder.setCommerceShippingMethodId(commerceShippingMethodId);
+		commerceOrder.setShippingAmount(shippingAmount);
+		commerceOrder.setShippingOptionName(commerceShippingOptionName);
+
+		return _commerceOrderPersistence.update(commerceOrder);
+	}
 
 	public CommerceOrder updateStatus(
 			long userId, long commerceOrderId, int status,

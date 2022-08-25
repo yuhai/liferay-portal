@@ -1390,14 +1390,9 @@ public class CommerceOrderLocalServiceImpl
 			CommerceContext commerceContext)
 		throws PortalException {
 
-		CommerceOrder commerceOrder = commerceOrderPersistence.findByPrimaryKey(
-			commerceOrderId);
-
-		commerceOrder.setCommerceShippingMethodId(commerceShippingMethodId);
-		commerceOrder.setShippingAmount(shippingAmount);
-		commerceOrder.setShippingOptionName(commerceShippingOptionName);
-
-		return commerceOrderPersistence.update(commerceOrder);
+		return _commerceOrderHelper.updateCommerceShippingMethod(
+			commerceOrderId, commerceShippingMethodId,
+			commerceShippingOptionName, shippingAmount, commerceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
