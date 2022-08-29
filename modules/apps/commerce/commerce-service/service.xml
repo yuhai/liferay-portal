@@ -958,5 +958,6 @@
 		<exception>GuestCartItemMaxAllowed</exception>
 		<exception>GuestCartMaxAllowed</exception>
 		<exception>ProductBundle</exception>
+		<exception>RequiredCommerceOrder</exception>
 	</exceptions>
 </service-builder>
