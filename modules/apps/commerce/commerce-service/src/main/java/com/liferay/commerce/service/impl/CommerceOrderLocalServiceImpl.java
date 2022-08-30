@@ -1374,6 +1374,20 @@ public class CommerceOrderLocalServiceImpl
 		return commerceOrderPersistence.update(commerceOrder);
 	}
 
+	@Override
+	public CommerceOrder updateCommerceShippingMethod(
+			CommerceOrder commerceOrder, CommerceContext commerceContext)
+		throws PortalException {
+
+		if (_commerceShippingHelper.isFreeShipping(commerceOrder)) {
+			return commerceOrderLocalService.updateCommerceShippingMethod(
+				commerceOrder.getCommerceOrderId(), 0, null, BigDecimal.ZERO,
+				commerceContext);
+		}
+
+		return commerceOrder;
+	}
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceOrder updateCommerceShippingMethod(
