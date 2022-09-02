@@ -1080,6 +1080,17 @@ public class CommerceOrderLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.model.CommerceOrder
 			updateCommerceShippingMethod(
+				com.liferay.commerce.model.CommerceOrder commerceOrder,
+				com.liferay.commerce.context.CommerceContext commerceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceOrderLocalService.updateCommerceShippingMethod(
+			commerceOrder, commerceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.model.CommerceOrder
+			updateCommerceShippingMethod(
 				long commerceOrderId, long commerceShippingMethodId,
 				String commerceShippingOptionName,
 				java.math.BigDecimal shippingAmount,

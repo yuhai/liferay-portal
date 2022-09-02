@@ -960,6 +960,15 @@ public class CommerceOrderLocalServiceUtil {
 	}
 
 	public static CommerceOrder updateCommerceShippingMethod(
+			CommerceOrder commerceOrder,
+			com.liferay.commerce.context.CommerceContext commerceContext)
+		throws PortalException {
+
+		return getService().updateCommerceShippingMethod(
+			commerceOrder, commerceContext);
+	}
+
+	public static CommerceOrder updateCommerceShippingMethod(
 			long commerceOrderId, long commerceShippingMethodId,
 			String commerceShippingOptionName,
 			java.math.BigDecimal shippingAmount,

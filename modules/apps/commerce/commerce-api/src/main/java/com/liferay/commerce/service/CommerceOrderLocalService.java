@@ -692,6 +692,10 @@ public interface CommerceOrderLocalService
 			long commerceOrderId, String commercePaymentMethodKey)
 		throws PortalException;
 
+	public CommerceOrder updateCommerceShippingMethod(
+			CommerceOrder commerceOrder, CommerceContext commerceContext)
+		throws PortalException;
+
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceOrder updateCommerceShippingMethod(
 			long commerceOrderId, long commerceShippingMethodId,
