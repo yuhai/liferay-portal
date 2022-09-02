@@ -274,11 +274,6 @@ public class CommerceOrderItemLocalServiceImpl
 		commerceOrderItemLocalService.deleteCommerceOrderItem(
 			commerceOrderItem);
 
-		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
-
-		_commerceOrderLocalService.recalculatePrice(
-			commerceOrder.getCommerceOrderId(), commerceContext);
-
 		return commerceOrderItem;
 	}
 
