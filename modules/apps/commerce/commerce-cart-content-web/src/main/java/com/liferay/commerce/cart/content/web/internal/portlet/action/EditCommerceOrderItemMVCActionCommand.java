@@ -21,6 +21,7 @@ import com.liferay.commerce.exception.CommerceOrderValidatorException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -66,16 +67,22 @@ public class EditCommerceOrderItemMVCActionCommand
 			actionRequest, "commerceOrderItemId");
 
 		try {
+			CommerceOrderItem commerceOrderItem =
+				_commerceOrderItemService.getCommerceOrderItem(
+					commerceOrderItemId);
+
 			if (cmd.equals(Constants.DELETE)) {
 				_commerceOrderItemService.deleteCommerceOrderItem(
 					commerceOrderItemId, commerceContext);
+
+				_commerceOrderLocalService.updateCommerceShippingMethod(
+					commerceOrderItem.getCommerceOrder(), commerceContext);
+
+				_commerceOrderLocalService.recalculatePrice(
+					commerceOrderItem.getCommerceOrderId(), commerceContext);
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
 				int quantity = ParamUtil.getInteger(actionRequest, "quantity");
-
-				CommerceOrderItem commerceOrderItem =
-					_commerceOrderItemService.getCommerceOrderItem(
-						commerceOrderItemId);
 
 				ServiceContext serviceContext =
 					ServiceContextFactory.getInstance(
@@ -110,5 +117,8 @@ public class EditCommerceOrderItemMVCActionCommand
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 }

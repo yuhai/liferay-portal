@@ -15,6 +15,7 @@
 package com.liferay.headless.commerce.admin.order.internal.resource.v1_0;
 
 import com.liferay.commerce.constants.CommerceActionKeys;
+import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.context.CommerceContextFactory;
 import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
@@ -22,6 +23,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
@@ -87,12 +89,19 @@ public class OrderItemResourceImpl
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(
 			commerceOrderItem.getCommerceOrderId());
 
+		CommerceContext commerceContext = _commerceContextFactory.create(
+			contextCompany.getCompanyId(), commerceOrder.getGroupId(),
+			contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
+			commerceOrder.getCommerceAccountId());
+
 		_commerceOrderItemService.deleteCommerceOrderItem(
-			commerceOrderItem.getCommerceOrderItemId(),
-			_commerceContextFactory.create(
-				contextCompany.getCompanyId(), commerceOrder.getGroupId(),
-				contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
-				commerceOrder.getCommerceAccountId()));
+			commerceOrderItem.getCommerceOrderItemId(), commerceContext);
+
+		_commerceOrderLocalService.updateCommerceShippingMethod(
+			commerceOrderItem.getCommerceOrder(), commerceContext);
+
+		_commerceOrderLocalService.recalculatePrice(
+			commerceOrderItem.getCommerceOrderId(), commerceContext);
 
 		Response.ResponseBuilder responseBuilder = Response.ok();
 
@@ -117,12 +126,19 @@ public class OrderItemResourceImpl
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(
 			commerceOrderItem.getCommerceOrderId());
 
+		CommerceContext commerceContext = _commerceContextFactory.create(
+			contextCompany.getCompanyId(), commerceOrder.getGroupId(),
+			contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
+			commerceOrder.getCommerceAccountId());
+
 		_commerceOrderItemService.deleteCommerceOrderItem(
-			commerceOrderItem.getCommerceOrderItemId(),
-			_commerceContextFactory.create(
-				contextCompany.getCompanyId(), commerceOrder.getGroupId(),
-				contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
-				commerceOrder.getCommerceAccountId()));
+			commerceOrderItem.getCommerceOrderItemId(), commerceContext);
+
+		_commerceOrderLocalService.updateCommerceShippingMethod(
+			commerceOrderItem.getCommerceOrder(), commerceContext);
+
+		_commerceOrderLocalService.recalculatePrice(
+			commerceOrderItem.getCommerceOrderId(), commerceContext);
 
 		Response.ResponseBuilder responseBuilder = Response.ok();
 
@@ -707,6 +723,9 @@ public class OrderItemResourceImpl
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

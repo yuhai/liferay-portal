@@ -19,6 +19,7 @@ import com.liferay.commerce.context.CommerceContextFactory;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Cart;
@@ -75,6 +76,12 @@ public class CartItemResourceImpl
 
 		_commerceOrderItemService.deleteCommerceOrderItem(
 			cartItemId, commerceContext);
+
+		_commerceOrderLocalService.updateCommerceShippingMethod(
+			commerceOrderItem.getCommerceOrder(), commerceContext);
+
+		_commerceOrderLocalService.recalculatePrice(
+			commerceOrderItem.getCommerceOrderId(), commerceContext);
 
 		Response.ResponseBuilder responseBuilder = Response.noContent();
 
@@ -221,6 +228,9 @@ public class CartItemResourceImpl
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Reference
 	private CommerceOrderService _commerceOrderService;

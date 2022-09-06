@@ -23,6 +23,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -176,8 +177,18 @@ public class EditCommerceOrderItemMVCActionCommand
 		}
 
 		for (long deleteCommerceOrderItemId : deleteCommerceOrderItemIds) {
+			CommerceOrderItem commerceOrderItem =
+				_commerceOrderItemService.getCommerceOrderItem(
+					deleteCommerceOrderItemId);
+
 			_commerceOrderItemService.deleteCommerceOrderItem(
 				deleteCommerceOrderItemId, commerceContext);
+
+			_commerceOrderLocalService.updateCommerceShippingMethod(
+				commerceOrderItem.getCommerceOrder(), commerceContext);
+
+			_commerceOrderLocalService.recalculatePrice(
+				commerceOrderItem.getCommerceOrderId(), commerceContext);
 		}
 	}
 
@@ -256,6 +267,9 @@ public class EditCommerceOrderItemMVCActionCommand
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Reference
 	private CPInstanceService _cpInstanceService;

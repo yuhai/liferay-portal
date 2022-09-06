@@ -23,6 +23,7 @@ import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -132,11 +133,20 @@ public class EditCommerceOrderItemMVCActionCommand
 		for (CommerceOrderItem commerceOrderItem : commerceOrderItems) {
 			_commerceOrderItemService.deleteCommerceOrderItem(
 				commerceOrderItem.getCommerceOrderItemId(), commerceContext);
+
+			_commerceOrderLocalService.updateCommerceShippingMethod(
+				commerceOrderItem.getCommerceOrder(), commerceContext);
+
+			_commerceOrderLocalService.recalculatePrice(
+				commerceOrderItem.getCommerceOrderId(), commerceContext);
 		}
 	}
 
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
+
+	@Reference
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Reference
 	private CommerceOrderService _commerceOrderService;
