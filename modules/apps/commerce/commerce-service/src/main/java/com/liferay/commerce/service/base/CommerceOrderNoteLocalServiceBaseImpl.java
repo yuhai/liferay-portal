@@ -24,7 +24,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -43,12 +43,11 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -57,6 +56,9 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the commerce order note local service.
@@ -71,7 +73,8 @@ import javax.sql.DataSource;
  */
 public abstract class CommerceOrderNoteLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements CommerceOrderNoteLocalService, IdentifiableOSGiService {
+	implements AopService, CommerceOrderNoteLocalService,
+			   IdentifiableOSGiService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -567,82 +570,24 @@ public abstract class CommerceOrderNoteLocalServiceBaseImpl
 		return commerceOrderNotePersistence.update(commerceOrderNote);
 	}
 
-	/**
-	 * Returns the commerce order note local service.
-	 *
-	 * @return the commerce order note local service
-	 */
-	public CommerceOrderNoteLocalService getCommerceOrderNoteLocalService() {
-		return commerceOrderNoteLocalService;
+	@Deactivate
+	protected void deactivate() {
+		_setLocalServiceUtilService(null);
 	}
 
-	/**
-	 * Sets the commerce order note local service.
-	 *
-	 * @param commerceOrderNoteLocalService the commerce order note local service
-	 */
-	public void setCommerceOrderNoteLocalService(
-		CommerceOrderNoteLocalService commerceOrderNoteLocalService) {
-
-		this.commerceOrderNoteLocalService = commerceOrderNoteLocalService;
+	@Override
+	public Class<?>[] getAopInterfaces() {
+		return new Class<?>[] {
+			CommerceOrderNoteLocalService.class, IdentifiableOSGiService.class,
+			PersistedModelLocalService.class
+		};
 	}
 
-	/**
-	 * Returns the commerce order note persistence.
-	 *
-	 * @return the commerce order note persistence
-	 */
-	public CommerceOrderNotePersistence getCommerceOrderNotePersistence() {
-		return commerceOrderNotePersistence;
-	}
-
-	/**
-	 * Sets the commerce order note persistence.
-	 *
-	 * @param commerceOrderNotePersistence the commerce order note persistence
-	 */
-	public void setCommerceOrderNotePersistence(
-		CommerceOrderNotePersistence commerceOrderNotePersistence) {
-
-		this.commerceOrderNotePersistence = commerceOrderNotePersistence;
-	}
-
-	/**
-	 * Returns the counter local service.
-	 *
-	 * @return the counter local service
-	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
-		return counterLocalService;
-	}
-
-	/**
-	 * Sets the counter local service.
-	 *
-	 * @param counterLocalService the counter local service
-	 */
-	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
-		this.counterLocalService = counterLocalService;
-	}
-
-	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.commerce.model.CommerceOrderNote",
-			commerceOrderNoteLocalService);
+	@Override
+	public void setAopProxy(Object aopProxy) {
+		commerceOrderNoteLocalService = (CommerceOrderNoteLocalService)aopProxy;
 
 		_setLocalServiceUtilService(commerceOrderNoteLocalService);
-	}
-
-	public void destroy() {
-		persistedModelLocalServiceRegistry.unregister(
-			"com.liferay.commerce.model.CommerceOrderNote");
-
-		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -705,20 +650,13 @@ public abstract class CommerceOrderNoteLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = CommerceOrderNoteLocalService.class)
 	protected CommerceOrderNoteLocalService commerceOrderNoteLocalService;
 
-	@BeanReference(type = CommerceOrderNotePersistence.class)
+	@Reference
 	protected CommerceOrderNotePersistence commerceOrderNotePersistence;
 
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
 
 }
