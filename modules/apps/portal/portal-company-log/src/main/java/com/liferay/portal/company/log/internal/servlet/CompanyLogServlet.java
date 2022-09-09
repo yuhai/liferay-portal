@@ -134,19 +134,19 @@ public class CompanyLogServlet extends HttpServlet {
 				permissionChecker.getUserId());
 		}
 
-		String logFilesDirPath = Log4JUtil.getCompanyLogDirectory(companyId);
+		File companyLogDirectory = Log4JUtil.getCompanyLogDirectory(companyId);
 
-		if (logFilesDirPath == null) {
+		if (companyLogDirectory == null) {
 			return;
 		}
 
 		String fileName = pathArray[1];
 
-		Path path = Paths.get(logFilesDirPath, fileName);
+		Path path = Paths.get(companyLogDirectory.getPath(), fileName);
 
 		path = path.normalize();
 
-		if (!path.startsWith(logFilesDirPath)) {
+		if (!path.startsWith(companyLogDirectory.getPath())) {
 			throw new PrincipalException("Unauthorized access");
 		}
 
@@ -267,14 +267,12 @@ public class CompanyLogServlet extends HttpServlet {
 		HttpServletRequest httpServletRequest, StringBundler sb,
 		Company company) {
 
-		String logFilesDirPath = Log4JUtil.getCompanyLogDirectory(
+		File logFilesDir  = Log4JUtil.getCompanyLogDirectory(
 			company.getCompanyId());
 
-		if (logFilesDirPath == null) {
+		if (logFilesDir == null) {
 			return;
 		}
-
-		File logFilesDir = new File(logFilesDirPath);
 
 		if (!logFilesDir.isDirectory()) {
 			return;

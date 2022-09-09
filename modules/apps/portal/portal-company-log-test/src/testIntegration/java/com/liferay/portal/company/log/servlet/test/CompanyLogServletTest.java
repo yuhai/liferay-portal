@@ -82,8 +82,8 @@ public class CompanyLogServletTest {
 
 		_adminUser = UserTestUtil.addCompanyAdminUser(_newCompany);
 
-		File logFilesDir = new File(
-			Log4JUtil.getCompanyLogDirectory(_newCompany.getCompanyId()));
+		File logFilesDir =
+			Log4JUtil.getCompanyLogDirectory(_newCompany.getCompanyId());
 
 		for (File file : logFilesDir.listFiles()) {
 			_logFile = file;
@@ -307,15 +307,13 @@ public class CompanyLogServletTest {
 			Company company, String responseContent)
 		throws Exception {
 
-		String logFilesDirPath = Log4JUtil.getCompanyLogDirectory(
-			company.getCompanyId());
-
-		File logFilesDir = new File(logFilesDirPath);
+		File logFilesDir = Log4JUtil.getCompanyLogDirectory(
+				company.getCompanyId());
 
 		File[] files = logFilesDir.listFiles();
 
 		Assert.assertTrue(
-			"The directory " + logFilesDirPath + " must have log files",
+			"The directory " + logFilesDir.getPath() + " must have log files",
 			files.length > 0);
 
 		for (File file : files) {

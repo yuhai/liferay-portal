@@ -580,17 +580,13 @@ public class Log4jConfigUtilTest {
 
 			tempLogFileDir = path.toFile();
 
-			String tempLogFileDirPath = StringUtil.replace(
-				tempLogFileDir.getPath(), CharPool.BACK_SLASH,
-				CharPool.FORWARD_SLASH);
-
 			String filePattern = "liferay-@company.id@.%d{yyyy-MM-dd}.xml.log";
 
 			Log4jConfigUtil.configureLog4J(
 				_generateCompanyLogRoutingAppenderConfigurationContent(
 					"COMPANY_LOG_ROUTING_TEXT_FILE",
 					StringBundler.concat(
-						tempLogFileDirPath, CharPool.FORWARD_SLASH,
+						tempLogFileDir.getPath(), CharPool.FORWARD_SLASH,
 						filePattern),
 					loggerName, _INFO));
 
@@ -598,15 +594,17 @@ public class Log4jConfigUtilTest {
 
 			logger.info("Test message");
 
+			File companyLogDirectory = Log4jConfigUtil.getCompanyLogDirectory(
+				companyId);
+
 			if (enabled) {
 				Assert.assertEquals(
-					"Company log directory should be " + tempLogFileDirPath,
-					tempLogFileDirPath,
-					Log4jConfigUtil.getCompanyLogDirectory(companyId));
+					"Company log directory should be " + tempLogFileDir.getPath(),
+					tempLogFileDir.getPath(),
+					companyLogDirectory.getPath());
 			}
 			else {
-				Assert.assertNull(
-					Log4jConfigUtil.getCompanyLogDirectory(companyId));
+				Assert.assertNull(companyLogDirectory);
 			}
 		}
 		finally {
