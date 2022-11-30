@@ -12,9 +12,10 @@
  * details.
  */
 
-package com.liferay.portal.spring.extender.internal.configuration;
+package com.liferay.portal.service.extender.internal.configuration;
 
 import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
@@ -56,12 +57,14 @@ public class PortletConfigurationExtender
 
 		ClassLoader classLoader = bundleWiring.getClassLoader();
 
-		Configuration portletConfiguration = ConfigurationUtil.getConfiguration(
-			classLoader, "portlet");
+		if (!ConfigurationFactoryUtil.hasConfiguration(
+				classLoader, "portlet")) {
 
-		if (portletConfiguration == null) {
 			return null;
 		}
+
+		Configuration portletConfiguration =
+			ConfigurationFactoryUtil.getConfiguration(classLoader, "portlet");
 
 		PortletConfigurationExtension portletConfigurationExtension =
 			new PortletConfigurationExtension(

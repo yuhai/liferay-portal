@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.spring.extender.internal;
+package com.liferay.portal.service.extender.internal;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.hibernate.SessionFactoryImpl;
@@ -22,10 +22,9 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.loader.ModuleAggregareClassLoader;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.spring.extender.internal.jdbc.DataSourceUtil;
-import com.liferay.portal.spring.extender.internal.loader.ModuleAggregareClassLoader;
 import com.liferay.portal.spring.hibernate.PortletHibernateConfiguration;
 import com.liferay.portal.spring.hibernate.PortletTransactionManager;
 import com.liferay.portal.spring.transaction.DefaultTransactionExecutor;
@@ -136,7 +135,8 @@ public class LiferayServiceExtender
 			ClassLoader extendeeClassLoader =
 				extendeeBundleWiring.getClassLoader();
 
-			_dataSource = DataSourceUtil.getDataSource(extendeeClassLoader);
+			_dataSource = DataSourceFactoryUtil.getDataSource(
+				extendeeClassLoader);
 
 			BundleContext extendeeBundleContext =
 				_extendeeBundle.getBundleContext();

@@ -12,12 +12,13 @@
  * details.
  */
 
-package com.liferay.portal.spring.extender.internal.upgrade;
+package com.liferay.portal.service.extender.internal.upgrade;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.db.DBResourceUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBContext;
 import com.liferay.portal.kernel.dao.db.DBManager;
@@ -30,8 +31,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.module.util.BundleUtil;
-import com.liferay.portal.spring.extender.internal.configuration.ConfigurationUtil;
-import com.liferay.portal.spring.extender.internal.upgrade.InitialUpgradeExtender.InitialUpgradeExtension;
+import com.liferay.portal.service.extender.internal.upgrade.InitialUpgradeExtender.InitialUpgradeExtension;
 import com.liferay.portal.spring.hibernate.DialectDetector;
 
 import java.sql.Connection;
@@ -137,10 +137,13 @@ public class InitialUpgradeExtender
 
 			BundleWiring bundleWiring = _bundle.adapt(BundleWiring.class);
 
-			Configuration configuration = ConfigurationUtil.getConfiguration(
-				bundleWiring.getClassLoader(), "service");
+			if (ConfigurationFactoryUtil.hasConfiguration(
+					bundleWiring.getClassLoader(), "service")) {
 
-			if (configuration != null) {
+				Configuration configuration =
+					ConfigurationFactoryUtil.getConfiguration(
+						bundleWiring.getClassLoader(), "service");
+
 				String buildNumber = configuration.get("build.number");
 
 				if (buildNumber != null) {
