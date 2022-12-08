@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.configurator.ConfigurableApplicationContextConfigurator;
 import com.liferay.portal.spring.extender.internal.bean.ApplicationContextServicePublisherUtil;
-import com.liferay.portal.spring.extender.internal.loader.ModuleAggregareClassLoader;
 
 import java.beans.Introspector;
 
@@ -48,31 +47,33 @@ public class ModuleApplicationContextRegistrator {
 	public ModuleApplicationContextRegistrator(
 		ConfigurableApplicationContextConfigurator
 			configurableApplicationContextConfigurator,
-		Bundle extendeeBundle, Bundle extenderBundle) {
+		Bundle extendeeBundle, Bundle extenderBundle,
+		ClassLoader moduleAggregareClassLoader, DataSource extendeeDataSource) {
 
 		_configurableApplicationContextConfigurator =
 			configurableApplicationContextConfigurator;
 		_extendeeBundle = extendeeBundle;
 		_extenderBundle = extenderBundle;
+		_extendeeDataSource = extendeeDataSource;
 
 		BundleWiring extendeeBundleWiring = _extendeeBundle.adapt(
 			BundleWiring.class);
 
 		_extendeeClassLoader = extendeeBundleWiring.getClassLoader();
 
-		_classLoader = new ModuleAggregareClassLoader(
-			_extendeeClassLoader, _extendeeBundle.getSymbolicName());
+		_classLoader = moduleAggregareClassLoader;
 
 		Dictionary<String, String> headers = _extendeeBundle.getHeaders(
 			StringPool.BLANK);
 
 		_moduleApplicationContext = new ModuleApplicationContext(
-			_extendeeBundle, _extendeeClassLoader, _classLoader,
+			_extendeeBundle, _extendeeClassLoader, _extendeeDataSource,
+			_classLoader,
 			StringUtil.split(
 				headers.get("Liferay-Spring-Context"), CharPool.COMMA));
 
 		_moduleApplicationContext.addBeanFactoryPostProcessor(
-			beanFactory -> ModuleApplicationContext.registerDataSourceBean(
+			beanFactory -> _moduleApplicationContext.registerDataSourceBean(
 				beanFactory, _extendeeClassLoader));
 
 		_moduleApplicationContext.addBeanFactoryPostProcessor(
@@ -166,6 +167,7 @@ public class ModuleApplicationContextRegistrator {
 		_dataSourceServiceRegistration;
 	private final Bundle _extendeeBundle;
 	private final ClassLoader _extendeeClassLoader;
+	private final DataSource _extendeeDataSource;
 	private final Bundle _extenderBundle;
 	private final ModuleApplicationContext _moduleApplicationContext;
 	private List<ServiceRegistration<?>> _serviceRegistrations;

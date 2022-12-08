@@ -16,7 +16,6 @@ package com.liferay.portal.spring.extender.internal.context;
 
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
-import com.liferay.portal.spring.extender.internal.jdbc.DataSourceUtil;
 
 import java.net.URL;
 
@@ -46,33 +45,10 @@ import org.springframework.core.io.UrlResource;
  */
 public class ModuleApplicationContext extends ClassPathXmlApplicationContext {
 
-	public static void registerDataSourceBean(
-		ConfigurableListableBeanFactory configurableListableBeanFactory,
-		ClassLoader extendeeClassLoader) {
-
-		if (configurableListableBeanFactory.containsBean("liferayDataSource")) {
-			return;
-		}
-
-		DataSource dataSource = DataSourceUtil.getDataSource(
-			extendeeClassLoader);
-
-		configurableListableBeanFactory.registerSingleton(
-			"liferayDataSource", dataSource);
-
-		if (InfrastructureUtil.getDataSource() != dataSource) {
-			DefaultSingletonBeanRegistry defaultSingletonBeanRegistry =
-				(DefaultSingletonBeanRegistry)configurableListableBeanFactory;
-
-			defaultSingletonBeanRegistry.registerDisposableBean(
-				"dataSourceDestroyer",
-				() -> DataSourceFactoryUtil.destroyDataSource(dataSource));
-		}
-	}
-
 	public ModuleApplicationContext(
 		Bundle bundle, ClassLoader extendeeClassLoader,
-		ClassLoader resourceLoaderClassLoader, String[] configLocations) {
+		DataSource extendeeDataSource, ClassLoader resourceLoaderClassLoader,
+		String[] configLocations) {
 
 		super(configLocations, false, null);
 
@@ -81,6 +57,8 @@ public class ModuleApplicationContext extends ClassPathXmlApplicationContext {
 		setClassLoader(resourceLoaderClassLoader);
 
 		super.refreshBeanFactory();
+
+		_extendeeDataSource = extendeeDataSource;
 
 		ConfigurableListableBeanFactory configurableListableBeanFactory =
 			getBeanFactory();
@@ -119,6 +97,28 @@ public class ModuleApplicationContext extends ClassPathXmlApplicationContext {
 		super.refresh();
 
 		_dataSource = getBean("liferayDataSource", DataSource.class);
+	}
+
+	public void registerDataSourceBean(
+		ConfigurableListableBeanFactory configurableListableBeanFactory,
+		ClassLoader extendeeClassLoader) {
+
+		if (configurableListableBeanFactory.containsBean("liferayDataSource")) {
+			return;
+		}
+
+		configurableListableBeanFactory.registerSingleton(
+			"liferayDataSource", _extendeeDataSource);
+
+		if (InfrastructureUtil.getDataSource() != _extendeeDataSource) {
+			DefaultSingletonBeanRegistry defaultSingletonBeanRegistry =
+				(DefaultSingletonBeanRegistry)configurableListableBeanFactory;
+
+			defaultSingletonBeanRegistry.registerDisposableBean(
+				"dataSourceDestroyer",
+				() -> DataSourceFactoryUtil.destroyDataSource(
+					_extendeeDataSource));
+		}
 	}
 
 	@Override
@@ -182,6 +182,7 @@ public class ModuleApplicationContext extends ClassPathXmlApplicationContext {
 	protected final Bundle bundle;
 
 	private volatile DataSource _dataSource;
+	private final DataSource _extendeeDataSource;
 	private final AtomicBoolean _freshBeanFactory = new AtomicBoolean(true);
 
 }
