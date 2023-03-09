@@ -439,7 +439,20 @@ public class DLFileEntryLocalServiceImpl
 
 		latestDLFileVersion.setVersion(version);
 
-		latestDLFileVersion.setStoreUUID(String.valueOf(UUID.randomUUID()));
+		boolean addStoreFile = true;
+
+		if ((dlVersionNumberIncrease != null) &&
+			(dlVersionNumberIncrease == DLVersionNumberIncrease.AUTOMATIC) &&
+			(computedDLVersionNumberIncrease ==
+				DLVersionNumberIncrease.MINOR)) {
+
+			latestDLFileVersion.setStoreUUID(lastDLFileVersion.getStoreUUID());
+
+			addStoreFile = false;
+		}
+		else {
+			latestDLFileVersion.setStoreUUID(String.valueOf(UUID.randomUUID()));
+		}
 
 		latestDLFileVersion = _dlFileVersionPersistence.update(
 			latestDLFileVersion);
@@ -456,10 +469,12 @@ public class DLFileEntryLocalServiceImpl
 
 		// File
 
-		DLStoreUtil.copyFileVersion(
-			user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
-			dlFileEntry.getName(),
-			DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION, version);
+		if (addStoreFile) {
+			DLStoreUtil.copyFileVersion(
+				user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
+				dlFileEntry.getName(),
+				DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION, version);
+		}
 
 		_registerPWCDeletionCallback(dlFileEntry);
 
