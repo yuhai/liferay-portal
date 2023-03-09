@@ -337,6 +337,15 @@ public class DLFileVersionPersistenceTest {
 	}
 
 	@Test
+	public void testCountByStoreUUID() throws Exception {
+		_persistence.countByStoreUUID("");
+
+		_persistence.countByStoreUUID("null");
+
+		_persistence.countByStoreUUID((String)null);
+	}
+
+	@Test
 	public void testCountByC_NotS() throws Exception {
 		_persistence.countByC_NotS(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
