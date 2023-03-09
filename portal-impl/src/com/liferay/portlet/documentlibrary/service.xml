@@ -331,6 +331,9 @@
 		<finder name="MimeType" return-type="Collection">
 			<finder-column name="mimeType" />
 		</finder>
+		<finder name="StoreUUID" return-type="Collection">
+			<finder-column name="storeUUID" />
+		</finder>
 		<finder name="C_NotS" return-type="Collection">
 			<finder-column name="companyId" />
 			<finder-column comparator="!=" name="status" />
