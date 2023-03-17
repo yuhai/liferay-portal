@@ -1150,6 +1150,66 @@ public class DLFileEntryLocalServiceTest {
 		}
 	}
 
+	@Test
+	public void testUpdateFileEntryUseDifferentStoreUUIDWithoutAutoMaticNumberIncrease()
+		throws Exception {
+
+		DLFileEntry dlFileEntry = _addAndApproveFileEntry(
+			new ByteArrayInputStream(new byte[0]), 0);
+
+		DLFileVersion dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		String storeUUID = dlFileVersion.getStoreUUID();
+
+		Assert.assertNotNull(storeUUID);
+
+		Assert.assertEquals("1.0", dlFileVersion.getVersion());
+
+		dlFileEntry = DLFileEntryLocalServiceUtil.updateFileEntry(
+			TestPropsValues.getUserId(), dlFileEntry.getFileEntryId(),
+			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK, DLVersionNumberIncrease.MINOR,
+			dlFileEntry.getFileEntryTypeId(), null, null,
+			new ByteArrayInputStream(new byte[0]), 0, null, null,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		Assert.assertEquals("1.1", dlFileVersion.getVersion());
+		Assert.assertNotEquals(storeUUID, dlFileVersion.getStoreUUID());
+	}
+
+	@Test
+	public void testUpdateFileEntryUseSameStoreUUIDWithAutoMaticNumberIncrease()
+		throws Exception {
+
+		DLFileEntry dlFileEntry = _addAndApproveFileEntry(
+			new ByteArrayInputStream(new byte[0]), 0);
+
+		DLFileVersion dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		String storeUUID = dlFileVersion.getStoreUUID();
+
+		Assert.assertNotNull(storeUUID);
+
+		Assert.assertEquals("1.0", dlFileVersion.getVersion());
+
+		dlFileEntry = DLFileEntryLocalServiceUtil.updateFileEntry(
+			TestPropsValues.getUserId(), dlFileEntry.getFileEntryId(),
+			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.AUTOMATIC, dlFileEntry.getFileEntryTypeId(),
+			null, null, new ByteArrayInputStream(new byte[0]), 0, null, null,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		Assert.assertEquals("1.1", dlFileVersion.getVersion());
+		Assert.assertEquals(storeUUID, dlFileVersion.getStoreUUID());
+	}
+
 	@Test(expected = DuplicateFolderNameException.class)
 	public void testValidateFileFailsWithAnExistingFolder() throws Exception {
 		Folder folder = DLAppServiceUtil.addFolder(
@@ -1356,6 +1416,29 @@ public class DLFileEntryLocalServiceTest {
 			ddmFormValuesMap, null, inputStream, 0,
 			dlFileEntry.getExpirationDate(), dlFileEntry.getReviewDate(),
 			serviceContext);
+
+		DLFileVersion dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		return DLFileEntryLocalServiceUtil.updateStatus(
+			TestPropsValues.getUserId(), dlFileVersion.getFileVersionId(),
+			WorkflowConstants.STATUS_APPROVED, serviceContext, new HashMap<>());
+	}
+
+	private DLFileEntry _addAndApproveFileEntry(
+			InputStream inputStream, long size)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		DLFileEntry dlFileEntry = DLFileEntryLocalServiceUtil.addFileEntry(
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK, -1, new HashMap<>(), null,
+			inputStream, size, null, null, serviceContext);
 
 		DLFileVersion dlFileVersion = dlFileEntry.getLatestFileVersion(true);
 
