@@ -32,6 +32,7 @@ import com.liferay.portlet.documentlibrary.service.base.DLFileVersionLocalServic
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Brian Wing Shun Chan
@@ -65,6 +66,34 @@ public class DLFileVersionLocalServiceImpl
 		}
 
 		return dlFileVersion;
+	}
+
+	@Override
+	public String getFileStoreVersion(String storeUUID, String defaultVersion) {
+		if (Objects.equals(
+				defaultVersion, DLFileEntryConstants.VERSION_DEFAULT) ||
+			Objects.equals(
+				defaultVersion,
+				DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
+
+			return defaultVersion;
+		}
+
+		List<DLFileVersion> dlFileVersions =
+			dlFileVersionPersistence.findByStoreUUID(storeUUID);
+
+		if (dlFileVersions.size() > 1) {
+			dlFileVersions = ListUtil.copy(dlFileVersions);
+
+			Collections.sort(
+				dlFileVersions, new DLFileVersionVersionComparator(true));
+
+			DLFileVersion dlFileVersion = dlFileVersions.get(0);
+
+			return dlFileVersion.getVersion();
+		}
+
+		return defaultVersion;
 	}
 
 	@Override
@@ -129,6 +158,11 @@ public class DLFileVersionLocalServiceImpl
 		}
 
 		return dlFileVersionPersistence.countByF_S(fileEntryId, status);
+	}
+
+	@Override
+	public int getFileVersionsCount(String storeUUID) {
+		return dlFileVersionPersistence.countByStoreUUID(storeUUID);
 	}
 
 	@Override
