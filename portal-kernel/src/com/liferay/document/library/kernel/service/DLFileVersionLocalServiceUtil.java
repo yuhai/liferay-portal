@@ -329,6 +329,12 @@ public class DLFileVersionLocalServiceUtil {
 		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
+	public static String getFileStoreVersion(
+		String storeUUID, String defaultVersion) {
+
+		return getService().getFileStoreVersion(storeUUID, defaultVersion);
+	}
+
 	public static DLFileVersion getFileVersion(long fileVersionId)
 		throws PortalException {
 
@@ -361,6 +367,10 @@ public class DLFileVersionLocalServiceUtil {
 
 	public static int getFileVersionsCount(long fileEntryId, int status) {
 		return getService().getFileVersionsCount(fileEntryId, status);
+	}
+
+	public static int getFileVersionsCount(String storeUUID) {
+		return getService().getFileVersionsCount(storeUUID);
 	}
 
 	public static

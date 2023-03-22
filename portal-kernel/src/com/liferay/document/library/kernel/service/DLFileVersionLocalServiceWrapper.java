@@ -362,6 +362,12 @@ public class DLFileVersionLocalServiceWrapper
 	}
 
 	@Override
+	public String getFileStoreVersion(String storeUUID, String defaultVersion) {
+		return _dlFileVersionLocalService.getFileStoreVersion(
+			storeUUID, defaultVersion);
+	}
+
+	@Override
 	public DLFileVersion getFileVersion(long fileVersionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -402,6 +408,11 @@ public class DLFileVersionLocalServiceWrapper
 	public int getFileVersionsCount(long fileEntryId, int status) {
 		return _dlFileVersionLocalService.getFileVersionsCount(
 			fileEntryId, status);
+	}
+
+	@Override
+	public int getFileVersionsCount(String storeUUID) {
+		return _dlFileVersionLocalService.getFileVersionsCount(storeUUID);
 	}
 
 	@Override

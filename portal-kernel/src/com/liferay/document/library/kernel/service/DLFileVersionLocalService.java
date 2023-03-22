@@ -303,6 +303,9 @@ public interface DLFileVersionLocalService
 		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public String getFileStoreVersion(String storeUUID, String defaultVersion);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DLFileVersion getFileVersion(long fileVersionId)
 		throws PortalException;
 
@@ -323,6 +326,9 @@ public interface DLFileVersionLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFileVersionsCount(long fileEntryId, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getFileVersionsCount(String storeUUID);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();

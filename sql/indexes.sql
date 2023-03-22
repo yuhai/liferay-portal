@@ -165,7 +165,7 @@ create unique index IX_10E504DF on DLFileVersion (fileEntryId, version[$COLUMN_L
 create index IX_3A12DA31 on DLFileVersion (groupId, folderId, status, ctCollectionId);
 create index IX_DCA2C64B on DLFileVersion (groupId, folderId, title[$COLUMN_LENGTH:255$], version[$COLUMN_LENGTH:75$], ctCollectionId);
 create index IX_9E97D7BA on DLFileVersion (mimeType[$COLUMN_LENGTH:75$], ctCollectionId);
-create index IX_C113FE10 on DLFileVersion (storeUUID[$COLUMN_LENGTH:75$], ctCollectionId);
+create index IX_C113FE10 on DLFileVersion (storeUUID[$COLUMN_LENGTH:255$], ctCollectionId);
 create index IX_16CE5EAC on DLFileVersion (uuid_[$COLUMN_LENGTH:75$], companyId, ctCollectionId);
 create index IX_48BF1DF8 on DLFileVersion (uuid_[$COLUMN_LENGTH:75$], ctCollectionId);
 create unique index IX_350F5CAE on DLFileVersion (uuid_[$COLUMN_LENGTH:75$], groupId, ctCollectionId);
