@@ -1149,6 +1149,11 @@ public class DLFileEntryLocalServiceImpl
 				dlFileEntry, increment);
 		}
 
+		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion(version);
+
+		version = _dlFileVersionLocalService.getFileStoreVersion(
+			dlFileVersion.getStoreUUID(), version);
+
 		return DLStoreUtil.getFileAsStream(
 			dlFileEntry.getCompanyId(), dlFileEntry.getDataRepositoryId(),
 			dlFileEntry.getName(), version);
