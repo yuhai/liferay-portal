@@ -80,6 +80,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
@@ -849,6 +850,40 @@ public class DLFileEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testGetDifferentStoreFileWithMajorVersions() throws Exception {
+		DLFileEntry dlFileEntry = _addAndApproveFileEntry(
+			new ByteArrayInputStream(new byte[] {1}), 1);
+
+		String oldVersionChecksum = "";
+		String newVersionChecksum = "";
+
+		try (InputStream inputStream =
+				DLFileEntryLocalServiceUtil.getFileAsStream(
+					dlFileEntry.getFileEntryId(), "1.0")) {
+
+			oldVersionChecksum = DigesterUtil.digestBase64(inputStream);
+		}
+
+		DLFileEntryLocalServiceUtil.updateFileEntry(
+			TestPropsValues.getUserId(), dlFileEntry.getFileEntryId(),
+			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.AUTOMATIC, dlFileEntry.getFileEntryTypeId(),
+			null, null, new ByteArrayInputStream(new byte[] {2}), 1, null, null,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		try (InputStream inputStream =
+				DLFileEntryLocalServiceUtil.getFileAsStream(
+					dlFileEntry.getFileEntryId(), "2.0")) {
+
+			newVersionChecksum = DigesterUtil.digestBase64(inputStream);
+		}
+
+		Assert.assertNotEquals(oldVersionChecksum, newVersionChecksum);
+	}
+
+	@Test
 	public void testGetNoAssetEntries() throws Exception {
 		DLFolder dlFolder = DLTestUtil.addDLFolder(_group.getGroupId());
 
@@ -887,6 +922,40 @@ public class DLFileEntryLocalServiceTest {
 
 		Assert.assertFalse(dlFileEntries.contains(assetFileEntry.getModel()));
 		Assert.assertTrue(dlFileEntries.contains(noAssetFileEntry.getModel()));
+	}
+
+	@Test
+	public void testGetSameStoreFileWithMinorVersions() throws Exception {
+		DLFileEntry dlFileEntry = _addAndApproveFileEntry(
+			new ByteArrayInputStream(new byte[] {1}), 1);
+
+		String oldVersionChecksum = "";
+		String newVersionChecksum = "";
+
+		try (InputStream inputStream =
+				DLFileEntryLocalServiceUtil.getFileAsStream(
+					dlFileEntry.getFileEntryId(), "1.0")) {
+
+			oldVersionChecksum = DigesterUtil.digestBase64(inputStream);
+		}
+
+		DLFileEntryLocalServiceUtil.updateFileEntry(
+			TestPropsValues.getUserId(), dlFileEntry.getFileEntryId(),
+			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.AUTOMATIC, dlFileEntry.getFileEntryTypeId(),
+			null, null, new ByteArrayInputStream(new byte[] {1}), 1, null, null,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		try (InputStream inputStream =
+				DLFileEntryLocalServiceUtil.getFileAsStream(
+					dlFileEntry.getFileEntryId(), "1.1")) {
+
+			newVersionChecksum = DigesterUtil.digestBase64(inputStream);
+		}
+
+		Assert.assertEquals(oldVersionChecksum, newVersionChecksum);
 	}
 
 	@Test
