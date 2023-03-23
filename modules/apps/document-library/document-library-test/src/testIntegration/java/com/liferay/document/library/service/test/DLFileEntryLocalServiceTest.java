@@ -1181,6 +1181,36 @@ public class DLFileEntryLocalServiceTest {
 	}
 
 	@Test
+	public void testUpdateFileEntryUseDifferentStoreUUIDWithPreviousVersionSizeEqualsToZeroAndNextVersionSizeGreaterThanZero()
+		throws Exception {
+
+		DLFileEntry dlFileEntry = _addAndApproveFileEntry(
+			new ByteArrayInputStream(new byte[0]), 0);
+
+		DLFileVersion dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		String storeUUID = dlFileVersion.getStoreUUID();
+
+		Assert.assertNotNull(storeUUID);
+
+		Assert.assertEquals("1.0", dlFileVersion.getVersion());
+
+		dlFileEntry = DLFileEntryLocalServiceUtil.updateFileEntry(
+			TestPropsValues.getUserId(), dlFileEntry.getFileEntryId(),
+			StringUtil.randomString(), ContentTypes.TEXT_PLAIN,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, StringPool.BLANK,
+			DLVersionNumberIncrease.AUTOMATIC, dlFileEntry.getFileEntryTypeId(),
+			null, null, new ByteArrayInputStream(new byte[1]), 1, null, null,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		dlFileVersion = dlFileEntry.getLatestFileVersion(true);
+
+		Assert.assertEquals("1.1", dlFileVersion.getVersion());
+		Assert.assertNotEquals(storeUUID, dlFileVersion.getStoreUUID());
+	}
+
+	@Test
 	public void testUpdateFileEntryUseSameStoreUUIDWithAutoMaticNumberIncrease()
 		throws Exception {
 
