@@ -444,7 +444,8 @@ public class DLFileEntryLocalServiceImpl
 		if ((dlVersionNumberIncrease != null) &&
 			(dlVersionNumberIncrease == DLVersionNumberIncrease.AUTOMATIC) &&
 			(computedDLVersionNumberIncrease ==
-				DLVersionNumberIncrease.MINOR)) {
+				DLVersionNumberIncrease.MINOR) &&
+			(lastDLFileVersion.getSize() > 0)) {
 
 			latestDLFileVersion.setStoreUUID(lastDLFileVersion.getStoreUUID());
 
