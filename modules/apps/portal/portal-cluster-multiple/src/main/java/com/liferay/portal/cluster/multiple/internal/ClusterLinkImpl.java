@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
@@ -44,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shuyang Zhou
  */
-@Component(enabled = false, service = ClusterLink.class)
+@Component(service = ClusterLink.class)
 public class ClusterLinkImpl implements ClusterLink {
 
 	@Override
@@ -76,6 +77,12 @@ public class ClusterLinkImpl implements ClusterLink {
 
 	@Activate
 	protected void activate() {
+		if (!GetterUtil.getBoolean(
+				_props.get(PropsKeys.CLUSTER_LINK_ENABLED))) {
+
+			return;
+		}
+
 		_enabled = true;
 
 		initialize(

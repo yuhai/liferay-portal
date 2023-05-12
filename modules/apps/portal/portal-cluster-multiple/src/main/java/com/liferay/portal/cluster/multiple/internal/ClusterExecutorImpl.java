@@ -86,7 +86,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.portal.cluster.multiple.configuration.ClusterExecutorConfiguration",
-	enabled = false,
 	service = {ClusterExecutor.class, ClusterExecutorImpl.class}
 )
 public class ClusterExecutorImpl implements ClusterExecutor {
@@ -216,6 +215,12 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 
 	@Activate
 	protected void activate(ComponentContext componentContext) {
+		if (!GetterUtil.getBoolean(
+				_props.get(PropsKeys.CLUSTER_LINK_ENABLED))) {
+
+			return;
+		}
+
 		_enabled = true;
 
 		clusterExecutorConfiguration = ConfigurableUtil.createConfigurable(

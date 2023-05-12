@@ -63,7 +63,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.cluster.multiple.configuration.ClusterExecutorConfiguration",
-	enabled = false, service = ClusterChannelFactory.class
+	service = ClusterChannelFactory.class
 )
 public class JGroupsClusterChannelFactory implements ClusterChannelFactory {
 
@@ -100,6 +100,12 @@ public class JGroupsClusterChannelFactory implements ClusterChannelFactory {
 	@Modified
 	protected synchronized void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
+
+		if (!GetterUtil.getBoolean(
+				_props.get(PropsKeys.CLUSTER_LINK_ENABLED))) {
+
+			return;
+		}
 
 		_clusterExecutorConfiguration = ConfigurableUtil.createConfigurable(
 			ClusterExecutorConfiguration.class, properties);
