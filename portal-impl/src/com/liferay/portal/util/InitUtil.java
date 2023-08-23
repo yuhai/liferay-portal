@@ -145,6 +145,15 @@ public class InitUtil {
 			Log4JUtil.configureLog4J(InitUtil.class.getClassLoader());
 		}
 
+		String configFileString = System.getProperty("java.util.logging.config.file");
+
+		if (configFileString == null) {
+			_log.warn("java.util.logging.config.file is null" );
+		}
+		else {
+			_log.warn("java.util.logging.config.file is " + configFileString);
+		}
+
 		// Log sanitizer
 
 		SanitizerLogWrapper.init();
