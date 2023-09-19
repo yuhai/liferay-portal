@@ -7294,6 +7294,14 @@ public class ResourcePermissionPersistenceImpl
 			}
 		}
 		catch (Exception exception) {
+			_log.error("resourcePermission name is " + resourcePermission.getName());
+			_log.error("resourcePermission scope is " + resourcePermission.getScope());
+			_log.error("resourcePermission roleId is " + resourcePermission.getRoleId());
+			_log.error("resourcePermission primKeyId is " + resourcePermission.getPrimKeyId());
+			_log.error("resourcePermission viewActionId is " + resourcePermission.getViewActionId());
+			_log.error("resourcePermission ownerId is " + resourcePermission.getOwnerId());
+			_log.error("resourcePermission resourcePermissionId is " + resourcePermission.getResourcePermissionId());
+
 			throw processException(exception);
 		}
 		finally {
