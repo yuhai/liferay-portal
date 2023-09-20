@@ -4462,6 +4462,10 @@ public class ResourcePermissionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
+				_log.error("resourcePermission name is " + name);
+				_log.error("resourcePermission scope is " + scope);
+				_log.error("resourcePermission roleId is " + roleId);
+
 				throw processException(exception);
 			}
 			finally {
