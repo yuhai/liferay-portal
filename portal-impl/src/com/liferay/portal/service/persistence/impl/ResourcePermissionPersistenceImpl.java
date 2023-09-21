@@ -21,7 +21,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.ResourcePermissionTable;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionUtil;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelperUtil;
@@ -37,9 +39,7 @@ import com.liferay.portal.model.impl.ResourcePermissionImpl;
 import com.liferay.portal.model.impl.ResourcePermissionModelImpl;
 
 import java.io.Serializable;
-
 import java.lang.reflect.InvocationHandler;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -7303,8 +7303,13 @@ public class ResourcePermissionPersistenceImpl
 			_log.error("resourcePermission roleId is " + resourcePermission.getRoleId());
 			_log.error("resourcePermission primKeyId is " + resourcePermission.getPrimKeyId());
 			_log.error("resourcePermission viewActionId is " + resourcePermission.getViewActionId());
+			_log.error("resourcePermission actionIds is " + resourcePermission.getActionIds());
 			_log.error("resourcePermission ownerId is " + resourcePermission.getOwnerId());
 			_log.error("resourcePermission resourcePermissionId is " + resourcePermission.getResourcePermissionId());
+
+			Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
+
+			_log.error("resourcePermission roleName is " + role.getName());
 
 			throw processException(exception);
 		}
