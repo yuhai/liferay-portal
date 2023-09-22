@@ -4466,6 +4466,10 @@ public class ResourcePermissionPersistenceImpl
 				_log.error("resourcePermission scope is " + scope);
 				_log.error("resourcePermission roleId is " + roleId);
 
+				Role role = RoleLocalServiceUtil.fetchRole(roleId);
+
+				_log.error("resourcePermission roleName is " + role.getName());
+
 				throw processException(exception);
 			}
 			finally {

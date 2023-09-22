@@ -124,7 +124,7 @@
 		<Logger level="ERROR" name="com.liferay.portal.service.impl.LayoutLocalServiceImpl" />
 		<Logger level="INFO" name="com.liferay.portal.service.impl.PortalLocalServiceImpl" />
 		<Logger level="INFO" name="com.liferay.portal.service.impl.PortalServiceImpl" />
-		<Logger level="WARN" name="com.liferay.portal.service.impl.PortletLocalServiceImpl" />
+		<Logger level="INFO" name="com.liferay.portal.service.impl.PortletLocalServiceImpl" />
 		<Logger level="INFO" name="com.liferay.portal.service.impl.ReleaseLocalServiceImpl" />
 		<Logger level="ERROR" name="com.liferay.portal.service.impl.RepositoryLocalServiceImpl" />
 		<Logger level="ERROR" name="com.liferay.portal.service.impl.ResourceLocalServiceImpl" />

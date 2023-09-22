@@ -1196,6 +1196,10 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 					continue;
 				}
 
+				if (portlet.getPortletId().contains("BackgroundTaskPortlet")) {
+					_log.info("roleName is " + roleName);
+				}
+
 				Role role = _roleLocalService.fetchRole(
 					portlet.getCompanyId(), roleName);
 
