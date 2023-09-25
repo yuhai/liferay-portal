@@ -3372,6 +3372,10 @@ public class ResourcePermissionPersistenceImpl
 				}
 			}
 			catch (Exception exception) {
+				_log.error("resourcePermission name is " + name);
+				_log.error("resourcePermission scope is " + scope);
+				_log.error("resourcePermission roleId is " + primKey);
+
 				throw processException(exception);
 			}
 			finally {
@@ -7236,6 +7240,37 @@ public class ResourcePermissionPersistenceImpl
 					resourcePermission.getPrimaryKeyObj());
 			}
 
+			if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
+				Thread thread = Thread.currentThread();
+
+				_log.info("thread Name is " + thread.getName());
+
+				_log.info("resourcePermission name is " + resourcePermission.getName());
+				_log.info("resourcePermission scope is " + resourcePermission.getScope());
+				_log.info("resourcePermission roleId is " + resourcePermission.getPrimKey());
+				_log.info("resourcePermission roleId is " + resourcePermission.getRoleId());
+				
+				Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
+
+				_log.info("resourcePermission roleName is " + role.getName());
+
+				StackTraceElement[] stackTraceElement = thread.getStackTrace();
+
+				int j = 0;
+
+				for (int i = 0; i < stackTraceElement.length; i++) {
+					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
+						_log.info(stackTraceElement[i].toString());
+
+						j++;
+					}
+					
+					if (j > 20) {
+						break;
+					}
+				}
+			}
+
 			if ((resourcePermission != null) &&
 				CTPersistenceHelperUtil.isRemove(resourcePermission)) {
 
@@ -7286,6 +7321,37 @@ public class ResourcePermissionPersistenceImpl
 
 		try {
 			session = openSession();
+
+			if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
+				Thread thread = Thread.currentThread();
+
+				_log.info("thread Name is " + thread.getName());
+
+				_log.info("resourcePermission name is " + resourcePermission.getName());
+				_log.info("resourcePermission scope is " + resourcePermission.getScope());
+				_log.info("resourcePermission roleId is " + resourcePermission.getPrimKey());
+				_log.info("resourcePermission roleId is " + resourcePermission.getRoleId());
+				
+				Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
+
+				_log.info("resourcePermission roleName is " + role.getName());
+
+				StackTraceElement[] stackTraceElement = thread.getStackTrace();
+
+				int j = 0;
+
+				for (int i = 0; i < stackTraceElement.length; i++) {
+					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
+						_log.info(stackTraceElement[i].toString());
+
+						j++;
+					}
+
+					if (j > 20) {
+						break;
+					}
+				}
+			}
 
 			if (CTPersistenceHelperUtil.isInsert(resourcePermission)) {
 				if (!isNew) {

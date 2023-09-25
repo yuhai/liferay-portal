@@ -133,6 +133,7 @@
 		<Logger level="INFO" name="com.liferay.portal.service.impl.ThemeLocalServiceImpl" />
 		<Logger level="ERROR" name="com.liferay.portal.service.impl.ThemeServiceImpl" />
 		<Logger level="WARN" name="com.liferay.portal.service.persistence.impl" />
+		<Logger level="INFO" name="com.liferay.portal.service.persistence.impl.ResourcePermissionPersistenceImpl" />
 		<Logger level="ERROR" name="com.liferay.portal.servlet" />
 		<Logger level="WARN" name="com.liferay.portal.servlet.LanguageServlet" />
 		<Logger level="ERROR" name="com.liferay.portal.servlet.PortalSessionCreator" />
