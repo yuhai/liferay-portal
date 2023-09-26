@@ -7254,21 +7254,21 @@ public class ResourcePermissionPersistenceImpl
 
 				_log.info("resourcePermission roleName is " + role.getName());
 
-				StackTraceElement[] stackTraceElement = thread.getStackTrace();
-
-				int j = 0;
-
-				for (int i = 0; i < stackTraceElement.length; i++) {
-					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
-						_log.info(stackTraceElement[i].toString());
-
-						j++;
-					}
-					
-					if (j > 20) {
-						break;
-					}
-				}
+//				StackTraceElement[] stackTraceElement = thread.getStackTrace();
+//
+//				int j = 0;
+//
+//				for (int i = 0; i < stackTraceElement.length; i++) {
+//					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
+//						_log.info(stackTraceElement[i].toString());
+//
+//						j++;
+//					}
+//					
+//					if (j > 20) {
+//						break;
+//					}
+//				}
 			}
 
 			if ((resourcePermission != null) &&
@@ -7336,21 +7336,21 @@ public class ResourcePermissionPersistenceImpl
 
 				_log.info("resourcePermission roleName is " + role.getName());
 
-				StackTraceElement[] stackTraceElement = thread.getStackTrace();
-
-				int j = 0;
-
-				for (int i = 0; i < stackTraceElement.length; i++) {
-					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
-						_log.info(stackTraceElement[i].toString());
-
-						j++;
-					}
-
-					if (j > 20) {
-						break;
-					}
-				}
+//				StackTraceElement[] stackTraceElement = thread.getStackTrace();
+//
+//				int j = 0;
+//
+//				for (int i = 0; i < stackTraceElement.length; i++) {
+//					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
+//						_log.info(stackTraceElement[i].toString());
+//
+//						j++;
+//					}
+//
+//					if (j > 20) {
+//						break;
+//					}
+//				}
 			}
 
 			if (CTPersistenceHelperUtil.isInsert(resourcePermission)) {
