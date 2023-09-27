@@ -7241,10 +7241,6 @@ public class ResourcePermissionPersistenceImpl
 			}
 
 			if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
-				Thread thread = Thread.currentThread();
-
-				_log.info("thread Name is " + thread.getName());
-
 				_log.info("resourcePermission name is " + resourcePermission.getName());
 				_log.info("resourcePermission scope is " + resourcePermission.getScope());
 				_log.info("resourcePermission roleId is " + resourcePermission.getPrimKey());
@@ -7323,14 +7319,11 @@ public class ResourcePermissionPersistenceImpl
 			session = openSession();
 
 			if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
-				Thread thread = Thread.currentThread();
-
-				_log.info("thread Name is " + thread.getName());
-
 				_log.info("resourcePermission name is " + resourcePermission.getName());
 				_log.info("resourcePermission scope is " + resourcePermission.getScope());
-				_log.info("resourcePermission roleId is " + resourcePermission.getPrimKey());
+				_log.info("resourcePermission PrimKey is " + resourcePermission.getPrimKey());
 				_log.info("resourcePermission roleId is " + resourcePermission.getRoleId());
+				_log.info("resourcePermission isNew is " + isNew);
 				
 				Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
 
@@ -7354,6 +7347,10 @@ public class ResourcePermissionPersistenceImpl
 			}
 
 			if (CTPersistenceHelperUtil.isInsert(resourcePermission)) {
+				if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
+					_log.info("CTPersistenceHelperUtil.isInsert ");
+				}
+
 				if (!isNew) {
 					session.evict(
 						ResourcePermissionImpl.class,
@@ -7363,6 +7360,10 @@ public class ResourcePermissionPersistenceImpl
 				session.save(resourcePermission);
 			}
 			else {
+				if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
+					_log.info("else ");
+				}
+
 				resourcePermission = (ResourcePermission)session.merge(
 					resourcePermission);
 			}
