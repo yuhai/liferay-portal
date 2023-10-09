@@ -1180,6 +1180,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			return;
 		}
 
+		_log.info("portlet is " + portlet.getPortletId());
+
 		List<String> actionIds = ResourceActionsUtil.getPortletResourceActions(
 			portlet.getRootPortletId());
 
