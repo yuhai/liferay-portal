@@ -7323,31 +7323,17 @@ public class ResourcePermissionPersistenceImpl
 			String name = resourcePermission.getName();
 
 			if (name.contains("Portlet")) {
-				_log.info("resourcePermission name is " + resourcePermission.getName());
-				_log.info("resourcePermission scope is " + resourcePermission.getScope());
-				_log.info("resourcePermission PrimKey is " + resourcePermission.getPrimKey());
-				_log.info("resourcePermission roleId is " + resourcePermission.getRoleId());
-				_log.info("resourcePermission isNew is " + isNew);
+				long resourcePermissionId = resourcePermission.getResourcePermissionId();
+
+				_log.info(resourcePermissionId + " resourcePermission name is " + resourcePermission.getName());
+				_log.info(resourcePermissionId + " resourcePermission scope is " + resourcePermission.getScope());
+				_log.info(resourcePermissionId + " resourcePermission PrimKey is " + resourcePermission.getPrimKey());
+				_log.info(resourcePermissionId + " resourcePermission roleId is " + resourcePermission.getRoleId());
+				_log.info(resourcePermissionId + " resourcePermission isNew is " + isNew);
 				
 				Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
 
-				_log.info("resourcePermission roleName is " + role.getName());
-
-//				StackTraceElement[] stackTraceElement = thread.getStackTrace();
-//
-//				int j = 0;
-//
-//				for (int i = 0; i < stackTraceElement.length; i++) {
-//					if (stackTraceElement[i].getClassName().contains("com.liferay")) {
-//						_log.info(stackTraceElement[i].toString());
-//
-//						j++;
-//					}
-//
-//					if (j > 20) {
-//						break;
-//					}
-//				}
+				_log.info(resourcePermissionId + " resourcePermission roleName is " + role.getName());
 			}
 
 			if (CTPersistenceHelperUtil.isInsert(resourcePermission)) {
@@ -7371,20 +7357,19 @@ public class ResourcePermissionPersistenceImpl
 				resourcePermission = (ResourcePermission)session.merge(
 					resourcePermission);
 			}
+
+			_log.info(resourcePermission.getResourcePermissionId() + " update successful");
 		}
 		catch (Exception exception) {
-			_log.error("resourcePermission name is " + resourcePermission.getName());
-			_log.error("resourcePermission scope is " + resourcePermission.getScope());
-			_log.error("resourcePermission roleId is " + resourcePermission.getRoleId());
-			_log.error("resourcePermission primKeyId is " + resourcePermission.getPrimKeyId());
-			_log.error("resourcePermission viewActionId is " + resourcePermission.getViewActionId());
-			_log.error("resourcePermission actionIds is " + resourcePermission.getActionIds());
-			_log.error("resourcePermission ownerId is " + resourcePermission.getOwnerId());
-			_log.error("resourcePermission resourcePermissionId is " + resourcePermission.getResourcePermissionId());
+			long resourcePermissionId = resourcePermission.getResourcePermissionId();
 
-			Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
-
-			_log.error("resourcePermission roleName is " + role.getName());
+			_log.error(resourcePermissionId + " resourcePermission name is " + resourcePermission.getName());
+			_log.error(resourcePermissionId + " resourcePermission scope is " + resourcePermission.getScope());
+			_log.error(resourcePermissionId + " resourcePermission roleId is " + resourcePermission.getRoleId());
+			_log.error(resourcePermissionId + " resourcePermission primKeyId is " + resourcePermission.getPrimKeyId());
+			_log.error(resourcePermissionId + " resourcePermission viewActionId is " + resourcePermission.getViewActionId());
+			_log.error(resourcePermissionId + " resourcePermission actionIds is " + resourcePermission.getActionIds());
+			_log.error(resourcePermissionId + " resourcePermission ownerId is " + resourcePermission.getOwnerId());
 
 			throw processException(exception);
 		}
