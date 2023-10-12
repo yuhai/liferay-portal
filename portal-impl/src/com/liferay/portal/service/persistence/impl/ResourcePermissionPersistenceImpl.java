@@ -7242,7 +7242,7 @@ public class ResourcePermissionPersistenceImpl
 
 			String name = resourcePermission.getName();
 
-			if (name.contains("BackgroundTaskPortlet") || name.contains("CPSpecificationOptionFacetsPortlet")) {
+			if (name.contains("Portlet")) {
 				_log.info("resourcePermission name is " + resourcePermission.getName());
 				_log.info("resourcePermission scope is " + resourcePermission.getScope());
 				_log.info("resourcePermission roleId is " + resourcePermission.getPrimKey());
@@ -7322,7 +7322,7 @@ public class ResourcePermissionPersistenceImpl
 
 			String name = resourcePermission.getName();
 
-			if (name.contains("BackgroundTaskPortlet") || name.contains("CPSpecificationOptionFacetsPortlet")) {
+			if (name.contains("Portlet")) {
 				_log.info("resourcePermission name is " + resourcePermission.getName());
 				_log.info("resourcePermission scope is " + resourcePermission.getScope());
 				_log.info("resourcePermission PrimKey is " + resourcePermission.getPrimKey());

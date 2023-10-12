@@ -2276,22 +2276,22 @@ public class ResourcePermissionLocalServiceImpl
 		if ((actionIdsLong != resourcePermission.getActionIds()) ||
 			resourcePermission.isNew()) {
 
-			if (resourcePermission.getName().contains("CPSpecificationOptionFacetsPortlet") ||
-				resourcePermission.getName().contains("RolesAdminPortlet")) {
-
-				_log.info("resourcePermission.getName() is " + resourcePermission.getName());
-				_log.info("actionIdsLong is " + actionIdsLong);
-				_log.info("resourcePermission.getActionIds() is " + resourcePermission.getActionIds());
-				_log.info("resourcePermission.isNew() is " + resourcePermission.isNew());
-				_log.info("resourcePermission roleId is " + resourcePermission.getRoleId());
-				_log.info("resourcePermission scope is " + resourcePermission.getScope());
-				_log.info("resourcePermission ownerId is " + resourcePermission.getOwnerId());
-				_log.info("resourcePermission primKeyId is " + resourcePermission.getPrimKeyId());
-
-				Role role = _roleLocalService.fetchRole(resourcePermission.getRoleId());
-
-				_log.info("resourcePermission roleName is " + role.getName());
-			}
+//			if (resourcePermission.getName().contains("CPSpecificationOptionFacetsPortlet") ||
+//				resourcePermission.getName().contains("RolesAdminPortlet")) {
+//
+//				_log.info("resourcePermission.getName() is " + resourcePermission.getName());
+//				_log.info("actionIdsLong is " + actionIdsLong);
+//				_log.info("resourcePermission.getActionIds() is " + resourcePermission.getActionIds());
+//				_log.info("resourcePermission.isNew() is " + resourcePermission.isNew());
+//				_log.info("resourcePermission roleId is " + resourcePermission.getRoleId());
+//				_log.info("resourcePermission scope is " + resourcePermission.getScope());
+//				_log.info("resourcePermission ownerId is " + resourcePermission.getOwnerId());
+//				_log.info("resourcePermission primKeyId is " + resourcePermission.getPrimKeyId());
+//
+//				Role role = _roleLocalService.fetchRole(resourcePermission.getRoleId());
+//
+//				_log.info("resourcePermission roleName is " + role.getName());
+//			}
 
 			resourcePermission.setActionIds(actionIdsLong);
 			resourcePermission.setViewActionId((actionIdsLong % 2) == 1);
