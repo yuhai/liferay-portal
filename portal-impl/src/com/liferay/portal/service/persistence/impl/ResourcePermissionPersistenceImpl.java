@@ -7320,21 +7320,17 @@ public class ResourcePermissionPersistenceImpl
 		try {
 			session = openSession();
 
-			String name = resourcePermission.getName();
+			long resourcePermissionId = resourcePermission.getResourcePermissionId();
 
-			if (name.contains("Portlet")) {
-				long resourcePermissionId = resourcePermission.getResourcePermissionId();
+			_log.info(resourcePermissionId + " resourcePermission name is " + resourcePermission.getName());
+			_log.info(resourcePermissionId + " resourcePermission scope is " + resourcePermission.getScope());
+			_log.info(resourcePermissionId + " resourcePermission PrimKey is " + resourcePermission.getPrimKey());
+			_log.info(resourcePermissionId + " resourcePermission roleId is " + resourcePermission.getRoleId());
+			_log.info(resourcePermissionId + " resourcePermission isNew is " + isNew);
+			
+			Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
 
-				_log.info(resourcePermissionId + " resourcePermission name is " + resourcePermission.getName());
-				_log.info(resourcePermissionId + " resourcePermission scope is " + resourcePermission.getScope());
-				_log.info(resourcePermissionId + " resourcePermission PrimKey is " + resourcePermission.getPrimKey());
-				_log.info(resourcePermissionId + " resourcePermission roleId is " + resourcePermission.getRoleId());
-				_log.info(resourcePermissionId + " resourcePermission isNew is " + isNew);
-				
-				Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
-
-				_log.info(resourcePermissionId + " resourcePermission roleName is " + role.getName());
-			}
+			_log.info(resourcePermissionId + " resourcePermission roleName is " + role.getName());
 
 			if (CTPersistenceHelperUtil.isInsert(resourcePermission)) {
 				if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
@@ -7358,7 +7354,7 @@ public class ResourcePermissionPersistenceImpl
 					resourcePermission);
 			}
 
-			_log.info(resourcePermission.getResourcePermissionId() + " update successful");
+			_log.info(resourcePermissionId + " update successful");
 		}
 		catch (Exception exception) {
 			long resourcePermissionId = resourcePermission.getResourcePermissionId();
