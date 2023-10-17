@@ -7,6 +7,8 @@ package com.liferay.portal.dao.orm.hibernate.event;
 
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
@@ -37,6 +39,8 @@ public class MVCCSynchronizerPostUpdateEventListener
 				if (ctModel.getCtCollectionId() != 0) {
 					return;
 				}
+
+				_log.info("PrimaryKey is " + ctModel.getPrimaryKey() + " mvccVersion is " + ctModel.getMvccVersion());
 			}
 
 			MVCCModel mvccModel = (MVCCModel)entity;
@@ -78,4 +82,5 @@ public class MVCCSynchronizerPostUpdateEventListener
 		throw new UnsupportedOperationException();
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(MVCCSynchronizerPostUpdateEventListener.class);
 }
