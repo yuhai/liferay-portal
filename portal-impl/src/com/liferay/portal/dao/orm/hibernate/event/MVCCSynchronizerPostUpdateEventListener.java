@@ -50,7 +50,8 @@ public class MVCCSynchronizerPostUpdateEventListener
 					String name = resourcePermissionImpl.getName();
 
 					if (name.equals("com_liferay_commerce_product_content_search_web_internal_portlet_CPSpecificationOptionFacetsPortlet") ||
-						name.equals("com_liferay_staging_bar_web_portlet_StagingBarPortlet")) {
+						name.equals("com_liferay_staging_bar_web_portlet_StagingBarPortlet")||
+						name.equals("com_liferay_portal_background_task_web_internal_portlet_BackgroundTaskPortlet")) {
 
 						Thread thread = Thread.currentThread();
 
