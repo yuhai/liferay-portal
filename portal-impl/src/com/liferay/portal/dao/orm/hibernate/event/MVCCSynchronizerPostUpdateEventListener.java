@@ -44,20 +44,17 @@ public class MVCCSynchronizerPostUpdateEventListener
 
 				if (ctModel instanceof ResourcePermissionImpl) {
 					ResourcePermissionImpl resourcePermissionImpl = (ResourcePermissionImpl)ctModel;
-	
-					_log.info("PrimaryKey is " + resourcePermissionImpl.getPrimaryKey() + " mvccVersion is " + resourcePermissionImpl.getMvccVersion() + " actionIds is " + resourcePermissionImpl.getActionIds());
 
 					String name = resourcePermissionImpl.getName();
 
-					if (name.equals("com_liferay_commerce_product_content_search_web_internal_portlet_CPSpecificationOptionFacetsPortlet") ||
-						name.equals("com_liferay_staging_bar_web_portlet_StagingBarPortlet")||
-						name.equals("com_liferay_portal_background_task_web_internal_portlet_BackgroundTaskPortlet")) {
-
+					if (name.contains("Portlet")) {
 						Thread thread = Thread.currentThread();
 
 						StackTraceElement[] stackTraceElements = thread.getStackTrace();
 
-						StringBundler sb = new StringBundler(stackTraceElements.length);
+						StringBundler sb = new StringBundler(stackTraceElements.length + 1);
+
+						sb.append("PrimaryKey is " + resourcePermissionImpl.getPrimaryKey() + " mvccVersion is " + resourcePermissionImpl.getMvccVersion() + " actionIds is " + resourcePermissionImpl.getActionIds() + " StackTrace is ");
 
 						for (StackTraceElement stackTraceElement: stackTraceElements) {
 							sb.append(stackTraceElement.toString());

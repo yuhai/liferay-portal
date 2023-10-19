@@ -7326,17 +7326,10 @@ public class ResourcePermissionPersistenceImpl
 			_log.info(resourcePermissionId + " resourcePermission scope is " + resourcePermission.getScope());
 			_log.info(resourcePermissionId + " resourcePermission PrimKey is " + resourcePermission.getPrimKey());
 			_log.info(resourcePermissionId + " resourcePermission roleId is " + resourcePermission.getRoleId());
+			_log.info(resourcePermissionId + " resourcePermission MvccVersion is " + resourcePermission.getMvccVersion());
 			_log.info(resourcePermissionId + " resourcePermission isNew is " + isNew);
-			
-			Role role = RoleLocalServiceUtil.fetchRole(resourcePermission.getRoleId());
-
-			_log.info(resourcePermissionId + " resourcePermission roleName is " + role.getName());
 
 			if (CTPersistenceHelperUtil.isInsert(resourcePermission)) {
-				if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
-					_log.info("CTPersistenceHelperUtil.isInsert ");
-				}
-
 				if (!isNew) {
 					session.evict(
 						ResourcePermissionImpl.class,
@@ -7346,15 +7339,12 @@ public class ResourcePermissionPersistenceImpl
 				session.save(resourcePermission);
 			}
 			else {
-				if (resourcePermission.getName().contains("BackgroundTaskPortlet")) {
-					_log.info("else ");
-				}
-
 				resourcePermission = (ResourcePermission)session.merge(
 					resourcePermission);
 			}
 
 			_log.info(resourcePermissionId + " update successful");
+			_log.info(resourcePermissionId + " resourcePermission MvccVersion is " + resourcePermission.getMvccVersion());
 		}
 		catch (Exception exception) {
 			long resourcePermissionId = resourcePermission.getResourcePermissionId();
