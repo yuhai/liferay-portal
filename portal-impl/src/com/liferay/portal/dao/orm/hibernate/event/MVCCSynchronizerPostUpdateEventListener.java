@@ -5,13 +5,15 @@
 
 package com.liferay.portal.dao.orm.hibernate.event;
 
-import com.liferay.portal.kernel.cache.PortalCache;
-import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
+import com.liferay.portal.model.impl.ResourcePermissionImpl;
 
 import java.io.Serializable;
 
@@ -40,7 +42,29 @@ public class MVCCSynchronizerPostUpdateEventListener
 					return;
 				}
 
-				_log.info("PrimaryKey is " + ctModel.getPrimaryKey() + " mvccVersion is " + ctModel.getMvccVersion());
+				if (ctModel instanceof ResourcePermissionImpl) {
+					ResourcePermissionImpl resourcePermissionImpl = (ResourcePermissionImpl)ctModel;
+	
+					_log.info("PrimaryKey is " + resourcePermissionImpl.getPrimaryKey() + " mvccVersion is " + resourcePermissionImpl.getMvccVersion() + " actionIds is " + resourcePermissionImpl.getActionIds());
+
+					String name = resourcePermissionImpl.getName();
+
+					if (name.equals("com_liferay_commerce_product_content_search_web_internal_portlet_CPSpecificationOptionFacetsPortlet") ||
+						name.equals("com_liferay_staging_bar_web_portlet_StagingBarPortlet")) {
+
+						Thread thread = Thread.currentThread();
+
+						StackTraceElement[] stackTraceElements = thread.getStackTrace();
+
+						StringBundler sb = new StringBundler(stackTraceElements.length);
+
+						for (StackTraceElement stackTraceElement: stackTraceElements) {
+							sb.append(stackTraceElement.toString());
+						}
+
+						_log.info(sb.toString());
+					}
+				}
 			}
 
 			MVCCModel mvccModel = (MVCCModel)entity;
@@ -83,4 +107,5 @@ public class MVCCSynchronizerPostUpdateEventListener
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(MVCCSynchronizerPostUpdateEventListener.class);
+
 }
