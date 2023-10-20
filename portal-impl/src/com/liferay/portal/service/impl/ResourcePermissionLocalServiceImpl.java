@@ -743,7 +743,8 @@ public class ResourcePermissionLocalServiceImpl
 				resourcePermissionsMap.computeIfAbsent(
 					resourcePermission.getName(), key -> new ArrayList<>());
 
-			resourcePermissions.add(resourcePermission);
+			resourcePermissions.add(
+				(ResourcePermission)resourcePermission.clone());
 		}
 
 		return resourcePermissionsMap;
@@ -2040,6 +2041,10 @@ public class ResourcePermissionLocalServiceImpl
 			resourcePermissions =
 				individualPortletResourcePermissionProvider.
 					getResourcePermissions(companyId, name);
+		}
+
+		if (name.equals("com_liferay_commerce_product_content_search_web_internal_portlet_CPSpecificationOptionFacetsPortlet")) {
+			_log.info(name);
 		}
 
 		if (resourcePermissions == null) {
