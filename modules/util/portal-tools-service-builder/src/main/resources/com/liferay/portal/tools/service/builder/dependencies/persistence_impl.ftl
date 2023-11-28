@@ -818,28 +818,25 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 					${entity.variableName}.setExternalReferenceCode(String.valueOf(${entity.variableName}.getPrimaryKey()));
 				</#if>
 			}
+			else {
+				<#if serviceBuilder.isVersionGTE_7_4_0()>
+					${entity.name} erc${entity.name} = fetchByERC_${entity.externalReferenceCode?cap_first[0..0]}(${entity.variableName}.getExternalReferenceCode(), ${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id());
+				<#else>
+					${entity.name} erc${entity.name} = fetchBy${entity.externalReferenceCode?cap_first[0..0]}_ERC(${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id(), ${entity.variableName}.getExternalReferenceCode());
+				</#if>
 
-			<#if serviceBuilder.isVersionGTE_7_3_0() && entity.hasExternalReferenceCode()>
-				else {
-					<#if serviceBuilder.isVersionGTE_7_4_0()>
-						${entity.name} erc${entity.name} = fetchByERC_${entity.externalReferenceCode?cap_first[0..0]}(${entity.variableName}.getExternalReferenceCode(), ${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id());
-					<#else>
-						${entity.name} erc${entity.name} = fetchBy${entity.externalReferenceCode?cap_first[0..0]}_ERC(${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id(), ${entity.variableName}.getExternalReferenceCode());
-					</#if>
-
-					if (isNew) {
-						if (erc${entity.name} != null) {
-								throw new ${duplicateEntityExternalReferenceCode}Exception("Duplicate ${entity.humanName} with external reference code " + ${entity.variableName}.getExternalReferenceCode() + " and ${entity.externalReferenceCode} " + ${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id());
-						}
-					}
-					else {
-						if ((erc${entity.name} != null) &&
-							(${entity.variableName}.get${entity.PKMethodName}() != erc${entity.name}.get${entity.PKMethodName}())) {
-								throw new ${duplicateEntityExternalReferenceCode}Exception("Duplicate ${entity.humanName} with external reference code " + ${entity.variableName}.getExternalReferenceCode() + " and ${entity.externalReferenceCode} " + ${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id());
-						}
+				if (isNew) {
+					if (erc${entity.name} != null) {
+							throw new ${duplicateEntityExternalReferenceCode}Exception("Duplicate ${entity.humanName} with external reference code " + ${entity.variableName}.getExternalReferenceCode() + " and ${entity.externalReferenceCode} " + ${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id());
 					}
 				}
-			</#if>
+				else {
+					if ((erc${entity.name} != null) &&
+						(${entity.variableName}.get${entity.PKMethodName}() != erc${entity.name}.get${entity.PKMethodName}())) {
+							throw new ${duplicateEntityExternalReferenceCode}Exception("Duplicate ${entity.humanName} with external reference code " + ${entity.variableName}.getExternalReferenceCode() + " and ${entity.externalReferenceCode} " + ${entity.variableName}.get${entity.externalReferenceCode?cap_first}Id());
+					}
+				}
+			}
 		</#if>
 
 		<#if entity.hasEntityColumn("createDate", "Date") && entity.hasEntityColumn("modifiedDate", "Date")>
