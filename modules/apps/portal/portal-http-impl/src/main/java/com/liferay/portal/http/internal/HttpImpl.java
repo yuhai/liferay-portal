@@ -11,6 +11,8 @@ import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.http.internal.configuration.HttpConfiguration;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncFilterInputStream;
@@ -55,6 +57,7 @@ import javax.servlet.http.Cookie;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -69,6 +72,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -83,23 +87,29 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.pool.PoolStats;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Hugo Huijser
  * @author Shuyang Zhou
  */
-@Component(service = Http.class)
+@Component(
+	configurationPid = "com.liferay.portal.http.internal.configuration.HttpConfiguration",
+	service = Http.class
+)
 public class HttpImpl implements Http {
 
 	@Override
@@ -306,7 +316,9 @@ public class HttpImpl implements Http {
 	}
 
 	@Activate
-	protected void activate() {
+	protected void activate(Map<String, Object> properties) {
+		modified(properties);
+
 		_proxyAuthPrefs.add(AuthSchemes.BASIC);
 		_proxyAuthPrefs.add(AuthSchemes.DIGEST);
 
@@ -430,6 +442,15 @@ public class HttpImpl implements Http {
 		}
 
 		return true;
+	}
+
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		HttpConfiguration httpConfiguration =
+			ConfigurableUtil.createConfigurable(
+				HttpConfiguration.class, properties);
+
+		_keepAliveTimeout = httpConfiguration.keepAliveTimeout();
 	}
 
 	protected void processPostMethod(
@@ -1032,6 +1053,8 @@ public class HttpImpl implements Http {
 
 		httpClientBuilder.setDefaultRequestConfig(requestConfigBuilder.build());
 
+		httpClientBuilder.setKeepAliveStrategy(_connectionKeepAliveStrategy);
+
 		httpClientBuilder.setRoutePlanner(
 			new SystemDefaultRoutePlanner(ProxySelector.getDefault()));
 
@@ -1063,6 +1086,9 @@ public class HttpImpl implements Http {
 
 		proxyHttpClientBuilder.setDefaultRequestConfig(
 			requestConfigBuilder.build());
+
+		proxyHttpClientBuilder.setKeepAliveStrategy(
+			_connectionKeepAliveStrategy);
 
 		return proxyHttpClientBuilder.build();
 	}
@@ -1111,6 +1137,32 @@ public class HttpImpl implements Http {
 
 	private final DCLSingleton<CloseableHttpClient>
 		_closeableHttpClientDCLSingleton = new DCLSingleton<>();
+
+	private final ConnectionKeepAliveStrategy _connectionKeepAliveStrategy =
+		new ConnectionKeepAliveStrategy() {
+
+			@Override
+			public long getKeepAliveDuration(
+				HttpResponse httpResponse, HttpContext httpContext) {
+
+				long keepAliveDuration =
+					_defaultConnectionKeepAliveStrategy.getKeepAliveDuration(
+						httpResponse, httpContext);
+
+				if ((_keepAliveTimeout > 0) && (keepAliveDuration <= 0)) {
+					return _keepAliveTimeout * 1000L;
+				}
+
+				return keepAliveDuration;
+			}
+
+			private final ConnectionKeepAliveStrategy
+				_defaultConnectionKeepAliveStrategy =
+					new DefaultConnectionKeepAliveStrategy();
+
+		};
+
+	private volatile int _keepAliveTimeout;
 	private final DCLSingleton<PoolingHttpClientConnectionManager>
 		_poolingHttpClientConnectionManagerDCLSingleton = new DCLSingleton<>();
 	private final List<String> _proxyAuthPrefs = new ArrayList<>();
