@@ -72,6 +72,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -451,6 +452,18 @@ public class HttpImpl implements Http {
 				HttpConfiguration.class, properties);
 
 		_keepAliveTimeout = httpConfiguration.keepAliveTimeout();
+
+		PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
+			_poolingHttpClientConnectionManagerDCLSingleton.getSingleton(
+				HttpImpl::_createPoolingHttpClientConnectionManager);
+
+		if (httpConfiguration.tcpKeepAliveEnabled()) {
+			poolingHttpClientConnectionManager.setDefaultSocketConfig(
+				_keepAliveSocketConfig);
+		}
+		else {
+			poolingHttpClientConnectionManager.setDefaultSocketConfig(null);
+		}
 	}
 
 	protected void processPostMethod(
@@ -1162,6 +1175,10 @@ public class HttpImpl implements Http {
 
 		};
 
+	private final SocketConfig _keepAliveSocketConfig = SocketConfig.custom(
+	).setSoKeepAlive(
+		true
+	).build();
 	private volatile int _keepAliveTimeout;
 	private final DCLSingleton<PoolingHttpClientConnectionManager>
 		_poolingHttpClientConnectionManagerDCLSingleton = new DCLSingleton<>();
