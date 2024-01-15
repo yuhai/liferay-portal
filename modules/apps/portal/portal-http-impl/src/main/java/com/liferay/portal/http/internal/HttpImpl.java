@@ -365,6 +365,12 @@ public class HttpImpl implements Http {
 	protected void deactivate() {
 		_poolingHttpClientConnectionManagerDCLSingleton.destroy(
 			HttpImpl::_destroyPoolingHttpClientConnectionManager);
+
+		_proxyCloseableHttpClientDCLSingleton.destroy(null);
+
+		_closeableHttpClientDCLSingleton.destroy(null);
+
+		_connectionKeepAliveStrategy = null;
 	}
 
 	protected CloseableHttpClient getCloseableHttpClient(HttpHost proxyHost) {
@@ -447,13 +453,38 @@ public class HttpImpl implements Http {
 
 	@Modified
 	protected void modified(Map<String, Object> properties) {
+		deactivate();
+
 		HttpConfiguration httpConfiguration =
 			ConfigurableUtil.createConfigurable(
 				HttpConfiguration.class, properties);
 
-		_keepAliveTimeout = httpConfiguration.keepAliveTimeout();
+		int keepAliveTimeout = httpConfiguration.keepAliveTimeout();
 
-		deactivate();
+		if (keepAliveTimeout > 0) {
+			_connectionKeepAliveStrategy = new ConnectionKeepAliveStrategy() {
+
+				@Override
+				public long getKeepAliveDuration(
+					HttpResponse httpResponse, HttpContext httpContext) {
+
+					long keepAliveDuration =
+						_defaultConnectionKeepAliveStrategy.
+							getKeepAliveDuration(httpResponse, httpContext);
+
+					if (keepAliveDuration <= 0) {
+						return keepAliveTimeout * 1000L;
+					}
+
+					return keepAliveDuration;
+				}
+
+				private final ConnectionKeepAliveStrategy
+					_defaultConnectionKeepAliveStrategy =
+						new DefaultConnectionKeepAliveStrategy();
+
+			};
+		}
 
 		if (httpConfiguration.tcpKeepAliveEnabled()) {
 			PoolingHttpClientConnectionManager
@@ -1155,32 +1186,7 @@ public class HttpImpl implements Http {
 
 	private final DCLSingleton<CloseableHttpClient>
 		_closeableHttpClientDCLSingleton = new DCLSingleton<>();
-
-	private final ConnectionKeepAliveStrategy _connectionKeepAliveStrategy =
-		new ConnectionKeepAliveStrategy() {
-
-			@Override
-			public long getKeepAliveDuration(
-				HttpResponse httpResponse, HttpContext httpContext) {
-
-				long keepAliveDuration =
-					_defaultConnectionKeepAliveStrategy.getKeepAliveDuration(
-						httpResponse, httpContext);
-
-				if ((_keepAliveTimeout > 0) && (keepAliveDuration <= 0)) {
-					return _keepAliveTimeout * 1000L;
-				}
-
-				return keepAliveDuration;
-			}
-
-			private final ConnectionKeepAliveStrategy
-				_defaultConnectionKeepAliveStrategy =
-					new DefaultConnectionKeepAliveStrategy();
-
-		};
-
-	private volatile int _keepAliveTimeout;
+	private volatile ConnectionKeepAliveStrategy _connectionKeepAliveStrategy;
 	private final DCLSingleton<PoolingHttpClientConnectionManager>
 		_poolingHttpClientConnectionManagerDCLSingleton = new DCLSingleton<>();
 	private final List<String> _proxyAuthPrefs = new ArrayList<>();
