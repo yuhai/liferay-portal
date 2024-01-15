@@ -453,16 +453,21 @@ public class HttpImpl implements Http {
 
 		_keepAliveTimeout = httpConfiguration.keepAliveTimeout();
 
-		PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
-			_poolingHttpClientConnectionManagerDCLSingleton.getSingleton(
-				HttpImpl::_createPoolingHttpClientConnectionManager);
+		deactivate();
 
 		if (httpConfiguration.tcpKeepAliveEnabled()) {
+			PoolingHttpClientConnectionManager
+				poolingHttpClientConnectionManager =
+					_poolingHttpClientConnectionManagerDCLSingleton.
+						getSingleton(
+							HttpImpl::
+								_createPoolingHttpClientConnectionManager);
+
 			poolingHttpClientConnectionManager.setDefaultSocketConfig(
-				_keepAliveSocketConfig);
-		}
-		else {
-			poolingHttpClientConnectionManager.setDefaultSocketConfig(null);
+				SocketConfig.custom(
+				).setSoKeepAlive(
+					true
+				).build());
 		}
 	}
 
@@ -1175,10 +1180,6 @@ public class HttpImpl implements Http {
 
 		};
 
-	private final SocketConfig _keepAliveSocketConfig = SocketConfig.custom(
-	).setSoKeepAlive(
-		true
-	).build();
 	private volatile int _keepAliveTimeout;
 	private final DCLSingleton<PoolingHttpClientConnectionManager>
 		_poolingHttpClientConnectionManagerDCLSingleton = new DCLSingleton<>();
