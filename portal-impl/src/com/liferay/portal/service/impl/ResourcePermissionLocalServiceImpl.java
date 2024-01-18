@@ -1219,6 +1219,10 @@ public class ResourcePermissionLocalServiceImpl
 
 			validate(modelResource, false);
 
+			if (modelResource.equals("com.liferay.bookmarks")) {
+				System.out.println("test");
+			}
+
 			List<String> groupModelActionIds = null;
 
 			if (Objects.equals(rootModelResource, modelResource)) {
