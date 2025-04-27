@@ -164,6 +164,8 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		Folder folder = addAttachmentsFolder(userId, groupId);
 
+		System.out.println("test");
+
 		return _portletFileRepository.addPortletFileEntry(
 			externalReferenceCode, groupId, userId, null, 0,
 			BlogsConstants.SERVICE_NAME, folder.getFolderId(), inputStream,
